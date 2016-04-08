@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml" fx:controller="aplicacion.control.VentanaLoginController">
+<children>
+        <Label layoutX="126" layoutY="60" minHeight="16" minWidth="69" fx:id="label" text="Ventana Dos"/>
+        <Button layoutX="126" layoutY="90" text="Cerrar Ventana" onAction="#salirVentana" fx:id="button" />
+    </children>
+</AnchorPane>

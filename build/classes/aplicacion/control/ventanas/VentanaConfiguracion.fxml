@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-image: url()" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.VentanaPrincipalController">
+    <children>
+        <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
+      <Button layoutX="40.0" layoutY="154.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="151.0" text="Contraseña de Usuario" />
+      <Button fx:id="buttonConfiguracion" layoutX="40.0" layoutY="108.0" mnemonicParsing="false" onAction="#onCLickConfiguration" prefHeight="25.0" prefWidth="151.0" text="Nombre de Usuario" />
+      <Button fx:id="buttonConfiguracion1" layoutX="384.0" layoutY="108.0" mnemonicParsing="false" onAction="#onCLickConfiguration" prefHeight="25.0" prefWidth="151.0" text="Registrar Empresa" />
+      <Button fx:id="buttonConfiguracion11" layoutX="384.0" layoutY="154.0" mnemonicParsing="false" onAction="#onCLickConfiguration" prefHeight="25.0" prefWidth="151.0" text="Agregar Administradores" />
+    </children>
+</AnchorPane>
