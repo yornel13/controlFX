@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="300.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.VentanaLoginController">
+   <children>
+      <Label layoutX="31.0" layoutY="70.0" text="Usuario:" />
+      <Label layoutX="21.0" layoutY="104.0" text="Contraseña:" />
+      <TextField fx:id="usuarioField" layoutX="108.0" layoutY="66.0" />
+      <TextField fx:id="contrasenaField" layoutX="109.0" layoutY="100.0" />
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="22.0" layoutY="14.0" prefHeight="20.0" prefWidth="256.0" text="Para ingresar a este modulo debe tener">
+         <font>
+            <Font size="14.0" />
+         </font></Label>
+      <Label alignment="CENTER" layoutX="31.0" layoutY="31.0" prefHeight="17.0" prefWidth="232.0" text="privilegios de administrador" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="entreButton" layoutX="131.0" layoutY="161.0" mnemonicParsing="false" onAction="#login" text="Entrar" />
+      <Label fx:id="textError" layoutX="36.0" layoutY="132.0" prefHeight="17.0" prefWidth="221.0" textFill="RED">
+         <font>
+            <Font name="Comic Sans MS" size="12.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

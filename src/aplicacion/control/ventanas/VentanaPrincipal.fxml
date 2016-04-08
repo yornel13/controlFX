@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.VentanaPrincipalController">
+    <children>
+        <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
+      <MenuButton fx:id="menuButton" layoutX="362.0" layoutY="175.0" mnemonicParsing="false" onAction="#onSelectMenuButtonItem" prefHeight="25.0" prefWidth="205.0" text="MenuButton" textAlignment="RIGHT">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </MenuButton>
+      <Label layoutX="362.0" layoutY="149.0" text="Empresa:" textOverrun="CLIP">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="419.0" layoutY="222.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="91.0" text="Entrar" />
+      <Button layoutX="510.0" layoutY="2.0" mnemonicParsing="false" onAction="#onCLickConfiguration" text="Configuracion" />
+    </children>
+</AnchorPane>
