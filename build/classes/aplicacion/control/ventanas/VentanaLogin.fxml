@@ -8,12 +8,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="300.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.VentanaLoginController">
+<AnchorPane id="AnchorPane" prefHeight="200.0" prefWidth="300.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.LoginController">
    <children>
       <Label layoutX="31.0" layoutY="70.0" text="Usuario:" />
       <Label layoutX="21.0" layoutY="104.0" text="Contraseña:" />
       <TextField fx:id="usuarioField" layoutX="108.0" layoutY="66.0" />
-      <TextField fx:id="contrasenaField" layoutX="109.0" layoutY="100.0" />
+      <PasswordField fx:id="contrasenaField" layoutX="108.0" layoutY="100.0" onAction="#login" />
       <Label alignment="CENTER" contentDisplay="CENTER" layoutX="22.0" layoutY="14.0" prefHeight="20.0" prefWidth="256.0" text="Para ingresar a este modulo debe tener">
          <font>
             <Font size="14.0" />
