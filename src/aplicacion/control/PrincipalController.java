@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Const;
 import hibernate.dao.EmpresaDAO;
 import hibernate.model.Empresa;
 import java.io.IOException;
@@ -15,9 +16,11 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 /**
  *
@@ -34,11 +37,17 @@ public class PrincipalController implements Initializable {
     private ChoiceBox selector;
     
     @FXML
-    private ToggleButton configuracion;
+    private Button configuracion;
+    
+    ArrayList<Empresa> empresas;
     
     @FXML
     private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
+        if (!empresas.isEmpty() && !selector.getSelectionModel().isEmpty()) {
+            aplicacionControl.mostarInEmpresa(empresas.get(selector.getSelectionModel().getSelectedIndex()));
+        }  else {
+            label.setText("Selecciona una empresa primero.");
+        }
     }
     
     @FXML
@@ -59,7 +68,7 @@ public class PrincipalController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         EmpresaDAO empresaDao = new EmpresaDAO();
-        ArrayList<Empresa> empresas = new ArrayList<>();
+        empresas = new ArrayList<>();
         empresas.addAll(empresaDao.findAll());
         
         String[] items = new String[empresas.size()];
@@ -68,6 +77,13 @@ public class PrincipalController implements Initializable {
             items[empresas.indexOf(emp)] = emp.getNombre();
         }
         
-        selector.setItems(FXCollections.observableArrayList(items));  
+        selector.setItems(FXCollections.observableArrayList(items)); 
+        
+        String image = AplicacionControl.class.getResource("imagenes/config_admin.png").toExternalForm();
+        
+        Image adminImage = new Image(image);
+        configuracion.setGraphic(new ImageView(adminImage));
+        configuracion.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
+        
     }    
 }

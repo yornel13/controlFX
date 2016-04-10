@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.InEmpresaController">
+    <children>
+        <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
+      <Button layoutX="404.0" layoutY="249.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Pagos" />
+      <Button fx:id="buttonConfiguracion" layoutX="402.0" layoutY="198.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Configuracion" />
+      <Button fx:id="empresaButton" layoutX="402.0" layoutY="146.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Clientes" />
+      <Button fx:id="empleadosButton" layoutX="401.0" layoutY="99.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="151.0" text="Empleados" />
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <Pane fx:id="contentPane" layoutY="330.0" prefHeight="70.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2));;">
+         <children>
+            <TextField layoutX="300.0" layoutY="23.0" prefHeight="25.0" prefWidth="187.0" promptText="Cedula del empleado" />
+            <Label fx:id="labelTest" layoutX="16.0" layoutY="15.0" prefHeight="40.0" prefWidth="145.0" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <Label layoutX="235.0" layoutY="27.0" text="Cedula:" textFill="#fffdfd">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Button layoutX="509.0" layoutY="23.0" mnemonicParsing="false" text="Marcar" />
+         </children></Pane>
+      <Line endX="460.0" layoutX="117.0" layoutY="40.0" startX="-100.0">
+         <stroke>
+            <LinearGradient endX="1.0" endY="1.0" startX="0.5523809523809524">
+               <stops>
+                  <Stop color="BLACK" />
+                  <Stop color="WHITE" offset="1.0" />
+               </stops>
+            </LinearGradient>
+         </stroke></Line>
+      <Label fx:id="empresaLabel" layoutX="19.0" layoutY="7.0" prefHeight="27.0" prefWidth="561.0" text="Nombre de la empresa seleccionada" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font></Label>
+      <Line endX="100.0" layoutX="476.0" layoutY="82.0" startX="-100.0" />
+      <Label layoutX="389.0" layoutY="59.0" text="Consultar" textFill="WHITE" />
+      <Button fx:id="homeButton" layoutX="9.0" layoutY="280.0" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" />
+      <Label fx:id="totalLabel" layoutX="26.0" layoutY="63.0" style="-fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); -fx-label-padding: 5;" text="Total de empleados: 8" textFill="WHITE" />
+      <Label fx:id="numeracionLabel" layoutX="26.0" layoutY="107.0" style="-fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); -fx-label-padding: 5;" text="NRUC: 45646456465" textFill="WHITE" />
+    </children>
+</AnchorPane>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
@@ -8,16 +9,16 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PrincipalController">
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" snapToPixel="false" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PrincipalController">
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <Label layoutX="362.0" layoutY="149.0" text="Empresa:" textOverrun="CLIP">
+      <Label layoutX="373.0" layoutY="151.0" text="Empresa:" textOverrun="CLIP">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
       <Button layoutX="419.0" layoutY="222.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="91.0" text="Entrar" />
-      <Button layoutX="510.0" layoutY="2.0" mnemonicParsing="false" onAction="#onCLickConfiguration" text="Administrador " />
+      <Button fx:id="configuracion" layoutX="530.0" layoutY="5.0" mnemonicParsing="false" onAction="#onCLickConfiguration" prefHeight="32.0" prefWidth="32.0" />
       <ChoiceBox fx:id="selector" layoutX="362.0" layoutY="182.0" onDragDetected="#onSelectMenuButtonItem" prefHeight="25.0" prefWidth="205.0" />
     </children>
 </AnchorPane>
