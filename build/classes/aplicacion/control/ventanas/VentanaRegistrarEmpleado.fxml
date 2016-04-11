@@ -19,7 +19,7 @@
                   <Label layoutX="25.0" layoutY="78.0" text="Apellidos" textFill="WHITE" />
                   <TextField fx:id="nombreField" layoutX="113.0" layoutY="33.0" prefHeight="25.0" prefWidth="440.0" promptText="Nombres" />
                   <TextField fx:id="apellidoField" layoutX="113.0" layoutY="73.0" prefHeight="25.0" prefWidth="440.0" promptText="Apellidos" />
-                  <TextField fx:id="cedulaField" layoutX="113.0" layoutY="113.0" prefHeight="25.0" prefWidth="440.0" promptText="Cedula" />
+                  <TextField fx:id="cedulaField" layoutX="113.0" layoutY="113.0" onInputMethodTextChanged="#changeDetected" prefHeight="25.0" prefWidth="440.0" promptText="Cedula" />
                   <TextField fx:id="telefonoField" layoutX="113.0" layoutY="153.0" prefHeight="25.0" prefWidth="440.0" promptText="Telefono" />
                   <TextField fx:id="direccionField" layoutX="113.0" layoutY="193.0" prefHeight="25.0" prefWidth="440.0" promptText="Direccion" />
                   <TextField fx:id="emailField" layoutX="113.0" layoutY="233.0" prefHeight="25.0" prefWidth="440.0" promptText="Email" />
@@ -35,7 +35,7 @@
                         <Font name="Comic Sans MS" size="14.0" />
                      </font>
                   </Label>
-                  <ChoiceBox fx:id="estadoCivilChoiceBox" layoutX="113.0" layoutY="273.0" prefWidth="150.0" />
+                  <ChoiceBox fx:id="estadoCivilChoiceBox" cache="true" layoutX="113.0" layoutY="273.0" prefWidth="150.0" />
                </children>
             </AnchorPane>
          </content>

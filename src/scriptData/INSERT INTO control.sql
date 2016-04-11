@@ -76,7 +76,7 @@ VALUES
 
 
 INSERT INTO control.identidad
-(`id`,`nombre_usuario`,`contrasena`,`activo`,`user_id`)
+(`id`,`nombre_usuario`,`contrasena`,`activo`,`usuario_id`)
 VALUES
 (1, 'admi','60eb0f73e33ce3ffd4e51d974447db53', true, 1);
 

@@ -122,6 +122,11 @@ public class RegistrarEmpleadoController implements Initializable {
     }
     
     @FXML
+    public void changeDetected(ActionEvent event) {
+        System.out.println("aplicacion.control.RegistrarEmpleadoController.changeDetected()");
+    }
+    
+    @FXML
     private void onCLickGuardar(ActionEvent event) throws IOException, Exception {
         System.out.println("aplicacion.control.RegistrarEmpleadoController.onCLickGuardar()");
         if (nombreField.getText().isEmpty()) {
