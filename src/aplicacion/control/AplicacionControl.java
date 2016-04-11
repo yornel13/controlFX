@@ -154,7 +154,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostarEmpleados() {
+    public void mostarEmpleados(Empresa empresa) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleados.fxml"));
@@ -168,6 +168,7 @@ public class AplicacionControl extends Application {
             EmpleadosController controller = loader.getController();
             controller.setStagePrincipal(ventana);
             controller.setProgramaPrincipal(this);
+            controller.setEmpresa(empresa);
             ventana.show();
  
         } catch (Exception e) {
@@ -176,7 +177,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostarRegistrarEmpleado() {
+    public void mostarRegistrarEmpleado(Empresa empresa) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
@@ -190,6 +191,7 @@ public class AplicacionControl extends Application {
             RegistrarEmpleadoController controller = loader.getController();
             controller.setStagePrincipal(ventana);
             controller.setProgramaPrincipal(this);
+            controller.setEmpresa(empresa);
             ventana.show();
  
         } catch (Exception e) {

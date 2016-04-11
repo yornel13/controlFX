@@ -12,7 +12,7 @@
 <AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.EmpleadosController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView layoutX="10.0" layoutY="40.0" prefHeight="350.0" prefWidth="580.0">
+      <TableView fx:id="empleadosTableView" layoutX="10.0" layoutY="40.0" prefHeight="350.0" prefWidth="580.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />

@@ -158,7 +158,7 @@ public class RegistrarEmpresaController implements Initializable {
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
             if (!"0123456789".contains(keyEvent.getCharacter())) {
                 keyEvent.consume();
-                
+
             }
         };
         return aux;
