@@ -75,6 +75,7 @@ public class InEmpresaController implements Initializable {
     @FXML
     private void verEmpleados(ActionEvent event) {
         aplicacionControl.mostarEmpleados(empresa);
+        stagePrincipal.close();
     }
     
     public void setEmpresa(Empresa empresa) {

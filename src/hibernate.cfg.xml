@@ -6,7 +6,7 @@
     <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="connection.url">jdbc:mysql://localhost:3306/control</property>
     <property name="connection.username">root</property>
-    <property name="connection.password">lasombra13</property>
+    <property name="connection.password">lasombra</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
     <property name="myeclipse.connection.profile">mysql</property>
     <property name="connection.autocommit">true</property>

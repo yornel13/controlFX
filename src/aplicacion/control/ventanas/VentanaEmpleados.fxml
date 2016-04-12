@@ -12,12 +12,13 @@
 <AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.EmpleadosController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="10.0" layoutY="40.0" prefHeight="350.0" prefWidth="580.0">
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="355.0" prefWidth="590.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
         </columns>
       </TableView>
       <Button layoutX="475.0" layoutY="6.0" mnemonicParsing="false" onAction="#agregarEmpleado" text="Agregar Empleado" />
+      <Button layoutX="8.0" layoutY="6.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
     </children>
 </AnchorPane>
