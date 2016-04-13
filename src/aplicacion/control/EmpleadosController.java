@@ -141,7 +141,7 @@ public class EmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    System.out.println(rowData.getId());
+                    aplicacionControl.mostrarEmpleado(usuariosDAO.findById(rowData.getId()));
                 }
             });
             return row ;

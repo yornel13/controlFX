@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import hibernate.model.Empresa;
+import hibernate.model.Usuarios;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -192,6 +193,29 @@ public class AplicacionControl extends Application {
             controller.setStagePrincipal(ventana);
             controller.setProgramaPrincipal(this);
             controller.setEmpresa(empresa);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarEmpleado(Usuarios empleado) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
+            AnchorPane ventanaEmpleado = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle(empleado.getNombre() + " - " + empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEmpleado);
+            ventana.setScene(scene);
+            EmpleadoController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpleado(empleado);
             ventana.show();
  
         } catch (Exception e) {
