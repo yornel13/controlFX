@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.Const;
 import hibernate.model.Usuarios;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -82,6 +80,9 @@ public class EmpleadoController implements Initializable {
     @FXML
     private Label nombre;
     
+    @FXML
+    private Button editarButton;
+    
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -89,6 +90,11 @@ public class EmpleadoController implements Initializable {
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
         this.aplicacionControl = aplicacionControl;
+    }
+    
+    public void editarEmpleado(ActionEvent event) {
+        aplicacionControl.mostrarEditarEmpleado(empleado);
+        stagePrincipal.close();
     }
     
     public void setEmpleado(Usuarios empleado   ) {
@@ -103,7 +109,7 @@ public class EmpleadoController implements Initializable {
         departamento.setText(empleado.getDetallesEmpleado().getDepartamento().getNombre());
         cargo.setText(empleado.getDetallesEmpleado().getCargo().getNombre());
         cuenta.setText(empleado.getDetallesEmpleado().getNroCuenta());
-        sueldo.setText(empleado.getDetallesEmpleado().getSueldo().toString() + " $");
+        sueldo.setText(empleado.getDetallesEmpleado().getSueldo() + " $");
         extra.setText(empleado.getDetallesEmpleado().getExtra());
     }
   

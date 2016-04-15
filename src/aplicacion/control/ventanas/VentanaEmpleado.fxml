@@ -44,5 +44,6 @@
       <Label fx:id="cuenta" layoutX="180.0" layoutY="305.0" text="Label" />
       <Label fx:id="sueldo" layoutX="180.0" layoutY="335.0" text="Label" />
       <Label fx:id="extra" layoutX="180.0" layoutY="365.0" text="Label" />
+      <Button layoutX="555.0" layoutY="15.0" mnemonicParsing="false" onAction="#editarEmpleado" prefHeight="30.0" prefWidth="30.0" style="-fx-background-image: url('aplicacion/control/imagenes/pencil.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

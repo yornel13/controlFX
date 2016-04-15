@@ -15,7 +15,7 @@ public class DetallesEmpleado implements java.io.Serializable {
 	private Departamento departamento;
 	private Empresa empresa;
 	private Cargo cargo;
-	private Long sueldo;
+	private Double sueldo;
 	private String nroCuenta;
 	private String extra;
 	private Set usuarioses = new HashSet(0);
@@ -27,7 +27,7 @@ public class DetallesEmpleado implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public DetallesEmpleado(Empresa empresa, Cargo cargo, Long sueldo) {
+	public DetallesEmpleado(Empresa empresa, Cargo cargo, Double sueldo) {
 		this.empresa = empresa;
 		this.cargo = cargo;
 		this.sueldo = sueldo;
@@ -35,7 +35,7 @@ public class DetallesEmpleado implements java.io.Serializable {
 
 	/** full constructor */
 	public DetallesEmpleado(Departamento departamento, Empresa empresa,
-			Cargo cargo, Long sueldo, String nroCuenta, String extra,
+			Cargo cargo, Double sueldo, String nroCuenta, String extra,
 			Set usuarioses) {
 		this.departamento = departamento;
 		this.empresa = empresa;
@@ -80,11 +80,11 @@ public class DetallesEmpleado implements java.io.Serializable {
 		this.cargo = cargo;
 	}
 
-	public Long getSueldo() {
+	public Double getSueldo() {
 		return this.sueldo;
 	}
 
-	public void setSueldo(Long sueldo) {
+	public void setSueldo(Double sueldo) {
 		this.sueldo = sueldo;
 	}
 

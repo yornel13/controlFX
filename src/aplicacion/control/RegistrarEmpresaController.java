@@ -114,6 +114,7 @@ public class RegistrarEmpresaController implements Initializable {
             empresa.setNumeracion(Integer.parseInt(numeracionField.getText()));
             empresa.setTelefono1(telefono1Field.getText());
             empresa.setTelefono2(telefono2Field.getText());
+            empresa.setDireccion(direccionField.getText());
             empresa.setFax(faxField.getText());
             empresa.setWeb(webField.getText());
             empresa.setEmail(emailField.getText());

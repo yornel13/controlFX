@@ -44,7 +44,7 @@ public class PrincipalController implements Initializable {
     @FXML
     private void handleButtonAction(ActionEvent event) {
         if (!empresas.isEmpty() && !selector.getSelectionModel().isEmpty()) {
-            aplicacionControl.mostarInEmpresa(empresas.get(selector.getSelectionModel().getSelectedIndex()));
+            aplicacionControl.mostrarInEmpresa(empresas.get(selector.getSelectionModel().getSelectedIndex()));
         }  else {
             label.setText("Selecciona una empresa primero.");
         }
@@ -58,7 +58,7 @@ public class PrincipalController implements Initializable {
     
     @FXML
     private void onCLickConfiguration(ActionEvent event) throws IOException, Exception {
-        aplicacionControl.mostarLogin();
+        aplicacionControl.mostrarLogin();
     }
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {

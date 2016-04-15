@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import hibernate.model.Usuarios;
 import java.io.IOException;
@@ -59,7 +60,7 @@ public class AplicacionControl extends Application {
         }
    }
     
-   public void mostarLogin() {
+   public void mostrarLogin() {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarLogin()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaLogin.fxml"));
@@ -81,7 +82,7 @@ public class AplicacionControl extends Application {
         }
     }
    
-   public void mostarConfiguracion() {
+   public void mostrarConfiguracion() {
         try {
             stagePrincipal.close();
             System.out.println("aplicacion.control.AplicacionControl.mostarConfiguracion()");
@@ -105,7 +106,7 @@ public class AplicacionControl extends Application {
         }
     }
    
-   public void mostarRegistrarEmpresa() {
+   public void mostrarRegistrarEmpresa() {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpresa()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpresa.fxml"));
@@ -127,7 +128,7 @@ public class AplicacionControl extends Application {
         }
     }
    
-    public void mostarInEmpresa(Empresa empresa) {
+    public void mostrarInEmpresa(Empresa empresa) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarInEmpresa()");
             stagePrincipal.close();
@@ -155,7 +156,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostarEmpleados(Empresa empresa) {
+    public void mostrarEmpleados(Empresa empresa) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleados.fxml"));
@@ -178,7 +179,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostarRegistrarEmpleado(Empresa empresa) {
+    public void mostrarRegistrarEmpleado(Empresa empresa) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
@@ -207,7 +208,7 @@ public class AplicacionControl extends Application {
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
             AnchorPane ventanaEmpleado = (AnchorPane) loader.load();
             Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " - " + empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            ventana.setTitle("Detalles de empleado");
             ventana.setResizable(false);
             ventana.initOwner(stagePrincipal);
             Scene scene = new Scene(ventanaEmpleado);
@@ -216,6 +217,164 @@ public class AplicacionControl extends Application {
             controller.setStagePrincipal(ventana);
             controller.setProgramaPrincipal(this);
             controller.setEmpleado(empleado);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarEditarEmpleado(Usuarios empleado) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpleado()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpleado.fxml"));
+            TabPane ventanaEditarEmpleado = (TabPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Editar empleado");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEditarEmpleado);
+            ventana.setScene(scene);
+            EditarEmpleadoController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpleado(empleado);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarEmpresas() {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostarEmpresas()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresas.fxml"));
+            AnchorPane ventanaEmpresas = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Empresas");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEmpresas);
+            ventana.setScene(scene);
+            EmpresasController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarEmpresa(Empresa empresa) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresa.fxml"));
+            AnchorPane ventanaEmpresa = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Detalles de empresa");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEmpresa);
+            ventana.setScene(scene);
+            EmpresaController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpresa(empresa);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarEditarEmpresa(Empresa empresa) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpresa()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpresa.fxml"));
+            AnchorPane ventanaEditarEmpresa = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Editar empleado");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEditarEmpresa);
+            ventana.setScene(scene);
+            EditarEmpresaController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpresa(empresa);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarRegistrarCliente() {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarCliente()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarCliente.fxml"));
+            AnchorPane ventanaRegistrarCliente = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Registrar cliente");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaRegistrarCliente);
+            ventana.setScene(scene);
+            RegistrarClienteController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarClientes() {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientes.fxml"));
+            AnchorPane ventanaClientes = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Clientes");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaClientes);
+            ventana.setScene(scene);
+            ClientesController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarCliente(Cliente cliente) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarCliente()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaCliente.fxml"));
+            AnchorPane ventanaCliente = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Detalles de cliente");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaCliente);
+            ventana.setScene(scene);
+            ClienteController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setCliente(cliente);
             ventana.show();
  
         } catch (Exception e) {

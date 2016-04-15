@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.RegistrarEmpresaController.numFilter;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
@@ -166,7 +165,7 @@ public class RegistrarEmpleadoController implements Initializable {
             detallesEmpleado.setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
             detallesEmpleado.setExtra(extraField.getText());
             detallesEmpleado.setNroCuenta(cuentaField.getText());
-            detallesEmpleado.setSueldo(Long.parseLong(sueldoField.getText()));
+            detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
             
             DetallesEmpleadoDAO detallesEmpleadoDAO = new DetallesEmpleadoDAO();
             detallesEmpleadoDAO.save(detallesEmpleado);
@@ -251,7 +250,7 @@ public class RegistrarEmpleadoController implements Initializable {
     public static EventHandler<KeyEvent> numFilter() {
 
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
-            if (!"0123456789".contains(keyEvent.getCharacter())) {
+            if (!"0123456789.".contains(keyEvent.getCharacter())) {
                 keyEvent.consume();
                 
             }

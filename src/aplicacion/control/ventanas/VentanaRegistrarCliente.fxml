@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RegistrarClienteController">
+   <children>
+      <Label layoutX="25.0" layoutY="30.0" text="Nombre" textFill="WHITE" />
+      <TextField fx:id="nombreField" layoutX="113.0" layoutY="30.0" prefHeight="25.0" prefWidth="440.0" promptText="Nombre" />
+      <TextField fx:id="detallesField" layoutX="113.0" layoutY="70.0" prefHeight="25.0" prefWidth="440.0" promptText="Detalles (Opcional)" />
+      <TextField fx:id="numeracionField" layoutX="113.0" layoutY="110.0" prefHeight="25.0" prefWidth="440.0" promptText="Numeracion (RUC)" />
+      <TextField fx:id="telefonoField" layoutX="113.0" layoutY="150.0" prefHeight="25.0" prefWidth="440.0" promptText="Telefono" />
+      <TextField fx:id="direccionField" layoutX="113.0" layoutY="190.0" prefHeight="25.0" prefWidth="440.0" promptText="Direccion" />
+      <Button fx:id="guardarButton" layoutX="202.0" layoutY="305.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
+      <Label layoutX="25.0" layoutY="110.0" text="RUC" textFill="WHITE" />
+      <Label layoutX="25.0" layoutY="150.0" text="Telefono" textFill="WHITE" />
+      <Label layoutX="25.0" layoutY="190.0" text="Direccion" textFill="WHITE" />
+      <Label layoutX="25.0" layoutY="70.0" text="Detalles" textFill="WHITE" />
+      <Button fx:id="cancelarButton" layoutX="333.0" layoutY="305.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
+      <Label fx:id="errorText" alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="259.0" prefHeight="21.0" prefWidth="400.0" textFill="#ab1010">
+         <font>
+            <Font name="Comic Sans MS" size="14.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

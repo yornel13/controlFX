@@ -5,15 +5,12 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.Const;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -50,13 +47,30 @@ public class ConfiguracionController implements Initializable {
     
     @FXML
     private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarVentanaPrincipal();
         stagePrincipal.close();
+        aplicacionControl.mostrarVentanaPrincipal();
     }
     
     @FXML
     private void registrarEmpresa(ActionEvent event) {
-        aplicacionControl.mostarRegistrarEmpresa();
+        aplicacionControl.mostrarRegistrarEmpresa();
+    }
+    
+    @FXML
+    private void mostrarEmpresas(ActionEvent event) {
+        aplicacionControl.mostrarEmpresas();
+        stagePrincipal.close();
+    }
+            
+    @FXML
+    private void registrarCliente(ActionEvent event) {
+        aplicacionControl.mostrarRegistrarCliente();
+    }
+    
+    @FXML
+    private void mostrarClientes(ActionEvent event) {
+        aplicacionControl.mostrarClientes();
+        stagePrincipal.close();
     }
     
     @Override
@@ -66,11 +80,12 @@ public class ConfiguracionController implements Initializable {
                 + "-fx-background-position: center top; " 
                 + "-fx-background-repeat: stretch;");
         
+        /*
         homeButton.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
         String image2 = AplicacionControl.class.getResource("imagenes/home_32dp.png").toExternalForm();
         Image homeImage = new Image(image2);
         homeButton.setGraphic(new ImageView(homeImage));
-      
+        */
     }    
     
 }

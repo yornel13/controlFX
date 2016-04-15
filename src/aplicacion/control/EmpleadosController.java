@@ -72,12 +72,12 @@ public class EmpleadosController implements Initializable {
     
     @FXML
     private void agregarEmpleado(ActionEvent event) {
-        aplicacionControl.mostarRegistrarEmpleado(empresa);
+        aplicacionControl.mostrarRegistrarEmpleado(empresa);
     }
     
     @FXML
     private void returnEmpresa(ActionEvent event) {
-        aplicacionControl.mostarInEmpresa(empresa);
+        aplicacionControl.mostrarInEmpresa(empresa);
         stagePrincipal.close();
     } 
     

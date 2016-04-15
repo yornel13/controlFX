@@ -18,7 +18,7 @@
           <TableColumn prefWidth="75.0" text="C2" />
         </columns>
       </TableView>
-      <Button layoutX="475.0" layoutY="6.0" mnemonicParsing="false" onAction="#agregarEmpleado" text="Agregar Empleado" />
+      <Button layoutX="534.0" layoutY="6.0" mnemonicParsing="false" onAction="#agregarEmpleado" text="Agregar" />
       <Button layoutX="8.0" layoutY="6.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
     </children>
 </AnchorPane>

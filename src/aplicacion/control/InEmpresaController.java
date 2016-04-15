@@ -7,7 +7,6 @@ package aplicacion.control;
 
 import aplicacion.control.util.Const;
 import hibernate.dao.DetallesEmpleadoDAO;
-import hibernate.dao.UsuariosDAO;
 import hibernate.model.Empresa;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -74,7 +73,7 @@ public class InEmpresaController implements Initializable {
     
     @FXML
     private void verEmpleados(ActionEvent event) {
-        aplicacionControl.mostarEmpleados(empresa);
+        aplicacionControl.mostrarEmpleados(empresa);
         stagePrincipal.close();
     }
     

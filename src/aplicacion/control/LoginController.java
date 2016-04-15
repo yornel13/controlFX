@@ -63,7 +63,7 @@ public class LoginController implements Initializable {
             identidad = iden.get(0);
             if (identidad.getContrasena().equals(MD5(contrasenaField.getText()))) {
                 salirVentana(event);
-                aplicacionControl.mostarConfiguracion();
+                aplicacionControl.mostrarConfiguracion();
             } else {
                 textError.setText("contraseña erronea");
             }
