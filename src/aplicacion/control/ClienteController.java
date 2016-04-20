@@ -6,7 +6,6 @@
 package aplicacion.control;
 
 import hibernate.model.Cliente;
-import hibernate.model.Usuarios;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -14,11 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 /**
@@ -67,7 +62,7 @@ public class ClienteController implements Initializable {
     }
     
     public void editarCliente(ActionEvent event) {
-        //aplicacionControl.mostrarEditarEmpleado(empleado);
+        aplicacionControl.mostrarEditarCliente(cliente);
         stagePrincipal.close();
     }
     

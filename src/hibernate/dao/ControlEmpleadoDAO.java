@@ -1,6 +1,8 @@
 package hibernate.dao;
 
 import hibernate.model.ControlEmpleado;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -59,6 +61,38 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public ControlEmpleado findByFecha(Timestamp fecha, Integer usuarioId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado where fecha = :fecha and usuario_id = :usuario_id")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("usuario_id", usuarioId);
+            Object result = query.uniqueResult();
+            return (ControlEmpleado) result;
+        }
+        
+        public List<ControlEmpleado> findAllByEmpleadoId(Integer usuarioId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado where usuario_id = :usuario_id")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (ArrayList<ControlEmpleado>) result;
+        }
+        
+        public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(Integer usuarioId, 
+                Timestamp inicio, Timestamp fin) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado where usuario_id = "
+                            + ":usuario_id and fecha >= :inicio and fecha <= :fin ORDER BY fecha")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+            Object result = query.list();
+            return (ArrayList<ControlEmpleado>) result;
+        }
 
 	public List findByExample(ControlEmpleado instance) {
 		log.debug("finding ControlEmpleado instance by example");

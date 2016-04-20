@@ -26,10 +26,10 @@
             <column name="horas_extras" />
         </property>
         <property name="horaEntrada" type="java.sql.Timestamp">
-            <column name="hora_entrada" length="0" not-null="true" />
+            <column name="hora_entrada" length="0" />
         </property>
         <property name="horaSalida" type="java.sql.Timestamp">
-            <column name="hora_salida" length="0" not-null="true" />
+            <column name="hora_salida" length="0" />
         </property>
     </class>
 </hibernate-mapping>

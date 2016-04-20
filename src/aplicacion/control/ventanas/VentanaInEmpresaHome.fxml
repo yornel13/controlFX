@@ -12,15 +12,15 @@
 <AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.InEmpresaController">
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <Button layoutX="404.0" layoutY="249.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Pagos" />
+      <Button layoutX="404.0" layoutY="249.0" mnemonicParsing="false" onAction="#onClickPagos" prefHeight="25.0" prefWidth="151.0" text="Pagos" />
       <Button fx:id="buttonConfiguracion" layoutX="402.0" layoutY="198.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Configuracion" />
       <Button fx:id="empresaButton" layoutX="402.0" layoutY="146.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Clientes" />
       <Button fx:id="empleadosButton" layoutX="401.0" layoutY="99.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="151.0" text="Empleados" />
       <Accordion layoutX="40.0" layoutY="14.0" />
       <Pane fx:id="contentPane" layoutY="330.0" prefHeight="70.0" prefWidth="600.0" style="-fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2));;">
          <children>
-            <TextField layoutX="300.0" layoutY="23.0" prefHeight="25.0" prefWidth="187.0" promptText="Cedula del empleado" />
-            <Label fx:id="labelTest" layoutX="16.0" layoutY="15.0" prefHeight="40.0" prefWidth="145.0" textFill="WHITE">
+            <TextField fx:id="cedulaField" layoutX="300.0" layoutY="23.0" onAction="#marcar" prefHeight="25.0" prefWidth="187.0" promptText="Cedula del empleado" />
+            <Label fx:id="labelTest" layoutX="16.0" layoutY="15.0" prefHeight="40.0" prefWidth="209.0" textFill="WHITE">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font></Label>
@@ -29,7 +29,7 @@
                   <Font name="System Bold" size="12.0" />
                </font>
             </Label>
-            <Button layoutX="509.0" layoutY="23.0" mnemonicParsing="false" text="Marcar" />
+            <Button layoutX="509.0" layoutY="23.0" mnemonicParsing="false" onAction="#marcar" text="Marcar" />
          </children></Pane>
       <Line endX="460.0" layoutX="117.0" layoutY="40.0" startX="-100.0">
          <stroke>

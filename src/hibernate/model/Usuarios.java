@@ -1,5 +1,6 @@
 package hibernate.model;
 
+import aplicacion.control.HorasDeTrabajo;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,8 +32,16 @@ public class Usuarios implements java.io.Serializable {
 	private Set controlEmpleados = new HashSet(0);
 	private Set bonos = new HashSet(0);
 	private Set registroAccioneses = new HashSet(0);
-
+        private HorasDeTrabajo horas;
 	// Constructors
+
+    public HorasDeTrabajo getHoras() {
+        return horas;
+    }
+
+    public void setHoras(HorasDeTrabajo horas) {
+        this.horas = horas;
+    }
 
 	/** default constructor */
 	public Usuarios() {

@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
@@ -159,48 +160,55 @@ public class RegistrarEmpleadoController implements Initializable {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
         } else {
-            DetallesEmpleado detallesEmpleado = new DetallesEmpleado();
-            detallesEmpleado.setEmpresa(empresa);
-            detallesEmpleado.setDepartamento(departamentos.get(departamentoChoiceBox.getSelectionModel().getSelectedIndex()));
-            detallesEmpleado.setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
-            detallesEmpleado.setExtra(extraField.getText());
-            detallesEmpleado.setNroCuenta(cuentaField.getText());
-            detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
-            
-            DetallesEmpleadoDAO detallesEmpleadoDAO = new DetallesEmpleadoDAO();
-            detallesEmpleadoDAO.save(detallesEmpleado);
-            
-            Usuarios usuario = new Usuarios();
-            usuario.setNombre(nombreField.getText());
-            usuario.setApellido(apellidoField.getText());
-            usuario.setCedula(cedulaField.getText());
-            usuario.setEmail(emailField.getText());
-            usuario.setDireccion(direccionField.getText());
-            usuario.setTelefono(telefonoField.getText());
-            usuario.setDetallesEmpleado(detallesEmpleado);
-            usuario.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
-            usuario.setActivo(Boolean.TRUE);
-            usuario.setCreacion(new Timestamp(new Date().getTime()));
-            usuario.setUltimaModificacion(new Timestamp(new Date().getTime()));
-            usuario.setRoles(roles.get(1));
-            
             UsuariosDAO usuariosDAO = new UsuariosDAO();
-            usuariosDAO.save(usuario);
+            DetallesEmpleadoDAO detallesEmpleadoDAO = new DetallesEmpleadoDAO();
             
-            stagePrincipal.close();
+            if (usuariosDAO.findByCedula(cedulaField.getText()) == null) {
+                
+                DetallesEmpleado detallesEmpleado = new DetallesEmpleado();
+                detallesEmpleado.setEmpresa(empresa);
+                detallesEmpleado.setDepartamento(departamentos.get(departamentoChoiceBox.getSelectionModel().getSelectedIndex()));
+                detallesEmpleado.setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
+                detallesEmpleado.setExtra(extraField.getText());
+                detallesEmpleado.setNroCuenta(cuentaField.getText());
+                detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
+
+                detallesEmpleadoDAO.save(detallesEmpleado);
+
+                Usuarios usuario = new Usuarios();
+                usuario.setNombre(nombreField.getText());
+                usuario.setApellido(apellidoField.getText());
+                usuario.setCedula(cedulaField.getText());
+                usuario.setEmail(emailField.getText());
+                usuario.setDireccion(direccionField.getText());
+                usuario.setTelefono(telefonoField.getText());
+                usuario.setDetallesEmpleado(detallesEmpleado);
+                usuario.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
+                usuario.setActivo(Boolean.TRUE);
+                usuario.setCreacion(new Timestamp(new Date().getTime()));
+                usuario.setUltimaModificacion(new Timestamp(new Date().getTime()));
+                usuario.setRoles(roles.get(1));
+
+                usuariosDAO.save(usuario);
+
+                stagePrincipal.close();
+
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Dialogo");
+                Button buttonOk = new Button("ok");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Empleado creado satisfactoriamente"), buttonOk).
+                alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                dialogStage.show();
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+            } else {
+                errorText2.setText("Ya hay un empleado con esta cedula");
+            }
             
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
-            Button buttonOk = new Button("ok");
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("Empleado creado satisfactoriamente"), buttonOk).
-            alignment(Pos.CENTER).padding(new Insets(10)).build()));
-            dialogStage.show();
-            buttonOk.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
         }
     }
     
@@ -244,13 +252,26 @@ public class RegistrarEmpleadoController implements Initializable {
         RolesDAO rolesDAO = new RolesDAO();
         roles = (ArrayList<Roles>) rolesDAO.findAll();
         
-        sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        
+        cedulaField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
     }    
+    
+    public static EventHandler<KeyEvent> numDecimalFilter() {
+
+        EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
+            if (!"0123456789.".contains(keyEvent.getCharacter())) {
+                keyEvent.consume();
+                
+            }
+        };
+        return aux;
+    }
     
     public static EventHandler<KeyEvent> numFilter() {
 
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
-            if (!"0123456789.".contains(keyEvent.getCharacter())) {
+            if (!"0123456789".contains(keyEvent.getCharacter())) {
                 keyEvent.consume();
                 
             }

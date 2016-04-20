@@ -80,6 +80,37 @@ public class UsuariosDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public Usuarios findByCedula(String cedula) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuarios where cedula = :cedula")
+                    .addEntity(Usuarios.class)
+                    .setParameter("cedula", cedula);
+            Object result = query.uniqueResult();
+            return (Usuarios) result;
+        }
+        
+        public Usuarios findByAllCedulaAndEmpresaId(String cedula, Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuarios JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuarios.detalles_empleado_id "
+                            + "WHERE empresa_id = :empresa_id and cedula = :cedula")
+                    .addEntity(Usuarios.class)
+                    .setParameter("empresa_id", empresaId)
+                    .setParameter("cedula", cedula);
+            Object result = query.uniqueResult();
+            return (Usuarios) result;
+        }
+        
+        public List<Usuarios> findByEmpresaId(Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuarios JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuarios.detalles_empleado_id WHERE empresa_id = :empresa_id")
+                    .addEntity(Usuarios.class)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<Usuarios>) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Usuarios instance with property: " + propertyName

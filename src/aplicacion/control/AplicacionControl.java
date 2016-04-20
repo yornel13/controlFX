@@ -382,6 +382,52 @@ public class AplicacionControl extends Application {
             //tratar la excepción
         }
     }
+    
+    public void mostrarEditarCliente(Cliente cliente) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarEditarCliente()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarCliente.fxml"));
+            AnchorPane ventanaEditarCliente = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Editar cliente");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEditarCliente);
+            ventana.setScene(scene);
+            EditarClienteController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setCliente(cliente);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void mostrarHorasEmpleados(Empresa empresa) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarHorasEmpleados()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleados.fxml"));
+            AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Empleados");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaEmpleados);
+            ventana.setScene(scene);
+            HorasEmpleadosController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpresa(empresa);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
 
     /**
      * @param args the command line arguments

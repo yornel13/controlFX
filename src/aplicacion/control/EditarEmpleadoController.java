@@ -153,6 +153,7 @@ public class EditarEmpleadoController implements Initializable {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
         } else {
+            
             empleado.getDetallesEmpleado().setDepartamento(departamentos.get(departamentoChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.getDetallesEmpleado().setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.getDetallesEmpleado().setExtra(extraField.getText());
@@ -236,10 +237,10 @@ public class EditarEmpleadoController implements Initializable {
         departamentoChoiceBox.setItems(FXCollections.observableArrayList(itemsDepartamentos)); 
         cargoChoiceBox.setItems(FXCollections.observableArrayList(itemsCargos)); 
        
-        sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
     }    
     
-    public static EventHandler<KeyEvent> numFilter() {
+    public static EventHandler<KeyEvent> numDecimalFilter() {
 
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
             if (!"0123456789.".contains(keyEvent.getCharacter())) {
