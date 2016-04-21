@@ -17,7 +17,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,12 +27,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -55,6 +59,9 @@ public class HorasEmpleadosController implements Initializable {
     
     @FXML
     private Button homeButton;
+    
+    @FXML
+    private Label textFecha;
     
     @FXML
     private TableView empleadosTableView;
@@ -90,6 +97,14 @@ public class HorasEmpleadosController implements Initializable {
     
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
+        
+        DateTime dateTime = new DateTime(getToday().getTime());
+           
+        Timestamp fin = new Timestamp(dateTime.withDayOfMonth(24).getMillis());
+        Timestamp inicio = new Timestamp(dateTime.withDayOfMonth(24).minusMonths(1).plusDays(1).getMillis());
+        
+        textFecha.setText("Rol de pago del mes de " + getMonthName(dateTime.getMonthOfYear()) + " 2016");
+        
         UsuariosDAO usuariosDAO = new UsuariosDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
@@ -99,22 +114,13 @@ public class HorasEmpleadosController implements Initializable {
            ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
            data = FXCollections.observableArrayList(); 
            
-           SimpleDateFormat dt = new SimpleDateFormat("yyyyy-mm-dd"); 
-            System.out.println((getToday().getYear() + 1900) + "/" + getToday().getMonth() + "/" + empresa.getDiaCortePago());
-           Date dateFin = new Date((getToday().getYear() + 1900) + "/" + getToday().getMonth() + "/" + empresa.getDiaCortePago());
-           dt.format(dateFin);
-           Timestamp fin = new Timestamp(dateFin.getTime());
-           Timestamp inicio = new Timestamp(new Date((getToday().getYear() + 1900) + "/" + (getToday().getMonth() - 1) + "/" +  (empresa.getDiaCortePago() + 1)).getTime());
-           
            for (Usuarios user: usuarios) {
             
                 Integer dias = 0;
                 Integer normales = 0;
                 Integer sobreTiempo = 0;
                 Integer suplementarias = 0;
-                System.out.println(getToday());
-                System.out.println(inicio);
-                System.out.println(fin);
+                
                 for (ControlEmpleado control: controlDAO.findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio, fin)) {
                     dias = dias + 1;
                     normales = normales + 8;
@@ -178,7 +184,7 @@ public class HorasEmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    aplicacionControl.mostrarEmpleado(usuariosDAO.findById(rowData.getId()));
+                    aplicacionControl.mostrarRolDePago(usuariosDAO.findById(rowData.getId()));
                 }
             });
             return row ;
@@ -200,6 +206,13 @@ public class HorasEmpleadosController implements Initializable {
         Date todayWithZeroTime = formatter.parse(formatter.format(today));
         
         return new Timestamp(todayWithZeroTime.getTime());
+    }
+    
+    public static String getMonthName(int month){
+        Calendar cal = Calendar.getInstance();
+        // Calendar numbers months from 0
+        cal.set(Calendar.MONTH, month - 1);
+        return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
     }
     
 }

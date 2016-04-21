@@ -428,6 +428,29 @@ public class AplicacionControl extends Application {
             //tratar la excepción
         }
     }
+    
+    public void mostrarRolDePago(Usuarios empleado) {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
+            AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Rol de Pago");
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaRolDePago);
+            ventana.setScene(scene);
+            RolDePagoController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpleado(empleado);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
 
     /**
      * @param args the command line arguments
