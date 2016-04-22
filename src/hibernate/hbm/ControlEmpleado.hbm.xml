@@ -10,14 +10,14 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="usuarios" class="hibernate.model.Usuarios" fetch="select">
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
             <column name="usuario_id" not-null="true" />
         </many-to-one>
         <many-to-one name="cliente" class="hibernate.model.Cliente" fetch="select">
             <column name="cliente_id" />
         </many-to-one>
         <property name="fecha" type="java.sql.Timestamp">
-            <column name="fecha" length="0" not-null="true" />
+            <column name="fecha" length="19" not-null="true" />
         </property>
         <property name="horasSuplementarias" type="java.lang.Integer">
             <column name="horas_suplementarias" />
@@ -26,10 +26,10 @@
             <column name="horas_extras" />
         </property>
         <property name="horaEntrada" type="java.sql.Timestamp">
-            <column name="hora_entrada" length="0" />
+            <column name="hora_entrada" length="19" />
         </property>
         <property name="horaSalida" type="java.sql.Timestamp">
-            <column name="hora_salida" length="0" />
+            <column name="hora_salida" length="19" />
         </property>
     </class>
 </hibernate-mapping>

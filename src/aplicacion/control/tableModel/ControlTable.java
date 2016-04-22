@@ -5,7 +5,7 @@
  */
 package aplicacion.control.tableModel;
 
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 
 /**
  *
@@ -14,7 +14,7 @@ import hibernate.model.Usuarios;
 public class ControlTable {
     
     private Integer id;
-    private Usuarios usuarios;
+    private Usuario usuario;
     private String cliente;
     private String fecha;
     private Integer horasSuplementarias;
@@ -28,12 +28,12 @@ public class ControlTable {
         this.id = id;
     }
 
-    public Usuarios getUsuarios() {
-        return usuarios;
+    public Usuario getUsuarios() {
+        return usuario;
     }
 
-    public void setUsuarios(Usuarios usuarios) {
-        this.usuarios = usuarios;
+    public void setUsuarios(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public String getCliente() {

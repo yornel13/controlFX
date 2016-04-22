@@ -7,11 +7,11 @@ package aplicacion.control;
 
 import aplicacion.control.util.Const;
 import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -44,7 +44,7 @@ public class InEmpresaController implements Initializable {
     
     Empresa empresa;
     
-    private ArrayList<Usuarios> empleados;
+    private ArrayList<Usuario> empleados;
     
     private Stage stagePrincipal;
     
@@ -109,7 +109,7 @@ public class InEmpresaController implements Initializable {
         empresaLabel.setText(empresa.getNombre());
         numeracionLabel.setText("RUC: " + empresa.getNumeracion().toString());
         
-        UsuariosDAO usuariosDAO = new UsuariosDAO();
+        UsuarioDAO usuariosDAO = new UsuarioDAO();
         empleados = new ArrayList<>();
         empleados.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
         totalLabel.setText("Total de empleados: " + empleados.size());
@@ -117,8 +117,8 @@ public class InEmpresaController implements Initializable {
     
     @FXML
     public void marcar(ActionEvent event) throws ParseException {
-        UsuariosDAO usuariosDAO = new UsuariosDAO();
-        Usuarios empleado = new Usuarios();
+        UsuarioDAO usuariosDAO = new UsuarioDAO();
+        Usuario empleado = new Usuario();
         empleado = usuariosDAO.findByAllCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
         if (empleado != null) {
             ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
@@ -137,7 +137,7 @@ public class InEmpresaController implements Initializable {
         }      
     }
     
-    public void mostrarHoras(Usuarios empleado) {
+    public void mostrarHoras(Usuario empleado) {
         try {
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtras.fxml"));
             AnchorPane ventanaHoras = (AnchorPane) loader.load();
@@ -159,12 +159,12 @@ public class InEmpresaController implements Initializable {
         }
     }
     
-    public void guardarRegistro(Usuarios empleado, Integer suplementarias, Integer sobreTiempo, Cliente cliente) throws ParseException {
+    public void guardarRegistro(Usuario empleado, Integer suplementarias, Integer sobreTiempo, Cliente cliente) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
         ControlEmpleado controlEmpleado = new ControlEmpleado();
         controlEmpleado = new ControlEmpleado();
         controlEmpleado.setFecha(getToday());
-        controlEmpleado.setUsuarios(empleado);
+        controlEmpleado.setUsuario(empleado);
         controlEmpleado.setHorasExtras(sobreTiempo);
         controlEmpleado.setHorasSuplementarias(suplementarias);
         controlEmpleado.setCliente(cliente);

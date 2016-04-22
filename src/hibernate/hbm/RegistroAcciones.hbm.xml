@@ -10,7 +10,7 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="usuarios" class="hibernate.model.Usuarios" fetch="select">
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
             <column name="usuario_id" not-null="true" />
         </many-to-one>
         <many-to-one name="accionTipo" class="hibernate.model.AccionTipo" fetch="select">
@@ -20,7 +20,7 @@
             <column name="detalles" length="100" />
         </property>
         <property name="fecha" type="java.sql.Timestamp">
-            <column name="fecha" length="0" not-null="true" />
+            <column name="fecha" length="19" not-null="true" />
         </property>
     </class>
 </hibernate-mapping>

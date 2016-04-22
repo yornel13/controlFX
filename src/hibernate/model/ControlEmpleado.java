@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.sql.Timestamp;
 
 /**
@@ -11,7 +13,7 @@ public class ControlEmpleado implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
-	private Usuarios usuarios;
+	private Usuario usuario;
 	private Cliente cliente;
 	private Timestamp fecha;
 	private Integer horasSuplementarias;
@@ -26,19 +28,19 @@ public class ControlEmpleado implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public ControlEmpleado(Usuarios usuarios, Timestamp fecha,
+	public ControlEmpleado(Usuario usuario, Timestamp fecha,
 			Timestamp horaEntrada, Timestamp horaSalida) {
-		this.usuarios = usuarios;
+		this.usuario = usuario;
 		this.fecha = fecha;
 		this.horaEntrada = horaEntrada;
 		this.horaSalida = horaSalida;
 	}
 
 	/** full constructor */
-	public ControlEmpleado(Usuarios usuarios, Cliente cliente, Timestamp fecha,
+	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha,
 			Integer horasSuplementarias, Integer horasExtras,
 			Timestamp horaEntrada, Timestamp horaSalida) {
-		this.usuarios = usuarios;
+		this.usuario = usuario;
 		this.cliente = cliente;
 		this.fecha = fecha;
 		this.horasSuplementarias = horasSuplementarias;
@@ -57,12 +59,12 @@ public class ControlEmpleado implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Usuarios getUsuarios() {
-		return this.usuarios;
+	public Usuario getUsuario() {
+		return this.usuario;
 	}
 
-	public void setUsuarios(Usuarios usuarios) {
-		this.usuarios = usuarios;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public Cliente getCliente() {

@@ -5,20 +5,19 @@
  */
 package aplicacion.control;
 
-import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
 import hibernate.dao.EstadoCivilDAO;
 import hibernate.dao.RolesDAO;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cargo;
 import hibernate.model.Departamento;
 import hibernate.model.DetallesEmpleado;
 import hibernate.model.Empresa;
 import hibernate.model.EstadoCivil;
 import hibernate.model.Roles;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -35,7 +34,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
@@ -102,6 +103,15 @@ public class RegistrarEmpleadoController implements Initializable {
     @FXML
     private Label errorText2;
     
+    @FXML
+    private RadioButton sexoM;
+    
+    @FXML
+    private RadioButton sexoF;
+    
+    @FXML 
+    private DatePicker datePicker;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -138,6 +148,9 @@ public class RegistrarEmpleadoController implements Initializable {
         } else if (cedulaField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar la cedula");
             errorText2.setText("Debe ingresar la cedula");
+        } else if (!sexoF.isSelected() && !sexoM.isSelected()) {
+            errorText1.setText("Debe seleccionar el sexo");
+            errorText2.setText("Debe seleccionar el sexo");
         } else if (telefonoField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar un numero telefonico");
             errorText2.setText("Debe ingresar un numero telefonico");
@@ -150,6 +163,9 @@ public class RegistrarEmpleadoController implements Initializable {
         } else if (estadoCivilChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Debe seleccionar el estado civil");
             errorText2.setText("Debe seleccionar el estado civil");
+        } else if (datePicker.getValue() == null) {
+            errorText1.setText("Debe seleccionar la fecha de nacimiento");
+            errorText2.setText("Debe seleccionar la fecha de nacimiento");
         } else if (departamentoChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Seleccione el departamento al cual pertenece el empleado");
             errorText2.setText("Seleccione el departamento al cual pertenece el empleado");
@@ -160,7 +176,7 @@ public class RegistrarEmpleadoController implements Initializable {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
         } else {
-            UsuariosDAO usuariosDAO = new UsuariosDAO();
+            UsuarioDAO usuariosDAO = new UsuarioDAO();
             DetallesEmpleadoDAO detallesEmpleadoDAO = new DetallesEmpleadoDAO();
             
             if (usuariosDAO.findByCedula(cedulaField.getText()) == null) {
@@ -175,11 +191,17 @@ public class RegistrarEmpleadoController implements Initializable {
 
                 detallesEmpleadoDAO.save(detallesEmpleado);
 
-                Usuarios usuario = new Usuarios();
+                Usuario usuario = new Usuario();
                 usuario.setNombre(nombreField.getText());
                 usuario.setApellido(apellidoField.getText());
                 usuario.setCedula(cedulaField.getText());
+                if (sexoM.isSelected()) {
+                    usuario.setSexo("M");
+                } else {
+                    usuario.setSexo("F");
+                }
                 usuario.setEmail(emailField.getText());
+                usuario.setNacimiento(Timestamp.valueOf(datePicker.getValue().atStartOfDay()));
                 usuario.setDireccion(direccionField.getText());
                 usuario.setTelefono(telefonoField.getText());
                 usuario.setDetallesEmpleado(detallesEmpleado);
@@ -187,7 +209,6 @@ public class RegistrarEmpleadoController implements Initializable {
                 usuario.setActivo(Boolean.TRUE);
                 usuario.setCreacion(new Timestamp(new Date().getTime()));
                 usuario.setUltimaModificacion(new Timestamp(new Date().getTime()));
-                usuario.setRoles(roles.get(1));
 
                 usuariosDAO.save(usuario);
 
@@ -210,6 +231,18 @@ public class RegistrarEmpleadoController implements Initializable {
             }
             
         }
+    }
+    
+    @FXML
+    public void sexoMasculinoClick(ActionEvent event) {
+        sexoM.setSelected(true);
+        sexoF.setSelected(false);
+    }
+    
+    @FXML
+    public void sexoFemeninoClick(ActionEvent event) {
+        sexoM.setSelected(false);
+        sexoF.setSelected(true);
     }
     
     @FXML

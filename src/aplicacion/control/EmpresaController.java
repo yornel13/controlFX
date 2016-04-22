@@ -6,10 +6,10 @@
 package aplicacion.control;
 
 import hibernate.dao.DetallesEmpleadoDAO;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.DetallesEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -114,11 +114,11 @@ public class EmpresaController implements Initializable {
         fax.setText(empresa.getFax());
         email.setText(empresa.getEmail());
         diaCorte.setText(empresa.getDiaCortePago() + " de cada mes");
-        UsuariosDAO usuariosDAO = new UsuariosDAO();
-        ArrayList<Usuarios> empleadosAll = new ArrayList<>();
-        ArrayList<Usuarios> empleados = new ArrayList<>();
+        UsuarioDAO usuariosDAO = new UsuarioDAO();
+        ArrayList<Usuario> empleadosAll = new ArrayList<>();
+        ArrayList<Usuario> empleados = new ArrayList<>();
         empleadosAll.addAll(usuariosDAO.findAll());
-        for (Usuarios user: empleadosAll) {
+        for (Usuario user: empleadosAll) {
             if (user.getDetallesEmpleado() != null && 
                     user.getDetallesEmpleado().getEmpresa().getId() == empresa.getId()) {
                 empleados.add(user);

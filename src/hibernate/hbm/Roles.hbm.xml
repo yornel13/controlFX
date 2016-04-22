@@ -10,6 +10,9 @@
             <column name="id" />
             <generator class="identity" />
         </id>
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
+            <column name="usuario_id" not-null="true" />
+        </many-to-one>
         <property name="nombre" type="java.lang.String">
             <column name="nombre" not-null="true" />
         </property>
@@ -19,11 +22,5 @@
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />
         </property>
-        <set name="usuarioses" inverse="true">
-            <key>
-                <column name="rol_id" not-null="true" />
-            </key>
-            <one-to-many class="hibernate.model.Usuarios" />
-        </set>
     </class>
 </hibernate-mapping>

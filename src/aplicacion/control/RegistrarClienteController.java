@@ -96,8 +96,8 @@ public class RegistrarClienteController implements Initializable {
             cliente.setTelefono(telefonoField.getText());
             cliente.setDireccion(direccionField.getText());
             cliente.setActivo(Boolean.TRUE);
-            //cliente.setCreacion(new Timestamp(new Date().getTime()));
-            //cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
+            cliente.setCreacion(new Timestamp(new Date().getTime()));
+            cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
             ClienteDAO clienteDAO = new ClienteDAO();
             clienteDAO.save(cliente);
             

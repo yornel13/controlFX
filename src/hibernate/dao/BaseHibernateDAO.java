@@ -1,5 +1,7 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.HibernateSessionFactory;
 import org.hibernate.Session;
 

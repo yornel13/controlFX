@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 /**
  * Identidad entity. @author MyEclipse Persistence Tools
  */
@@ -9,7 +11,7 @@ public class Identidad implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
-	private Usuarios usuarios;
+	private Usuario usuario;
 	private String nombreUsuario;
 	private String contrasena;
 	private Boolean activo;
@@ -28,9 +30,9 @@ public class Identidad implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Identidad(Usuarios usuarios, String nombreUsuario,
-			String contrasena, Boolean activo) {
-		this.usuarios = usuarios;
+	public Identidad(Usuario usuario, String nombreUsuario, String contrasena,
+			Boolean activo) {
+		this.usuario = usuario;
 		this.nombreUsuario = nombreUsuario;
 		this.contrasena = contrasena;
 		this.activo = activo;
@@ -46,12 +48,12 @@ public class Identidad implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Usuarios getUsuarios() {
-		return this.usuarios;
+	public Usuario getUsuario() {
+		return this.usuario;
 	}
 
-	public void setUsuarios(Usuarios usuarios) {
-		this.usuarios = usuarios;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public String getNombreUsuario() {

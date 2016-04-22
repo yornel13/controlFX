@@ -10,6 +10,8 @@ import hibernate.HibernateSessionFactory;
 import hibernate.model.Cliente;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -101,7 +103,7 @@ public class EditarClienteController implements Initializable {
             cliente.setRuc(Integer.parseInt(numeracionField.getText()));
             cliente.setTelefono(telefonoField.getText());
             cliente.setDireccion(direccionField.getText());
-            //cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
+            cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
             HibernateSessionFactory.getSession().flush();
             
             stagePrincipal.close();

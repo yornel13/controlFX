@@ -7,10 +7,10 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -68,7 +68,7 @@ public class HorasEmpleadosController implements Initializable {
     
     private ObservableList<EmpleadoTable> data;
     
-    ArrayList<Usuarios> usuarios;
+    ArrayList<Usuario> usuarios;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -105,7 +105,7 @@ public class HorasEmpleadosController implements Initializable {
         
         textFecha.setText("Rol de pago del mes de " + getMonthName(dateTime.getMonthOfYear()) + " 2016");
         
-        UsuariosDAO usuariosDAO = new UsuariosDAO();
+        UsuarioDAO usuariosDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
         
@@ -114,7 +114,7 @@ public class HorasEmpleadosController implements Initializable {
            ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
            data = FXCollections.observableArrayList(); 
            
-           for (Usuarios user: usuarios) {
+           for (Usuario user: usuarios) {
             
                 Integer dias = 0;
                 Integer normales = 0;

@@ -1,6 +1,9 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.Bono;
+import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -16,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * provides additional information for how to configure it for the desired type
  * of transaction control.
  * 
- * @see hibernate.model.Bono
+ * @see .Bono
  * @author MyEclipse Persistence Tools
  */
 public class BonoDAO extends BaseHibernateDAO {

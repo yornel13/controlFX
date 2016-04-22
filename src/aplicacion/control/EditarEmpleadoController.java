@@ -12,7 +12,7 @@ import hibernate.dao.EstadoCivilDAO;
 import hibernate.model.Cargo;
 import hibernate.model.Departamento;
 import hibernate.model.EstadoCivil;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -47,7 +47,7 @@ public class EditarEmpleadoController implements Initializable {
     
     private Stage stagePrincipal;
     
-    private Usuarios empleado;
+    private Usuario empleado;
    
     ArrayList<EstadoCivil> estadosCivil;
     ArrayList<Departamento> departamentos;
@@ -192,7 +192,7 @@ public class EditarEmpleadoController implements Initializable {
         stagePrincipal.close();
     }
     
-    public void setEmpleado(Usuarios empleado) {
+    public void setEmpleado(Usuario empleado) {
         this.empleado = empleado;
         
         nombreField.setText(empleado.getNombre());

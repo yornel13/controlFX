@@ -1,5 +1,8 @@
 package hibernate.model;
 
+// default package
+
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +21,8 @@ public class Cliente implements java.io.Serializable {
 	private String direccion;
 	private String telefono;
 	private Boolean activo;
+	private Timestamp creacion;
+	private Timestamp ultimaModificacion;
 	private Set controlEmpleados = new HashSet(0);
 
 	// Constructors
@@ -28,18 +33,22 @@ public class Cliente implements java.io.Serializable {
 
 	/** minimal constructor */
 	public Cliente(String nombre, String detalles, Integer ruc,
-			String direccion, String telefono, Boolean activo) {
+			String direccion, String telefono, Boolean activo,
+			Timestamp creacion, Timestamp ultimaModificacion) {
 		this.nombre = nombre;
 		this.detalles = detalles;
 		this.ruc = ruc;
 		this.direccion = direccion;
 		this.telefono = telefono;
 		this.activo = activo;
+		this.creacion = creacion;
+		this.ultimaModificacion = ultimaModificacion;
 	}
 
 	/** full constructor */
 	public Cliente(String nombre, String detalles, Integer ruc,
 			String direccion, String telefono, Boolean activo,
+			Timestamp creacion, Timestamp ultimaModificacion,
 			Set controlEmpleados) {
 		this.nombre = nombre;
 		this.detalles = detalles;
@@ -47,6 +56,8 @@ public class Cliente implements java.io.Serializable {
 		this.direccion = direccion;
 		this.telefono = telefono;
 		this.activo = activo;
+		this.creacion = creacion;
+		this.ultimaModificacion = ultimaModificacion;
 		this.controlEmpleados = controlEmpleados;
 	}
 
@@ -106,6 +117,22 @@ public class Cliente implements java.io.Serializable {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
+	}
+
+	public Timestamp getCreacion() {
+		return this.creacion;
+	}
+
+	public void setCreacion(Timestamp creacion) {
+		this.creacion = creacion;
+	}
+
+	public Timestamp getUltimaModificacion() {
+		return this.ultimaModificacion;
+	}
+
+	public void setUltimaModificacion(Timestamp ultimaModificacion) {
+		this.ultimaModificacion = ultimaModificacion;
 	}
 
 	public Set getControlEmpleados() {

@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.sql.Timestamp;
 
 /**
@@ -11,10 +13,10 @@ public class Bono implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
-	private Usuarios usuarios;
+	private Usuario usuario;
 	private String concepto;
 	private String detalles;
-	private Long monto;
+	private Double monto;
 	private Timestamp fecha;
 	private Boolean activo;
 
@@ -25,9 +27,9 @@ public class Bono implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Bono(Usuarios usuarios, String concepto, String detalles,
-			Long monto, Timestamp fecha, Boolean activo) {
-		this.usuarios = usuarios;
+	public Bono(Usuario usuario, String concepto, String detalles,
+			Double monto, Timestamp fecha, Boolean activo) {
+		this.usuario = usuario;
 		this.concepto = concepto;
 		this.detalles = detalles;
 		this.monto = monto;
@@ -45,12 +47,12 @@ public class Bono implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Usuarios getUsuarios() {
-		return this.usuarios;
+	public Usuario getUsuario() {
+		return this.usuario;
 	}
 
-	public void setUsuarios(Usuarios usuarios) {
-		this.usuarios = usuarios;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public String getConcepto() {
@@ -69,11 +71,11 @@ public class Bono implements java.io.Serializable {
 		this.detalles = detalles;
 	}
 
-	public Long getMonto() {
+	public Double getMonto() {
 		return this.monto;
 	}
 
-	public void setMonto(Long monto) {
+	public void setMonto(Double monto) {
 		this.monto = monto;
 	}
 

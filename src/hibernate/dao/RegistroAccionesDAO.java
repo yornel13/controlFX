@@ -1,6 +1,9 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.RegistroAcciones;
+import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -16,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * transactions. Each of these methods provides additional information for how
  * to configure it for the desired type of transaction control.
  * 
- * @see hibernate.model.RegistroAcciones
+ * @see .RegistroAcciones
  * @author MyEclipse Persistence Tools
  */
 public class RegistroAccionesDAO extends BaseHibernateDAO {
@@ -62,8 +65,7 @@ public class RegistroAccionesDAO extends BaseHibernateDAO {
 	public List findByExample(RegistroAcciones instance) {
 		log.debug("finding RegistroAcciones instance by example");
 		try {
-			List results = getSession()
-					.createCriteria("hibernate.model.RegistroAcciones")
+			List results = getSession().createCriteria("hibernate.model.RegistroAcciones")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());

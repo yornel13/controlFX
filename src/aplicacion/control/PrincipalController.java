@@ -85,5 +85,10 @@ public class PrincipalController implements Initializable {
         configuracion.setGraphic(new ImageView(adminImage));
         configuracion.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
         
-    }    
+    } 
+    
+    @FXML
+    public void onClickLoginButton(ActionEvent event) {
+        
+    }
 }

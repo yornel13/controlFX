@@ -6,9 +6,9 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -54,7 +54,7 @@ public class EmpleadosController implements Initializable {
     
     private ObservableList<EmpleadoTable> data;
     
-    ArrayList<Usuarios> usuarios;
+    ArrayList<Usuario> usuarios;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -83,9 +83,9 @@ public class EmpleadosController implements Initializable {
     
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
-        UsuariosDAO usuariosDAO = new UsuariosDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        for (Usuarios usuario: (ArrayList<Usuarios>) usuariosDAO.findAll()) {
+        for (Usuario usuario: (ArrayList<Usuario>) usuarioDAO.findAll()) {
             if (usuario.getDetallesEmpleado() != null && 
                     usuario.getDetallesEmpleado().getEmpresa().getId() == empresa.getId()) {
                 usuarios.add(usuario);
@@ -94,7 +94,7 @@ public class EmpleadosController implements Initializable {
         System.out.println(usuarios.size());
         if (!usuarios.isEmpty()) {
            data = FXCollections.observableArrayList(); 
-           for (Usuarios user: usuarios) {
+           for (Usuario user: usuarios) {
                EmpleadoTable empleado = new EmpleadoTable();
                empleado.id.set(user.getId());
                empleado.nombre.set(user.getNombre());
@@ -141,7 +141,7 @@ public class EmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    aplicacionControl.mostrarEmpleado(usuariosDAO.findById(rowData.getId()));
+                    aplicacionControl.mostrarEmpleado(usuarioDAO.findById(rowData.getId()));
                 }
             });
             return row ;

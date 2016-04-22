@@ -1,7 +1,10 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.AccionTipo;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -16,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * methods provides additional information for how to configure it for the
  * desired type of transaction control.
  * 
- * @see hibernate.model.AccionTipo
+ * @see .AccionTipo
  * @author MyEclipse Persistence Tools
  */
 public class AccionTipoDAO extends BaseHibernateDAO {
@@ -51,8 +54,8 @@ public class AccionTipoDAO extends BaseHibernateDAO {
 	public AccionTipo findById(java.lang.Integer id) {
 		log.debug("getting AccionTipo instance with id: " + id);
 		try {
-			AccionTipo instance = (AccionTipo) getSession().get(
-					"hibernate.model.AccionTipo", id);
+			AccionTipo instance = (AccionTipo) getSession().get("hibernate.model.AccionTipo",
+					id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
@@ -63,8 +66,7 @@ public class AccionTipoDAO extends BaseHibernateDAO {
 	public List findByExample(AccionTipo instance) {
 		log.debug("finding AccionTipo instance by example");
 		try {
-			List results = getSession()
-					.createCriteria("hibernate.model.AccionTipo")
+			List results = getSession().createCriteria("hibernate.model.AccionTipo")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());

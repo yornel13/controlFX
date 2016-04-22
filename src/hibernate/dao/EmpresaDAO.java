@@ -1,7 +1,11 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.Empresa;
+import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -16,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * methods provides additional information for how to configure it for the
  * desired type of transaction control.
  * 
- * @see hibernate.model.Empresa
+ * @see .Empresa
  * @author MyEclipse Persistence Tools
  */
 public class EmpresaDAO extends BaseHibernateDAO {
@@ -62,8 +66,7 @@ public class EmpresaDAO extends BaseHibernateDAO {
 	public Empresa findById(java.lang.Integer id) {
 		log.debug("getting Empresa instance with id: " + id);
 		try {
-			Empresa instance = (Empresa) getSession().get(
-					"hibernate.model.Empresa", id);
+			Empresa instance = (Empresa) getSession().get("hibernate.model.Empresa", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
@@ -74,8 +77,7 @@ public class EmpresaDAO extends BaseHibernateDAO {
 	public List findByExample(Empresa instance) {
 		log.debug("finding Empresa instance by example");
 		try {
-			List results = getSession()
-					.createCriteria("hibernate.model.Empresa")
+			List results = getSession().createCriteria("hibernate.model.Empresa")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());

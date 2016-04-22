@@ -1,5 +1,7 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.Roles;
 import java.util.List;
 import org.hibernate.LockOptions;
@@ -16,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * provides additional information for how to configure it for the desired type
  * of transaction control.
  * 
- * @see hibernate.model.Roles
+ * @see .Roles
  * @author MyEclipse Persistence Tools
  */
 public class RolesDAO extends BaseHibernateDAO {
@@ -51,13 +53,21 @@ public class RolesDAO extends BaseHibernateDAO {
 	public Roles findById(java.lang.Integer id) {
 		log.debug("getting Roles instance with id: " + id);
 		try {
-			Roles instance = (Roles) getSession().get("hibernate.model.Roles",
-					id);
+			Roles instance = (Roles) getSession().get("hibernate.model.Roles", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
 			throw re;
 		}
+	}
+        
+        public List findAllByUsuarioId(Integer usuarioId) {
+            Query query = getSession().
+                createSQLQuery("SELECT * FROM Roles where usuario_id = :usuario_id")
+                .addEntity(Roles.class)
+                .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (List<Roles>) result;
 	}
 
 	public List findByExample(Roles instance) {

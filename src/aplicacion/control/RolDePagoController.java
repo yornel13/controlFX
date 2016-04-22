@@ -9,10 +9,10 @@ import static aplicacion.control.HorasEmpleadosController.getToday;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.tableModel.EmpleadoTable;
 import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -49,7 +49,7 @@ public class RolDePagoController implements Initializable {
     
     private AplicacionControl aplicacionControl;
     
-    private Usuarios empleado;
+    private Usuario empleado;
     
     private ArrayList<ControlEmpleado> controlEmpleado;
     private ArrayList<ControlTable> controlEmpleadoTable;
@@ -138,7 +138,7 @@ public class RolDePagoController implements Initializable {
     
     private ObservableList<ControlTable> data;
     
-    ArrayList<Usuarios> usuarios;
+    ArrayList<Usuario> usuarios;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -165,7 +165,7 @@ public class RolDePagoController implements Initializable {
         stagePrincipal.close();
     } 
     
-    public void setEmpleado(Usuarios empleado) throws ParseException {
+    public void setEmpleado(Usuario empleado) throws ParseException {
         this.empleado = empleado;
         
         DateTime dateTime = new DateTime(getToday().getTime());
@@ -176,7 +176,7 @@ public class RolDePagoController implements Initializable {
         setControlEmpleadoInfor(empleado, inicio, fin);
     }
     
-    public void setControlEmpleadoInfor(Usuarios empleado, Timestamp inicio, Timestamp fin) {
+    public void setControlEmpleadoInfor(Usuario empleado, Timestamp inicio, Timestamp fin) {
         
         textEmpleado.setText("Empleado: " + empleado.getNombre() + " " + empleado.getApellido());
         
@@ -266,7 +266,14 @@ public class RolDePagoController implements Initializable {
         totalRecargo.setText(String.format( "%.2f", totalRecargoDouble));
         Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble;
         subTotal.setText(String.format( "%.2f", subTotalDouble));
+        Double decimoTercero = subTotalDouble / 12d;
+        totalDecimo3.setText(String.format( "%.2f", decimoTercero));
+        Double decimoCuarto = (30.5d/30d) * Double.valueOf(dias); // Todo, hacer 30.5 una constante
+        totalDecimo4.setText(String.format( "%.2f", decimoCuarto));
         
+        totalReserva.setText(String.format( "%.2f", decimoTercero));
+        
+      
         
         
         

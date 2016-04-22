@@ -1,7 +1,6 @@
 package hibernate.model;
 
-import java.util.HashSet;
-import java.util.Set;
+// default package
 
 /**
  * Roles entity. @author MyEclipse Persistence Tools
@@ -12,10 +11,10 @@ public class Roles implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
+	private Usuario usuario;
 	private String nombre;
 	private String permiso;
 	private Boolean activo;
-	private Set usuarioses = new HashSet(0);
 
 	// Constructors
 
@@ -23,19 +22,12 @@ public class Roles implements java.io.Serializable {
 	public Roles() {
 	}
 
-	/** minimal constructor */
-	public Roles(String nombre, String permiso, Boolean activo) {
-		this.nombre = nombre;
-		this.permiso = permiso;
-		this.activo = activo;
-	}
-
 	/** full constructor */
-	public Roles(String nombre, String permiso, Boolean activo, Set usuarioses) {
+	public Roles(Usuario usuario, String nombre, String permiso, Boolean activo) {
+		this.usuario = usuario;
 		this.nombre = nombre;
 		this.permiso = permiso;
 		this.activo = activo;
-		this.usuarioses = usuarioses;
 	}
 
 	// Property accessors
@@ -46,6 +38,14 @@ public class Roles implements java.io.Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Usuario getUsuario() {
+		return this.usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public String getNombre() {
@@ -70,14 +70,6 @@ public class Roles implements java.io.Serializable {
 
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
-	}
-
-	public Set getUsuarioses() {
-		return this.usuarioses;
-	}
-
-	public void setUsuarioses(Set usuarioses) {
-		this.usuarioses = usuarioses;
 	}
 
 }

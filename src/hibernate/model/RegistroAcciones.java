@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.sql.Timestamp;
 
 /**
@@ -11,7 +13,7 @@ public class RegistroAcciones implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
-	private Usuarios usuarios;
+	private Usuario usuario;
 	private AccionTipo accionTipo;
 	private String detalles;
 	private Timestamp fecha;
@@ -23,17 +25,17 @@ public class RegistroAcciones implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public RegistroAcciones(Usuarios usuarios, AccionTipo accionTipo,
+	public RegistroAcciones(Usuario usuario, AccionTipo accionTipo,
 			Timestamp fecha) {
-		this.usuarios = usuarios;
+		this.usuario = usuario;
 		this.accionTipo = accionTipo;
 		this.fecha = fecha;
 	}
 
 	/** full constructor */
-	public RegistroAcciones(Usuarios usuarios, AccionTipo accionTipo,
+	public RegistroAcciones(Usuario usuario, AccionTipo accionTipo,
 			String detalles, Timestamp fecha) {
-		this.usuarios = usuarios;
+		this.usuario = usuario;
 		this.accionTipo = accionTipo;
 		this.detalles = detalles;
 		this.fecha = fecha;
@@ -49,12 +51,12 @@ public class RegistroAcciones implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Usuarios getUsuarios() {
-		return this.usuarios;
+	public Usuario getUsuario() {
+		return this.usuario;
 	}
 
-	public void setUsuarios(Usuarios usuarios) {
-		this.usuarios = usuarios;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public AccionTipo getAccionTipo() {

@@ -41,10 +41,10 @@
             <column name="logo" />
         </property>
         <property name="creacion" type="java.sql.Timestamp">
-            <column name="creacion" length="0" not-null="true" />
+            <column name="creacion" length="19" not-null="true" />
         </property>
         <property name="ultimaModificacion" type="java.sql.Timestamp">
-            <column name="ultima_modificacion" length="0" not-null="true" />
+            <column name="ultima_modificacion" length="19" not-null="true" />
         </property>
         <property name="observacion" type="java.lang.String">
             <column name="observacion" />

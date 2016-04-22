@@ -6,10 +6,10 @@
 package aplicacion.control;
 
 import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.dao.UsuariosDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -80,11 +80,11 @@ public class PagosController implements Initializable {
     }
     
     private void metodo(Empresa empresa) {
-        UsuariosDAO usuariosDAO = new UsuariosDAO();
-        ArrayList<Usuarios> empleados = new ArrayList<>();
+        UsuarioDAO usuariosDAO = new UsuarioDAO();
+        ArrayList<Usuario> empleados = new ArrayList<>();
         empleados.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
         
-        for (Usuarios emp: empleados){
+        for (Usuario emp: empleados){
             ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
             
             Integer normales = 0;
@@ -96,9 +96,6 @@ public class PagosController implements Initializable {
                 sobreTiempo = sobreTiempo + control.getHorasExtras();
                 suplementarias = suplementarias + control.getHorasSuplementarias();
             }
-            emp.getHoras().setNormales(normales);
-            emp.getHoras().setSobreTiempo(sobreTiempo);
-            emp.getHoras().setSuplementarias(suplementarias);
             
             System.out.println(normales);
             System.out.println(sobreTiempo);

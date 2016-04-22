@@ -10,7 +10,7 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="usuarios" class="hibernate.model.Usuarios" fetch="select">
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
             <column name="usuario_id" />
         </many-to-one>
         <property name="nombreUsuario" type="java.lang.String">

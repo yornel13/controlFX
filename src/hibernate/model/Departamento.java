@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.util.HashSet;
 import java.util.Set;
 

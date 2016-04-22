@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.sql.Timestamp;
 
 /**
@@ -11,26 +13,26 @@ public class PagoMes implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
-	private Usuarios usuarios;
+	private Usuario usuario;
 	private Timestamp inicio;
 	private Timestamp finalizo;
 	private Integer totalDias;
-	private Long horasNormales;
-	private Long totalHorasNormales;
-	private Long totalHorasExtras;
-	private Long totalHorasSuplementarias;
-	private Long totalHorasAdicionales;
-	private Integer montoBono;
-	private Integer montoTransporte;
-	private Long totalMontoAdicionales;
-	private Long subtotal;
-	private Long totalDecimoTercero;
-	private Long totalDecimoCuarto;
-	private Long montoJubilacionPatronal;
-	private Long montoAportePatronal;
-	private Long montoSeguros;
-	private Long montoUniformes;
-	private Long montoTotalIngreso;
+	private Double horasNormales;
+	private Double totalHorasNormales;
+	private Double totalHorasExtras;
+	private Double totalHorasSuplementarias;
+	private Double totalHorasAdicionales;
+	private Double montoBono;
+	private Double montoTransporte;
+	private Double totalMontoAdicionales;
+	private Double subtotal;
+	private Double totalDecimoTercero;
+	private Double totalDecimoCuarto;
+	private Double montoJubilacionPatronal;
+	private Double montoAportePatronal;
+	private Double montoSeguros;
+	private Double montoUniformes;
+	private Double montoTotalIngreso;
 
 	// Constructors
 
@@ -39,15 +41,16 @@ public class PagoMes implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public PagoMes(Usuarios usuarios, Timestamp inicio, Timestamp finalizo,
-			Integer totalDias, Long horasNormales, Long totalHorasNormales,
-			Long totalHorasExtras, Long totalHorasSuplementarias,
-			Long totalHorasAdicionales, Integer montoBono,
-			Integer montoTransporte, Long totalMontoAdicionales, Long subtotal,
-			Long totalDecimoTercero, Long totalDecimoCuarto,
-			Long montoJubilacionPatronal, Long montoAportePatronal,
-			Long montoSeguros, Long montoUniformes, Long montoTotalIngreso) {
-		this.usuarios = usuarios;
+	public PagoMes(Usuario usuario, Timestamp inicio, Timestamp finalizo,
+			Integer totalDias, Double horasNormales, Double totalHorasNormales,
+			Double totalHorasExtras, Double totalHorasSuplementarias,
+			Double totalHorasAdicionales, Double montoBono,
+			Double montoTransporte, Double totalMontoAdicionales,
+			Double subtotal, Double totalDecimoTercero,
+			Double totalDecimoCuarto, Double montoJubilacionPatronal,
+			Double montoAportePatronal, Double montoSeguros,
+			Double montoUniformes, Double montoTotalIngreso) {
+		this.usuario = usuario;
 		this.inicio = inicio;
 		this.finalizo = finalizo;
 		this.totalDias = totalDias;
@@ -79,12 +82,12 @@ public class PagoMes implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Usuarios getUsuarios() {
-		return this.usuarios;
+	public Usuario getUsuario() {
+		return this.usuario;
 	}
 
-	public void setUsuarios(Usuarios usuarios) {
-		this.usuarios = usuarios;
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	public Timestamp getInicio() {
@@ -111,131 +114,131 @@ public class PagoMes implements java.io.Serializable {
 		this.totalDias = totalDias;
 	}
 
-	public Long getHorasNormales() {
+	public Double getHorasNormales() {
 		return this.horasNormales;
 	}
 
-	public void setHorasNormales(Long horasNormales) {
+	public void setHorasNormales(Double horasNormales) {
 		this.horasNormales = horasNormales;
 	}
 
-	public Long getTotalHorasNormales() {
+	public Double getTotalHorasNormales() {
 		return this.totalHorasNormales;
 	}
 
-	public void setTotalHorasNormales(Long totalHorasNormales) {
+	public void setTotalHorasNormales(Double totalHorasNormales) {
 		this.totalHorasNormales = totalHorasNormales;
 	}
 
-	public Long getTotalHorasExtras() {
+	public Double getTotalHorasExtras() {
 		return this.totalHorasExtras;
 	}
 
-	public void setTotalHorasExtras(Long totalHorasExtras) {
+	public void setTotalHorasExtras(Double totalHorasExtras) {
 		this.totalHorasExtras = totalHorasExtras;
 	}
 
-	public Long getTotalHorasSuplementarias() {
+	public Double getTotalHorasSuplementarias() {
 		return this.totalHorasSuplementarias;
 	}
 
-	public void setTotalHorasSuplementarias(Long totalHorasSuplementarias) {
+	public void setTotalHorasSuplementarias(Double totalHorasSuplementarias) {
 		this.totalHorasSuplementarias = totalHorasSuplementarias;
 	}
 
-	public Long getTotalHorasAdicionales() {
+	public Double getTotalHorasAdicionales() {
 		return this.totalHorasAdicionales;
 	}
 
-	public void setTotalHorasAdicionales(Long totalHorasAdicionales) {
+	public void setTotalHorasAdicionales(Double totalHorasAdicionales) {
 		this.totalHorasAdicionales = totalHorasAdicionales;
 	}
 
-	public Integer getMontoBono() {
+	public Double getMontoBono() {
 		return this.montoBono;
 	}
 
-	public void setMontoBono(Integer montoBono) {
+	public void setMontoBono(Double montoBono) {
 		this.montoBono = montoBono;
 	}
 
-	public Integer getMontoTransporte() {
+	public Double getMontoTransporte() {
 		return this.montoTransporte;
 	}
 
-	public void setMontoTransporte(Integer montoTransporte) {
+	public void setMontoTransporte(Double montoTransporte) {
 		this.montoTransporte = montoTransporte;
 	}
 
-	public Long getTotalMontoAdicionales() {
+	public Double getTotalMontoAdicionales() {
 		return this.totalMontoAdicionales;
 	}
 
-	public void setTotalMontoAdicionales(Long totalMontoAdicionales) {
+	public void setTotalMontoAdicionales(Double totalMontoAdicionales) {
 		this.totalMontoAdicionales = totalMontoAdicionales;
 	}
 
-	public Long getSubtotal() {
+	public Double getSubtotal() {
 		return this.subtotal;
 	}
 
-	public void setSubtotal(Long subtotal) {
+	public void setSubtotal(Double subtotal) {
 		this.subtotal = subtotal;
 	}
 
-	public Long getTotalDecimoTercero() {
+	public Double getTotalDecimoTercero() {
 		return this.totalDecimoTercero;
 	}
 
-	public void setTotalDecimoTercero(Long totalDecimoTercero) {
+	public void setTotalDecimoTercero(Double totalDecimoTercero) {
 		this.totalDecimoTercero = totalDecimoTercero;
 	}
 
-	public Long getTotalDecimoCuarto() {
+	public Double getTotalDecimoCuarto() {
 		return this.totalDecimoCuarto;
 	}
 
-	public void setTotalDecimoCuarto(Long totalDecimoCuarto) {
+	public void setTotalDecimoCuarto(Double totalDecimoCuarto) {
 		this.totalDecimoCuarto = totalDecimoCuarto;
 	}
 
-	public Long getMontoJubilacionPatronal() {
+	public Double getMontoJubilacionPatronal() {
 		return this.montoJubilacionPatronal;
 	}
 
-	public void setMontoJubilacionPatronal(Long montoJubilacionPatronal) {
+	public void setMontoJubilacionPatronal(Double montoJubilacionPatronal) {
 		this.montoJubilacionPatronal = montoJubilacionPatronal;
 	}
 
-	public Long getMontoAportePatronal() {
+	public Double getMontoAportePatronal() {
 		return this.montoAportePatronal;
 	}
 
-	public void setMontoAportePatronal(Long montoAportePatronal) {
+	public void setMontoAportePatronal(Double montoAportePatronal) {
 		this.montoAportePatronal = montoAportePatronal;
 	}
 
-	public Long getMontoSeguros() {
+	public Double getMontoSeguros() {
 		return this.montoSeguros;
 	}
 
-	public void setMontoSeguros(Long montoSeguros) {
+	public void setMontoSeguros(Double montoSeguros) {
 		this.montoSeguros = montoSeguros;
 	}
 
-	public Long getMontoUniformes() {
+	public Double getMontoUniformes() {
 		return this.montoUniformes;
 	}
 
-	public void setMontoUniformes(Long montoUniformes) {
+	public void setMontoUniformes(Double montoUniformes) {
 		this.montoUniformes = montoUniformes;
 	}
 
-	public Long getMontoTotalIngreso() {
+	public Double getMontoTotalIngreso() {
 		return this.montoTotalIngreso;
 	}
 
-	public void setMontoTotalIngreso(Long montoTotalIngreso) {
+	public void setMontoTotalIngreso(Double montoTotalIngreso) {
 		this.montoTotalIngreso = montoTotalIngreso;
 	}
 

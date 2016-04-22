@@ -1,6 +1,9 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.PagoMes;
+import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -16,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * methods provides additional information for how to configure it for the
  * desired type of transaction control.
  * 
- * @see hibernate.model.PagoMes
+ * @see .PagoMes
  * @author MyEclipse Persistence Tools
  */
 public class PagoMesDAO extends BaseHibernateDAO {
@@ -65,8 +68,7 @@ public class PagoMesDAO extends BaseHibernateDAO {
 	public PagoMes findById(java.lang.Integer id) {
 		log.debug("getting PagoMes instance with id: " + id);
 		try {
-			PagoMes instance = (PagoMes) getSession().get(
-					"hibernate.model.PagoMes", id);
+			PagoMes instance = (PagoMes) getSession().get("hibernate.model.PagoMes", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
@@ -77,8 +79,7 @@ public class PagoMesDAO extends BaseHibernateDAO {
 	public List findByExample(PagoMes instance) {
 		log.debug("finding PagoMes instance by example");
 		try {
-			List results = getSession()
-					.createCriteria("hibernate.model.PagoMes")
+			List results = getSession().createCriteria("hibernate.model.PagoMes")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());

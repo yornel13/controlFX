@@ -16,8 +16,9 @@
     <mapping resource="hibernate/hbm/Roles.hbm.xml"/>
     <mapping resource="hibernate/hbm/AccionTipo.hbm.xml"/>
     <mapping resource="hibernate/hbm/EstadoCivil.hbm.xml"/>
-    <mapping resource="hibernate/hbm/Usuarios.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Usuario.hbm.xml"/>
     <mapping resource="hibernate/hbm/Bono.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Constante.hbm.xml"/>
     <mapping resource="hibernate/hbm/ControlEmpleado.hbm.xml"/>
     <mapping resource="hibernate/hbm/PagoMes.hbm.xml"/>
     <mapping resource="hibernate/hbm/RegistroAcciones.hbm.xml"/>

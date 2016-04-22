@@ -1,7 +1,10 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.EstadoCivil;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -16,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * transactions. Each of these methods provides additional information for how
  * to configure it for the desired type of transaction control.
  * 
- * @see hibernate.model.EstadoCivil
+ * @see .EstadoCivil
  * @author MyEclipse Persistence Tools
  */
 public class EstadoCivilDAO extends BaseHibernateDAO {
@@ -63,8 +66,7 @@ public class EstadoCivilDAO extends BaseHibernateDAO {
 	public List findByExample(EstadoCivil instance) {
 		log.debug("finding EstadoCivil instance by example");
 		try {
-			List results = getSession()
-					.createCriteria("hibernate.model.EstadoCivil")
+			List results = getSession().createCriteria("hibernate.model.EstadoCivil")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());

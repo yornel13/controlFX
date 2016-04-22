@@ -10,7 +10,7 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="usuarios" class="hibernate.model.Usuarios" fetch="select">
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
             <column name="usuario_id" not-null="true" />
         </many-to-one>
         <property name="concepto" type="java.lang.String">
@@ -19,11 +19,11 @@
         <property name="detalles" type="java.lang.String">
             <column name="detalles" length="65535" not-null="true" />
         </property>
-        <property name="monto" type="java.lang.Long">
-            <column name="monto" precision="10" scale="0" not-null="true" />
+        <property name="monto" type="java.lang.Double">
+            <column name="monto" precision="10" not-null="true" />
         </property>
         <property name="fecha" type="java.sql.Timestamp">
-            <column name="fecha" length="0" not-null="true" />
+            <column name="fecha" length="19" not-null="true" />
         </property>
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />

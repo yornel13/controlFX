@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +20,7 @@ public class DetallesEmpleado implements java.io.Serializable {
 	private Double sueldo;
 	private String nroCuenta;
 	private String extra;
-	private Set usuarioses = new HashSet(0);
+	private Set usuarios = new HashSet(0);
 
 	// Constructors
 
@@ -36,14 +38,14 @@ public class DetallesEmpleado implements java.io.Serializable {
 	/** full constructor */
 	public DetallesEmpleado(Departamento departamento, Empresa empresa,
 			Cargo cargo, Double sueldo, String nroCuenta, String extra,
-			Set usuarioses) {
+			Set usuarios) {
 		this.departamento = departamento;
 		this.empresa = empresa;
 		this.cargo = cargo;
 		this.sueldo = sueldo;
 		this.nroCuenta = nroCuenta;
 		this.extra = extra;
-		this.usuarioses = usuarioses;
+		this.usuarios = usuarios;
 	}
 
 	// Property accessors
@@ -104,12 +106,12 @@ public class DetallesEmpleado implements java.io.Serializable {
 		this.extra = extra;
 	}
 
-	public Set getUsuarioses() {
-		return this.usuarioses;
+	public Set getUsuarios() {
+		return this.usuarios;
 	}
 
-	public void setUsuarioses(Set usuarioses) {
-		this.usuarioses = usuarioses;
+	public void setUsuarios(Set usuarios) {
+		this.usuarios = usuarios;
 	}
 
 }

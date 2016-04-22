@@ -16,11 +16,11 @@
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />
         </property>
-        <set name="usuarioses" inverse="true">
+        <set name="usuarios" inverse="true">
             <key>
                 <column name="estado_civil_id" />
             </key>
-            <one-to-many class="hibernate.model.Usuarios" />
+            <one-to-many class="hibernate.model.Usuario" />
         </set>
     </class>
 </hibernate-mapping>

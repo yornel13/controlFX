@@ -28,6 +28,12 @@
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />
         </property>
+        <property name="creacion" type="java.sql.Timestamp">
+            <column name="creacion" length="19" not-null="true" />
+        </property>
+        <property name="ultimaModificacion" type="java.sql.Timestamp">
+            <column name="ultima_modificacion" length="19" not-null="true" />
+        </property>
         <set name="controlEmpleados" inverse="true">
             <key>
                 <column name="cliente_id" />

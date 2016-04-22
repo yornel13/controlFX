@@ -5,9 +5,10 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Permisos;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -25,10 +26,16 @@ public class AplicacionControl extends Application {
     private Stage stagePrincipal;
     private AnchorPane rootPane;
     
+    public Permisos permisos;
+    
     @Override
     public void start(Stage stagePrincipal) throws Exception {
         this.stagePrincipal = stagePrincipal;
         mostrarVentanaPrincipal();
+    }
+    
+    public void login() {
+        
     }
     
     /*
@@ -202,7 +209,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarEmpleado(Usuarios empleado) {
+    public void mostrarEmpleado(Usuario empleado) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
@@ -225,7 +232,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarEditarEmpleado(Usuarios empleado) {
+    public void mostrarEditarEmpleado(Usuario empleado) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpleado()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpleado.fxml"));
@@ -429,7 +436,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarRolDePago(Usuarios empleado) {
+    public void mostrarRolDePago(Usuario empleado) {
         try {
             System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));

@@ -58,21 +58,10 @@ VALUES
 (4, 'VIUDO(A)', true);
 
 
-
-INSERT INTO control.roles
-(`id`,`nombre`,`permiso`,`activo`)
+INSERT INTO control.usuario
+(`id`,`nombre`,`apellido`,`cedula`,`email`,`direccion`,`telefono`,`detalles_empleado_id`,`creacion`,`ultima_modificacion`,`foto`,`estado_civil_id`,`activo`,`nacimiento`,`sexo`)
 VALUES
-(1, 'ADMINISTRADOR','control total', true);
-INSERT INTO control.roles
-(`id`,`nombre`,`permiso`,`activo`)
-VALUES
-(2, 'EMPLEADO','ninguno', true);
-
-
-INSERT INTO control.usuarios
-(`id`,`nombre`,`apellido`,`cedula`,`email`,`direccion`,`telefono`,`detalles_empleado_id`,`creacion`,`ultima_modificacion`,`foto`,`estado_civil_id`,`rol_id`,`activo`)
-VALUES
-(1,'admi','admi','admi','admi','admi','admi',null, '1970-01-01 00:00:01', '1970-01-01 00:00:01',null,1,1,true);
+(1,'admi','admi','admi','admi','admi','admi',null, '1970-01-01 00:00:01', '1970-01-01 00:00:01',null,1,true,'1970-01-01 00:00:01','M');
 
 
 INSERT INTO control.identidad

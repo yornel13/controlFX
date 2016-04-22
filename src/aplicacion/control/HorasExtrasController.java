@@ -7,7 +7,7 @@ package aplicacion.control;
 
 import hibernate.dao.ClienteDAO;
 import hibernate.model.Cliente;
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +35,7 @@ public class HorasExtrasController implements Initializable {
     
     private Stage stagePrincipal;
     
-    private Usuarios empleado;
+    private Usuario empleado;
     
     @FXML
     private TextField suplementarias;
@@ -88,7 +88,7 @@ public class HorasExtrasController implements Initializable {
         }
     }
     
-    public void setEmpleado(Usuarios empleado) {
+    public void setEmpleado(Usuario empleado) {
         this.empleado = empleado;
     }
 

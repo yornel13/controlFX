@@ -1,5 +1,7 @@
 package hibernate.model;
 
+// default package
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +16,7 @@ public class EstadoCivil implements java.io.Serializable {
 	private Integer id;
 	private String nombre;
 	private Boolean activo;
-	private Set usuarioses = new HashSet(0);
+	private Set usuarios = new HashSet(0);
 
 	// Constructors
 
@@ -29,10 +31,10 @@ public class EstadoCivil implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public EstadoCivil(String nombre, Boolean activo, Set usuarioses) {
+	public EstadoCivil(String nombre, Boolean activo, Set usuarios) {
 		this.nombre = nombre;
 		this.activo = activo;
-		this.usuarioses = usuarioses;
+		this.usuarios = usuarios;
 	}
 
 	// Property accessors
@@ -61,12 +63,12 @@ public class EstadoCivil implements java.io.Serializable {
 		this.activo = activo;
 	}
 
-	public Set getUsuarioses() {
-		return this.usuarioses;
+	public Set getUsuarios() {
+		return this.usuarios;
 	}
 
-	public void setUsuarioses(Set usuarioses) {
-		this.usuarioses = usuarioses;
+	public void setUsuarios(Set usuarios) {
+		this.usuarios = usuarios;
 	}
 
 }

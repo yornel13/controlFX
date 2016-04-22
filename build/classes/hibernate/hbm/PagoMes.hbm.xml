@@ -10,65 +10,65 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="usuarios" class="hibernate.model.Usuarios" fetch="select">
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
             <column name="usuario_id" not-null="true" />
         </many-to-one>
         <property name="inicio" type="java.sql.Timestamp">
-            <column name="inicio" length="0" not-null="true" />
+            <column name="inicio" length="19" not-null="true" />
         </property>
         <property name="finalizo" type="java.sql.Timestamp">
-            <column name="finalizo" length="0" not-null="true" />
+            <column name="finalizo" length="19" not-null="true" />
         </property>
         <property name="totalDias" type="java.lang.Integer">
             <column name="total_dias" not-null="true" />
         </property>
-        <property name="horasNormales" type="java.lang.Long">
-            <column name="horas_normales" precision="10" scale="0" not-null="true" />
+        <property name="horasNormales" type="java.lang.Double">
+            <column name="horas_normales" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalHorasNormales" type="java.lang.Long">
-            <column name="total_horas_normales" precision="10" scale="0" not-null="true" />
+        <property name="totalHorasNormales" type="java.lang.Double">
+            <column name="total_horas_normales" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalHorasExtras" type="java.lang.Long">
-            <column name="total_horas_extras" precision="10" scale="0" not-null="true" />
+        <property name="totalHorasExtras" type="java.lang.Double">
+            <column name="total_horas_extras" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalHorasSuplementarias" type="java.lang.Long">
-            <column name="total_horas_suplementarias" precision="10" scale="0" not-null="true" />
+        <property name="totalHorasSuplementarias" type="java.lang.Double">
+            <column name="total_horas_suplementarias" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalHorasAdicionales" type="java.lang.Long">
-            <column name="total_horas_adicionales" precision="10" scale="0" not-null="true" />
+        <property name="totalHorasAdicionales" type="java.lang.Double">
+            <column name="total_horas_adicionales" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoBono" type="java.lang.Integer">
-            <column name="monto_bono" not-null="true" />
+        <property name="montoBono" type="java.lang.Double">
+            <column name="monto_bono" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoTransporte" type="java.lang.Integer">
-            <column name="monto_transporte" not-null="true" />
+        <property name="montoTransporte" type="java.lang.Double">
+            <column name="monto_transporte" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalMontoAdicionales" type="java.lang.Long">
-            <column name="total_monto_adicionales" precision="10" scale="0" not-null="true" />
+        <property name="totalMontoAdicionales" type="java.lang.Double">
+            <column name="total_monto_adicionales" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="subtotal" type="java.lang.Long">
-            <column name="subtotal" precision="10" scale="0" not-null="true" />
+        <property name="subtotal" type="java.lang.Double">
+            <column name="subtotal" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalDecimoTercero" type="java.lang.Long">
-            <column name="total_decimo_tercero" precision="10" scale="0" not-null="true" />
+        <property name="totalDecimoTercero" type="java.lang.Double">
+            <column name="total_decimo_tercero" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="totalDecimoCuarto" type="java.lang.Long">
-            <column name="total_decimo_cuarto" precision="10" scale="0" not-null="true" />
+        <property name="totalDecimoCuarto" type="java.lang.Double">
+            <column name="total_decimo_cuarto" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoJubilacionPatronal" type="java.lang.Long">
-            <column name="monto_jubilacion_patronal" precision="10" scale="0" not-null="true" />
+        <property name="montoJubilacionPatronal" type="java.lang.Double">
+            <column name="monto_jubilacion_patronal" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoAportePatronal" type="java.lang.Long">
-            <column name="monto_aporte_patronal" precision="10" scale="0" not-null="true" />
+        <property name="montoAportePatronal" type="java.lang.Double">
+            <column name="monto_aporte_patronal" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoSeguros" type="java.lang.Long">
-            <column name="monto_seguros" precision="10" scale="0" not-null="true" />
+        <property name="montoSeguros" type="java.lang.Double">
+            <column name="monto_seguros" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoUniformes" type="java.lang.Long">
-            <column name="monto_uniformes" precision="10" scale="0" not-null="true" />
+        <property name="montoUniformes" type="java.lang.Double">
+            <column name="monto_uniformes" precision="10" scale="4" not-null="true" />
         </property>
-        <property name="montoTotalIngreso" type="java.lang.Long">
-            <column name="monto_total_ingreso" precision="10" scale="0" not-null="true" />
+        <property name="montoTotalIngreso" type="java.lang.Double">
+            <column name="monto_total_ingreso" precision="10" scale="4" not-null="true" />
         </property>
     </class>
 </hibernate-mapping>

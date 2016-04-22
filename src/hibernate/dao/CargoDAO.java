@@ -1,7 +1,10 @@
 package hibernate.dao;
 
+// default package
+
 import hibernate.model.Cargo;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -16,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * provides additional information for how to configure it for the desired type
  * of transaction control.
  * 
- * @see hibernate.model.Cargo
+ * @see .Cargo
  * @author MyEclipse Persistence Tools
  */
 public class CargoDAO extends BaseHibernateDAO {
@@ -50,8 +53,7 @@ public class CargoDAO extends BaseHibernateDAO {
 	public Cargo findById(java.lang.Integer id) {
 		log.debug("getting Cargo instance with id: " + id);
 		try {
-			Cargo instance = (Cargo) getSession().get("hibernate.model.Cargo",
-					id);
+			Cargo instance = (Cargo) getSession().get("hibernate.model.Cargo", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);

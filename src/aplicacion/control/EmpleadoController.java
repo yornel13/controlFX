@@ -5,7 +5,7 @@
  */
 package aplicacion.control;
 
-import hibernate.model.Usuarios;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -26,7 +26,7 @@ import javafx.stage.Stage;
  */
 public class EmpleadoController implements Initializable {
     
-    private Usuarios empleado;
+    private Usuario empleado;
     
     private Stage stagePrincipal;
     
@@ -97,7 +97,7 @@ public class EmpleadoController implements Initializable {
         stagePrincipal.close();
     }
     
-    public void setEmpleado(Usuarios empleado   ) {
+    public void setEmpleado(Usuario empleado   ) {
         this.empleado = empleado;
         nombre.setText(empleado.getNombre() + " " + empleado.getApellido());
         cedula.setText(empleado.getCedula());

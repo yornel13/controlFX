@@ -5,8 +5,11 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Permisos;
 import hibernate.dao.IdentidadDAO;
+import hibernate.dao.RolesDAO;
 import hibernate.model.Identidad;
+import hibernate.model.Roles;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -63,6 +66,7 @@ public class LoginController implements Initializable {
             identidad = iden.get(0);
             if (identidad.getContrasena().equals(MD5(contrasenaField.getText()))) {
                 salirVentana(event);
+                //obtenerPermisos(iden.getO);
                 aplicacionControl.mostrarConfiguracion();
             } else {
                 textError.setText("contraseña erronea");
@@ -70,17 +74,27 @@ public class LoginController implements Initializable {
         }
     }
     
-   public String MD5(String md5) {
-   try {
-        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-        byte[] array = md.digest(md5.getBytes());
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < array.length; ++i) {
-          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-       }
-        return sb.toString();
-    } catch (java.security.NoSuchAlgorithmException e) {
+    public void obtenerPermisos(Integer usuarioId) {
+        ArrayList<Roles> roles = new ArrayList<>();
+        RolesDAO rolesDAO = new RolesDAO();
+        roles.addAll(rolesDAO.findAllByUsuarioId(usuarioId));
+        Permisos permisos = new Permisos();
+        permisos.setRoles(roles);
+        aplicacionControl.permisos = permisos;
     }
+    
+    public String MD5(String md5) {
+        try {
+             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+             byte[] array = md.digest(md5.getBytes());
+             StringBuffer sb = new StringBuffer();
+             for (int i = 0; i < array.length; ++i) {
+               sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+            }
+             return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            // nothing to do
+        }
     return null;
 }
 
