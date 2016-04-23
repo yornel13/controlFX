@@ -2,6 +2,7 @@ package hibernate.model;
 
 // default package
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ public class DetallesEmpleado implements java.io.Serializable {
 	private Double sueldo;
 	private String nroCuenta;
 	private String extra;
+        private Timestamp fechaInicio;
+        private Timestamp fechaContrato;
 	private Set usuarios = new HashSet(0);
 
 	// Constructors
@@ -114,4 +117,20 @@ public class DetallesEmpleado implements java.io.Serializable {
 		this.usuarios = usuarios;
 	}
 
+        public Timestamp getFechaInicio() {
+            return fechaInicio;
+        }
+
+        public void setFechaInicio(Timestamp fechaInicio) {
+            this.fechaInicio = fechaInicio;
+        }
+
+        public Timestamp getFechaContrato() {
+            return fechaContrato;
+        }
+
+        public void setFechaContrato(Timestamp fechaContrato) {
+            this.fechaContrato = fechaContrato;
+        }
+        
 }

@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.Constante;
+import hibernate.model.Usuario;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -75,6 +76,15 @@ public class ConstanteDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public Constante findUniqueResultByNombre(String nombre) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM constante where nombre = :nombre and activo = true")
+                    .addEntity(Constante.class)
+                    .setParameter("nombre", nombre);
+            Object result = query.uniqueResult();
+            return (Constante) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Constante instance with property: " + propertyName

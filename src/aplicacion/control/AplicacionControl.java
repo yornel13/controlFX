@@ -11,10 +11,19 @@ import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -26,7 +35,12 @@ public class AplicacionControl extends Application {
     private Stage stagePrincipal;
     private AnchorPane rootPane;
     
+    public Scene loginScene;
     public Permisos permisos;
+    
+    // Boton y texto de logeo
+    public Button login;
+    public Label usuarioLogin;
     
     @Override
     public void start(Stage stagePrincipal) throws Exception {
@@ -34,18 +48,94 @@ public class AplicacionControl extends Application {
         mostrarVentanaPrincipal();
     }
     
-    public void login() {
-        
+    public void login(Button login, Label usuarioLogin) {
+        this.login = login;
+        this.usuarioLogin = usuarioLogin;
+        if (permisos != null) {
+            permisos = null;
+            login.setText("Ingresar");
+            usuarioLogin.setText("");
+        } else {
+            if (loginScene == null || !loginScene.getWindow().isShowing()) {
+                mostrarLogin();
+            }
+        }
+    }
+    
+    public void loginCompletado(Usuario usuario) {
+        permisos.setUsuario(usuario);
+        login.setText("Salir");
+        usuarioLogin.setText(permisos.getUsuario().getNombre() + 
+                " " + permisos.getUsuario().getApellido());
+    }
+    
+    public void mostrarLogin() {
+        try {
+            System.out.println("aplicacion.control.AplicacionControl.mostarLogin()");
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaLogin.fxml"));
+            AnchorPane ventanaLogin = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Ingresar");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/user.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            loginScene = new Scene(ventanaLogin);
+            ventana.setScene(loginScene);
+            LoginController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void noLogeado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Dialogo");
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Debes ingresar tu usuario primero."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public void noPermitido() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Dialogo");
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("No tienes permiso para ingresar aqui."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+    }
+    
+    private void insertarDatosDeUsuarios(Button login, Label usuarioLogin) {
+       this.login = login;
+       this.usuarioLogin = usuarioLogin;
+       if (permisos != null) {
+           login.setText("Salir");
+           usuarioLogin.setText(permisos.getUsuario().getNombre() + 
+                " " + permisos.getUsuario().getApellido());
+       }
     }
     
     /*
      * cargamos la ventana principal
      */
-    
-    
-    public void cerrar() {
-        
-    }
     
     public void mostrarVentanaPrincipal() {
         try {
@@ -61,56 +151,45 @@ public class AplicacionControl extends Application {
             stagePrincipal.setScene(scene);
             PrincipalController controller = loader.getController();
             controller.setProgramaPrincipal(this);
+            insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
             stagePrincipal.show();
         } catch (IOException e) {
             //tratar la excepción.
         }
    }
-    
-   public void mostrarLogin() {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostarLogin()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaLogin.fxml"));
-            AnchorPane ventanaLogin = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Login");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaLogin);
-            ventana.setScene(scene);
-            LoginController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
-        }
-    }
    
    public void mostrarConfiguracion() {
-        try {
-            stagePrincipal.close();
-            System.out.println("aplicacion.control.AplicacionControl.mostarConfiguracion()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracion.fxml"));
-            AnchorPane ventanaConfiguracion = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Administrador");
-            ventana.setResizable(false);
-            ventana.setWidth(600);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaConfiguracion);
-            ventana.setScene(scene);
-            ConfiguracionController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
-        }
+       if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+               try {
+                    stagePrincipal.close();
+                    System.out.println("aplicacion.control.AplicacionControl.mostarConfiguracion()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracion.fxml"));
+                    AnchorPane ventanaConfiguracion = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Administrador");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/config_admin.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(600);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaConfiguracion);
+                    ventana.setScene(scene);
+                    ConfiguracionController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       } 
     }
    
    public void mostrarRegistrarEmpresa() {
@@ -465,5 +544,4 @@ public class AplicacionControl extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
 }

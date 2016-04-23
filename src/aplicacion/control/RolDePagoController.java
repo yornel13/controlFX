@@ -8,10 +8,20 @@ package aplicacion.control;
 import static aplicacion.control.HorasEmpleadosController.getToday;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.util.Const;
+import com.sun.org.apache.bcel.internal.classfile.Constant;
+import hibernate.dao.ActuarialesDAO;
+import hibernate.dao.ConstanteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.SeguroDAO;
+import hibernate.dao.UniformeDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.Actuariales;
+import hibernate.model.Constante;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
+import hibernate.model.Seguro;
+import hibernate.model.Uniforme;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -204,8 +214,8 @@ public class RolDePagoController implements Initializable {
                 controlTable.setCliente(control.getCliente().getNombre());
             }
             controlTable.setFecha(new DateTime(control.getFecha().getTime()).toString("dd-MM-yyyy"));
-            controlTable.setHorasExtras(sobreTiempo);
-            controlTable.setHorasSuplementarias(suplementarias);
+            controlTable.setHorasExtras(control.getHorasExtras());
+            controlTable.setHorasSuplementarias(control.getHorasSuplementarias());
             controlTable.setUsuarios(empleado);
             
             controlEmpleadoTable.add(controlTable);
@@ -268,15 +278,21 @@ public class RolDePagoController implements Initializable {
         subTotal.setText(String.format( "%.2f", subTotalDouble));
         Double decimoTercero = subTotalDouble / 12d;
         totalDecimo3.setText(String.format( "%.2f", decimoTercero));
-        Double decimoCuarto = (30.5d/30d) * Double.valueOf(dias); // Todo, hacer 30.5 una constante
+        Double decimoCuarto = (getDecimoCuarto()/30d) * Double.valueOf(dias);
         totalDecimo4.setText(String.format( "%.2f", decimoCuarto));
-        
         totalReserva.setText(String.format( "%.2f", decimoTercero));
+        Double jubilacionPatronal = getActuariales(empleado.getId())/ 360d * Double.valueOf(dias);
+        totalJubilacion.setText(String.format( "%.2f", jubilacionPatronal));
+        Double aportePatronal = subTotalDouble * 12.5d / 100d;
+        totalAporte.setText(String.format( "%.2f", aportePatronal));
+        Double segurosDecimal = getSeguro(empleado.getDetallesEmpleado().getEmpresa().getId()) * Double.valueOf(dias);
+        totalSeguros.setText(String.format( "%.2f", segurosDecimal));
+        Double uniformeDecimal = getUniforme(empleado.getDetallesEmpleado().getEmpresa().getId()) * Double.valueOf(dias);
+        totalUniformes.setText(String.format( "%.2f", uniformeDecimal));
         
-      
-        
-        
-        
+        Double ingresoTotal = subTotalDouble + decimoTercero + decimoCuarto + decimoTercero 
+                + jubilacionPatronal + aportePatronal + segurosDecimal + uniformeDecimal;
+        totalIngresos.setText(String.format( "%.2f", ingresoTotal));
     }
     
     @Override
@@ -301,6 +317,50 @@ public class RolDePagoController implements Initializable {
         // Calendar numbers months from 0
         cal.set(Calendar.MONTH, month - 1);
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+    }
+    
+    public double getDecimoCuarto() {
+        ConstanteDAO constanteDao = new ConstanteDAO();
+        Constante constante;
+        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.DECIMO_TERCERO);
+        if (constante == null) {
+            return 30.5;
+        } else {
+            return Double.valueOf(constante.getValor());
+        }
+    }
+    
+    public double getActuariales(Integer empleadoId) {
+        ActuarialesDAO actuarialesDAO = new ActuarialesDAO();
+        Actuariales actuariales;
+        actuariales = actuarialesDAO.findByEmpleadoId(empleadoId);
+        if (actuariales == null) {
+            return 0;
+        } else {
+            return actuariales.getPrimario() + actuariales.getSecundario();
+        }
+    }
+    
+    public double getSeguro(Integer empresaId) {
+        SeguroDAO seguroDAO = new SeguroDAO();
+        Seguro seguro;
+        seguro = seguroDAO.findByEmpresaId(empresaId);
+        if (seguro == null) {
+          return 0;  
+        } else {
+            return seguro.getValor();
+        }  
+    }
+    
+    public double getUniforme(Integer empresaId) {
+        UniformeDAO uniformeDAO = new UniformeDAO();
+        Uniforme uniforme;
+        uniforme = uniformeDAO.findByEmpresaId(empresaId);
+        if (uniforme == null) {
+          return 0;  
+        } else {
+            return uniforme.getValor();
+        }  
     }
     
 }

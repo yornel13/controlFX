@@ -69,3 +69,14 @@ INSERT INTO control.identidad
 VALUES
 (1, 'admi','60eb0f73e33ce3ffd4e51d974447db53', true, 1);
 
+INSERT INTO control.roles
+(`id`,`nombre`,`permiso`,`activo`,`usuario_id`)
+VALUES
+(1, 'total','', true, 1);
+
+
+INSERT INTO control.constante
+(`id`,`nombre`,`valor`,`activo`)
+VALUES
+(1, 'decimo_cuarto', '30,5', 1);
+

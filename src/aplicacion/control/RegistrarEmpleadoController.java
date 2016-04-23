@@ -112,6 +112,12 @@ public class RegistrarEmpleadoController implements Initializable {
     @FXML 
     private DatePicker datePicker;
     
+    @FXML 
+    private DatePicker datePickerInicio;
+    
+    @FXML 
+    private DatePicker datePickerContratacion;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -172,6 +178,12 @@ public class RegistrarEmpleadoController implements Initializable {
         } else if (cargoChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Seleccione el cargo del empleado");
             errorText2.setText("Seleccione el cargo del empleado");
+        } else if (datePickerInicio.getValue() == null) {
+            errorText1.setText("Debe seleccionar la fecha de inicio del empleado");
+            errorText2.setText("Debe seleccionar la fecha de inicio del empleado");
+        } else if (datePickerContratacion.getValue() == null) {
+            errorText1.setText("Debe seleccionar la fecha de contratacion del empleado");
+            errorText2.setText("Debe seleccionar la fecha de contratacion del empleado");
         } else if (sueldoField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
@@ -185,6 +197,8 @@ public class RegistrarEmpleadoController implements Initializable {
                 detallesEmpleado.setEmpresa(empresa);
                 detallesEmpleado.setDepartamento(departamentos.get(departamentoChoiceBox.getSelectionModel().getSelectedIndex()));
                 detallesEmpleado.setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
+                detallesEmpleado.setFechaInicio(Timestamp.valueOf(datePickerInicio.getValue().atStartOfDay()));
+                detallesEmpleado.setFechaContrato(Timestamp.valueOf(datePickerContratacion.getValue().atStartOfDay()));
                 detallesEmpleado.setExtra(extraField.getText());
                 detallesEmpleado.setNroCuenta(cuentaField.getText());
                 detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));

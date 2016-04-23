@@ -58,7 +58,7 @@ public class PrincipalController implements Initializable {
     
     @FXML
     private void onCLickConfiguration(ActionEvent event) throws IOException, Exception {
-        aplicacionControl.mostrarLogin();
+        aplicacionControl.mostrarConfiguracion();
     }
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
@@ -85,10 +85,18 @@ public class PrincipalController implements Initializable {
         configuracion.setGraphic(new ImageView(adminImage));
         configuracion.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
         
-    } 
+    }
+    
+    // Login items
+    @FXML
+    public Button login;
+    
+    @FXML 
+    public Label usuarioLogin;
     
     @FXML
     public void onClickLoginButton(ActionEvent event) {
-        
+        aplicacionControl.login(login, usuarioLogin);
     }
+  
 }

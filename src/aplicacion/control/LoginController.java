@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -40,7 +41,6 @@ public class LoginController implements Initializable {
     
     @FXML
     private Label textError;
-    
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -66,8 +66,9 @@ public class LoginController implements Initializable {
             identidad = iden.get(0);
             if (identidad.getContrasena().equals(MD5(contrasenaField.getText()))) {
                 salirVentana(event);
-                //obtenerPermisos(iden.getO);
-                aplicacionControl.mostrarConfiguracion();
+                obtenerPermisos(identidad.getUsuario().getId());
+                aplicacionControl.loginCompletado(identidad.getUsuario());
+                //aplicacionControl.mostrarConfiguracion();
             } else {
                 textError.setText("contraseña erronea");
             }

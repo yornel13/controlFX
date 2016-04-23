@@ -28,6 +28,12 @@
         <property name="extra" type="java.lang.String">
             <column name="extra" length="65535" />
         </property>
+        <property name="fechaInicio" type="java.sql.Timestamp">
+            <column name="fecha_inicio" length="19" />
+        </property>
+        <property name="fechaContrato" type="java.sql.Timestamp">
+            <column name="fecha_contrato" length="19" />
+        </property>
         <set name="usuarios" inverse="true">
             <key>
                 <column name="detalles_empleado_id" />

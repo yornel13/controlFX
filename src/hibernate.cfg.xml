@@ -25,5 +25,9 @@
     <mapping resource="hibernate/hbm/Cargo.hbm.xml"/>
     <mapping resource="hibernate/hbm/Identidad.hbm.xml"/>
     <mapping resource="hibernate/hbm/DetallesEmpleado.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Actuariales.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Seguro.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Uniforme.hbm.xml"/>
+    
   </session-factory>
 </hibernate-configuration>

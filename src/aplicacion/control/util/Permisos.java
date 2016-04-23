@@ -6,6 +6,7 @@
 package aplicacion.control.util;
 
 import hibernate.model.Roles;
+import hibernate.model.Usuario;
 import java.util.ArrayList;
 
 /**
@@ -14,7 +15,16 @@ import java.util.ArrayList;
  */
 public class Permisos {
     
+    private Usuario usuario;
     private ArrayList<Roles> roles;
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
 
     public ArrayList<Roles> getRoles() {
         return roles;
@@ -29,7 +39,7 @@ public class Permisos {
             if (rol.getNombre().equalsIgnoreCase(TOTAL)) {
                 return true;
             } else if (rol.getNombre().equalsIgnoreCase(permisoRequerido)) {
-                if (rol.getPermiso().equalsIgnoreCase(nivel)) {
+                if (getNivel(rol.getPermiso()) >= getNivel(nivel)) {
                     return true;
                 }
             }
@@ -52,4 +62,19 @@ public class Permisos {
         public static final String ELIMINAR = "eliminar";
     }
     
+    public static Integer getNivel(String nivel) {
+        
+        switch(nivel) {
+            case Nivel.VER:
+                return 1;
+            case Nivel.CREAR:
+                return 2;
+            case Nivel.EDITAR:
+                return 3;
+            case Nivel.ELIMINAR:
+                return 4;
+            default:
+                return 0;         
+        }
+    }
 }

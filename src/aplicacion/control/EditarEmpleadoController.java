@@ -16,9 +16,13 @@ import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -29,13 +33,16 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -95,6 +102,21 @@ public class EditarEmpleadoController implements Initializable {
     @FXML
     private Label errorText2;
     
+    @FXML
+    private RadioButton sexoM;
+    
+    @FXML
+    private RadioButton sexoF;
+    
+    @FXML 
+    private DatePicker datePicker;
+    
+    @FXML 
+    private DatePicker datePickerInicio;
+    
+    @FXML 
+    private DatePicker datePickerContratacion;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -120,6 +142,18 @@ public class EditarEmpleadoController implements Initializable {
     }
     
     @FXML
+    public void sexoMasculinoClick(ActionEvent event) {
+        sexoM.setSelected(true);
+        sexoF.setSelected(false);
+    }
+    
+    @FXML
+    public void sexoFemeninoClick(ActionEvent event) {
+        sexoM.setSelected(false);
+        sexoF.setSelected(true);
+    }
+    
+    @FXML
     private void onCLickGuardar(ActionEvent event) throws IOException, Exception {
         System.out.println("aplicacion.control.RegistrarEmpleadoController.onCLickGuardar()");
         if (nombreField.getText().isEmpty()) {
@@ -131,6 +165,9 @@ public class EditarEmpleadoController implements Initializable {
         } else if (cedulaField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar la cedula");
             errorText2.setText("Debe ingresar la cedula");
+        } else if (!sexoF.isSelected() && !sexoM.isSelected()) {
+            errorText1.setText("Debe seleccionar el sexo");
+            errorText2.setText("Debe seleccionar el sexo");
         } else if (telefonoField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar un numero telefonico");
             errorText2.setText("Debe ingresar un numero telefonico");
@@ -143,12 +180,21 @@ public class EditarEmpleadoController implements Initializable {
         } else if (estadoCivilChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Debe seleccionar el estado civil");
             errorText2.setText("Debe seleccionar el estado civil");
+        } else if (datePicker.getValue() == null) {
+            errorText1.setText("Debe seleccionar la fecha de nacimiento");
+            errorText2.setText("Debe seleccionar la fecha de nacimiento");
         } else if (departamentoChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Seleccione el departamento al cual pertenece el empleado");
             errorText2.setText("Seleccione el departamento al cual pertenece el empleado");
         } else if (cargoChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Seleccione el cargo del empleado");
             errorText2.setText("Seleccione el cargo del empleado");
+        } else if (datePickerInicio.getValue() == null) {
+            errorText1.setText("Debe seleccionar la fecha de inicio del empleado");
+            errorText2.setText("Debe seleccionar la fecha de inicio del empleado");
+        } else if (datePickerContratacion.getValue() == null) {
+            errorText1.setText("Debe seleccionar la fecha de contratacion del empleado");
+            errorText2.setText("Debe seleccionar la fecha de contratacion del empleado");
         } else if (sueldoField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
@@ -156,6 +202,8 @@ public class EditarEmpleadoController implements Initializable {
             
             empleado.getDetallesEmpleado().setDepartamento(departamentos.get(departamentoChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.getDetallesEmpleado().setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
+            empleado.getDetallesEmpleado().setFechaInicio(Timestamp.valueOf(datePickerInicio.getValue().atStartOfDay()));
+            empleado.getDetallesEmpleado().setFechaContrato(Timestamp.valueOf(datePickerContratacion.getValue().atStartOfDay()));
             empleado.getDetallesEmpleado().setExtra(extraField.getText());
             empleado.getDetallesEmpleado().setNroCuenta(cuentaField.getText());
             empleado.getDetallesEmpleado().setSueldo(Double.parseDouble(sueldoField.getText()));
@@ -163,7 +211,13 @@ public class EditarEmpleadoController implements Initializable {
             empleado.setNombre(nombreField.getText());
             empleado.setApellido(apellidoField.getText());
             empleado.setCedula(cedulaField.getText());
-            empleado.setEmail(emailField.getText());
+            if (sexoM.isSelected()) {
+                    empleado.setSexo("M");
+                } else {
+                    empleado.setSexo("F");
+                }
+                empleado.setEmail(emailField.getText());
+                empleado.setNacimiento(Timestamp.valueOf(datePicker.getValue().atStartOfDay()));
             empleado.setDireccion(direccionField.getText());
             empleado.setTelefono(telefonoField.getText());
             empleado.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
@@ -206,7 +260,17 @@ public class EditarEmpleadoController implements Initializable {
         extraField.setText(empleado.getDetallesEmpleado().getExtra());
         estadoCivilChoiceBox.getSelectionModel().select(empleado.getEstadoCivil().getNombre());
         departamentoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getDepartamento().getNombre());
-        cargoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getCargo().getNombre());  
+        cargoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getCargo().getNombre()); 
+        if (empleado.getSexo() == null) {
+            sexoMasculinoClick(null);
+        } else if (empleado.getSexo().equalsIgnoreCase("F")) {
+            sexoFemeninoClick(null);
+        } else {
+            sexoMasculinoClick(null);
+        }
+        datePicker.setValue(getDateFromTimestamp(empleado.getNacimiento()));
+        datePickerInicio.setValue(getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaInicio()));
+        datePickerContratacion.setValue(getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaContrato()));
     }
     
     @Override
@@ -249,4 +313,14 @@ public class EditarEmpleadoController implements Initializable {
         };
         return aux;
     }
+    
+    public static LocalDate getDateFromTimestamp(Timestamp timestamp) {
+        if (timestamp == null) {
+            return null;
+        } else {
+            DateTime dateTime = new DateTime(timestamp.getTime());
+            return LocalDate.of(dateTime.getYear(), dateTime.getMonthOfYear(), dateTime.getDayOfMonth());
+        }
+    }
+ 
 }

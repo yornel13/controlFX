@@ -51,11 +51,11 @@
                <children>
                   <Label layoutX="25.0" layoutY="38.0" text="Departamento" textFill="WHITE" />
                   <Label layoutX="25.0" layoutY="78.0" text="Cargo" textFill="WHITE" />
-                  <TextField fx:id="cuentaField" layoutX="113.0" layoutY="153.0" prefHeight="25.0" prefWidth="440.0" promptText="Numero de cuenta" />
+                  <TextField fx:id="cuentaField" layoutX="113.0" layoutY="153.0" prefHeight="25.0" prefWidth="440.0" promptText="Numero de cuenta Bancaria" />
                   <TextField fx:id="extraField" layoutX="113.0" layoutY="193.0" prefHeight="25.0" prefWidth="440.0" promptText="Dato adicional (Opcional)" />
                   <TextField fx:id="sueldoField" layoutX="113.0" layoutY="233.0" prefHeight="25.0" prefWidth="98.0" promptText="Sueldo mensual" />
                   <Button fx:id="guardarButton1" layoutX="199.0" layoutY="359.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
-                  <Label layoutX="25.0" layoutY="158.0" text="Cuenta" textFill="WHITE" />
+                  <Label layoutX="25.0" layoutY="158.0" text="Cta. Bancaria" textFill="WHITE" />
                   <Label layoutX="29.0" layoutY="238.0" text="Sueldo" textFill="WHITE" />
                   <Label layoutX="26.0" layoutY="198.0" text="Extra" textFill="WHITE" />
                   <Button fx:id="cancelarButton1" layoutX="342.0" layoutY="359.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
@@ -67,6 +67,10 @@
                         <Font name="Comic Sans MS" size="14.0" />
                      </font>
                   </Label>
+                  <DatePicker fx:id="datePickerInicio" layoutX="113.0" layoutY="113.0" prefHeight="25.0" prefWidth="150.0" promptText="Fecha de inicio" />
+                  <DatePicker fx:id="datePickerContratacion" layoutX="379.0" layoutY="113.0" promptText="Fecha de contratacion" />
+                  <Label layoutX="25.0" layoutY="118.0" text="Inicio" textFill="WHITE" />
+                  <Label layoutX="295.0" layoutY="118.0" text="Contratacion" textFill="WHITE" />
                </children>
             </AnchorPane>
          </content>
