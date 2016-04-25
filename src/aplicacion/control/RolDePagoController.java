@@ -10,6 +10,7 @@ import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import com.sun.org.apache.bcel.internal.classfile.Constant;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
@@ -35,6 +36,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -44,6 +46,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -205,6 +208,31 @@ public class RolDePagoController implements Initializable {
         }
     }
     
+    @FXML
+    public void mostrarEditarHoras(ControlEmpleado controlEmpleado) {
+        try {
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtras.fxml"));
+            AnchorPane ventanaHoras = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaHoras);
+            ventana.setScene(scene);
+            EditarHorasExtrasController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setControlEmpleado(controlEmpleado);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
     public void guardarRegistro(Usuario empleado, Integer suplementarias, 
             Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
@@ -217,6 +245,24 @@ public class RolDePagoController implements Initializable {
         controlEmpleado.setHorasSuplementarias(suplementarias);
         controlEmpleado.setCliente(cliente);
         controlEmpleadoDAO.save(controlEmpleado);
+        setEmpleado(empleado);
+    }
+    
+    public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Integer suplementarias, 
+            Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
+        
+        controlEmpleado.setFecha(fecha);
+        controlEmpleado.setLibre(libre);
+        if (libre) {
+            controlEmpleado.setHorasExtras(0);
+            controlEmpleado.setHorasSuplementarias(0);
+            controlEmpleado.setCliente(null);
+        } else {
+            controlEmpleado.setHorasExtras(sobreTiempo);
+            controlEmpleado.setHorasSuplementarias(suplementarias);
+            controlEmpleado.setCliente(cliente);
+        }
+        HibernateSessionFactory.getSession().flush();
         setEmpleado(empleado);
     }
     
@@ -290,15 +336,39 @@ public class RolDePagoController implements Initializable {
         horasSuplementarias.setMinWidth(100);
         horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         
+        TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Delete");
+        delete.setMinWidth(40);
+        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
+            private final Button deleteButton = new Button("Delete");
+
+            @Override
+            protected void updateItem(ControlTable controlTable, boolean empty) {
+                super.updateItem(controlTable, empty);
+
+                if (controlTable == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                setGraphic(deleteButton);
+                deleteButton.setOnAction(event -> {
+                    controlDAO.delete(controlDAO.findById(controlTable.getId()));
+                    HibernateSessionFactory.getSession().flush();
+                    data.remove(controlTable);
+                });
+            }
+        });
+        
         empleadosTableView.getColumns().addAll(fecha, cliente, horasExtras, 
-                horasSuplementarias);
+                horasSuplementarias, delete);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<ControlTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     ControlTable rowData = row.getItem();
-                    //aplicacionControl.mostrarEmpleado(usuariosDAO.findById(rowData.getId()));
+                    mostrarEditarHoras(controlDAO.findById(rowData.getId()));
                 }
             });
             return row ;
