@@ -25,11 +25,11 @@
         <property name="horasExtras" type="java.lang.Integer">
             <column name="horas_extras" />
         </property>
-        <property name="horaEntrada" type="java.sql.Timestamp">
-            <column name="hora_entrada" length="19" />
+        <property name="libre" type="java.lang.Boolean">
+            <column name="libre" />
         </property>
-        <property name="horaSalida" type="java.sql.Timestamp">
-            <column name="hora_salida" length="19" />
+        <property name="vacaciones" type="java.lang.Boolean">
+            <column name="vacaciones" />
         </property>
     </class>
 </hibernate-mapping>

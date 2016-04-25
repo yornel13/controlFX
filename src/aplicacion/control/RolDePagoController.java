@@ -48,6 +48,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -65,7 +66,7 @@ public class RolDePagoController implements Initializable {
     
     private Usuario empleado;
     
-    private ArrayList<ControlEmpleado> controlEmpleado;
+    public ArrayList<ControlEmpleado> controlEmpleado;
     private ArrayList<ControlTable> controlEmpleadoTable;
    
     @FXML
@@ -186,6 +187,8 @@ public class RolDePagoController implements Initializable {
             AnchorPane ventanaHoras = (AnchorPane) loader.load();
             Stage ventana = new Stage();
             ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
             ventana.setResizable(false);
             ventana.initOwner(stagePrincipal);
             Scene scene = new Scene(ventanaHoras);
@@ -202,11 +205,13 @@ public class RolDePagoController implements Initializable {
         }
     }
     
-    public void guardarRegistro(Usuario empleado, Integer suplementarias, Integer sobreTiempo, Cliente cliente) throws ParseException {
+    public void guardarRegistro(Usuario empleado, Integer suplementarias, 
+            Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
         ControlEmpleado controlEmpleado = new ControlEmpleado();
         controlEmpleado = new ControlEmpleado();
-        controlEmpleado.setFecha(getToday());
+        controlEmpleado.setFecha(fecha);
+        controlEmpleado.setLibre(libre);
         controlEmpleado.setUsuario(empleado);
         controlEmpleado.setHorasExtras(sobreTiempo);
         controlEmpleado.setHorasSuplementarias(suplementarias);
@@ -227,6 +232,8 @@ public class RolDePagoController implements Initializable {
     }
     
     public void setControlEmpleadoInfor(Usuario empleado, Timestamp inicio, Timestamp fin) {
+        
+        empleadosTableView.getColumns().clear(); 
         
         textEmpleado.setText("Empleado: " + empleado.getNombre() + " " + empleado.getApellido());
         
@@ -338,18 +345,7 @@ public class RolDePagoController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.TRUE);
         empleadosTableView.getColumns().clear(); 
-    }    
-    
-    public static Timestamp getToday() throws ParseException {
-        
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        Date today = new Date();
-
-        Date todayWithZeroTime = formatter.parse(formatter.format(today));
-        
-        return new Timestamp(todayWithZeroTime.getTime());
-    }
+    }  
     
     public static String getMonthName(int month){
         Calendar cal = Calendar.getInstance();

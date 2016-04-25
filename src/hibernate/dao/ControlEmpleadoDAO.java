@@ -75,7 +75,7 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(Integer usuarioId, Timestamp inicio, Timestamp fin) {
 		Query query = getSession().
                     createSQLQuery("SELECT * FROM control_empleado WHERE usuario_id = :usuario_id "
-                            + "and fecha >= :inicio and fecha <= :fin")
+                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("inicio", inicio)

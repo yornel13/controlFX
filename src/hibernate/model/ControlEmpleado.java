@@ -18,8 +18,8 @@ public class ControlEmpleado implements java.io.Serializable {
 	private Timestamp fecha;
 	private Integer horasSuplementarias;
 	private Integer horasExtras;
-	private Timestamp horaEntrada;
-	private Timestamp horaSalida;
+	private Boolean libre;
+        private Boolean vacaciones;
 
 	// Constructors
 
@@ -29,24 +29,24 @@ public class ControlEmpleado implements java.io.Serializable {
 
 	/** minimal constructor */
 	public ControlEmpleado(Usuario usuario, Timestamp fecha,
-			Timestamp horaEntrada, Timestamp horaSalida) {
+			Boolean libre, Boolean vacaciones) {
 		this.usuario = usuario;
 		this.fecha = fecha;
-		this.horaEntrada = horaEntrada;
-		this.horaSalida = horaSalida;
+		this.libre = libre;
+		this.vacaciones = vacaciones;
 	}
 
 	/** full constructor */
 	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha,
 			Integer horasSuplementarias, Integer horasExtras,
-			Timestamp horaEntrada, Timestamp horaSalida) {
+			Boolean libre, Boolean vacaciones) {
 		this.usuario = usuario;
 		this.cliente = cliente;
 		this.fecha = fecha;
 		this.horasSuplementarias = horasSuplementarias;
 		this.horasExtras = horasExtras;
-		this.horaEntrada = horaEntrada;
-		this.horaSalida = horaSalida;
+		this.libre = libre;
+		this.vacaciones = vacaciones;
 	}
 
 	// Property accessors
@@ -97,22 +97,22 @@ public class ControlEmpleado implements java.io.Serializable {
 
 	public void setHorasExtras(Integer horasExtras) {
 		this.horasExtras = horasExtras;
-	}
+        }
 
-	public Timestamp getHoraEntrada() {
-		return this.horaEntrada;
-	}
+        public Boolean getLibre() {
+            return libre;
+        }
 
-	public void setHoraEntrada(Timestamp horaEntrada) {
-		this.horaEntrada = horaEntrada;
-	}
+        public void setLibre(Boolean libre) {
+            this.libre = libre;
+        }
 
-	public Timestamp getHoraSalida() {
-		return this.horaSalida;
-	}
+        public Boolean getVacaciones() {
+            return vacaciones;
+        }
 
-	public void setHoraSalida(Timestamp horaSalida) {
-		this.horaSalida = horaSalida;
-	}
+        public void setVacaciones(Boolean vacaciones) {
+            this.vacaciones = vacaciones;
+        }
 
 }
