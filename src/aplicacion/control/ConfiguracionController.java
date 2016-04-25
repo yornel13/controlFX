@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -75,10 +76,11 @@ public class ConfiguracionController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        String image = AplicacionControl.class.getResource("imagenes/administracion.jpg").toExternalForm();
+        String image = AplicacionControl.class.getResource("imagenes/fondo_administracion.jpg").toExternalForm();
         imagenLabel.setStyle("-fx-background-image: url('" + image + "'); " 
-                + "-fx-background-position: center top; " 
+               + "-fx-background-position: center top; " 
                 + "-fx-background-repeat: stretch;");
+        
         
         /*
         homeButton.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
@@ -86,6 +88,19 @@ public class ConfiguracionController implements Initializable {
         Image homeImage = new Image(image2);
         homeButton.setGraphic(new ImageView(homeImage));
         */
-    }    
+    }  
+    
+    
+    // Login items
+    @FXML
+    public Button login;
+    
+    @FXML 
+    public Label usuarioLogin;
+    
+    @FXML
+    public void onClickLoginButton(ActionEvent event) {
+        aplicacionControl.login(login, usuarioLogin);
+    }
     
 }

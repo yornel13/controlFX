@@ -23,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -144,6 +145,8 @@ public class EditarEmpresaController implements Initializable {
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
             dialogStage.setTitle("Dialogo");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("ok");
             dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
             children(new Text("Empresa editada satisfactoriamente"), buttonOk).

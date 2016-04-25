@@ -7,6 +7,9 @@ package aplicacion.control;
 
 import hibernate.model.Usuario;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +22,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -81,7 +85,15 @@ public class EmpleadoController implements Initializable {
     private Label nombre;
     
     @FXML
+    private Label fechaInicio;
+    
+    @FXML
+    private Label fechaContrato;
+    
+    @FXML
     private Button editarButton;
+    
+    
     
     
     public void setStagePrincipal(Stage stagePrincipal) {
@@ -111,6 +123,12 @@ public class EmpleadoController implements Initializable {
         cuenta.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldo.setText(empleado.getDetallesEmpleado().getSueldo() + " $");
         extra.setText(empleado.getDetallesEmpleado().getExtra());
+        DateTime inicio = new DateTime(empleado.getDetallesEmpleado().getFechaInicio().getTime());
+        fechaInicio.setText(inicio.getDayOfMonth() + " de " + getMonthName(inicio.getMonthOfYear()) + " " + inicio.getYear());
+        DateTime contrato = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
+        fechaContrato.setText(contrato.getDayOfMonth() + " de " + getMonthName(contrato.getMonthOfYear()) + " " + contrato.getYear());
+        
+        
     }
   
     
@@ -123,9 +141,9 @@ public class EmpleadoController implements Initializable {
       
         Image image = new Image(profile);
         Rectangle rekt = new Rectangle(40, 40); //haha
-//    ☐ rekt
-//    ☐ not rekt
-//    ☑ tyrannosaurus rekt 
+        //    ☐ rekt
+        //    ☐ not rekt
+        //    ☑ tyrannosaurus rekt 
         ImagePattern imagePattern = new ImagePattern(image);
         rekt.setFill(imagePattern);
         
@@ -138,6 +156,13 @@ public class EmpleadoController implements Initializable {
         
         profileImage.getChildren().add(imageView);
         
-    }    
+    }  
+    
+    public static String getMonthName(int month){
+        Calendar cal = Calendar.getInstance();
+        // Calendar numbers months from 0
+        cal.set(Calendar.MONTH, month - 1);
+        return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+    }
     
 }

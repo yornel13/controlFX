@@ -88,20 +88,20 @@ public class InEmpresaController implements Initializable {
     
     @FXML
     private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarVentanaPrincipal();
         stagePrincipal.close();
+        aplicacionControl.mostrarVentanaPrincipal();
     }
     
     @FXML
-    private void verEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarEmpleados(empresa);
+    private void verEmpleados(ActionEvent event) { 
         stagePrincipal.close();
+        aplicacionControl.mostrarEmpleados(empresa);
     }
     
     @FXML
     public void onClickPagos(ActionEvent event) {
-        aplicacionControl.mostrarHorasEmpleados(empresa);
         stagePrincipal.close();
+        aplicacionControl.mostrarHorasEmpleados(empresa);
     }
     
     public void setEmpresa(Empresa empresa) {
@@ -113,50 +113,6 @@ public class InEmpresaController implements Initializable {
         empleados = new ArrayList<>();
         empleados.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
         totalLabel.setText("Total de empleados: " + empleados.size());
-    }
-    
-    @FXML
-    public void marcar(ActionEvent event) throws ParseException {
-        UsuarioDAO usuariosDAO = new UsuarioDAO();
-        Usuario empleado = new Usuario();
-        empleado = usuariosDAO.findByAllCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
-        if (empleado != null) {
-            ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
-            ControlEmpleado controlEmpleado = new ControlEmpleado();
-            
-            controlEmpleado = controlEmpleadoDAO.findByFecha(getToday(), empleado.getId());
-            
-            // si no hubo registro hoy
-            if (controlEmpleado == null) {
-                mostrarHoras(empleado);
-            } else {
-                labelTest.setText("Ya el usuario fue \nregistrado hoy");
-            }
-        }  else {
-            labelTest.setText("El usuario no existe");
-        }      
-    }
-    
-    public void mostrarHoras(Usuario empleado) {
-        try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtras.fxml"));
-            AnchorPane ventanaHoras = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaHoras);
-            ventana.setScene(scene);
-            HorasExtrasController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpleado(empleado);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
-        }
     }
     
     public void guardarRegistro(Usuario empleado, Integer suplementarias, Integer sobreTiempo, Cliente cliente) throws ParseException {
@@ -176,16 +132,16 @@ public class InEmpresaController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        homeButton.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
-        String image2 = AplicacionControl.class.getResource("imagenes/home_32dp.png").toExternalForm();
-        Image homeImage = new Image(image2);
-        homeButton.setGraphic(new ImageView(homeImage));
+        //homeButton.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
+        //String image2 = AplicacionControl.class.getResource("imagenes/home_32dp.png").toExternalForm();
+        //Image homeImage = new Image(image2);
+        //homeButton.setGraphic(new ImageView(homeImage));
         
-        contentPane.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
+        //contentPane.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
         
-        labelTest.setText("Ingrese la cedula del empleado \n para hacer el registro de hoy");
+        //labelTest.setText("Ingrese la cedula del empleado \n para hacer el registro de hoy");
         
-        cedulaField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        //cedulaField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
         
     } 
     
@@ -214,5 +170,17 @@ public class InEmpresaController implements Initializable {
             }
         };
         return aux;
+    }
+    
+    // Login items
+    @FXML
+    public Button login;
+    
+    @FXML 
+    public Label usuarioLogin;
+    
+    @FXML
+    public void onClickLoginButton(ActionEvent event) {
+        aplicacionControl.login(login, usuarioLogin);
     }
 }

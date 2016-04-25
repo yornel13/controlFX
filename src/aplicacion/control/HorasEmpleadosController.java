@@ -177,7 +177,7 @@ public class HorasEmpleadosController implements Initializable {
         sobreTiempo.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
         
         
-        empleadosTableView.getColumns().addAll(nombre, apellido, cedula, cargo, dias, horas, sobreTiempo, suplementarias);
+        empleadosTableView.getColumns().addAll(cedula, nombre, apellido, cargo, dias, horas, sobreTiempo, suplementarias);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
@@ -213,6 +213,18 @@ public class HorasEmpleadosController implements Initializable {
         // Calendar numbers months from 0
         cal.set(Calendar.MONTH, month - 1);
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+    }
+    
+    // Login items
+    @FXML
+    public Button login;
+    
+    @FXML 
+    public Label usuarioLogin;
+    
+    @FXML
+    public void onClickLoginButton(ActionEvent event) {
+        aplicacionControl.login(login, usuarioLogin);
     }
     
 }

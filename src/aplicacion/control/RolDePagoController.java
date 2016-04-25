@@ -17,6 +17,7 @@ import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Actuariales;
+import hibernate.model.Cliente;
 import hibernate.model.Constante;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
@@ -38,13 +39,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
@@ -175,6 +179,42 @@ public class RolDePagoController implements Initializable {
         stagePrincipal.close();
     } 
     
+    @FXML
+    public void mostrarHoras(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtras.fxml"));
+            AnchorPane ventanaHoras = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaHoras);
+            ventana.setScene(scene);
+            HorasExtrasController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpleado(empleado);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        }
+    }
+    
+    public void guardarRegistro(Usuario empleado, Integer suplementarias, Integer sobreTiempo, Cliente cliente) throws ParseException {
+        ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
+        ControlEmpleado controlEmpleado = new ControlEmpleado();
+        controlEmpleado = new ControlEmpleado();
+        controlEmpleado.setFecha(getToday());
+        controlEmpleado.setUsuario(empleado);
+        controlEmpleado.setHorasExtras(sobreTiempo);
+        controlEmpleado.setHorasSuplementarias(suplementarias);
+        controlEmpleado.setCliente(cliente);
+        controlEmpleadoDAO.save(controlEmpleado);
+        setEmpleado(empleado);
+    }
+    
     public void setEmpleado(Usuario empleado) throws ParseException {
         this.empleado = empleado;
         
@@ -226,7 +266,6 @@ public class RolDePagoController implements Initializable {
            data.addAll(controlEmpleadoTable);
            empleadosTableView.setItems(data);
         }
-        
         
         TableColumn fecha = new TableColumn("Fecha");
         fecha.setMinWidth(100);
@@ -297,7 +336,7 @@ public class RolDePagoController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
-        empleadosTableView.setEditable(Boolean.FALSE);
+        empleadosTableView.setEditable(Boolean.TRUE);
         empleadosTableView.getColumns().clear(); 
     }    
     

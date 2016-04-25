@@ -31,7 +31,7 @@ import javafx.stage.Stage;
  */
 public class HorasExtrasController implements Initializable {
     
-    private InEmpresaController inEmpresaController;
+    private RolDePagoController rolDePagoController;
     
     private Stage stagePrincipal;
     
@@ -58,8 +58,8 @@ public class HorasExtrasController implements Initializable {
         this.stagePrincipal = stagePrincipal;
     }
     
-    public void setProgramaPrincipal(InEmpresaController inEmpresaController) {
-        this.inEmpresaController = inEmpresaController;
+    public void setProgramaPrincipal(RolDePagoController rolDePagoController) {
+        this.rolDePagoController = rolDePagoController;
     }
     
     @FXML
@@ -74,15 +74,15 @@ public class HorasExtrasController implements Initializable {
             cliente = clientes.get(selector.getSelectionModel().getSelectedIndex());
         }
         if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
-           inEmpresaController.guardarRegistro(empleado, 0, 0, cliente); 
+           rolDePagoController.guardarRegistro(empleado, 0, 0, cliente); 
         } else if (suplementarias.getText().isEmpty()) {
-            inEmpresaController.guardarRegistro(empleado, 0, 
+            rolDePagoController.guardarRegistro(empleado, 0, 
                 Integer.parseInt(sobreTiempo.getText()), cliente);
         } else if (sobreTiempo.getText().isEmpty()) {
-            inEmpresaController.guardarRegistro(empleado, 
+            rolDePagoController.guardarRegistro(empleado, 
                 Integer.parseInt(suplementarias.getText()), 0, cliente);
         } else {
-            inEmpresaController.guardarRegistro(empleado, 
+            rolDePagoController.guardarRegistro(empleado, 
                     Integer.parseInt(suplementarias.getText()), 
                     Integer.parseInt(sobreTiempo.getText()), cliente);
         }

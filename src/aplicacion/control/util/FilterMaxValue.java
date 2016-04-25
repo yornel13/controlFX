@@ -23,6 +23,7 @@ public class FilterMaxValue implements EventHandler<KeyEvent> {
             this.maxVal= i;
         }
 
+        @Override
         public void handle(KeyEvent arg0) {
 
             TextField tx = (TextField) arg0.getSource();

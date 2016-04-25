@@ -37,6 +37,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -212,12 +213,13 @@ public class EditarEmpleadoController implements Initializable {
             empleado.setApellido(apellidoField.getText());
             empleado.setCedula(cedulaField.getText());
             if (sexoM.isSelected()) {
-                    empleado.setSexo("M");
-                } else {
-                    empleado.setSexo("F");
-                }
-                empleado.setEmail(emailField.getText());
-                empleado.setNacimiento(Timestamp.valueOf(datePicker.getValue().atStartOfDay()));
+                empleado.setSexo("M");
+            } else {
+                empleado.setSexo("F");
+            }
+            empleado.setEmail(emailField.getText());
+            System.out.println(datePicker.getValue().atStartOfDay());
+            empleado.setNacimiento(Timestamp.valueOf(datePicker.getValue().atStartOfDay()));
             empleado.setDireccion(direccionField.getText());
             empleado.setTelefono(telefonoField.getText());
             empleado.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
@@ -230,6 +232,8 @@ public class EditarEmpleadoController implements Initializable {
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
             dialogStage.setTitle("Dialogo");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("ok");
             dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
             children(new Text("Empleado editado satisfactoriamente"), buttonOk).

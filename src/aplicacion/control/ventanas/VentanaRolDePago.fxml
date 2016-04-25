@@ -289,5 +289,6 @@
             <Font size="14.0" />
          </font>
       </Label>
+      <Button layoutX="530.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarHoras" text="Registrar" />
     </children>
 </AnchorPane>
