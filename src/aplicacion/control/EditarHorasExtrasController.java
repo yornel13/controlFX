@@ -5,11 +5,9 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.HorasEmpleadosController.getToday;
 import hibernate.dao.ClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
-import hibernate.model.Usuario;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
