@@ -258,7 +258,9 @@ public class RolDePagoController implements Initializable {
         controlEmpleado.setHorasSuplementarias(suplementarias);
         controlEmpleado.setCliente(cliente);
         controlEmpleadoDAO.save(controlEmpleado);
-        setEmpleado(empleado);
+        setControlEmpleadoInfo(this.empleado, 
+                Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
+                Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
     }
     
     public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Integer suplementarias, 
@@ -276,7 +278,10 @@ public class RolDePagoController implements Initializable {
             controlEmpleado.setCliente(cliente);
         }
         HibernateSessionFactory.getSession().flush();
-        setEmpleado(empleado);
+        
+        setControlEmpleadoInfo(empleado, 
+                Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
+                Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
     }
     
     public void setEmpleado(Usuario empleado) throws ParseException {
@@ -328,11 +333,11 @@ public class RolDePagoController implements Initializable {
             controlEmpleadoTable.add(controlTable);
         }
        
+        data = FXCollections.observableArrayList(); 
         if (!controlEmpleadoTable.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
            data.addAll(controlEmpleadoTable);
-           empleadosTableView.setItems(data);
-        }
+        } 
+        empleadosTableView.setItems(data);
         
         TableColumn fecha = new TableColumn("Fecha");
         fecha.setMinWidth(100);
