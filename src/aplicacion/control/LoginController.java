@@ -96,8 +96,8 @@ public class LoginController implements Initializable {
         } catch (java.security.NoSuchAlgorithmException e) {
             // nothing to do
         }
-    return null;
-}
+        return null;
+    }
 
   
     @Override

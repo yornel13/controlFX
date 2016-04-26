@@ -76,7 +76,16 @@ public class UsuarioDAO extends BaseHibernateDAO {
             return (Usuario) result;
         }
         
-        public Usuario findByAllCedulaAndEmpresaId(String cedula, Integer empresaId) {
+        public Usuario findByCedulaActivo(String cedula) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario where cedula = :cedula and activo = true")
+                    .addEntity(Usuario.class)
+                    .setParameter("cedula", cedula);
+            Object result = query.uniqueResult();
+            return (Usuario) result;
+        }
+        
+        public Usuario findByCedulaAndEmpresaId(String cedula, Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario JOIN detalles_empleado "
                             + "ON detalles_empleado.id = usuario.detalles_empleado_id "

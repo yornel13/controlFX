@@ -61,9 +61,18 @@ public class RolesDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List findAllByUsuarioId(Integer usuarioId) {
+        public List<Roles> findAllByUsuarioId(Integer usuarioId) {
             Query query = getSession().
                 createSQLQuery("SELECT * FROM Roles where usuario_id = :usuario_id")
+                .addEntity(Roles.class)
+                .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (List<Roles>) result;
+	}
+        
+        public List<Roles> findAllByUsuarioIdActivo(Integer usuarioId) {
+            Query query = getSession().
+                createSQLQuery("SELECT * FROM Roles where usuario_id = :usuario_id and activo = true")
                 .addEntity(Roles.class)
                 .setParameter("usuario_id", usuarioId);
             Object result = query.list();

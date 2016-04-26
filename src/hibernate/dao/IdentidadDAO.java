@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.Identidad;
+import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -60,6 +61,14 @@ public class IdentidadDAO extends BaseHibernateDAO {
 			log.error("get failed", re);
 			throw re;
 		}
+	}
+        
+        public List<Identidad> findAllActivo() {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM identidad where activo = true")
+                    .addEntity(Identidad.class);
+            Object result = query.list();
+            return (List<Identidad>) result;
 	}
 
 	public List findByExample(Identidad instance) {
