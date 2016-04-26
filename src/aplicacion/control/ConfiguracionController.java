@@ -74,6 +74,12 @@ public class ConfiguracionController implements Initializable {
         stagePrincipal.close();
     }
     
+    @FXML
+    private void verAdministradores(ActionEvent event) {
+        aplicacionControl.mostrarAdminitradores();
+        stagePrincipal.close();
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         String image = AplicacionControl.class.getResource("imagenes/fondo_administracion.jpg").toExternalForm();
