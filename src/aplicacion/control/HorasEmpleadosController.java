@@ -86,7 +86,7 @@ public class HorasEmpleadosController implements Initializable {
     
     @FXML
     private void agregarEmpleado(ActionEvent event) {
-        aplicacionControl.mostrarRegistrarEmpleado(empresa);
+        //aplicacionControl.mostrarRegistrarEmpleado(empresa);
     }
     
     @FXML

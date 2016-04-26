@@ -661,7 +661,9 @@ public class AplicacionControl extends Application {
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
             AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
             Stage ventana = new Stage();
-            ventana.setTitle("Rol de Pago");
+            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
             ventana.setResizable(false);
             ventana.initOwner(stagePrincipal);
             Scene scene = new Scene(ventanaRolDePago);

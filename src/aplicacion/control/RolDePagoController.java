@@ -8,6 +8,7 @@ package aplicacion.control;
 import static aplicacion.control.HorasEmpleadosController.getToday;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fechas;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
@@ -24,6 +25,7 @@ import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -37,6 +39,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -74,7 +77,7 @@ public class RolDePagoController implements Initializable {
     private Pane imagenLabel;
     
     @FXML
-    private Button homeButton;
+    private Button ver;
     
     @FXML
     private TableView empleadosTableView;
@@ -145,6 +148,14 @@ public class RolDePagoController implements Initializable {
     @FXML
     private Label textEmpleado;
     
+    @FXML
+    private DatePicker pickerDe;
+    
+    @FXML 
+    private DatePicker pickerHasta;
+    
+    
+    
     
     private ObservableList<ControlTable> data;
     
@@ -167,12 +178,22 @@ public class RolDePagoController implements Initializable {
     @FXML
     private void agregarEmpleado(ActionEvent event) {
         //aplicacionControl.mostrarRegistrarEmpleado(empresa);
+        LocalDate jose = pickerDe.getValue();
     }
     
     @FXML
-    private void returnEmpresa(ActionEvent event) {
-        //aplicacionControl.mostrarInEmpresa(empresa);
-        stagePrincipal.close();
+    private void mostrarRegistro(ActionEvent event) {
+        if (pickerDe.getValue() == null) {
+            // error
+        } else if (pickerHasta.getValue() == null) {
+            // error 
+        } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
+            // error
+        } else {       
+            Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+            Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+            setControlEmpleadoInfo(empleado, inicio, fin);
+        }
     } 
     
     @FXML
@@ -261,19 +282,20 @@ public class RolDePagoController implements Initializable {
     public void setEmpleado(Usuario empleado) throws ParseException {
         this.empleado = empleado;
         
-        DateTime dateTime = new DateTime(getToday().getTime());
+        DateTime dateTime = new DateTime();
            
-        Timestamp fin = new Timestamp(dateTime.withDayOfMonth(24).getMillis());
-        Timestamp inicio = new Timestamp(dateTime.withDayOfMonth(24).minusMonths(1).plusDays(1).getMillis());
+        Timestamp fin = new Timestamp(dateTime.getMillis());
+        Timestamp inicio = new Timestamp(dateTime.minusMonths(1).plusDays(1).getMillis());
         
-        setControlEmpleadoInfor(empleado, inicio, fin);
+        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        
+        setControlEmpleadoInfo(empleado, inicio, fin);
     }
     
-    public void setControlEmpleadoInfor(Usuario empleado, Timestamp inicio, Timestamp fin) {
+    public void setControlEmpleadoInfo(Usuario empleado, Timestamp inicio, Timestamp fin) {
         
         empleadosTableView.getColumns().clear(); 
-        
-        textEmpleado.setText("Empleado: " + empleado.getNombre() + " " + empleado.getApellido());
         
         ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
         

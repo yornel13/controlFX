@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Fechas;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
@@ -269,9 +270,9 @@ public class EditarEmpleadoController implements Initializable {
         } else {
             sexoMasculinoClick(null);
         }
-        datePicker.setValue(getDateFromTimestamp(empleado.getNacimiento()));
-        datePickerInicio.setValue(getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaInicio()));
-        datePickerContratacion.setValue(getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaContrato()));
+        datePicker.setValue(Fechas.getDateFromTimestamp(empleado.getNacimiento()));
+        datePickerInicio.setValue(Fechas.getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaInicio()));
+        datePickerContratacion.setValue(Fechas.getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaContrato()));
     }
     
     @Override
@@ -313,15 +314,6 @@ public class EditarEmpleadoController implements Initializable {
             }
         };
         return aux;
-    }
-    
-    public static LocalDate getDateFromTimestamp(Timestamp timestamp) {
-        if (timestamp == null) {
-            return null;
-        } else {
-            DateTime dateTime = new DateTime(timestamp.getTime());
-            return LocalDate.of(dateTime.getYear(), dateTime.getMonthOfYear(), dateTime.getDayOfMonth());
-        }
     }
  
 }
