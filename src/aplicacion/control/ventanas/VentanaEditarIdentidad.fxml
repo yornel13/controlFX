@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="250.0" maxWidth="400.0" minHeight="250.0" minWidth="400.0" prefHeight="250.0" prefWidth="400.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RegistrarAdministradorController">
+   <children>
+      <Label fx:id="errorText" alignment="CENTER" contentDisplay="CENTER" layoutX="107.0" layoutY="410.0" prefHeight="21.0" prefWidth="400.0" textFill="#ab1010">
+         <font>
+            <Font name="Comic Sans MS" size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="cancelarButton" layoutX="227.0" layoutY="192.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
+      <Button fx:id="guardarButton" layoutX="112.0" layoutY="192.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
+      <Label layoutX="35.0" layoutY="25.0" text="Nuevo Usuario" textFill="WHITE" />
+      <TextField fx:id="usuarioField" layoutX="160.0" layoutY="20.0" prefHeight="25.0" prefWidth="213.0" promptText="Usuario para ingresar" />
+      <PasswordField fx:id="contrasenaField" layoutX="160.0" layoutY="100.0" prefHeight="25.0" prefWidth="213.0" promptText="Nueva contraseña" />
+      <PasswordField fx:id="contrasenaField2" layoutX="160.0" layoutY="140.0" prefHeight="25.0" prefWidth="213.0" promptText="Repita la contraseña" />
+      <Label layoutX="35.0" layoutY="105.0" text="Nueva Contraseña" textFill="WHITE" />
+      <Label layoutX="35.0" layoutY="145.0" text="Confirmar contraseña" textFill="WHITE" />
+      <Label layoutX="35.0" layoutY="65.0" text="Contrseña anterior" textFill="#ff2121">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <PasswordField fx:id="contrasenaField1" layoutX="160.0" layoutY="60.0" prefHeight="25.0" prefWidth="213.0" promptText="Contraseña" />
+       </children>
+</AnchorPane>

@@ -58,6 +58,11 @@ public class ConfiguracionController implements Initializable {
     }
     
     @FXML
+    private void registrarAdministrador(ActionEvent event) {
+        aplicacionControl.mostrarRegistrarAdministrador();
+    }
+    
+    @FXML
     private void mostrarEmpresas(ActionEvent event) {
         aplicacionControl.mostrarEmpresas();
         stagePrincipal.close();
