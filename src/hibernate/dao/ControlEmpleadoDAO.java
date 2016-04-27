@@ -84,6 +84,20 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
                 return (List<ControlEmpleado>) result;
 	}
         
+        public List<ControlEmpleado> findAllByEmpleadoIdClienteIdInDeterminateTime(
+                Integer usuarioId, Integer clienteId, Timestamp inicio, Timestamp fin) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado WHERE usuario_id = :usuario_id and cliente_id = :cliente_id "
+                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("cliente_id", clienteId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+                Object result = query.list();
+                return (List<ControlEmpleado>) result;
+	}
+        
         public ControlEmpleado findByFecha(Timestamp fecha, Integer usuarioId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM control_empleado where fecha = :fecha "

@@ -18,7 +18,6 @@
           <TableColumn prefWidth="75.0" text="C2" />
         </columns>
       </TableView>
-      <Button layoutX="695.0" layoutY="7.0" maxWidth="90.0" minWidth="90.0" mnemonicParsing="false" onAction="#agregarEmpleado" prefHeight="25.0" prefWidth="90.0" text="Rol de pago" />
       <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
             <children>

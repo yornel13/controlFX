@@ -12,9 +12,9 @@
 <AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.InEmpresaController">
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <Button layoutX="604.0" layoutY="310.0" mnemonicParsing="false" onAction="#onClickPagos" prefHeight="25.0" prefWidth="151.0" text="Pagos" />
-      <Button fx:id="buttonConfiguracion" layoutX="602.0" layoutY="250.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Configuracion" />
-      <Button fx:id="empresaButton" layoutX="602.0" layoutY="190.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Clientes" />
+      <Button layoutX="604.0" layoutY="310.0" mnemonicParsing="false" onAction="#onClickPagos" prefHeight="25.0" prefWidth="151.0" text="Pagos por empleado" />
+      <Button fx:id="buttonConfiguracion" disable="true" layoutX="604.0" layoutY="189.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Configuracion" />
+      <Button fx:id="buttonClientes" layoutX="604.0" layoutY="250.0" mnemonicParsing="false" onAction="#verClientes" prefHeight="25.0" prefWidth="151.0" text="Pagos por cliente" />
       <Button fx:id="empleadosButton" layoutX="601.0" layoutY="130.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="151.0" text="Empleados" />
       <Accordion layoutX="40.0" layoutY="14.0" />
       <Line endX="660.0" layoutX="117.0" layoutY="40.0" startX="-100.0">

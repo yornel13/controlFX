@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="700.0" minHeight="400.0" minWidth="700.0" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosClienteController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="680.0" minHeight="-Infinity" minWidth="680.0" prefHeight="355.0" prefWidth="680.0">
+        <columns>
+          <TableColumn prefWidth="75.0" text="C1" />
+          <TableColumn prefWidth="75.0" text="C2" />
+        </columns>
+      </TableView>
+      <Button fx:id="ver" layoutX="558.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarRegistro" text="Ver" />
+      <Label layoutX="318.0" layoutY="10.0" text="Hasta" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="109.0" layoutY="10.0" text="De" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="pickerDe" layoutX="134.0" layoutY="5.0" promptText="inicio" />
+      <DatePicker fx:id="pickerHasta" layoutX="364.0" layoutY="5.0" promptText="fin" />
+      <Accordion layoutX="184.0" layoutY="14.0" />
+    </children>
+</AnchorPane>

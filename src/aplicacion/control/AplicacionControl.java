@@ -457,6 +457,42 @@ public class AplicacionControl extends Application {
        }
     }
     
+    public void mostrarClientesEmpresa(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesEmpresa.fxml"));
+                    AnchorPane ventanaClientesEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Rol de pago por cliente");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaClientesEmpresa);
+                    ventana.setScene(scene);
+                    ClientesEmpresaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+
+                } catch (Exception e) {
+                     e.printStackTrace();
+                     //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
+    
     public void mostrarAdminitradores() {
         if (permisos == null) {
            noLogeado();
@@ -648,7 +684,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Empleados");
+                    ventana.setTitle("Rol de pado por empleado");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -662,6 +698,41 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       } 
+    }
+    
+    public void mostrarHorasEmpleadosCliente(Empresa empresa, Cliente cliente) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+           if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarHorasEmpleados()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosCliente.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Rol de pado para el cliente " + cliente.getNombre());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(700);
+                    ventana.setHeight(428);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    HorasEmpleadosClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setCliente(empresa, cliente);
                     ventana.show();
  
                 } catch (Exception e) {
@@ -695,6 +766,40 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado, inicio, fin);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       } 
+    }
+    
+    public void mostrarRolDePagoCliente(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoCliente.fxml"));
+                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Empleado: " + empleado.getNombre() + " " 
+                            + empleado.getApellido() + " | Cliente: " + cliente.getNombre());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRolDePago);
+                    ventana.setScene(scene);
+                    RolDePagoClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado, cliente, inicio, fin);
                     ventana.show();
 
                 } catch (Exception e) {

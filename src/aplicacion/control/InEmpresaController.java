@@ -99,6 +99,12 @@ public class InEmpresaController implements Initializable {
     }
     
     @FXML
+    private void verClientes(ActionEvent event) { 
+        stagePrincipal.close();
+        aplicacionControl.mostrarClientesEmpresa(empresa);
+    }
+    
+    @FXML
     public void onClickPagos(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarHorasEmpleados(empresa);

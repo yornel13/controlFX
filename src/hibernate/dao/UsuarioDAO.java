@@ -100,7 +100,8 @@ public class UsuarioDAO extends BaseHibernateDAO {
         public List<Usuario> findByEmpresaId(Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario JOIN detalles_empleado "
-                            + "ON detalles_empleado.id = usuario.detalles_empleado_id WHERE empresa_id = :empresa_id")
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "WHERE empresa_id = :empresa_id")
                     .addEntity(Usuario.class)
                     .setParameter("empresa_id", empresaId);
             Object result = query.list();
