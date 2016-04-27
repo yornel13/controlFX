@@ -20,11 +20,6 @@
       </TableView>
       <Button layoutX="695.0" layoutY="7.0" maxWidth="90.0" minWidth="90.0" mnemonicParsing="false" onAction="#agregarEmpleado" prefHeight="25.0" prefWidth="90.0" text="Rol de pago" />
       <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
-      <Label fx:id="textFecha" layoutX="299.0" layoutY="9.0" text="Rol de pago del mes de Julio 2016" textAlignment="CENTER" textFill="WHITE" textOverrun="CLIP" underline="true">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
             <children>
                <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
@@ -39,5 +34,19 @@
                </Button>
             </children>
          </Pane>
+      <Button fx:id="ver" layoutX="603.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarRegistro" text="Ver" />
+      <Label layoutX="363.0" layoutY="10.0" text="Hasta" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="154.0" layoutY="10.0" text="De" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="pickerDe" layoutX="179.0" layoutY="5.0" promptText="inicio" />
+      <DatePicker fx:id="pickerHasta" layoutX="409.0" layoutY="5.0" promptText="fin" />
+      <Accordion layoutX="184.0" layoutY="14.0" />
     </children>
 </AnchorPane>

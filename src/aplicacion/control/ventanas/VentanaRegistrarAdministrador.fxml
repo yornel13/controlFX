@@ -19,13 +19,17 @@
       <Button fx:id="cancelarButton" layoutX="349.0" layoutY="445.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
       <Button fx:id="guardarButton" layoutX="206.0" layoutY="445.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
       <Label layoutX="35.0" layoutY="27.0" text="Usuario" textFill="WHITE" />
+      <TextField fx:id="usuarioField" layoutX="123.0" layoutY="18.0" prefHeight="25.0" prefWidth="440.0" promptText="Usuario para ingresar" />
+      <PasswordField fx:id="contrasenaField" layoutX="123.0" layoutY="61.0" prefHeight="25.0" prefWidth="213.0" promptText="Contraseña" />
+      <PasswordField fx:id="contrasenaField2" layoutX="351.0" layoutY="61.0" prefHeight="25.0" prefWidth="213.0" promptText="Repita la contraseña" />
+      <CheckBox fx:id="checkBoxAsignar" layoutX="35.0" layoutY="100.0" mnemonicParsing="false" onAction="#onClickAsignar" text="Asignar a un empleado" textFill="WHITE" />
       <Pane fx:id="panelUsuario" layoutY="123.0" prefHeight="280.0" prefWidth="600.0">
          <children>
             <Label layoutX="35.0" layoutY="13.0" text="Nombres" textFill="WHITE" />
             <Label layoutX="35.0" layoutY="53.0" text="Apellidos" textFill="WHITE" />
             <TextField fx:id="nombreField" layoutX="123.0" layoutY="8.0" prefHeight="25.0" prefWidth="440.0" promptText="Nombres" />
             <TextField fx:id="apellidoField" layoutX="123.0" layoutY="48.0" prefHeight="25.0" prefWidth="440.0" promptText="Apellidos" />
-            <TextField fx:id="cedulaField" layoutX="123.0" layoutY="88.0" onInputMethodTextChanged="#changeDetected" prefHeight="25.0" prefWidth="206.0" promptText="Cedula" />
+            <TextField fx:id="cedulaField" layoutX="123.0" layoutY="88.0" prefHeight="25.0" prefWidth="206.0" promptText="Cedula" />
             <TextField fx:id="telefonoField" layoutX="123.0" layoutY="128.0" prefHeight="25.0" prefWidth="440.0" promptText="Telefono" />
             <TextField fx:id="direccionField" layoutX="123.0" layoutY="168.0" prefHeight="25.0" prefWidth="440.0" promptText="Direccion" />
             <TextField fx:id="emailField" layoutX="123.0" layoutY="208.0" prefHeight="25.0" prefWidth="440.0" promptText="Email" />
@@ -42,11 +46,7 @@
             <Label layoutX="419.0" layoutY="93.0" text="Sexo" textFill="WHITE" />
          </children>
       </Pane>
-      <TextField fx:id="usuarioField" layoutX="123.0" layoutY="18.0" prefHeight="25.0" prefWidth="440.0" promptText="Usuario para ingresar" />
       <Label layoutX="35.0" layoutY="65.0" text="Contraseña" textFill="WHITE" />
-      <CheckBox fx:id="checkBoxAsignar" layoutX="35.0" layoutY="100.0" mnemonicParsing="false" text="Asignar a un empleado" textFill="WHITE" />
       <ChoiceBox fx:id="choiceBoxEmpleado" layoutX="112.0" layoutY="238.0" prefHeight="25.0" prefWidth="377.0" visible="false" />
-      <PasswordField fx:id="contrasenaField" layoutX="123.0" layoutY="61.0" prefHeight="25.0" prefWidth="213.0" promptText="Contraseña" />
-      <PasswordField fx:id="contrasenaField2" layoutX="351.0" layoutY="61.0" prefHeight="25.0" prefWidth="213.0" promptText="Repita la contraseña" />
-   </children>
+       </children>
 </AnchorPane>

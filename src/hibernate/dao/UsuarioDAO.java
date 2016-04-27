@@ -106,6 +106,14 @@ public class UsuarioDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<Usuario>) result;
         }
+        
+        public List<Usuario> findAllEmpleadosActivos() {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario where activo = true and detalles_empleado_id is not null")
+                    .addEntity(Usuario.class);
+            Object result = query.list();
+            return (List<Usuario>) result;
+        }
 
 	public List findByExample(Usuario instance) {
 		log.debug("finding Usuario instance by example");

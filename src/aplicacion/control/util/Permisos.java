@@ -40,6 +40,7 @@ public class Permisos {
                 return true;
             } else if (rol.getNombre().equalsIgnoreCase(permisoRequerido)) {
                 if (getNivel(rol.getPermiso()) >= getNivel(nivel)) {
+                    System.out.println(rol.getNombre());
                     return true;
                 }
             }

@@ -103,6 +103,26 @@ public class IdentidadDAO extends BaseHibernateDAO {
 	public List findByNombreUsuario(Object nombreUsuario) {
 		return findByProperty(NOMBRE_USUARIO, nombreUsuario);
 	}
+        
+        public Identidad findByNombreUsuarioActivo(String nombreUsuario) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM identidad where nombre_usuario = :nombre_usuario "
+                            + "and activo = true")
+                    .addEntity(Identidad.class)
+                    .setParameter("nombre_usuario", nombreUsuario);
+            Object result = query.uniqueResult();
+            return (Identidad) result;
+	}
+        
+        public Identidad findByUsuarioIdActivo(Integer usuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM identidad where usuario_id = :usuario_id "
+                            + "and activo = true")
+                    .addEntity(Identidad.class)
+                    .setParameter("usuario_id", usuarioId);
+            Object result = query.uniqueResult();
+            return (Identidad) result;
+	}
 
 	public List findByContrasena(Object contrasena) {
 		return findByProperty(CONTRASENA, contrasena);

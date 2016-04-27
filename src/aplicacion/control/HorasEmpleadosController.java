@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.util.Fechas;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.ControlEmpleado;
@@ -27,6 +28,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -64,7 +66,16 @@ public class HorasEmpleadosController implements Initializable {
     private Label textFecha;
     
     @FXML
+    private DatePicker pickerDe;
+    
+    @FXML 
+    private DatePicker pickerHasta;
+    
+    @FXML
     private TableView empleadosTableView;
+    
+    private Timestamp inicio;
+    private Timestamp fin;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -103,11 +114,36 @@ public class HorasEmpleadosController implements Initializable {
         Timestamp fin = new Timestamp(dateTime.withDayOfMonth(24).getMillis());
         Timestamp inicio = new Timestamp(dateTime.withDayOfMonth(24).minusMonths(1).plusDays(1).getMillis());
         
-        textFecha.setText("Rol de pago del mes de " + getMonthName(dateTime.getMonthOfYear()) + " 2016");
+        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
         
+        setTableInfo(empresa, inicio, fin);
+        
+    }
+    
+    @FXML
+    private void mostrarRegistro(ActionEvent event) {
+        if (pickerDe.getValue() == null) {
+            // error
+        } else if (pickerHasta.getValue() == null) {
+            // error 
+        } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
+            // error
+        } else {       
+            Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+            Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+            setTableInfo(empresa, inicio, fin);
+        }
+    } 
+    
+    public void setTableInfo(Empresa empresa, Timestamp inicio, Timestamp fin) {
+        this.inicio = inicio;
+        this.fin = fin;
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
+        
+        empleadosTableView.getColumns().clear(); 
         
         if (!usuarios.isEmpty()) {
             
@@ -184,7 +220,8 @@ public class HorasEmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    aplicacionControl.mostrarRolDePago(usuariosDAO.findById(rowData.getId()));
+                    System.out.println(inicio);
+                    aplicacionControl.mostrarRolDePago(usuariosDAO.findById(rowData.getId()), this.inicio, this.fin);
                 }
             });
             return row ;

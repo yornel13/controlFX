@@ -31,6 +31,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -44,6 +45,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -63,18 +65,12 @@ public class RegistrarAdministradorController implements Initializable {
     private Empresa empresa;
    
     ArrayList<EstadoCivil> estadosCivil;
-    ArrayList<Departamento> departamentos;
-    ArrayList<Cargo> cargos;
+    ArrayList<Usuario> empleados; 
+            
     ArrayList<Roles> roles;
     
     @FXML
     private ChoiceBox estadoCivilChoiceBox;
-    
-    @FXML
-    private ChoiceBox departamentoChoiceBox;
-    
-    @FXML
-    private ChoiceBox cargoChoiceBox;
     
     @FXML
     private TextField nombreField;
@@ -118,7 +114,8 @@ public class RegistrarAdministradorController implements Initializable {
     @FXML
     private Pane panelUsuario;
     
-    @FXML ChoiceBox choiceBoxEmpleado;
+    @FXML 
+    private ChoiceBox choiceBoxEmpleado;
     
     @FXML
     private Label errorText;
@@ -137,6 +134,8 @@ public class RegistrarAdministradorController implements Initializable {
     
     @FXML 
     private DatePicker datePickerContratacion;
+    
+    IdentidadDAO identidadDAO;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -158,15 +157,22 @@ public class RegistrarAdministradorController implements Initializable {
     }
     
     @FXML
-    public void changeDetected(ActionEvent event) {
-        System.out.println("aplicacion.control.RegistrarEmpleadoController.changeDetected()");
+    public void onClickAsignar(ActionEvent event) {
+        if (checkBoxAsignar.isSelected()) {
+            panelUsuario.setVisible(false);
+            choiceBoxEmpleado.setVisible(true);
+        } else {
+            panelUsuario.setVisible(true);
+            choiceBoxEmpleado.setVisible(false);
+        }
     }
     
     @FXML
     private void onCLickGuardar(ActionEvent event) throws IOException, Exception {
         System.out.println("aplicacion.control.RegistrarEmpleadoController.onCLickGuardar()");
         
-        IdentidadDAO identidadDAO = new IdentidadDAO();
+        identidadDAO = new IdentidadDAO();
+        
         if (usuarioField.getText().isEmpty() || usuarioField.getText().length() < 4) {
             errorText.setText("Debe ingresar un usuario valido");
         } else if (contrasenaField.getText().isEmpty()) {
@@ -177,84 +183,129 @@ public class RegistrarAdministradorController implements Initializable {
             errorText.setText("Debe repetir la contraseña"); 
         } else if (contrasenaField2.getText().isEmpty()) {
             errorText.setText("Debe repetir la contraseña"); 
-        } else if (contrasenaField.getText().equals(contrasenaField2)) {
+        } else if (!contrasenaField.getText().equals(contrasenaField2.getText())) {
             errorText.setText("Las contraseñas no son las mismas"); 
-        } else if (nombreField.getText().isEmpty()) {
-            errorText.setText("Debe ingresar un nombre");
-        } else if (apellidoField.getText().isEmpty()) {
-            errorText.setText("Debe ingresar un apellido");
-        } else if (cedulaField.getText().isEmpty()) {
-            errorText.setText("Debe ingresar la cedula");
-        } else if (!sexoF.isSelected() && !sexoM.isSelected()) {
-            errorText.setText("Debe seleccionar el sexo");
-        } else if (telefonoField.getText().isEmpty()) {
-            errorText.setText("Debe ingresar un numero telefonico");
-        } else if (direccionField.getText().isEmpty()) {
-            errorText.setText("Debe ingresar la direccion");
-        } else if (emailField.getText().isEmpty()) {
-            errorText.setText("Debe ingresar una direccion");
-        } else if (estadoCivilChoiceBox.getSelectionModel().isEmpty()) {
-            errorText.setText("Debe seleccionar el estado civil");
-        } else if (datePicker.getValue() == null) {
-            errorText.setText("Debe seleccionar la fecha de nacimiento");
         } else {
-            UsuarioDAO usuariosDAO = new UsuarioDAO();
-            
-            if (usuariosDAO.findByCedulaActivo(cedulaField.getText()) == null) {
+        
+            if (checkBoxAsignar.isSelected()) {
                 
-                if (identidadDAO.findByNombreUsuario(nombreField.getText()) == null) {
-                    
-                    Usuario usuario = new Usuario();
-                    usuario.setNombre(nombreField.getText());
-                    usuario.setApellido(apellidoField.getText());
-                    usuario.setCedula(cedulaField.getText());
-                    if (sexoM.isSelected()) {
-                        usuario.setSexo("M");
-                    } else {
-                        usuario.setSexo("F");
-                    }
-                    usuario.setEmail(emailField.getText());
-                    usuario.setNacimiento(Timestamp.valueOf(datePicker.getValue().atStartOfDay()));
-                    usuario.setDireccion(direccionField.getText());
-                    usuario.setTelefono(telefonoField.getText());
-                    usuario.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
-                    usuario.setActivo(Boolean.TRUE);
-                    usuario.setCreacion(new Timestamp(new Date().getTime()));
-                    usuario.setUltimaModificacion(new Timestamp(new Date().getTime()));
-
-                    usuariosDAO.save(usuario);
-                    
-                    Identidad identidad = new Identidad();
-                    
-                    identidad.setNombreUsuario(usuarioField.getText());
-                    identidad.setContrasena(Password.MD5(contrasenaField.getText()));
-                    identidad.setActivo(Boolean.TRUE);
-                    identidad.setUsuario(usuario);
-                    
-                    identidadDAO.save(identidad);
-
-                    stagePrincipal.close();
-
-                    Stage dialogStage = new Stage();
-                    dialogStage.initModality(Modality.APPLICATION_MODAL);
-                    dialogStage.setResizable(false);
-                    dialogStage.setTitle("Dialogo");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-                    dialogStage.getIcons().add(new Image(stageIcon));
-                    Button buttonOk = new Button("ok");
-                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("Usuario registrado satisfactoriamente"), buttonOk).
-                    alignment(Pos.CENTER).padding(new Insets(10)).build()));
-                    dialogStage.show();
-                    buttonOk.setOnAction((ActionEvent e) -> {
-                        dialogStage.close();
-                    });
+                if (choiceBoxEmpleado.getSelectionModel().isEmpty()) {
+                   errorText.setText("Seleccione el empleado");  
                 } else {
-                   errorText.setText("Ya esta en uso este usuario"); 
+                    if (identidadDAO.findByNombreUsuarioActivo(usuarioField.getText()) == null) {
+
+                        Identidad identidad = new Identidad();
+
+                        Integer usuarioId = empleados.get(choiceBoxEmpleado.getSelectionModel().getSelectedIndex()).getId();
+
+                        if (identidadDAO.findByUsuarioIdActivo(usuarioId) == null) {
+
+                            guardarIdentidad(empleados.get(choiceBoxEmpleado.getSelectionModel().getSelectedIndex()));
+                            
+                        } else {
+                            errorText.setText("El empleado ya tiene un usario creado");  
+                        }
+                    } else {
+                        errorText.setText("Ya esta en uso esta cedula");
+                    }
                 }
+
             } else {
-                errorText.setText("Ya esta en uso esta cedula");
-            }
+
+                if (nombreField.getText().isEmpty()) {
+                    errorText.setText("Debe ingresar un nombre");
+                } else if (apellidoField.getText().isEmpty()) {
+                    errorText.setText("Debe ingresar un apellido");
+                } else if (cedulaField.getText().isEmpty()) {
+                    errorText.setText("Debe ingresar la cedula");
+                } else if (!sexoF.isSelected() && !sexoM.isSelected()) {
+                    errorText.setText("Debe seleccionar el sexo");
+                } else if (telefonoField.getText().isEmpty()) {
+                    errorText.setText("Debe ingresar un numero telefonico");
+                } else if (direccionField.getText().isEmpty()) {
+                    errorText.setText("Debe ingresar la direccion");
+                } else if (emailField.getText().isEmpty()) {
+                    errorText.setText("Debe ingresar una direccion");
+                } else if (estadoCivilChoiceBox.getSelectionModel().isEmpty()) {
+                    errorText.setText("Debe seleccionar el estado civil");
+                } else if (datePicker.getValue() == null) {
+                    errorText.setText("Debe seleccionar la fecha de nacimiento");
+                } else {
+                    UsuarioDAO usuariosDAO = new UsuarioDAO();
+
+                    if (usuariosDAO.findByCedulaActivo(cedulaField.getText()) == null) {
+                        
+                        if (identidadDAO.findByNombreUsuarioActivo(usuarioField.getText()) == null) {
+
+                            Usuario usuario = new Usuario();
+                            usuario.setNombre(nombreField.getText());
+                            usuario.setApellido(apellidoField.getText());
+                            usuario.setCedula(cedulaField.getText());
+                            if (sexoM.isSelected()) {
+                                usuario.setSexo("M");
+                            } else {
+                                usuario.setSexo("F");
+                            }
+                            usuario.setEmail(emailField.getText());
+                            usuario.setNacimiento(Timestamp.valueOf(datePicker.getValue().atStartOfDay()));
+                            usuario.setDireccion(direccionField.getText());
+                            usuario.setTelefono(telefonoField.getText());
+                            usuario.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
+                            usuario.setActivo(Boolean.TRUE);
+                            usuario.setCreacion(new Timestamp(new Date().getTime()));
+                            usuario.setUltimaModificacion(new Timestamp(new Date().getTime()));
+
+                            usuariosDAO.save(usuario);
+
+                            guardarIdentidad(usuario);
+                            
+                        } else {
+                           errorText.setText("Ya esta en uso este usuario"); 
+                        }
+                    } else {
+                        errorText.setText("Ya esta en uso esta cedula");
+                    }
+                }
+            } 
+        }
+    }
+    
+    public void guardarIdentidad(Usuario usuario) {
+        
+        Identidad identidad = new Identidad();
+
+        identidad.setNombreUsuario(usuarioField.getText());
+        identidad.setContrasena(Password.MD5(contrasenaField.getText()));
+        identidad.setActivo(Boolean.TRUE);
+        identidad.setUsuario(usuario);
+
+        identidadDAO.save(identidad);
+        stagePrincipal.close();
+        
+        seleccionarPermisos(usuario);
+    }
+    
+    public void seleccionarPermisos(Usuario usuario) {
+        try {
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaAsignarRol.fxml"));
+            AnchorPane ventanaPermisos = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle(usuarioField.getText());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaPermisos);
+            ventana.setScene(scene);
+            AsignarRolController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setUsuario(usuario);
+            controller.setProgramaPrincipal(this);
+            ventana.show();
+ 
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
         }
     }
     
@@ -282,16 +333,24 @@ public class RegistrarAdministradorController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         EstadoCivilDAO estadoCivilDAO = new EstadoCivilDAO();
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
         
         estadosCivil = (ArrayList<EstadoCivil>) estadoCivilDAO.findAll();
+        empleados = (ArrayList<Usuario>) usuarioDAO.findAllEmpleadosActivos();
         
         String[] itemsEstadosCivil = new String[estadosCivil.size()];
+        String[] itemsEmpleados = new String[empleados.size()];
         
         for (EstadoCivil obj: estadosCivil) {
             itemsEstadosCivil[estadosCivil.indexOf(obj)] = obj.getNombre();
         }
         
+        for (Usuario obj: empleados) {
+            itemsEmpleados[empleados.indexOf(obj)] = obj.getNombre() + " " + obj.getApellido();
+        }
+        
         estadoCivilChoiceBox.setItems(FXCollections.observableArrayList(itemsEstadosCivil)); 
+        choiceBoxEmpleado.setItems(FXCollections.observableArrayList(itemsEmpleados));
         
         RolesDAO rolesDAO = new RolesDAO();
         roles = (ArrayList<Roles>) rolesDAO.findAll();

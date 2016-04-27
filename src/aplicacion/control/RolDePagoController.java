@@ -284,13 +284,13 @@ public class RolDePagoController implements Initializable {
                 Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
     }
     
-    public void setEmpleado(Usuario empleado) throws ParseException {
+    public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin) throws ParseException {
         this.empleado = empleado;
         
-        DateTime dateTime = new DateTime();
+        //DateTime dateTime = new DateTime();
            
-        Timestamp fin = new Timestamp(dateTime.getMillis());
-        Timestamp inicio = new Timestamp(dateTime.minusMonths(1).plusDays(1).getMillis());
+        //Timestamp fin = new Timestamp(dateTime.getMillis());
+        //Timestamp inicio = new Timestamp(dateTime.minusMonths(1).plusDays(1).getMillis());
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
