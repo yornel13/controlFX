@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.HorasEmpleadosController.getToday;
 import hibernate.dao.ClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;

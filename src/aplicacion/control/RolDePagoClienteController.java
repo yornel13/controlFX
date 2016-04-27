@@ -200,7 +200,7 @@ public class RolDePagoClienteController implements Initializable {
     @FXML
     public void mostrarHoras(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtras.fxml"));
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasCliente.fxml"));
             AnchorPane ventanaHoras = (AnchorPane) loader.load();
             Stage ventana = new Stage();
             ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
@@ -210,10 +210,10 @@ public class RolDePagoClienteController implements Initializable {
             ventana.initOwner(stagePrincipal);
             Scene scene = new Scene(ventanaHoras);
             ventana.setScene(scene);
-            HorasExtrasController controller = loader.getController();
+            HorasExtrasClienteController controller = loader.getController();
             controller.setStagePrincipal(ventana);
-            //controller.setProgramaPrincipal(this);
-            controller.setEmpleado(empleado);
+            controller.setProgramaPrincipal(this);
+            controller.setEmpleado(empleado, cliente);
             ventana.show();
  
         } catch (Exception e) {
@@ -225,7 +225,7 @@ public class RolDePagoClienteController implements Initializable {
     @FXML
     public void mostrarEditarHoras(ControlEmpleado controlEmpleado) {
         try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtras.fxml"));
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtrasCliente.fxml"));
             AnchorPane ventanaHoras = (AnchorPane) loader.load();
             Stage ventana = new Stage();
             ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
@@ -235,9 +235,9 @@ public class RolDePagoClienteController implements Initializable {
             ventana.initOwner(stagePrincipal);
             Scene scene = new Scene(ventanaHoras);
             ventana.setScene(scene);
-            EditarHorasExtrasController controller = loader.getController();
+            EditarHorasExtrasClienteController controller = loader.getController();
             controller.setStagePrincipal(ventana);
-            //controller.setProgramaPrincipal(this);
+            controller.setProgramaPrincipal(this);
             controller.setControlEmpleado(controlEmpleado);
             ventana.show();
  
