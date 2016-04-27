@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Usuario;
@@ -133,24 +134,43 @@ public class HorasExtrasClienteController implements Initializable {
             });
         } else {
             Timestamp timestamp = Timestamp.valueOf(datePickerFecha.getValue().atStartOfDay());
-            stagePrincipal.close();
             
-            if (checkBoxLibre.isSelected()) {
-                rolDePagoClienteController.guardarRegistro(empleado, 0, 0, null, timestamp, true);
-            } else {
-                if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
-                   rolDePagoClienteController.guardarRegistro(empleado, 0, 0, cliente, timestamp, false); 
-                } else if (suplementarias.getText().isEmpty()) {
-                    rolDePagoClienteController.guardarRegistro(empleado, 0, 
-                        Integer.parseInt(sobreTiempo.getText()), cliente, timestamp, false);
-                } else if (sobreTiempo.getText().isEmpty()) {
-                    rolDePagoClienteController.guardarRegistro(empleado, 
-                        Integer.parseInt(suplementarias.getText()), 0, cliente, timestamp, false);
+            ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
+            if (controlEmpleadoDAO.findByFecha(timestamp, empleado.getId()) == null) {
+                stagePrincipal.close();
+
+                if (checkBoxLibre.isSelected()) {
+                    rolDePagoClienteController.guardarRegistro(empleado, 0, 0, cliente, timestamp, true);
                 } else {
-                    rolDePagoClienteController.guardarRegistro(empleado, 
-                            Integer.parseInt(suplementarias.getText()), 
+                    if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
+                       rolDePagoClienteController.guardarRegistro(empleado, 0, 0, cliente, timestamp, false); 
+                    } else if (suplementarias.getText().isEmpty()) {
+                        rolDePagoClienteController.guardarRegistro(empleado, 0, 
                             Integer.parseInt(sobreTiempo.getText()), cliente, timestamp, false);
+                    } else if (sobreTiempo.getText().isEmpty()) {
+                        rolDePagoClienteController.guardarRegistro(empleado, 
+                            Integer.parseInt(suplementarias.getText()), 0, cliente, timestamp, false);
+                    } else {
+                        rolDePagoClienteController.guardarRegistro(empleado, 
+                                Integer.parseInt(suplementarias.getText()), 
+                                Integer.parseInt(sobreTiempo.getText()), cliente, timestamp, false);
+                    }
                 }
+            } else {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Dialogo");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button buttonOk = new Button("ok");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Ya el empleado tiene un registro con esta fecha"), buttonOk).
+                alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                dialogStage.show();
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                }); 
             }
         }
     }

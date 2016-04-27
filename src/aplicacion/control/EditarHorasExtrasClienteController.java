@@ -129,7 +129,7 @@ public class EditarHorasExtrasClienteController implements Initializable {
             stagePrincipal.close();
             
             if (checkBoxLibre.isSelected()) {
-                rolDePagoClienteController.guardarRegistroEditado(controlEmpleado, 0, 0, null, timestamp, true);
+                rolDePagoClienteController.guardarRegistroEditado(controlEmpleado, 0, 0, cliente, timestamp, true);
             } else {
                 if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
                    rolDePagoClienteController.guardarRegistroEditado(controlEmpleado, 0, 0, cliente, timestamp, false); 
@@ -155,7 +155,7 @@ public class EditarHorasExtrasClienteController implements Initializable {
         sobreTiempo.setText(this.controlEmpleado.getHorasExtras().toString());
         suplementarias.setText(this.controlEmpleado.getHorasSuplementarias().toString());
         datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
-        if (this.controlEmpleado.getLibre()) {
+        if (this.controlEmpleado.getLibre() != null && this.controlEmpleado.getLibre()) {
             checkBoxLibre.setSelected(true);
             checkLibre(null);
         }
@@ -166,6 +166,7 @@ public class EditarHorasExtrasClienteController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
         sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        datePickerFecha.setDisable(true);
     }    
     
     public static EventHandler<KeyEvent> numFilter() {

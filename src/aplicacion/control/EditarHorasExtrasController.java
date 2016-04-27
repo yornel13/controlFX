@@ -105,14 +105,10 @@ public class EditarHorasExtrasController implements Initializable {
     private void checkLibre(ActionEvent event) {
         System.out.println("aplicacion.control.HorasExtrasController.checkLibre()");
         if (checkBoxLibre.isSelected()) {
-            selector.setVisible(false);
             panelHoras.setVisible(false); 
-            textCliente.setVisible(false);
             textEmpleadoLibre.setVisible(true);
         } else {
-            selector.setVisible(true);
             panelHoras.setVisible(true);
-            textCliente.setVisible(true);
             textEmpleadoLibre.setVisible(false);
         }
     }
@@ -139,13 +135,14 @@ public class EditarHorasExtrasController implements Initializable {
             Timestamp timestamp = Timestamp.valueOf(datePickerFecha.getValue().atStartOfDay());
             stagePrincipal.close();
             
-            if (checkBoxLibre.isSelected()) {
-                rolDePagoController.guardarRegistroEditado(controlEmpleado, 0, 0, null, timestamp, true);
-            } else {
-                if (!clientes.isEmpty() && !selector.getSelectionModel().isEmpty() 
+            if (!clientes.isEmpty() && !selector.getSelectionModel().isEmpty() 
                         && selector.getSelectionModel().getSelectedItem() != null) {
                     cliente = clientes.get(selector.getSelectionModel().getSelectedIndex());
-                }
+            }
+            
+            if (checkBoxLibre.isSelected()) {
+                rolDePagoController.guardarRegistroEditado(controlEmpleado, 0, 0, cliente, timestamp, true);
+            } else {
                 if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
                    rolDePagoController.guardarRegistroEditado(controlEmpleado, 0, 0, cliente, timestamp, false); 
                 } else if (suplementarias.getText().isEmpty()) {
@@ -172,7 +169,7 @@ public class EditarHorasExtrasController implements Initializable {
             selector.getSelectionModel().select(controlEmpleado.getCliente().getNombre());
         }
         datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
-        if (this.controlEmpleado.getLibre()) {
+        if (this.controlEmpleado.getLibre() != null && this.controlEmpleado.getLibre()) {
             checkBoxLibre.setSelected(true);
             checkLibre(null);
         }
@@ -183,6 +180,7 @@ public class EditarHorasExtrasController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
         sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        datePickerFecha.setDisable(true);
         
         ClienteDAO clienteDAO = new ClienteDAO();
         clientes = new ArrayList<>();

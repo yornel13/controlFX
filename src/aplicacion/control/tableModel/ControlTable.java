@@ -19,7 +19,24 @@ public class ControlTable {
     private String fecha;
     private Integer horasSuplementarias;
     private Integer horasExtras;
+    private String descanso;
 
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getDescanso() {
+        return descanso;
+    }
+
+    public void setDescanso(String descanso) {
+        this.descanso = descanso;
+    }
+    
     public Integer getId() {
         return id;
     }

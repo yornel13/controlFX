@@ -154,8 +154,7 @@ public class RolDePagoController implements Initializable {
     @FXML 
     private DatePicker pickerHasta;
     
-    
-    
+    @FXML Button expandirButton;
     
     private ObservableList<ControlTable> data;
     
@@ -176,9 +175,14 @@ public class RolDePagoController implements Initializable {
     }
     
     @FXML
-    private void agregarEmpleado(ActionEvent event) {
-        //aplicacionControl.mostrarRegistrarEmpleado(empresa);
-        LocalDate jose = pickerDe.getValue();
+    private void expandir(ActionEvent event) {
+        if (expandirButton.getText().equalsIgnoreCase("Expandir")) {
+            empleadosTableView.setPrefHeight(445);
+            expandirButton.setText("Contraer");
+        } else {
+            empleadosTableView.setPrefHeight(205);
+            expandirButton.setText("Expandir");
+        }
     }
     
     @FXML
@@ -267,15 +271,14 @@ public class RolDePagoController implements Initializable {
             Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
         
         controlEmpleado.setFecha(fecha);
+        controlEmpleado.setCliente(cliente);
         controlEmpleado.setLibre(libre);
         if (libre) {
             controlEmpleado.setHorasExtras(0);
             controlEmpleado.setHorasSuplementarias(0);
-            controlEmpleado.setCliente(null);
         } else {
             controlEmpleado.setHorasExtras(sobreTiempo);
             controlEmpleado.setHorasSuplementarias(suplementarias);
-            controlEmpleado.setCliente(cliente);
         }
         HibernateSessionFactory.getSession().flush();
         
@@ -329,7 +332,9 @@ public class RolDePagoController implements Initializable {
             controlTable.setHorasExtras(control.getHorasExtras());
             controlTable.setHorasSuplementarias(control.getHorasSuplementarias());
             controlTable.setUsuarios(empleado);
-            
+            if (control.getLibre() != null && control.getLibre()) {
+               controlTable.setDescanso("Libre"); 
+            } 
             controlEmpleadoTable.add(controlTable);
         }
        
@@ -347,19 +352,28 @@ public class RolDePagoController implements Initializable {
         cliente.setMinWidth(100);
         cliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
         
-        TableColumn horasExtras = new TableColumn("HORAS (ST)");
+        TableColumn horasExtras = new TableColumn("ST");
         horasExtras.setMinWidth(100);
         horasExtras.setCellValueFactory(new PropertyValueFactory<>("horasExtras"));
         
-        TableColumn horasSuplementarias = new TableColumn("HORAS (RC)");
+        TableColumn horasSuplementarias = new TableColumn("RC");
         horasSuplementarias.setMinWidth(100);
         horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         
-        TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Delete");
+        TableColumn horas = new TableColumn("Horas");
+        horas.setMinWidth(100);
+        horas.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
+        horas.getColumns().addAll(horasExtras, horasSuplementarias);
+        
+        TableColumn descanso = new TableColumn("Descanso");
+        descanso.setMinWidth(100);
+        descanso.setCellValueFactory(new PropertyValueFactory<>("descanso"));
+        
+        TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Borrar");
         delete.setMinWidth(40);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
-            private final Button deleteButton = new Button("Delete");
+            private final Button deleteButton = new Button("Borrar");
 
             @Override
             protected void updateItem(ControlTable controlTable, boolean empty) {
@@ -379,8 +393,7 @@ public class RolDePagoController implements Initializable {
             }
         });
         
-        empleadosTableView.getColumns().addAll(fecha, cliente, horasExtras, 
-                horasSuplementarias, delete);
+        empleadosTableView.getColumns().addAll(fecha, cliente, horas, descanso, delete);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<ControlTable> row = new TableRow<>();
