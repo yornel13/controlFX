@@ -460,7 +460,7 @@ public class AplicacionControl extends Application {
     public void mostrarAdminitradores() {
         if (permisos == null) {
            noLogeado();
-       } else {
+        } else {
            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarAdminitradores()");
@@ -495,7 +495,7 @@ public class AplicacionControl extends Application {
     public void mostrarRegistrarAdministrador() {
         if (permisos == null) {
            noLogeado();
-       } else {
+        } else {
            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRegistrarAdministrador()");
@@ -641,7 +641,7 @@ public class AplicacionControl extends Application {
     public void mostrarHorasEmpleados(Empresa empresa) {
         if (permisos == null) {
            noLogeado();
-       } else {
+        } else {
            if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarHorasEmpleados()");
@@ -675,28 +675,36 @@ public class AplicacionControl extends Application {
     }
     
     public void mostrarRolDePago(Usuario empleado, Timestamp inicio, Timestamp fin) {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
-            AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-            String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-            ventana.getIcons().add(new Image(stageIcon));
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaRolDePago);
-            ventana.setScene(scene);
-            RolDePagoController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpleado(empleado, inicio, fin);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
-        }
+        if (permisos == null) {
+           noLogeado();
+        } else {
+           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
+                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRolDePago);
+                    ventana.setScene(scene);
+                    RolDePagoController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado, inicio, fin);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       } 
     }
 
     /**
