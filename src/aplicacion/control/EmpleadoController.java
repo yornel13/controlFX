@@ -6,8 +6,8 @@
 package aplicacion.control;
 
 import hibernate.model.Usuario;
+import java.io.File;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -21,6 +21,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
 
@@ -94,7 +95,39 @@ public class EmpleadoController implements Initializable {
     private Button editarButton;
     
     
-    
+    @FXML
+    public void changeImage(ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        fileChooser.setTitle("Selecciona la foto");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));                 
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("All Images", "*.*"),
+            new FileChooser.ExtensionFilter("JPG", "*.jpg"),
+            new FileChooser.ExtensionFilter("GIF", "*.gif"),
+            new FileChooser.ExtensionFilter("BMP", "*.bmp"),
+            new FileChooser.ExtensionFilter("PNG", "*.png")
+        );
+        
+        File file = fileChooser.showOpenDialog(stagePrincipal);
+        System.out.println(file);
+        String profile = file.toURI().toString();
+        
+        Image image = new Image(profile);
+        Rectangle rekt = new Rectangle(40, 40); 
+        ImagePattern imagePattern = new ImagePattern(image);
+        rekt.setFill(imagePattern);
+        
+
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(140);
+        imageView.setPreserveRatio(true);
+        imageView.setSmooth(true);
+        imageView.setCache(true);
+        
+        profileImage.getChildren().clear();
+        profileImage.getChildren().add(imageView);
+    }
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -128,9 +161,7 @@ public class EmpleadoController implements Initializable {
         DateTime contrato = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
         fechaContrato.setText(contrato.getDayOfMonth() + " de " + getMonthName(contrato.getMonthOfYear()) + " " + contrato.getYear());
         
-        
     }
-  
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -140,10 +171,7 @@ public class EmpleadoController implements Initializable {
                 + "-fx-background-repeat: stretch;"); */
       
         Image image = new Image(profile);
-        Rectangle rekt = new Rectangle(40, 40); //haha
-        //    ☐ rekt
-        //    ☐ not rekt
-        //    ☑ tyrannosaurus rekt 
+        Rectangle rekt = new Rectangle(40, 40); 
         ImagePattern imagePattern = new ImagePattern(image);
         rekt.setFill(imagePattern);
         

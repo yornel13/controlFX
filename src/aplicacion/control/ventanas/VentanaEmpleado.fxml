@@ -12,6 +12,7 @@
 
 <AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.EmpleadoController">
     <children>
+      <Pane fx:id="profileImage" layoutX="15.0" layoutY="60.0" prefHeight="130.0" prefWidth="140.0" style="-fx-background-color: black;" />
       <Accordion layoutX="40.0" layoutY="14.0" />
       <Label layoutX="170.0" layoutY="60.0" text="Cedula" textFill="#2382c6" />
       <Label layoutX="170.0" layoutY="90.0" text="Telefono" textFill="#2382c6" />
@@ -26,7 +27,6 @@
             <Font name="Comic Sans MS" size="14.0" />
          </font>
       </Label>
-      <Pane fx:id="profileImage" layoutX="15.0" layoutY="60.0" prefHeight="140.0" prefWidth="140.0" style="-fx-background-color: black;" />
       <Label layoutX="30.0" layoutY="245.0" text="Departamento" textFill="#2382c6" />
       <Label layoutX="30.0" layoutY="275.0" text="Cargo" textFill="#2382c6" />
       <Label layoutX="30.0" layoutY="305.0" text="Nro. De Cuenta" textFill="#2382c6" />
@@ -62,5 +62,6 @@
             <Label alignment="CENTER" contentDisplay="CENTER" text="Fecha de inicio" textFill="#2382c6" GridPane.halignment="RIGHT" />
          </children>
       </GridPane>
+      <Button layoutX="15.0" layoutY="190.0" minHeight="21.0" mnemonicParsing="false" onAction="#changeImage" prefHeight="21.0" prefWidth="140.0" style="-fx-background-image: url('aplicacion/control/imagenes/pencil.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: gray;" text="Cambiar" />
     </children>
 </AnchorPane>
