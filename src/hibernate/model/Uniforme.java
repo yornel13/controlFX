@@ -2,6 +2,9 @@ package hibernate.model;
 
 // default package
 
+import java.sql.Timestamp;
+
+
 /**
  * Uniforme entity. @author MyEclipse Persistence Tools
  */
@@ -15,6 +18,7 @@ public class Uniforme implements java.io.Serializable {
 	private String nombre;
 	private Double valor;
 	private Boolean activo;
+        private Timestamp fecha;
 
 	// Constructors
 
@@ -72,4 +76,12 @@ public class Uniforme implements java.io.Serializable {
 		this.activo = activo;
 	}
 
+        public Timestamp getFecha() {
+            return fecha;
+        }
+
+        public void setFecha(Timestamp fecha) {
+            this.fecha = fecha;
+        }
+       
 }

@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Permisos;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.net.URL;
@@ -138,8 +139,18 @@ public class EmpleadoController implements Initializable {
     }
     
     public void editarEmpleado(ActionEvent event) {
-        aplicacionControl.mostrarEditarEmpleado(empleado);
-        stagePrincipal.close();
+        if (aplicacionControl.permisos == null) {
+            aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+               
+                aplicacionControl.mostrarEditarEmpleado(empleado);
+                stagePrincipal.close();
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
     }
     
     public void setEmpleado(Usuario empleado   ) {

@@ -42,5 +42,6 @@
            </Button>
         </children>
      </Pane>
+      <Button disable="true" layoutX="78.0" layoutY="485.0" mnemonicParsing="false" prefWidth="151.0" text="Auditoria" />
     </children>
 </AnchorPane>

@@ -2,6 +2,9 @@ package hibernate.model;
 
 // default package
 
+import java.sql.Timestamp;
+
+
 /**
  * Actuariales entity. @author MyEclipse Persistence Tools
  */
@@ -15,6 +18,7 @@ public class Actuariales implements java.io.Serializable {
 	private Double primario;
 	private Double secundario;
 	private Boolean activo;
+        private Timestamp fecha;
 
 	// Constructors
 
@@ -72,5 +76,13 @@ public class Actuariales implements java.io.Serializable {
 	public void setActivo(Boolean activo) {
 		this.activo = activo;
 	}
+
+        public Timestamp getFecha() {
+            return fecha;
+        }
+
+        public void setFecha(Timestamp fecha) {
+            this.fecha = fecha;
+        }  
 
 }

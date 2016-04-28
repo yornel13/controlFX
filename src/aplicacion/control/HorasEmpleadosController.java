@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Permisos;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.ControlEmpleado;
@@ -136,6 +137,20 @@ public class HorasEmpleadosController implements Initializable {
         }
     } 
     
+    private void rolDePagoPorEmpleado(Usuario empleado) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+               
+               aplicacionControl.mostrarRolDePago(empleado, inicio, fin);
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
     public void setTableInfo(Empresa empresa, Timestamp inicio, Timestamp fin) {
         this.inicio = inicio;
         this.fin = fin;
@@ -221,7 +236,7 @@ public class HorasEmpleadosController implements Initializable {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
                     System.out.println(inicio);
-                    aplicacionControl.mostrarRolDePago(usuariosDAO.findById(rowData.getId()), this.inicio, this.fin);
+                    rolDePagoPorEmpleado(usuariosDAO.findById(rowData.getId()));
                 }
             });
             return row ;

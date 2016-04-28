@@ -242,35 +242,43 @@ public class AplicacionControl extends Application {
     }
    
    public void mostrarRegistrarEmpresa() {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpresa()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpresa.fxml"));
-            AnchorPane ventanaRegistrarEmpresa = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Registrar empresa");
-            String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-            ventana.getIcons().add(new Image(stageIcon));
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaRegistrarEmpresa);
-            ventana.setScene(scene);
-            RegistrarEmpresaController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            ventana.show();
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.CREAR)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpresa()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpresa.fxml"));
+                    AnchorPane ventanaRegistrarEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Registrar empresa");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRegistrarEmpresa);
+                    ventana.setScene(scene);
+                    RegistrarEmpresaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
         }
     }
     
     public void mostrarEmpleados(Empresa empresa) {
-       if (permisos == null) {
+        if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
@@ -295,18 +303,18 @@ public class AplicacionControl extends Application {
                     e.printStackTrace();
                     //tratar la excepción
                 }
-           } else {
+            } else {
               noPermitido();
-           }
-       }
+            }
+        }
     }
     
     public void mostrarEmpleadosTodos() {
-       if (permisos == null) {
+        if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleadosTodos.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
@@ -330,18 +338,18 @@ public class AplicacionControl extends Application {
                     e.printStackTrace();
                     //tratar la excepción
                 }
-           } else {
-              noPermitido();
-           }
+            } else {
+                noPermitido();
+            }
        }
     }
     
     public void mostrarRegistrarEmpleado(Empresa empresa) {
         if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.CREAR)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.CREAR)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
                     TabPane ventanaRegistrarEmpleado = (TabPane) loader.load();
@@ -363,41 +371,48 @@ public class AplicacionControl extends Application {
                     e.printStackTrace();
                     //tratar la excepción
                 }
-           } else {
+            } else {
               noPermitido();
-           }
-       }
+            }
+        }
     }
     
     public void mostrarEmpleado(Usuario empleado) {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
-            AnchorPane ventanaEmpleado = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Detalles de empleado");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaEmpleado);
-            ventana.setScene(scene);
-            EmpleadoController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpleado(empleado);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
+                    AnchorPane ventanaEmpleado = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Detalles de empleado");
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleado);
+                    ventana.setScene(scene);
+                    EmpleadoController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado);
+                    ventana.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
         }
     }
     
     public void mostrarEditarEmpleado(Usuario empleado) {
         if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpleado.fxml"));
                     TabPane ventanaEditarEmpleado = (TabPane) loader.load();
@@ -417,18 +432,18 @@ public class AplicacionControl extends Application {
                     e.printStackTrace();
                     //tratar la excepción
                 }
-           } else {
+            } else {
               noPermitido();
-           }
-       }
+            }
+        }
     }
     
     public void mostrarEmpresas() {
         if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarEmpresas()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresas.fxml"));
                     AnchorPane ventanaEmpresas = (AnchorPane) loader.load();
@@ -448,22 +463,22 @@ public class AplicacionControl extends Application {
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
  
-               } catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     //tratar la excepción
-               }
-           } else {
+                }
+            } else {
               noPermitido();
-           }
-       }
+            }
+        }
     }
     
     public void mostrarClientes() {
         if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientes.fxml"));
                     AnchorPane ventanaClientes = (AnchorPane) loader.load();
@@ -487,18 +502,18 @@ public class AplicacionControl extends Application {
                      e.printStackTrace();
                      //tratar la excepción
                 }
-           } else {
-              noPermitido();
-           }
-       }
+            } else {
+                noPermitido();
+            }
+        }
     }
     
     public void mostrarClientesEmpresa(Empresa empresa) {
         if (permisos == null) {
            noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
-               try {
+        } else {
+            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesEmpresa.fxml"));
                     AnchorPane ventanaClientesEmpresa = (AnchorPane) loader.load();
@@ -523,18 +538,18 @@ public class AplicacionControl extends Application {
                      e.printStackTrace();
                      //tratar la excepción
                 }
-           } else {
-              noPermitido();
-           }
-       }
+            } else {
+               noPermitido();
+            }
+        }
     }
     
     public void mostrarAdminitradores() {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
-               try {
+            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarAdminitradores()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaAdministradores.fxml"));
                     AnchorPane ventanaAdministradores = (AnchorPane) loader.load();
@@ -554,22 +569,22 @@ public class AplicacionControl extends Application {
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
  
-               } catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     //tratar la excepción
-               }
-           } else {
-              noPermitido();
-           }
-       }
+                }
+            } else {
+               noPermitido();
+            }
+        }
     }
     
     public void mostrarRegistrarAdministrador() {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
-               try {
+            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRegistrarAdministrador()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarAdministrador.fxml"));
                     AnchorPane ventanaRegistrarAdministrador = (AnchorPane) loader.load();
@@ -586,127 +601,167 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     ventana.show();
  
-               } catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     //tratar la excepción
-               }
-           } else {
+                }
+            } else {
               noPermitido();
-           }
-       }
+            }
+        }
     }
     
     public void mostrarEmpresa(Empresa empresa) {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresa.fxml"));
-            AnchorPane ventanaEmpresa = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Detalles de empresa");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaEmpresa);
-            ventana.setScene(scene);
-            EmpresaController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpresa(empresa);
-            ventana.show();
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresa.fxml"));
+                    AnchorPane ventanaEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Detalles de empresa");
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpresa);
+                    ventana.setScene(scene);
+                    EmpresaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
         }
     }
     
     public void mostrarEditarEmpresa(Empresa empresa) {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpresa()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpresa.fxml"));
-            AnchorPane ventanaEditarEmpresa = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Editar empleado");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaEditarEmpresa);
-            ventana.setScene(scene);
-            EditarEmpresaController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpresa(empresa);
-            ventana.show();
+         if (permisos == null) {
+           noLogeado();
+         } else {
+            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpresa()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpresa.fxml"));
+                    AnchorPane ventanaEditarEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Editar empleado");
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEditarEmpresa);
+                    ventana.setScene(scene);
+                    EditarEmpresaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+               noPermitido();
+            }
         }
     }
     
     public void mostrarRegistrarCliente() {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarCliente()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarCliente.fxml"));
-            AnchorPane ventanaRegistrarCliente = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Registrar cliente");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaRegistrarCliente);
-            ventana.setScene(scene);
-            RegistrarClienteController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            ventana.show();
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.CREAR)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarCliente()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarCliente.fxml"));
+                    AnchorPane ventanaRegistrarCliente = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Registrar cliente");
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRegistrarCliente);
+                    ventana.setScene(scene);
+                    RegistrarClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                noPermitido();
+            }
         }
     }
     
     public void mostrarCliente(Cliente cliente) {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostrarCliente()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaCliente.fxml"));
-            AnchorPane ventanaCliente = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Detalles de cliente");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaCliente);
-            ventana.setScene(scene);
-            ClienteController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setCliente(cliente);
-            ventana.show();
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarCliente()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaCliente.fxml"));
+                    AnchorPane ventanaCliente = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Detalles de cliente");
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaCliente);
+                    ventana.setScene(scene);
+                    ClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setCliente(cliente);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                noPermitido();
+            }
         }
     }
     
     public void mostrarEditarCliente(Cliente cliente) {
-        try {
-            System.out.println("aplicacion.control.AplicacionControl.mostrarEditarCliente()");
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarCliente.fxml"));
-            AnchorPane ventanaEditarCliente = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle("Editar cliente");
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaEditarCliente);
-            ventana.setScene(scene);
-            EditarClienteController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setCliente(cliente);
-            ventana.show();
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.EDITAR)) {
+                try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarEditarCliente()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarCliente.fxml"));
+                    AnchorPane ventanaEditarCliente = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Editar cliente");
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEditarCliente);
+                    ventana.setScene(scene);
+                    EditarClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setCliente(cliente);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                noPermitido();
+            }
         }
     }
     
@@ -776,7 +831,7 @@ public class AplicacionControl extends Application {
                     //tratar la excepción
                 }
            } else {
-              noPermitido();
+               noPermitido();
            }
        } 
     }
@@ -785,8 +840,8 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
-               try {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
                     AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
@@ -942,6 +997,38 @@ public class AplicacionControl extends Application {
               noPermitido();
            }
        }
+    }
+    
+    public void mostrarPagoMes(Usuario empleado, Timestamp inicio, Timestamp fin) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoMes.fxml"));
+                    AnchorPane ventanaPagoMes = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaPagoMes);
+                    ventana.setScene(scene);
+                    PagoMesController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado, inicio, fin);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       } 
     }
 
     /**

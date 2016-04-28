@@ -22,5 +22,8 @@
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />
         </property>
+        <property name="fecha" type="java.sql.Timestamp">
+            <column name="fecha" length="19" not-null="true" />
+        </property>
     </class>
 </hibernate-mapping>

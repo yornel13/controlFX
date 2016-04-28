@@ -43,9 +43,9 @@
                      <toggleGroup>
                         <ToggleGroup fx:id="grupoHoras" />
                      </toggleGroup></RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Crear" toggleGroup="$grupoHoras" GridPane.rowIndex="2" />
-                  <RadioButton mnemonicParsing="false" text="Editar" toggleGroup="$grupoHoras" GridPane.rowIndex="3" />
-                  <RadioButton mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoHoras" GridPane.rowIndex="4" />
+                  <RadioButton disable="true" mnemonicParsing="false" text="Crear" toggleGroup="$grupoHoras" GridPane.rowIndex="2" />
+                  <RadioButton disable="true" mnemonicParsing="false" text="Editar" toggleGroup="$grupoHoras" GridPane.rowIndex="3" />
+                  <RadioButton disable="true" mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoHoras" GridPane.rowIndex="4" />
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -80,16 +80,16 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
             </GridPane>
-            <GridPane layoutX="140.0" layoutY="10.0">
+            <GridPane layoutX="30.0" layoutY="10.0">
                <children>
                   <Label text="Empresas" textFill="WHITE" />
                   <RadioButton mnemonicParsing="false" text="Ver" GridPane.rowIndex="1">
                      <toggleGroup>
                         <ToggleGroup fx:id="grupoEmpresas" />
                      </toggleGroup></RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Crear" toggleGroup="$grupoEmpresas" GridPane.rowIndex="2" />
-                  <RadioButton mnemonicParsing="false" text="Editar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="3" />
-                  <RadioButton mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="4" />
+                  <RadioButton disable="true" mnemonicParsing="false" text="Crear" toggleGroup="$grupoEmpresas" GridPane.rowIndex="2" />
+                  <RadioButton disable="true" mnemonicParsing="false" text="Editar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="3" />
+                  <RadioButton disable="true" mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="4" />
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -102,7 +102,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
             </GridPane>
-            <GridPane layoutX="30.0" layoutY="10.0">
+            <GridPane layoutX="140.0" layoutY="10.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>

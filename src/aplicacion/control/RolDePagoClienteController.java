@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
@@ -205,52 +206,84 @@ public class RolDePagoClienteController implements Initializable {
     
     @FXML
     public void mostrarHoras(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasCliente.fxml"));
-            AnchorPane ventanaHoras = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-            ventana.getIcons().add(new Image(stageIcon));
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaHoras);
-            ventana.setScene(scene);
-            HorasExtrasClienteController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpleado(empleado, cliente);
-            ventana.show();
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasCliente.fxml"));
+                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaHoras);
+                    ventana.setScene(scene);
+                    HorasExtrasClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado, cliente);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
         }
     }
     
     @FXML
     public void mostrarEditarHoras(ControlEmpleado controlEmpleado) {
-        try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtrasCliente.fxml"));
-            AnchorPane ventanaHoras = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-            ventana.getIcons().add(new Image(stageIcon));
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaHoras);
-            ventana.setScene(scene);
-            EditarHorasExtrasClienteController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setControlEmpleado(controlEmpleado);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtrasCliente.fxml"));
+                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaHoras);
+                    ventana.setScene(scene);
+                    EditarHorasExtrasClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setControlEmpleado(controlEmpleado);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
         }
+    }
+    
+    private void borrarHoras(ControlEmpleado controlEmpleado, ControlTable controlTable) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.ELIMINAR)) {
+               
+                new ControlEmpleadoDAO().delete(controlEmpleado);
+                HibernateSessionFactory.getSession().flush();
+                data.remove(controlTable);
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
     }
     
     public void guardarRegistro(Usuario empleado, Integer suplementarias, 
@@ -385,9 +418,7 @@ public class RolDePagoClienteController implements Initializable {
 
                 setGraphic(deleteButton);
                 deleteButton.setOnAction(event -> {
-                    controlDAO.delete(controlDAO.findById(controlTable.getId()));
-                    HibernateSessionFactory.getSession().flush();
-                    data.remove(controlTable);
+                    borrarHoras(controlDAO.findById(controlTable.getId()), controlTable);
                 });
             }
         });

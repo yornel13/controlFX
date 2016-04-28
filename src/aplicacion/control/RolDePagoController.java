@@ -9,6 +9,7 @@ import static aplicacion.control.HorasEmpleadosController.getToday;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
@@ -160,6 +161,9 @@ public class RolDePagoController implements Initializable {
     
     ArrayList<Usuario> usuarios;
     
+    Timestamp fin;
+    Timestamp inicio;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -186,6 +190,12 @@ public class RolDePagoController implements Initializable {
     }
     
     @FXML
+    public void onClickPago(ActionEvent event) {
+        stagePrincipal.close();
+        aplicacionControl.mostrarPagoMes(empleado, inicio, fin);
+    }
+    
+    @FXML
     private void mostrarRegistro(ActionEvent event) {
         if (pickerDe.getValue() == null) {
             // error
@@ -194,75 +204,107 @@ public class RolDePagoController implements Initializable {
         } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
             // error
         } else {       
-            Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-            Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+            fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+            inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
             setControlEmpleadoInfo(empleado, inicio, fin);
         }
     } 
     
     @FXML
     public void mostrarHoras(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtras.fxml"));
-            AnchorPane ventanaHoras = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-            ventana.getIcons().add(new Image(stageIcon));
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaHoras);
-            ventana.setScene(scene);
-            HorasExtrasController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setEmpleado(empleado);
-            ventana.show();
- 
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtras.fxml"));
+                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaHoras);
+                    ventana.setScene(scene);
+                    HorasExtrasController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
         }
     }
     
     @FXML
     public void mostrarEditarHoras(ControlEmpleado controlEmpleado) {
-        try {
-            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtras.fxml"));
-            AnchorPane ventanaHoras = (AnchorPane) loader.load();
-            Stage ventana = new Stage();
-            ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-            ventana.getIcons().add(new Image(stageIcon));
-            ventana.setResizable(false);
-            ventana.initOwner(stagePrincipal);
-            Scene scene = new Scene(ventanaHoras);
-            ventana.setScene(scene);
-            EditarHorasExtrasController controller = loader.getController();
-            controller.setStagePrincipal(ventana);
-            controller.setProgramaPrincipal(this);
-            controller.setControlEmpleado(controlEmpleado);
-            ventana.show();
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtras.fxml"));
+                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaHoras);
+                    ventana.setScene(scene);
+                    EditarHorasExtrasController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setControlEmpleado(controlEmpleado);
+                    ventana.show();
  
-        } catch (Exception e) {
-            e.printStackTrace();
-            //tratar la excepción
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
         }
+    }
+    
+    private void borrarHoras(ControlEmpleado controlEmpleado, ControlTable controlTable) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.ELIMINAR)) {
+               
+                new ControlEmpleadoDAO().delete(controlEmpleado);
+                HibernateSessionFactory.getSession().flush();
+                data.remove(controlTable);
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
     }
     
     public void guardarRegistro(Usuario empleado, Integer suplementarias, 
             Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
-        ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
-        ControlEmpleado controlEmpleado = new ControlEmpleado();
-        controlEmpleado = new ControlEmpleado();
-        controlEmpleado.setFecha(fecha);
-        controlEmpleado.setLibre(libre);
-        controlEmpleado.setUsuario(empleado);
-        controlEmpleado.setHorasExtras(sobreTiempo);
-        controlEmpleado.setHorasSuplementarias(suplementarias);
-        controlEmpleado.setCliente(cliente);
-        controlEmpleadoDAO.save(controlEmpleado);
-        setControlEmpleadoInfo(this.empleado, 
+            ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
+            ControlEmpleado controlEmpleado = new ControlEmpleado();
+            controlEmpleado = new ControlEmpleado();
+            controlEmpleado.setFecha(fecha);
+            controlEmpleado.setLibre(libre);
+            controlEmpleado.setUsuario(empleado);
+            controlEmpleado.setHorasExtras(sobreTiempo);
+            controlEmpleado.setHorasSuplementarias(suplementarias);
+            controlEmpleado.setCliente(cliente);
+            controlEmpleadoDAO.save(controlEmpleado);
+            setControlEmpleadoInfo(this.empleado, 
                 Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
                 Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
     }
@@ -270,30 +312,27 @@ public class RolDePagoController implements Initializable {
     public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Integer suplementarias, 
             Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
         
-        controlEmpleado.setFecha(fecha);
-        controlEmpleado.setCliente(cliente);
-        controlEmpleado.setLibre(libre);
-        if (libre) {
-            controlEmpleado.setHorasExtras(0);
-            controlEmpleado.setHorasSuplementarias(0);
-        } else {
-            controlEmpleado.setHorasExtras(sobreTiempo);
-            controlEmpleado.setHorasSuplementarias(suplementarias);
-        }
-        HibernateSessionFactory.getSession().flush();
-        
-        setControlEmpleadoInfo(empleado, 
+            controlEmpleado.setFecha(fecha);
+            controlEmpleado.setCliente(cliente);
+            controlEmpleado.setLibre(libre);
+            if (libre) {
+                controlEmpleado.setHorasExtras(0);
+                controlEmpleado.setHorasSuplementarias(0);
+            } else {
+                controlEmpleado.setHorasExtras(sobreTiempo);
+                controlEmpleado.setHorasSuplementarias(suplementarias);
+            }
+            HibernateSessionFactory.getSession().flush();
+
+            setControlEmpleadoInfo(empleado, 
                 Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
                 Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
     }
     
     public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin) throws ParseException {
         this.empleado = empleado;
-        
-        //DateTime dateTime = new DateTime();
-           
-        //Timestamp fin = new Timestamp(dateTime.getMillis());
-        //Timestamp inicio = new Timestamp(dateTime.minusMonths(1).plusDays(1).getMillis());
+        this.inicio = inicio;
+        this.fin = fin;
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -386,9 +425,7 @@ public class RolDePagoController implements Initializable {
 
                 setGraphic(deleteButton);
                 deleteButton.setOnAction(event -> {
-                    controlDAO.delete(controlDAO.findById(controlTable.getId()));
-                    HibernateSessionFactory.getSession().flush();
-                    data.remove(controlTable);
+                    borrarHoras(controlDAO.findById(controlTable.getId()), controlTable);
                 });
             }
         });
