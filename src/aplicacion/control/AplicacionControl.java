@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.util.Permisos;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
+import hibernate.model.Identidad;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -287,6 +288,41 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
+    
+    public void mostrarEmpleadosTodos() {
+       if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleadosTodos.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Todos los empleados");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    EmpleadosTodosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
  
@@ -810,6 +846,102 @@ public class AplicacionControl extends Application {
               noPermitido();
            }
        } 
+    }
+    
+    public void mostrarEditarContrasena(Identidad identidad) {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarContrasena.fxml"));
+                    AnchorPane ventanaEditarContrasena = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Usuario: " + identidad.getNombreUsuario());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEditarContrasena);
+                    ventana.setScene(scene);
+                    EditarContrasenaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setIdentidad(identidad);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
+    
+    public void mostrarEditarUsuario(Identidad identidad) {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarUsuario.fxml"));
+                    AnchorPane ventanaEditarUsuario = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Usuario: " + identidad.getNombreUsuario());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEditarUsuario);
+                    ventana.setScene(scene);
+                    EditarUsuarioController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setIdentidad(identidad);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
+    
+    public void mostrarEditarRol(Identidad identidad) {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarRol.fxml"));
+                    AnchorPane ventanaEditarPermisos = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Usuario: " + identidad.getNombreUsuario());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEditarPermisos);
+                    ventana.setScene(scene);
+                    EditarRolController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setIdentidad(identidad);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
     }
 
     /**

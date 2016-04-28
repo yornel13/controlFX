@@ -6,10 +6,10 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.Administrador;
-import aplicacion.control.tableModel.ControlTable;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.IdentidadDAO;
 import hibernate.dao.RolesDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.Identidad;
 import hibernate.model.Roles;
@@ -22,6 +22,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -29,7 +32,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -84,6 +91,60 @@ public class AdministradoresController implements Initializable {
         aplicacionControl.mostrarConfiguracion();
         stagePrincipal.close();
     } 
+    
+    public void editarAdministrador(Identidad identidad) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Dialogo");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonNombreUsuario = new Button("Nombre Usuario");
+        Button buttonContrasena = new Button("Contraseña");
+        Button buttonPermisos = new Button("Permisos");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Que desea editar?"), buttonNombreUsuario, buttonContrasena, buttonPermisos).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        buttonPermisos.setPrefWidth(150);
+        buttonContrasena.setPrefWidth(150);
+        buttonNombreUsuario.setPrefWidth(150);
+        dialogStage.show();
+        buttonNombreUsuario.setOnAction((ActionEvent e) -> {
+            aplicacionControl.mostrarEditarUsuario(identidad);
+            dialogStage.close();
+        });
+        buttonContrasena.setOnAction((ActionEvent e) -> {
+            aplicacionControl.mostrarEditarContrasena(identidad);
+            dialogStage.close();
+        });
+        buttonPermisos.setOnAction((ActionEvent e) -> {
+            aplicacionControl.mostrarEditarRol(identidad);
+            dialogStage.close();
+        });
+    }
+    
+    public void deleteAdministrador(Administrador administrador) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Confirmación de borrado");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));;
+        Button buttonConfirmar = new Button("Si Borrar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Borrar el usuario " +administrador.getNombreUsuario()+ "?"), buttonConfirmar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        dialogStage.show();
+        buttonConfirmar.setOnAction((ActionEvent e) -> {
+            new IdentidadDAO().delete(new IdentidadDAO().findById(administrador.getId()));
+            if (administrador.getUsuario().getDetallesEmpleado() == null) {
+                new UsuarioDAO().findById(administrador.getUsuario().getId()).setActivo(Boolean.FALSE);
+            }
+            HibernateSessionFactory.getSession().flush();
+            data.remove(administrador);
+            dialogStage.close();
+        });
+    }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
@@ -174,33 +235,7 @@ public class AdministradoresController implements Initializable {
 
                 setGraphic(editarButton);
                 editarButton.setOnAction(event -> {
-                    //controlDAO.delete(controlDAO.findById(controlTable.getId()));
-                    //HibernateSessionFactory.getSession().flush();
-                    //data.remove(administrador);
-                });
-            }
-        });
-        
-        TableColumn<Administrador, Administrador> roles = new TableColumn<>("Roles");
-        roles.setMinWidth(40);
-        roles.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        roles.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
-            private final Button rolesButton = new Button("Permisos");
-
-            @Override
-            protected void updateItem(Administrador administrador, boolean empty) {
-                super.updateItem(administrador, empty);
-
-                if (administrador == null) {
-                    setGraphic(null);
-                    return;
-                }
-
-                setGraphic(rolesButton);
-                rolesButton.setOnAction(event -> {
-                    //controlDAO.delete(controlDAO.findById(controlTable.getId()));
-                    //HibernateSessionFactory.getSession().flush();
-                    //data.remove(administrador);
+                    editarAdministrador(identidadDAO.findById(administrador.getId()));
                 });
             }
         });
@@ -222,14 +257,12 @@ public class AdministradoresController implements Initializable {
 
                 setGraphic(deleteButton);
                 deleteButton.setOnAction(event -> {
-                    //controlDAO.delete(controlDAO.findById(controlTable.getId()));
-                    HibernateSessionFactory.getSession().flush();
-                    data.remove(administrador);
+                    deleteAdministrador(administrador);
                 });
             }
         });
         
-        administradoresTable.getColumns().addAll(cedula, nombre, nombreEmpresa, nombreUsuario, permisos, roles, editar, delete);
+        administradoresTable.getColumns().addAll(cedula, nombre, nombreEmpresa, nombreUsuario, permisos, editar, delete);
         
         administradoresTable.setRowFactory( (Object tv) -> {
             TableRow<Administrador> row = new TableRow<>();

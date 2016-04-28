@@ -13,7 +13,7 @@
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
       <Button layoutX="78.0" layoutY="387.0" mnemonicParsing="false" onAction="#verAdministradores" prefHeight="25.0" prefWidth="151.0" text="Ver adminitradores" />
-      <Button fx:id="buttonConfiguracion" layoutX="78.0" layoutY="340.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="151.0" text="Ver empleados" />
+      <Button fx:id="buttonConfiguracion" layoutX="78.0" layoutY="340.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="151.0" text="Ver empleados" />
       <Button layoutX="574.0" layoutY="340.0" mnemonicParsing="false" onAction="#registrarEmpresa" prefHeight="25.0" prefWidth="151.0" text="Crear" />
       <Accordion layoutX="40.0" layoutY="14.0" />
       <Pane fx:id="imagenLabel" prefHeight="216.0" prefWidth="800.0" />

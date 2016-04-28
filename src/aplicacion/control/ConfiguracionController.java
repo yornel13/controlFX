@@ -64,8 +64,8 @@ public class ConfiguracionController implements Initializable {
     
     @FXML
     private void mostrarEmpresas(ActionEvent event) {
-        aplicacionControl.mostrarEmpresas();
         stagePrincipal.close();
+        aplicacionControl.mostrarEmpresas();
     }
             
     @FXML
@@ -75,15 +75,21 @@ public class ConfiguracionController implements Initializable {
     
     @FXML
     private void mostrarClientes(ActionEvent event) {
-        aplicacionControl.mostrarClientes();
         stagePrincipal.close();
+        aplicacionControl.mostrarClientes();
     }
     
     @FXML
     private void verAdministradores(ActionEvent event) {
-        aplicacionControl.mostrarAdminitradores();
         stagePrincipal.close();
+        aplicacionControl.mostrarAdminitradores();
     }
+            
+    @FXML
+    private void verEmpleados(ActionEvent event) {
+        stagePrincipal.close();
+        aplicacionControl.mostrarEmpleadosTodos();
+    }       
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {

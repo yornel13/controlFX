@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.Const;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
@@ -23,16 +22,11 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -117,7 +111,7 @@ public class InEmpresaController implements Initializable {
         
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         empleados = new ArrayList<>();
-        empleados.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
+        empleados.addAll(usuariosDAO.findByEmpresaIdActivo(empresa.getId()));
         totalLabel.setText("Total de empleados: " + empleados.size());
     }
     
@@ -137,18 +131,7 @@ public class InEmpresaController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
-        //homeButton.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
-        //String image2 = AplicacionControl.class.getResource("imagenes/home_32dp.png").toExternalForm();
-        //Image homeImage = new Image(image2);
-        //homeButton.setGraphic(new ImageView(homeImage));
-        
-        //contentPane.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
-        
-        //labelTest.setText("Ingrese la cedula del empleado \n para hacer el registro de hoy");
-        
-        //cedulaField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        
+        // nada aqui por ahora
     } 
     
     // obtener dia sin horas

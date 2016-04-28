@@ -6,16 +6,10 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Password;
-import hibernate.dao.CargoDAO;
-import hibernate.dao.DepartamentoDAO;
-import hibernate.dao.DetallesEmpleadoDAO;
 import hibernate.dao.EstadoCivilDAO;
 import hibernate.dao.IdentidadDAO;
 import hibernate.dao.RolesDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Cargo;
-import hibernate.model.Departamento;
-import hibernate.model.DetallesEmpleado;
 import hibernate.model.Empresa;
 import hibernate.model.EstadoCivil;
 import hibernate.model.Identidad;
@@ -33,10 +27,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -47,9 +38,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBoxBuilder;
-import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -179,8 +167,6 @@ public class RegistrarAdministradorController implements Initializable {
             errorText.setText("Debe ingresar una contraseña");
         } else if (contrasenaField.getText().length() < 4) {
             errorText.setText("Debe ingresar una contraseña de minimo 4 caracteres"); 
-        } else if (contrasenaField2.getText().isEmpty()) {
-            errorText.setText("Debe repetir la contraseña"); 
         } else if (contrasenaField2.getText().isEmpty()) {
             errorText.setText("Debe repetir la contraseña"); 
         } else if (!contrasenaField.getText().equals(contrasenaField2.getText())) {

@@ -21,6 +21,7 @@ public class EmpleadoTable {
     public SimpleStringProperty telefono = new SimpleStringProperty();
     public SimpleStringProperty departamento = new SimpleStringProperty();
     public SimpleStringProperty cargo = new SimpleStringProperty();
+    public SimpleStringProperty empresa = new SimpleStringProperty();
     public SimpleIntegerProperty dias = new SimpleIntegerProperty();
     public SimpleIntegerProperty horas = new SimpleIntegerProperty();
     public SimpleIntegerProperty suplementarias = new SimpleIntegerProperty();
@@ -68,6 +69,10 @@ public class EmpleadoTable {
 
     public String getCargo() {
         return cargo.get();
+    }
+    
+    public String getEmpresa() {
+        return empresa.get();
     }
    
 }

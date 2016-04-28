@@ -108,9 +108,28 @@ public class UsuarioDAO extends BaseHibernateDAO {
             return (List<Usuario>) result;
         }
         
+        public List<Usuario> findByEmpresaIdActivo(Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "WHERE empresa_id = :empresa_id and activo = true")
+                    .addEntity(Usuario.class)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<Usuario>) result;
+        }
+        
         public List<Usuario> findAllEmpleadosActivos() {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario where activo = true and detalles_empleado_id is not null")
+                    .addEntity(Usuario.class);
+            Object result = query.list();
+            return (List<Usuario>) result;
+        }
+        
+        public List<Usuario> findAllEmpleadosActivosOrderByCedula() {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario where activo = true and detalles_empleado_id is not null order by cedula")
                     .addEntity(Usuario.class);
             Object result = query.list();
             return (List<Usuario>) result;

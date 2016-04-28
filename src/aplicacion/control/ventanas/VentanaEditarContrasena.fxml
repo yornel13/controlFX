@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.media.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" fx:id="oldpassword" maxHeight="250.0" maxWidth="400.0" minHeight="250.0" minWidth="400.0" prefHeight="250.0" prefWidth="400.0" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.EditarContrasenaController">
+   <children>
+      <Button fx:id="cancelarButton" layoutX="227.0" layoutY="186.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
+      <Button fx:id="guardarButton" layoutX="112.0" layoutY="186.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
+      <PasswordField fx:id="newPassword" layoutX="160.0" layoutY="78.0" prefHeight="25.0" prefWidth="213.0" promptText="Nueva contraseña" />
+      <PasswordField fx:id="repeatPassword" layoutX="160.0" layoutY="118.0" onAction="#onCLickGuardar" prefHeight="25.0" prefWidth="213.0" promptText="Repita la contraseña" />
+      <Label layoutX="35.0" layoutY="83.0" text="Nueva Contraseña" textFill="WHITE" />
+      <Label layoutX="35.0" layoutY="123.0" text="Confirmar contraseña" textFill="WHITE" />
+      <Label layoutX="35.0" layoutY="43.0" text="Contrseña anterior" textFill="#fffefe" />
+      <PasswordField fx:id="oldPassword" layoutX="160.0" layoutY="38.0" prefHeight="25.0" prefWidth="213.0" promptText="Contraseña antigua" />
+      <Label fx:id="errorText" alignment="CENTER" contentDisplay="CENTER" layoutX="90.0" layoutY="155.0" prefHeight="17.0" prefWidth="220.0" textAlignment="RIGHT" textFill="RED">
+         <font>
+            <Font name="Comic Sans MS" size="12.0" />
+         </font>
+      </Label>
+       </children>
+</AnchorPane>

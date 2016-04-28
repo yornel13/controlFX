@@ -86,16 +86,10 @@ public class EmpleadosController implements Initializable {
         this.empresa = empresa;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        for (Usuario usuario: (ArrayList<Usuario>) usuarioDAO.findAll()) {
-            if (usuario.getDetallesEmpleado() != null && 
-                    usuario.getDetallesEmpleado().getEmpresa().getId() == empresa.getId()) {
-                usuarios.add(usuario);
-            }
-        }
-        System.out.println(usuarios.size());
+        usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
         if (!usuarios.isEmpty()) {
            data = FXCollections.observableArrayList(); 
-           for (Usuario user: usuarios) {
+           usuarios.stream().map((user) -> {
                EmpleadoTable empleado = new EmpleadoTable();
                empleado.id.set(user.getId());
                empleado.nombre.set(user.getNombre());
@@ -104,8 +98,10 @@ public class EmpleadosController implements Initializable {
                empleado.telefono.set(user.getTelefono());
                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               data.add(empleado);
-           }
+                return empleado;
+            }).forEach((empleado) -> {
+                data.add(empleado);
+            });
            empleadosTableView.setItems(data);
         }
         
