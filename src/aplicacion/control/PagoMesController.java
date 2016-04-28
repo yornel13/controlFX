@@ -31,8 +31,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
@@ -137,9 +139,31 @@ public class PagoMesController implements Initializable {
     
     @FXML Button expandirButton;
     
+    @FXML
+    private TextField bonoField;
+    
+    @FXML
+    private TextField transporteField;
+    
+    @FXML
+    private TextField seguroField;
+    
+    @FXML
+    private TextField uniformeField;
+    
+    @FXML
+    private TextField vacacionesField;
+    
+    @FXML
+    private CheckBox checkVacaciones;
+    
     private ObservableList<ControlTable> data;
     
     ArrayList<Usuario> usuarios;
+    
+    Timestamp fin;
+    
+    Timestamp inicio;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -156,6 +180,21 @@ public class PagoMesController implements Initializable {
     }
     
     @FXML
+    private void onClickVacaciones(ActionEvent event) {
+        if (checkVacaciones.isSelected()) {
+            vacacionesField.setDisable(false);
+        } else {
+            vacacionesField.setDisable(true);
+            vacacionesField.setText("");
+        }
+    }
+    
+    @FXML
+    private void onClickCalcular(ActionEvent event) {
+        setControlEmpleadoInfo(empleado, inicio, fin);
+    }
+    
+    @FXML
     private void mostrarRegistro(ActionEvent event) {
         if (pickerDe.getValue() == null) {
             // error
@@ -164,19 +203,16 @@ public class PagoMesController implements Initializable {
         } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
             // error
         } else {       
-            Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-            Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+            fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+            inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
             setControlEmpleadoInfo(empleado, inicio, fin);
         }
     } 
     
     public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin) throws ParseException {
         this.empleado = empleado;
-        
-        //DateTime dateTime = new DateTime();
-           
-        //Timestamp fin = new Timestamp(dateTime.getMillis());
-        //Timestamp inicio = new Timestamp(dateTime.minusMonths(1).plusDays(1).getMillis());
+        this.inicio = inicio;
+        this.fin = fin;
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -234,8 +270,17 @@ public class PagoMesController implements Initializable {
         totalSobreTiempo.setText(String.format( "%.2f", totalSobreTiempoDouble));
         Double totalRecargoDouble = sueldoHoras * Double.valueOf(suplementarias);
         totalRecargo.setText(String.format( "%.2f", totalRecargoDouble));
-        Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble;
+        Double totalBonoDouble = getBono();
+        totalBono.setText(String.format( "%.2f", totalBonoDouble));
+        Double totalTransporteDouble = getTransporte();
+        totalTransporte.setText(String.format( "%.2f", totalTransporteDouble));
+        Double totalBonosDouble = totalBonoDouble + totalTransporteDouble;
+        totalBonos.setText(String.format( "%.2f", totalBonosDouble));
+        Double totalVacacionesDouble = getVacaciones();
+        totalVacaciones.setText(String.format( "%.2f", totalVacacionesDouble));
+        Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonosDouble + totalVacacionesDouble;
         subTotal.setText(String.format( "%.2f", subTotalDouble));
+        ////////////////////////////////////////////////////
         Double decimoTercero = subTotalDouble / 12d;
         totalDecimo3.setText(String.format( "%.2f", decimoTercero));
         Double decimoCuarto = (getDecimoCuarto()/30d) * Double.valueOf(dias);
@@ -290,6 +335,7 @@ public class PagoMesController implements Initializable {
     }
     
     public double getSeguro(Integer empresaId) {
+        /*
         SeguroDAO seguroDAO = new SeguroDAO();
         Seguro seguro;
         seguro = seguroDAO.findByEmpresaId(empresaId);
@@ -297,10 +343,16 @@ public class PagoMesController implements Initializable {
           return 0;  
         } else {
             return seguro.getValor();
-        }  
+        }  */
+        if (seguroField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(seguroField.getText());
+        }
     }
     
     public double getUniforme(Integer empresaId) {
+        /*
         UniformeDAO uniformeDAO = new UniformeDAO();
         Uniforme uniforme;
         uniforme = uniformeDAO.findByEmpresaId(empresaId);
@@ -308,7 +360,36 @@ public class PagoMesController implements Initializable {
           return 0;  
         } else {
             return uniforme.getValor();
-        }  
+        }  */
+        if (uniformeField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(uniformeField.getText());
+        }
+    }
+    
+    public double getBono() {
+        if (bonoField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(bonoField.getText());
+        }
+    }
+    
+    public double getTransporte() {
+        if (transporteField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(transporteField.getText());
+        }
+    }
+    
+    public double getVacaciones() {
+        if (vacacionesField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(vacacionesField.getText());
+        }
     }
     
 }
