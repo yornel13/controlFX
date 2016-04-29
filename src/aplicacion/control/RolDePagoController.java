@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagoMesController.numDecimalFilter;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
@@ -20,6 +19,7 @@ import hibernate.model.Actuariales;
 import hibernate.model.Cliente;
 import hibernate.model.Constante;
 import hibernate.model.ControlEmpleado;
+import hibernate.model.Pago;
 import hibernate.model.Seguro;
 import hibernate.model.Uniforme;
 import hibernate.model.Usuario;
@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -485,10 +486,10 @@ public class RolDePagoController implements Initializable {
         // Salario
         Double totalSalarioDouble = sueldoDia * Double.valueOf(dias);
         totalSalario.setText(String.format( "%.2f", totalSalarioDouble));
-        Double totalSobreTiempoDouble = sueldoHoras * Double.valueOf(sobreTiempo);
-        totalSobreTiempo.setText(String.format( "%.2f", totalSobreTiempoDouble));
         Double totalRecargoDouble = sueldoHoras * Double.valueOf(suplementarias);
         totalRecargo.setText(String.format( "%.2f", totalRecargoDouble));
+        Double totalSobreTiempoDouble = sueldoHoras * Double.valueOf(sobreTiempo);
+        totalSobreTiempo.setText(String.format( "%.2f", totalSobreTiempoDouble));
         Double totalBonoDouble = getBono();
         totalBono.setText(String.format( "%.2f", totalBonoDouble));
         Double totalTransporteDouble = getTransporte();
@@ -517,6 +518,18 @@ public class RolDePagoController implements Initializable {
         Double ingresoTotal = subTotalDouble + decimoTercero + decimoCuarto + decimoTercero 
                 + jubilacionPatronal + aportePatronal + segurosDecimal + uniformeDecimal;
         totalIngresos.setText(String.format( "%.2f", ingresoTotal));
+        
+        Pago pago = new Pago();
+        pago.setFecha(new Timestamp(new Date().getTime()));
+        pago.setInicio(inicio);
+        pago.setFinalizo(fin);
+        pago.setDias(dias);
+        pago.setHorasNormales(Double.valueOf(normales));
+        pago.setHorasSuplementarias(Double.valueOf(suplementarias));  // RC
+        pago.setHorasSobreTiempo(Double.valueOf(sobreTiempo));         // ST
+        pago.setTotalHorasExtras(Double.valueOf(sobreTiempo + suplementarias));
+        pago.setUsuario(empleado);
+        //pago.set
     }
     
     @Override

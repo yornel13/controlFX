@@ -20,7 +20,7 @@
     <mapping resource="hibernate/hbm/Bono.hbm.xml"/>
     <mapping resource="hibernate/hbm/Constante.hbm.xml"/>
     <mapping resource="hibernate/hbm/ControlEmpleado.hbm.xml"/>
-    <mapping resource="hibernate/hbm/PagoMes.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Pago.hbm.xml"/>
     <mapping resource="hibernate/hbm/RegistroAcciones.hbm.xml"/>
     <mapping resource="hibernate/hbm/Cargo.hbm.xml"/>
     <mapping resource="hibernate/hbm/Identidad.hbm.xml"/>
@@ -28,6 +28,5 @@
     <mapping resource="hibernate/hbm/Actuariales.hbm.xml"/>
     <mapping resource="hibernate/hbm/Seguro.hbm.xml"/>
     <mapping resource="hibernate/hbm/Uniforme.hbm.xml"/>
-    
   </session-factory>
 </hibernate-configuration>

@@ -27,7 +27,7 @@ public class Usuario implements java.io.Serializable {
 	private Boolean activo;
 	private Timestamp nacimiento;
 	private String sexo;
-	private Set pagoMeses = new HashSet(0);
+        private Set pago = new HashSet(0);
 	private Set identidads = new HashSet(0);
 	private Set controlEmpleados = new HashSet(0);
 	private Set bonos = new HashSet(0);
@@ -60,7 +60,7 @@ public class Usuario implements java.io.Serializable {
 			String nombre, String apellido, String cedula, String email,
 			String direccion, String telefono, Timestamp creacion,
 			Timestamp ultimaModificacion, String foto, Boolean activo,
-			Timestamp nacimiento, String sexo, Set pagoMeses, Set identidads,
+			Timestamp nacimiento, String sexo, Set pago, Set identidads,
 			Set controlEmpleados, Set bonos, Set registroAccioneses, Set roleses) {
 		this.estadoCivil = estadoCivil;
 		this.detallesEmpleado = detallesEmpleado;
@@ -76,7 +76,7 @@ public class Usuario implements java.io.Serializable {
 		this.activo = activo;
 		this.nacimiento = nacimiento;
 		this.sexo = sexo;
-		this.pagoMeses = pagoMeses;
+                this.pago = pago;
 		this.identidads = identidads;
 		this.controlEmpleados = controlEmpleados;
 		this.bonos = bonos;
@@ -206,14 +206,6 @@ public class Usuario implements java.io.Serializable {
 		this.sexo = sexo;
 	}
 
-	public Set getPagoMeses() {
-		return this.pagoMeses;
-	}
-
-	public void setPagoMeses(Set pagoMeses) {
-		this.pagoMeses = pagoMeses;
-	}
-
 	public Set getIdentidads() {
 		return this.identidads;
 	}
@@ -253,5 +245,15 @@ public class Usuario implements java.io.Serializable {
 	public void setRoleses(Set roleses) {
 		this.roleses = roleses;
 	}
+
+        public Set getPago() {
+            return pago;
+        }
+
+        public void setPago(Set pago) {
+            this.pago = pago;
+        }
+        
+        
 
 }

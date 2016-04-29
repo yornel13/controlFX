@@ -865,7 +865,7 @@ public class AplicacionControl extends Application {
                 }
            } else {
               noPermitido();
-           }
+           } 
        } 
     }
     

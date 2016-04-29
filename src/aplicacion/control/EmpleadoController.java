@@ -111,23 +111,26 @@ public class EmpleadoController implements Initializable {
         );
         
         File file = fileChooser.showOpenDialog(stagePrincipal);
-        System.out.println(file);
-        String profile = file.toURI().toString();
         
-        Image image = new Image(profile);
-        Rectangle rekt = new Rectangle(40, 40); 
-        ImagePattern imagePattern = new ImagePattern(image);
-        rekt.setFill(imagePattern);
-        
+        if (file != null) {
+            System.out.println(file);
+            String profile = file.toURI().toString();
 
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(140);
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-        imageView.setCache(true);
-        
-        profileImage.getChildren().clear();
-        profileImage.getChildren().add(imageView);
+            Image image = new Image(profile);
+            Rectangle rekt = new Rectangle(40, 40); 
+            ImagePattern imagePattern = new ImagePattern(image);
+            rekt.setFill(imagePattern);
+
+
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(140);
+            imageView.setPreserveRatio(true);
+            imageView.setSmooth(true);
+            imageView.setCache(true);
+
+            profileImage.getChildren().clear();
+            profileImage.getChildren().add(imageView);
+        }
     }
     
     public void setStagePrincipal(Stage stagePrincipal) {
