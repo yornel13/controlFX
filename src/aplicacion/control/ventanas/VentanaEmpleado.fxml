@@ -62,6 +62,6 @@
             <Label alignment="CENTER" contentDisplay="CENTER" text="Fecha de inicio" textFill="#2382c6" GridPane.halignment="RIGHT" />
          </children>
       </GridPane>
-      <Button layoutX="15.0" layoutY="190.0" minHeight="21.0" mnemonicParsing="false" onAction="#changeImage" prefHeight="21.0" prefWidth="140.0" style="-fx-background-image: url('aplicacion/control/imagenes/pencil.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: gray;" text="Cambiar" />
+      <Button layoutX="15.0" layoutY="190.0" minHeight="21.0" mnemonicParsing="false" onAction="#changeImage" prefHeight="21.0" prefWidth="140.0" style="-fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: gray;" text="Cambiar" />
     </children>
 </AnchorPane>

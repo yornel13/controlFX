@@ -93,8 +93,8 @@
                         <ToggleGroup fx:id="grupoEmpresas" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton disable="true" mnemonicParsing="false" text="Crear" toggleGroup="$grupoEmpresas" GridPane.rowIndex="2" />
-                  <RadioButton disable="true" mnemonicParsing="false" text="Editar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="3" />
+                  <RadioButton mnemonicParsing="false" text="Crear" toggleGroup="$grupoEmpresas" GridPane.rowIndex="2" />
+                  <RadioButton mnemonicParsing="false" text="Editar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="3" />
                   <RadioButton disable="true" mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoEmpresas" GridPane.rowIndex="4" />
                </children>
                <columnConstraints>

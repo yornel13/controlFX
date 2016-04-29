@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
@@ -28,6 +29,7 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -35,6 +37,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
@@ -144,12 +147,6 @@ public class PagoMesController implements Initializable {
     
     @FXML
     private TextField transporteField;
-    
-    @FXML
-    private TextField seguroField;
-    
-    @FXML
-    private TextField uniformeField;
     
     @FXML
     private TextField vacacionesField;
@@ -302,7 +299,9 @@ public class PagoMesController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) { 
-        
+       bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+       transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+       vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
     }  
     
     public static String getMonthName(int month){
@@ -335,37 +334,21 @@ public class PagoMesController implements Initializable {
     }
     
     public double getSeguro(Integer empresaId) {
-        /*
-        SeguroDAO seguroDAO = new SeguroDAO();
-        Seguro seguro;
-        seguro = seguroDAO.findByEmpresaId(empresaId);
+        Seguro seguro = new SeguroDAO().findByEmpresaId(empresaId);
         if (seguro == null) {
           return 0;  
         } else {
             return seguro.getValor();
-        }  */
-        if (seguroField.getText().isEmpty()) {
-            return 0;
-        } else {
-            return Double.valueOf(seguroField.getText());
-        }
+        }  
     }
     
     public double getUniforme(Integer empresaId) {
-        /*
-        UniformeDAO uniformeDAO = new UniformeDAO();
-        Uniforme uniforme;
-        uniforme = uniformeDAO.findByEmpresaId(empresaId);
+        Uniforme uniforme = new UniformeDAO().findByEmpresaId(empresaId);
         if (uniforme == null) {
           return 0;  
         } else {
             return uniforme.getValor();
-        }  */
-        if (uniformeField.getText().isEmpty()) {
-            return 0;
-        } else {
-            return Double.valueOf(uniformeField.getText());
-        }
+        }  
     }
     
     public double getBono() {
@@ -390,6 +373,17 @@ public class PagoMesController implements Initializable {
         } else {
             return Double.valueOf(vacacionesField.getText());
         }
+    }
+    
+    public static EventHandler<KeyEvent> numDecimalFilter() {
+
+        EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
+            if (!"0123456789.".contains(keyEvent.getCharacter())) {
+                keyEvent.consume();
+                
+            }
+        };
+        return aux;
     }
     
 }

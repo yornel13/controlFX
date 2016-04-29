@@ -11,9 +11,28 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="520.0" maxWidth="600.0" prefHeight="520.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
+<AnchorPane id="AnchorPane" maxHeight="590.0" maxWidth="600.0" minHeight="590.0" minWidth="600.0" prefHeight="590.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
     <children>
-      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="420.0" prefHeight="60.0" prefWidth="588.0">
+      <TextField fx:id="transporteField" layoutX="104.0" layoutY="265.0" promptText="Monto" />
+      <TextField fx:id="bonoField" layoutX="104.0" layoutY="300.0" promptText="Monto" />
+      <Label layoutX="19.0" layoutY="302.0" text="Transporte" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="vacacionesField" layoutX="401.0" layoutY="265.0" promptText="Monto" />
+      <CheckBox fx:id="checkVacaciones" layoutX="283.0" layoutY="267.0" mnemonicParsing="false" onAction="#onClickVacaciones" selected="true" text="Vacaciones" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </CheckBox>
+      <Label layoutX="19.0" layoutY="267.0" text="Bono" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="446.0" layoutY="300.0" mnemonicParsing="false" onAction="#onClickCalcular" text="Calcular" />
+      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="502.0" prefHeight="60.0" prefWidth="588.0">
          <children>
             <Label text="Decimo 3ro" textFill="#fffbfb">
                <font>
@@ -100,7 +119,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="336.0" prefHeight="60.0" prefWidth="588.0">
+      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="418.0" prefHeight="60.0" prefWidth="588.0">
          <children>
             <Label text="Salario" textFill="#fffbfb">
                <font>
@@ -198,7 +217,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="254.0" prefHeight="60.0" prefWidth="588.0">
+      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="336.0" prefHeight="60.0" prefWidth="588.0">
         <columnConstraints>
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="72.0" />
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="121.0" />
@@ -264,18 +283,18 @@
          </children>
       </GridPane>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="205.0" prefWidth="590.0">
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="590.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
         </columns>
       </TableView>
-      <Label layoutX="419.0" layoutY="491.0" text="Total ingresos:" textFill="#fffbfb" underline="true">
+      <Label layoutX="419.0" layoutY="573.0" text="Total ingresos:" textFill="#fffbfb" underline="true">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label fx:id="totalIngresos" layoutX="541.0" layoutY="491.0" text="0.00" textFill="#fffbfb">
+      <Label fx:id="totalIngresos" layoutX="541.0" layoutY="573.0" text="0.00" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
@@ -294,6 +313,6 @@
          </font>
       </Label>
       <Button fx:id="ver" layoutX="459.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarRegistro" text="Ver" />
-      <Button fx:id="expandirButton" layoutX="5.0" layoutY="487.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" />
+      <Button fx:id="expandirButton" layoutX="5.0" layoutY="569.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" />
     </children>
 </AnchorPane>

@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.RolDePagoController.numDecimalFilter;
 import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
@@ -26,7 +27,6 @@ import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -35,19 +35,23 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -155,6 +159,18 @@ public class RolDePagoClienteController implements Initializable {
     @FXML 
     private DatePicker pickerHasta;
     
+    @FXML
+    private TextField bonoField;
+    
+    @FXML
+    private TextField transporteField;
+    
+    @FXML
+    private TextField vacacionesField;
+    
+    @FXML
+    private CheckBox checkVacaciones;
+    
     @FXML Button expandirButton;
     
     private Cliente cliente;
@@ -163,6 +179,9 @@ public class RolDePagoClienteController implements Initializable {
     private ObservableList<ControlTable> data;
     
     ArrayList<Usuario> usuarios;
+    
+    Timestamp fin;
+    Timestamp inicio;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -179,12 +198,17 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     @FXML
+    private void onClickCalcular(ActionEvent event) {
+        setControlEmpleadoInfo(empleado, inicio, fin);
+    }
+    
+    @FXML
     private void expandir(ActionEvent event) {
         if (expandirButton.getText().equalsIgnoreCase("Expandir")) {
-            empleadosTableView.setPrefHeight(445);
+            empleadosTableView.setPrefHeight(525);
             expandirButton.setText("Contraer");
         } else {
-            empleadosTableView.setPrefHeight(205);
+            empleadosTableView.setPrefHeight(220);
             expandirButton.setText("Expandir");
         }
     }
@@ -270,6 +294,16 @@ public class RolDePagoClienteController implements Initializable {
         }
     }
     
+    @FXML
+    private void onClickVacaciones(ActionEvent event) {
+        if (checkVacaciones.isSelected()) {
+            vacacionesField.setDisable(false);
+        } else {
+            vacacionesField.setDisable(true);
+            vacacionesField.setText("");
+        }
+    }
+    
     private void borrarHoras(ControlEmpleado controlEmpleado, ControlTable controlTable) {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
@@ -326,6 +360,8 @@ public class RolDePagoClienteController implements Initializable {
     public void setEmpleado(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) throws ParseException {
         this.empleado = empleado;
         this.cliente = cliente;
+        this.inicio = inicio;
+        this.fin = fin;
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -452,8 +488,17 @@ public class RolDePagoClienteController implements Initializable {
         totalSobreTiempo.setText(String.format( "%.2f", totalSobreTiempoDouble));
         Double totalRecargoDouble = sueldoHoras * Double.valueOf(suplementarias);
         totalRecargo.setText(String.format( "%.2f", totalRecargoDouble));
-        Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble;
+        Double totalBonoDouble = getBono();
+        totalBono.setText(String.format( "%.2f", totalBonoDouble));
+        Double totalTransporteDouble = getTransporte();
+        totalTransporte.setText(String.format( "%.2f", totalTransporteDouble));
+        Double totalBonosDouble = totalBonoDouble + totalTransporteDouble;
+        totalBonos.setText(String.format( "%.2f", totalBonosDouble));
+        Double totalVacacionesDouble = getVacaciones();
+        totalVacaciones.setText(String.format( "%.2f", totalVacacionesDouble));
+        Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonosDouble + totalVacacionesDouble;
         subTotal.setText(String.format( "%.2f", subTotalDouble));
+        ////////////////////////////////////////////////////
         Double decimoTercero = subTotalDouble / 12d;
         totalDecimo3.setText(String.format( "%.2f", decimoTercero));
         Double decimoCuarto = (getDecimoCuarto()/30d) * Double.valueOf(dias);
@@ -477,6 +522,10 @@ public class RolDePagoClienteController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.TRUE);
         empleadosTableView.getColumns().clear(); 
+        
+        bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
     }  
     
     public static String getMonthName(int month){
@@ -509,9 +558,7 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     public double getSeguro(Integer empresaId) {
-        SeguroDAO seguroDAO = new SeguroDAO();
-        Seguro seguro;
-        seguro = seguroDAO.findByEmpresaId(empresaId);
+        Seguro seguro = new SeguroDAO().findByEmpresaId(empresaId);
         if (seguro == null) {
           return 0;  
         } else {
@@ -520,9 +567,7 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     public double getUniforme(Integer empresaId) {
-        UniformeDAO uniformeDAO = new UniformeDAO();
-        Uniforme uniforme;
-        uniforme = uniformeDAO.findByEmpresaId(empresaId);
+        Uniforme uniforme = new UniformeDAO().findByEmpresaId(empresaId);
         if (uniforme == null) {
           return 0;  
         } else {
@@ -530,4 +575,38 @@ public class RolDePagoClienteController implements Initializable {
         }  
     }
     
+    public double getBono() {
+        if (bonoField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(bonoField.getText());
+        }
+    }
+    
+    public double getTransporte() {
+        if (transporteField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(transporteField.getText());
+        }
+    }
+    
+    public double getVacaciones() {
+        if (vacacionesField.getText().isEmpty()) {
+            return 0;
+        } else {
+            return Double.valueOf(vacacionesField.getText());
+        }
+    }
+    
+    public static EventHandler<KeyEvent> numDecimalFilter() {
+
+        EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
+            if (!"0123456789.".contains(keyEvent.getCharacter())) {
+                keyEvent.consume();
+                
+            }
+        };
+        return aux;
+    }
 }
