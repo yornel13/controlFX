@@ -37,6 +37,7 @@ public class PagoDAO extends BaseHibernateDAO {
 	public static final String BONO = "bono";
 	public static final String TRANSPORTE = "transporte";
 	public static final String TOTAL_BONOS = "totalBonos";
+        public static final String VACACIONES = "vacaciones";
 	public static final String SUBTOTAL = "subtotal";
 	public static final String DECIMO_TERCERO = "decimoTercero";
 	public static final String DECIMO_CUARTO = "decimoCuarto";
@@ -159,6 +160,10 @@ public class PagoDAO extends BaseHibernateDAO {
 
 	public List findByTotalBonos(Object totalBonos) {
 		return findByProperty(TOTAL_BONOS, totalBonos);
+	}
+        
+        public List findByVaciones(Object vacaciones) {
+		return findByProperty(VACACIONES, vacaciones);
 	}
 
 	public List findBySubtotal(Object subtotal) {

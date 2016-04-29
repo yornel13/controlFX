@@ -816,7 +816,7 @@ public class AplicacionControl extends Application {
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.setWidth(700);
-                    ventana.setHeight(428);
+                    ventana.setHeight(468);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEmpleados);
                     ventana.setScene(scene);

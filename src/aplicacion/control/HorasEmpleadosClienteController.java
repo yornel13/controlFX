@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Permisos;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
@@ -34,6 +35,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -76,6 +78,12 @@ public class HorasEmpleadosClienteController implements Initializable {
     @FXML
     private TableView empleadosTableView;
     
+    @FXML
+    private TextField cedulaField;
+    
+    @FXML
+    private Label errorText;
+    
     private Timestamp inicio;
     private Timestamp fin;
     
@@ -108,6 +116,21 @@ public class HorasEmpleadosClienteController implements Initializable {
         stagePrincipal.close();
     } 
     
+    @FXML
+    private void verRol(ActionEvent event) {
+        if (cedulaField != null) {
+            Usuario emp = new UsuarioDAO().findByCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
+            if (emp != null) {
+                errorText.setText("");
+                rolDePagoPorCliente(emp);
+            } else {
+                errorText.setText("No encontrado");
+            }
+        } else {
+            errorText.setText("No encontrado");
+        }
+    }
+    
     public void setCliente(Empresa empresa, Cliente cliente) throws ParseException {
         this.empresa = empresa;
         this.cliente = cliente;
@@ -127,17 +150,31 @@ public class HorasEmpleadosClienteController implements Initializable {
     @FXML
     private void mostrarRegistro(ActionEvent event) {
         if (pickerDe.getValue() == null) {
-            // error
+            errorText.setText("Fechas incorrectas");
         } else if (pickerHasta.getValue() == null) {
-            // error 
+            errorText.setText("Fechas incorrectas");
         } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
-            // error
+            errorText.setText("Fechas incorrectas");
         } else {       
             fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
             inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
             setTableInfo(empresa, inicio, fin);
         }
     } 
+    
+    private void rolDePagoPorCliente(Usuario empleado) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+               
+               aplicacionControl.mostrarRolDePagoCliente(empleado, cliente, inicio, fin);
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
     
     public void setTableInfo(Empresa empresa, Timestamp inicio, Timestamp fin) {
         this.inicio = inicio;
@@ -223,11 +260,13 @@ public class HorasEmpleadosClienteController implements Initializable {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
                     System.out.println(inicio);
-                    aplicacionControl.mostrarRolDePagoCliente(usuariosDAO.findById(rowData.getId()), cliente, this.inicio, this.fin);
+                    rolDePagoPorCliente(usuariosDAO.findById(rowData.getId()));
                 }
             });
             return row ;
         });
+        
+        errorText.setText("");
     }
     
     @Override

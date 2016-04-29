@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="700.0" minHeight="400.0" minWidth="700.0" prefHeight="400.0" prefWidth="700.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosClienteController">
+<AnchorPane id="AnchorPane" maxHeight="440.0" maxWidth="700.0" minHeight="440.0" minWidth="700.0" prefHeight="440.0" prefWidth="700.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosClienteController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
       <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="680.0" minHeight="-Infinity" minWidth="680.0" prefHeight="355.0" prefWidth="680.0">
@@ -32,5 +32,13 @@
       <DatePicker fx:id="pickerDe" layoutX="134.0" layoutY="5.0" promptText="inicio" />
       <DatePicker fx:id="pickerHasta" layoutX="364.0" layoutY="5.0" promptText="fin" />
       <Accordion layoutX="184.0" layoutY="14.0" />
+      <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
+      <Button layoutX="247.0" layoutY="404.0" mnemonicParsing="false" onAction="#verRol" text="ver rol" />
+      <TextField fx:id="cedulaField" layoutX="80.0" layoutY="404.0" onAction="#verRol" />
+      <Label layoutX="19.0" layoutY="406.0" text="Cedula" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>

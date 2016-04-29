@@ -13,6 +13,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.PagoDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.model.Actuariales;
@@ -180,6 +181,8 @@ public class RolDePagoController implements Initializable {
     Timestamp fin;
     Timestamp inicio;
     
+    private Pago pago;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -212,8 +215,8 @@ public class RolDePagoController implements Initializable {
     
     @FXML
     public void onClickPago(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarPagoMes(empleado, inicio, fin);
+        pago.setDetalles("");
+        new PagoDAO().save(pago);
     }
     
     @FXML
@@ -519,7 +522,7 @@ public class RolDePagoController implements Initializable {
                 + jubilacionPatronal + aportePatronal + segurosDecimal + uniformeDecimal;
         totalIngresos.setText(String.format( "%.2f", ingresoTotal));
         
-        Pago pago = new Pago();
+        pago = new Pago();
         pago.setFecha(new Timestamp(new Date().getTime()));
         pago.setInicio(inicio);
         pago.setFinalizo(fin);
@@ -528,8 +531,26 @@ public class RolDePagoController implements Initializable {
         pago.setHorasSuplementarias(Double.valueOf(suplementarias));  // RC
         pago.setHorasSobreTiempo(Double.valueOf(sobreTiempo));         // ST
         pago.setTotalHorasExtras(Double.valueOf(sobreTiempo + suplementarias));
-        pago.setUsuario(empleado);
-        //pago.set
+        pago.setSalario(totalSalarioDouble);
+        pago.setMontoHorasSuplementarias(totalRecargoDouble);
+        pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);
+        pago.setBono(totalBonoDouble);
+        pago.setTransporte(totalTransporteDouble);
+        pago.setTotalBonos(totalBonosDouble);
+        pago.setVacaciones(totalVacacionesDouble);
+        pago.setSubtotal(subTotalDouble);
+        pago.setDecimoTercero(decimoTercero);
+        pago.setDecimoCuarto(decimoCuarto);
+        pago.setJubilacionPatronal(jubilacionPatronal);
+        pago.setAportePatronal(aportePatronal);
+        pago.setSeguros(segurosDecimal);
+        pago.setUniformes(uniformeDecimal);
+        pago.setTotalIngreso(ingresoTotal);
+        pago.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
+        pago.setCedula(empleado.getCedula());
+        pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
+        pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
+        
     }
     
     @Override

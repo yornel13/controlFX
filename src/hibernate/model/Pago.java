@@ -13,7 +13,7 @@ public class Pago implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
-	private Usuario usuario;
+	private String detalles;
 	private Timestamp inicio;
 	private Timestamp finalizo;
 	private Timestamp fecha;
@@ -29,6 +29,7 @@ public class Pago implements java.io.Serializable {
 	private Double bono;
 	private Double transporte;
 	private Double totalBonos;
+        private Double vacaciones;
 	private Double subtotal;
 	private Double decimoTercero;
 	private Double decimoCuarto;
@@ -54,7 +55,7 @@ public class Pago implements java.io.Serializable {
 			Double horasSuplementarias, Double horasSobreTiempo,
 			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
-			Double bono, Double transporte, Double totalBonos, Double subtotal,
+			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
 			Double decimoTercero, Double decimoCuarto,
 			Double jubilacionPatronal, Double aportePatronal, Double seguros,
 			Double uniformes, Double totalIngreso, String empleado,
@@ -74,6 +75,7 @@ public class Pago implements java.io.Serializable {
 		this.bono = bono;
 		this.transporte = transporte;
 		this.totalBonos = totalBonos;
+                this.vacaciones = vacaciones;
 		this.subtotal = subtotal;
 		this.decimoTercero = decimoTercero;
 		this.decimoCuarto = decimoCuarto;
@@ -88,17 +90,17 @@ public class Pago implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Pago(Usuario usuario, Timestamp inicio, Timestamp finalizo,
+	public Pago(String detalles, Timestamp inicio, Timestamp finalizo,
 			Timestamp fecha, Double sueldo, Integer dias, Double horasNormales,
 			Double horasSuplementarias, Double horasSobreTiempo,
 			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
-			Double bono, Double transporte, Double totalBonos, Double subtotal,
+			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
 			Double decimoTercero, Double decimoCuarto,
 			Double jubilacionPatronal, Double aportePatronal, Double seguros,
 			Double uniformes, Double totalIngreso, String empleado,
 			String cedula, String empresa, String cliente) {
-		this.usuario = usuario;
+		this.detalles = detalles;
 		this.inicio = inicio;
 		this.finalizo = finalizo;
 		this.fecha = fecha;
@@ -115,6 +117,7 @@ public class Pago implements java.io.Serializable {
 		this.transporte = transporte;
 		this.totalBonos = totalBonos;
 		this.subtotal = subtotal;
+                this.vacaciones = vacaciones;
 		this.decimoTercero = decimoTercero;
 		this.decimoCuarto = decimoCuarto;
 		this.jubilacionPatronal = jubilacionPatronal;
@@ -138,14 +141,14 @@ public class Pago implements java.io.Serializable {
 		this.id = id;
 	}
 
-	public Usuario getUsuario() {
-		return this.usuario;
-	}
+        public String getDetalles() {
+            return detalles;
+        }
 
-	public void setUsuario(Usuario usuario) {
-		this.usuario = usuario;
-	}
-
+        public void setDetalles(String detalles) {
+            this.detalles = detalles;
+        }
+        
 	public Timestamp getInicio() {
 		return this.inicio;
 	}
@@ -265,6 +268,14 @@ public class Pago implements java.io.Serializable {
 	public void setTotalBonos(Double totalBonos) {
 		this.totalBonos = totalBonos;
 	}
+        
+        public Double getVacaciones() {
+            return vacaciones;
+        }
+
+        public void setVacaciones(Double vacaciones) {
+            this.vacaciones = vacaciones;
+        }
 
 	public Double getSubtotal() {
 		return this.subtotal;
@@ -360,6 +371,6 @@ public class Pago implements java.io.Serializable {
 
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
-	}
+	} 
 
 }

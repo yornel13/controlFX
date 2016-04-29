@@ -10,9 +10,9 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
-            <column name="usuario_id" />
-        </many-to-one>
+        <property name="detalles" type="java.lang.String">
+            <column name="detalles" />
+        </property>
         <property name="inicio" type="java.sql.Timestamp">
             <column name="inicio" length="19" not-null="true" />
         </property>
@@ -57,6 +57,9 @@
         </property>
         <property name="totalBonos" type="java.lang.Double">
             <column name="total_bonos" precision="10" not-null="true" />
+        </property>
+         <property name="vacaciones" type="java.lang.Double">
+            <column name="vacaciones" precision="10" not-null="true" />
         </property>
         <property name="subtotal" type="java.lang.Double">
             <column name="subtotal" precision="10" not-null="true" />

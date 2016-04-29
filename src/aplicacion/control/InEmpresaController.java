@@ -71,7 +71,6 @@ public class InEmpresaController implements Initializable {
     @FXML
     private TextField cedulaField;
     
-    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -99,15 +98,21 @@ public class InEmpresaController implements Initializable {
     }
     
     @FXML
-    private void verClientes(ActionEvent event) { 
+    private void rolCliente(ActionEvent event) { 
         stagePrincipal.close();
         aplicacionControl.mostrarClientesEmpresa(empresa);
     }
     
     @FXML
-    public void onClickPagos(ActionEvent event) {
+    public void rolEmpleado(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarHorasEmpleados(empresa);
+    }
+    
+    @FXML
+    private void verPagos(ActionEvent event) { 
+        stagePrincipal.close();
+        //aplicacionControl.mostrarClientesEmpresa(empresa);
     }
     
     public void setEmpresa(Empresa empresa) {

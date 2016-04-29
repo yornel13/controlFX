@@ -34,6 +34,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -75,6 +76,12 @@ public class HorasEmpleadosController implements Initializable {
     @FXML
     private TableView empleadosTableView;
     
+    @FXML
+    private TextField cedulaField;
+    
+    @FXML
+    private Label errorText;
+    
     private Timestamp inicio;
     private Timestamp fin;
     
@@ -97,8 +104,18 @@ public class HorasEmpleadosController implements Initializable {
     }
     
     @FXML
-    private void agregarEmpleado(ActionEvent event) {
-        //aplicacionControl.mostrarRegistrarEmpleado(empresa);
+    private void verRol(ActionEvent event) {
+        if (cedulaField != null) {
+            Usuario emp = new UsuarioDAO().findByCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
+            if (emp != null) {
+                errorText.setText("");
+                rolDePagoPorEmpleado(emp);
+            } else {
+                errorText.setText("No encontrado");
+            }
+        } else {
+            errorText.setText("No encontrado");
+        }
     }
     
     @FXML
@@ -112,8 +129,8 @@ public class HorasEmpleadosController implements Initializable {
         
         DateTime dateTime = new DateTime(getToday().getTime());
            
-        Timestamp fin = new Timestamp(dateTime.withDayOfMonth(24).getMillis());
-        Timestamp inicio = new Timestamp(dateTime.withDayOfMonth(24).minusMonths(1).plusDays(1).getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(24).getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(24).minusMonths(1).plusDays(1).getMillis());
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -125,12 +142,12 @@ public class HorasEmpleadosController implements Initializable {
     @FXML
     private void mostrarRegistro(ActionEvent event) {
         if (pickerDe.getValue() == null) {
-            // error
+            errorText.setText("Fechas incorrectas");
         } else if (pickerHasta.getValue() == null) {
-            // error 
+            errorText.setText("Fechas incorrectas");
         } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
-            // error
-        } else {       
+            errorText.setText("Fechas incorrectas");
+        } else {  
             Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
             Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
             setTableInfo(empresa, inicio, fin);
@@ -241,6 +258,9 @@ public class HorasEmpleadosController implements Initializable {
             });
             return row ;
         });
+        
+        
+        errorText.setText("");
     }
     
     @Override
