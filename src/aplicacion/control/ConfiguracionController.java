@@ -53,6 +53,12 @@ public class ConfiguracionController implements Initializable {
     }
     
     @FXML
+    private void mostrarDepartamentosCargos(ActionEvent event) {
+        stagePrincipal.close();
+        aplicacionControl.mostrarCargosDepartamentos();
+    }
+    
+    @FXML
     private void registrarEmpresa(ActionEvent event) {
         aplicacionControl.mostrarRegistrarEmpresa();
     }

@@ -1066,6 +1066,77 @@ public class AplicacionControl extends Application {
            }
        }
     }
+    
+    public void mostrarCargosDepartamentos() {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+               try {
+                    stagePrincipal.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDepartamentosCargos.fxml"));
+                    AnchorPane ventanaDepartamentosCargos = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Configuracion");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaDepartamentosCargos);
+                    ventana.setScene(scene);
+                    DepartamentosCargosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
+    
+    public void mostrarPagos(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+               try {
+                    stagePrincipal.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagos.fxml"));
+                    AnchorPane ventanaPagos = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empresa.getSiglas());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaPagos);
+                    ventana.setScene(scene);
+                    PagosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
 
     /**
      * @param args the command line arguments

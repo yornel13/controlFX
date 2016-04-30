@@ -92,6 +92,24 @@ public class DetallesEmpleadoDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<DetallesEmpleado> findByCargoId(Integer cargoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM detalles_empleado WHERE cargo_id = :cargo_id")
+                    .addEntity(DetallesEmpleado.class)
+                    .setParameter("cargo_id", cargoId);
+            Object result = query.list();
+            return (List<DetallesEmpleado>) result;
+        }
+        
+        public List<DetallesEmpleado> findByDepartamentoId(Integer departamentoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM detalles_empleado WHERE departamento_id = :departamento_id")
+                    .addEntity(DetallesEmpleado.class)
+                    .setParameter("departamento_id", departamentoId);
+            Object result = query.list();
+            return (List<DetallesEmpleado>) result;
+        }
 
 	public List findBySueldo(Object sueldo) {
 		return findByProperty(SUELDO, sueldo);
