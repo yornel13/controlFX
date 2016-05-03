@@ -550,6 +550,7 @@ public class RolDePagoController implements Initializable {
         pago.setCedula(empleado.getCedula());
         pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
         pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
+        pago.setUsuario(empleado);
         
     }
     

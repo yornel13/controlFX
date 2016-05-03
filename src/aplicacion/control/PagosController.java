@@ -7,13 +7,16 @@ package aplicacion.control;
 
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.ClienteDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
 import hibernate.dao.PagoDAO;
+import hibernate.model.Cliente;
 import hibernate.model.Departamento;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,6 +27,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -44,10 +49,18 @@ public class PagosController implements Initializable {
     
     private AplicacionControl aplicacionControl;
     
-    Empresa empresa;
+     private Empresa empresa;
+    
+    private ArrayList<Cliente> clientes;
     
     @FXML
     private TableView pagosTableView;
+    
+    @FXML
+    private ChoiceBox clienteSelector;
+    
+    @FXML
+    private CheckBox checkBoxCliente;
     
     private ObservableList<Pago> data;
     
@@ -61,6 +74,24 @@ public class PagosController implements Initializable {
     
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
+    }
+    
+    @FXML
+    private void onCheckCliente(ActionEvent event) {
+        if (checkBoxCliente.isSelected()) {
+            clienteSelector.setDisable(false);
+        } else {
+            clienteSelector.setDisable(true);
+        }
+    }
+    
+    @FXML
+    private void onVerCliente(ActionEvent event) {
+        if (!clienteSelector.getSelectionModel().isEmpty() && checkBoxCliente.isSelected()) {
+            setPagoClienteTabla();
+        } else {
+            setPagoTable();
+        }
     }
     
     @FXML
@@ -141,17 +172,8 @@ public class PagosController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) { 
-        setPagoTable();
-    }
-    
-    public void setPagoTable() {
         pagosTableView.setEditable(Boolean.FALSE);
         pagosTableView.getColumns().clear();
-        
-        PagoDAO pagoDAO = new PagoDAO();
-        data = FXCollections.observableArrayList(); 
-        data.addAll(pagoDAO.findAll());
-        pagosTableView.setItems(data);
         
         TableColumn cedula = new TableColumn("Cedula");
         cedula.setMinWidth(100);
@@ -257,6 +279,36 @@ public class PagosController implements Initializable {
                 vacaciones, subtotal, decimoTercero, decimoCuarto,
                 jubilacionPatronal, aportePatronal, seguros, uniformes,
                 totalIngreso); 
+        setPagoTable();
+        
+        ClienteDAO clienteDAO = new ClienteDAO();
+        clientes = new ArrayList<>();
+        clientes.addAll(clienteDAO.findAll());
+        
+        String[] items = new String[clientes.size()];
+        for (Cliente cli: clientes) {
+            items[clientes.indexOf(cli)] = cli.getNombre();
+        }
+        
+        clienteSelector.setItems(FXCollections.observableArrayList(items));
+        clienteSelector.setDisable(true);
+    }
+    
+    public void setPagoTable() {
+        
+        PagoDAO pagoDAO = new PagoDAO();
+        data = FXCollections.observableArrayList(); 
+        data.addAll(pagoDAO.findAll());
+        pagosTableView.setItems(data);
+    }
+    
+    public void setPagoClienteTabla() {
+        Integer clienteId = clientes.get(clienteSelector.getSelectionModel().getSelectedIndex()).getId();
+        
+        PagoDAO pagoDAO = new PagoDAO();
+        data = FXCollections.observableArrayList(); 
+        data.addAll(pagoDAO.findByClienteId(clienteId));
+        pagosTableView.setItems(data);
     }
     
     // Login items

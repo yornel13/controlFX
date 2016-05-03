@@ -94,8 +94,14 @@
         <property name="empresa" type="java.lang.String">
             <column name="empresa" not-null="true" />
         </property>
-        <property name="cliente" type="java.lang.String">
-            <column name="cliente" />
+        <property name="clienteNombre" type="java.lang.String">
+            <column name="cliente_nombre" />
         </property>
+        <many-to-one name="cliente" class="hibernate.model.Cliente" fetch="select">
+            <column name="cliente_id" />
+        </many-to-one>
+        <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
+            <column name="usuario_id" />
+        </many-to-one>
     </class>
 </hibernate-mapping>

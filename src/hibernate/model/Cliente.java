@@ -24,6 +24,7 @@ public class Cliente implements java.io.Serializable {
 	private Timestamp creacion;
 	private Timestamp ultimaModificacion;
 	private Set controlEmpleados = new HashSet(0);
+        private Set pagos = new HashSet(0);
 
 	// Constructors
 
@@ -143,4 +144,13 @@ public class Cliente implements java.io.Serializable {
 		this.controlEmpleados = controlEmpleados;
 	}
 
+        public Set getPagos() {
+            return pagos;
+        }
+
+        public void setPagos(Set pagos) {
+            this.pagos = pagos;
+        }
+
+        
 }

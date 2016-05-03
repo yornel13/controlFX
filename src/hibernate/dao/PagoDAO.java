@@ -49,7 +49,7 @@ public class PagoDAO extends BaseHibernateDAO {
 	public static final String EMPLEADO = "empleado";
 	public static final String CEDULA = "cedula";
 	public static final String EMPRESA = "empresa";
-	public static final String CLIENTE = "cliente";
+	public static final String CLIENTE_NOMBRE = "clienteNombre";
 
 	public void save(Pago transientInstance) {
 		log.debug("saving Pago instance");
@@ -210,8 +210,8 @@ public class PagoDAO extends BaseHibernateDAO {
 		return findByProperty(EMPRESA, empresa);
 	}
 
-	public List findByCliente(Object cliente) {
-		return findByProperty(CLIENTE, cliente);
+	public List findByClienteNombre(Object clienteNombre) {
+		return findByProperty(CLIENTE_NOMBRE, clienteNombre);
 	}
 
 	public List findAll() {
@@ -225,6 +225,24 @@ public class PagoDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<Pago> findByClienteId(Integer clienteId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where cliente_id = :cliente_id")
+                    .addEntity(Pago.class)
+                    .setParameter("cliente_id", clienteId);
+            Object result = query.list();
+            return (List<Pago>) result;
+        }
+        
+        public List<Pago> findByUsuarioId(Integer usuarioId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where usuario_id = :usuario_id")
+                    .addEntity(Pago.class)
+                    .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (List<Pago>) result;
+        }
 
 	public Pago merge(Pago detachedInstance) {
 		log.debug("merging Pago instance");

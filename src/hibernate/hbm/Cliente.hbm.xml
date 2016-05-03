@@ -40,5 +40,11 @@
             </key>
             <one-to-many class="hibernate.model.ControlEmpleado" />
         </set>
+        <set name="pagos" inverse="true">
+            <key>
+                <column name="cliente_id" />
+            </key>
+            <one-to-many class="hibernate.model.Pago" />
+        </set>
     </class>
 </hibernate-mapping>

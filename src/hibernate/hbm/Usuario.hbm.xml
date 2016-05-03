@@ -52,9 +52,9 @@
         <property name="sexo" type="java.lang.String">
             <column name="sexo" length="1" />
         </property>
-        <set name="pago" inverse="true">
+        <set name="pagos" inverse="true">
             <key>
-                <column name="usuario_id" not-null="true" />
+                <column name="usuario_id" />
             </key>
             <one-to-many class="hibernate.model.Pago" />
         </set>

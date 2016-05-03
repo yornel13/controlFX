@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.AuditoriaController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="accionesTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="780.0">
+        <columns>
+          <TableColumn fx:id="detalles" prefWidth="622.0" text="Accion" />
+          <TableColumn fx:id="fecha" prefWidth="156.0" text="Fecha" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+      <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#returnConfiguracion" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
+        <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
+            <children>
+               <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <Button fx:id="login" layoutX="725.0" layoutY="2.0" maxHeight="25.0" mnemonicParsing="false" onAction="#onClickLoginButton" prefHeight="25.0" prefWidth="75.0" style="-fx-background-color: transparent;" text="Ingresar" underline="true">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Button>
+            </children>
+         </Pane>
+      <Button layoutX="597.0" layoutY="5.0" mnemonicParsing="false" onAction="#onVerUsuarios" text="ver" />
+      <ChoiceBox fx:id="usuariosSelector" layoutX="197.0" layoutY="5.0" prefHeight="25.0" prefWidth="276.0" />
+      <CheckBox fx:id="checkBoxUsuarios" layoutX="490.0" layoutY="9.0" mnemonicParsing="false" onAction="#onCheckUsuarios" text="Por empleado" textFill="#fffefe" />
+    </children>
+</AnchorPane>

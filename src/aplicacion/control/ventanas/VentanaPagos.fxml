@@ -33,5 +33,8 @@
                </Button>
             </children>
          </Pane>
+      <CheckBox fx:id="checkBoxCliente" layoutX="482.0" layoutY="9.0" mnemonicParsing="false" onAction="#onCheckCliente" text="Por cliente" textFill="#fffefe" />
+      <ChoiceBox fx:id="clienteSelector" layoutX="189.0" layoutY="5.0" prefHeight="25.0" prefWidth="276.0" />
+      <Button layoutX="578.0" layoutY="5.0" mnemonicParsing="false" onAction="#onVerCliente" text="ver" />
     </children>
 </AnchorPane>

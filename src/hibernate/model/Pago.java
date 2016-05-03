@@ -41,7 +41,9 @@ public class Pago implements java.io.Serializable {
 	private String empleado;
 	private String cedula;
 	private String empresa;
-	private String cliente;
+	private String clienteNombre;
+        private Cliente cliente;
+        private Usuario usuario;
 
 	// Constructors
 
@@ -99,7 +101,7 @@ public class Pago implements java.io.Serializable {
 			Double decimoTercero, Double decimoCuarto,
 			Double jubilacionPatronal, Double aportePatronal, Double seguros,
 			Double uniformes, Double totalIngreso, String empleado,
-			String cedula, String empresa, String cliente) {
+			String cedula, String empresa, String clienteNombre) {
 		this.detalles = detalles;
 		this.inicio = inicio;
 		this.finalizo = finalizo;
@@ -128,7 +130,7 @@ public class Pago implements java.io.Serializable {
 		this.empleado = empleado;
 		this.cedula = cedula;
 		this.empresa = empresa;
-		this.cliente = cliente;
+		this.clienteNombre = clienteNombre;
 	}
 
 	// Property accessors
@@ -365,12 +367,28 @@ public class Pago implements java.io.Serializable {
 		this.empresa = empresa;
 	}
 
-	public String getCliente() {
-		return this.cliente;
+	public String getClienteNombre() {
+		return this.clienteNombre;
 	}
 
-	public void setCliente(String cliente) {
-		this.cliente = cliente;
+	public void setClienteNombre(String clienteNombre) {
+		this.clienteNombre = clienteNombre;
 	} 
 
+        public Cliente getCliente() {
+            return cliente;
+        }
+
+        public void setCliente(Cliente cliente) {
+            this.cliente = cliente;
+        }
+
+        public Usuario getUsuario() {
+            return usuario;
+        }
+
+        public void setUsuario(Usuario usuario) {
+            this.usuario = usuario;
+        }
+           
 }

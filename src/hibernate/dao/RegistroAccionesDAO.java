@@ -90,6 +90,24 @@ public class RegistroAccionesDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<RegistroAcciones> findAllDesc() {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones order by fecha DESC")
+                    .addEntity(RegistroAcciones.class);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
+        public List<RegistroAcciones> findAllDescByUsuarioId(Integer usuarioId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where usuario_id = "
+                            + ":usuario_id order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
 
 	public List findByDetalles(Object detalles) {
 		return findByProperty(DETALLES, detalles);

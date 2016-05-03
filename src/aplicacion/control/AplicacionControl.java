@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Auditar;
 import aplicacion.control.util.Permisos;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
@@ -44,6 +45,8 @@ public class AplicacionControl extends Application {
     public Button login;
     public Label usuarioLogin;
     
+    public Auditar au;
+    
     @Override
     public void start(Stage stagePrincipal) throws Exception {
         this.stagePrincipal = stagePrincipal;
@@ -69,6 +72,8 @@ public class AplicacionControl extends Application {
         login.setText("Salir");
         usuarioLogin.setText(permisos.getUsuario().getNombre() + 
                 " " + permisos.getUsuario().getApellido());
+        au = new Auditar();
+        au.saveRegistro(au.INGRESO, au.LOGEO, usuario, null);
     }
     
     public void mostrarLogin() {
@@ -191,6 +196,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.CONFIGURACION, permisos.getUsuario(), null);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -230,6 +236,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPRESA, permisos.getUsuario(), empresa.getNombre());
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -298,6 +305,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -333,6 +341,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -397,6 +406,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPLEADO, permisos.getUsuario(), empleado.getNombre());
                 } catch (Exception e) {
                     e.printStackTrace();
                     //tratar la excepción
@@ -462,6 +472,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPRESAS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -497,6 +508,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.CLIENTES, permisos.getUsuario(), null);
 
                 } catch (Exception e) {
                      e.printStackTrace();
@@ -533,6 +545,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
 
                 } catch (Exception e) {
                      e.printStackTrace();
@@ -568,6 +581,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ADMINITRADORES, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -631,6 +645,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPRESA, permisos.getUsuario(), empresa.getNombre());
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -723,6 +738,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setCliente(cliente);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.CLIENTE, permisos.getUsuario(), cliente.getNombre());
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -790,6 +806,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -825,7 +842,7 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setCliente(empresa, cliente);
                     ventana.show();
- 
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
                 } catch (Exception e) {
                     e.printStackTrace();
                     //tratar la excepción
@@ -999,38 +1016,6 @@ public class AplicacionControl extends Application {
        }
     }
     
-    public void mostrarPagoMes(Usuario empleado, Timestamp inicio, Timestamp fin) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoMes.fxml"));
-                    AnchorPane ventanaPagoMes = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaPagoMes);
-                    ventana.setScene(scene);
-                    PagoMesController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpleado(empleado, inicio, fin);
-                    ventana.show();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-              noPermitido();
-           }
-       } 
-    }
-    
     public void mostrarConfiguracionEmpresa(Empresa empresa) {
         if (permisos == null) {
            noLogeado();
@@ -1056,6 +1041,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.CONFIGURACION, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1127,6 +1113,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1136,6 +1123,41 @@ public class AplicacionControl extends Application {
               noPermitido();
            }
        }
+    }
+    
+    public void mostrarAuditoria() {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaAuditar.fxml"));
+                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Auditoria");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaAuditar);
+                    ventana.setScene(scene);
+                    AuditoriaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.AUDITORIA, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
     }
 
     /**
