@@ -283,13 +283,13 @@
             </Label>
          </children>
       </GridPane>
-      <Accordion layoutX="40.0" layoutY="14.0" />
       <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="590.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
         </columns>
       </TableView>
+      <Accordion layoutX="40.0" layoutY="14.0" />
       <Label layoutX="419.0" layoutY="573.0" text="Total ingresos:" textFill="#fffbfb" underline="true">
          <font>
             <Font size="14.0" />

@@ -20,6 +20,15 @@ public class ControlTable {
     private Integer horasSuplementarias;
     private Integer horasExtras;
     private String descanso;
+    private String dia;
+
+    public String getDia() {
+        return dia;
+    }
+
+    public void setDia(String dia) {
+        this.dia = dia;
+    }
 
     public Usuario getUsuario() {
         return usuario;

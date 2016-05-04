@@ -129,8 +129,8 @@ public class HorasEmpleadosController implements Initializable {
         
         DateTime dateTime = new DateTime(getToday().getTime());
            
-        fin = new Timestamp(dateTime.withDayOfMonth(24).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(24).minusMonths(1).plusDays(1).getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));

@@ -23,7 +23,7 @@
             <column name="apellido" not-null="true" />
         </property>
         <property name="cedula" type="java.lang.String">
-            <column name="cedula" not-null="true" unique="true" />
+            <column name="cedula" not-null="true" />
         </property>
         <property name="email" type="java.lang.String">
             <column name="email" not-null="true" />

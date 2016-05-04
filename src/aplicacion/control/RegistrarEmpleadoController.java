@@ -192,7 +192,7 @@ public class RegistrarEmpleadoController implements Initializable {
             UsuarioDAO usuariosDAO = new UsuarioDAO();
             DetallesEmpleadoDAO detallesEmpleadoDAO = new DetallesEmpleadoDAO();
             
-            if (usuariosDAO.findByCedula(cedulaField.getText()) == null) {
+            if (usuariosDAO.findByCedulaActivo(cedulaField.getText()) == null) {
                 
                 DetallesEmpleado detallesEmpleado = new DetallesEmpleado();
                 detallesEmpleado.setEmpresa(empresa);

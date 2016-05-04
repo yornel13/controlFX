@@ -2,7 +2,7 @@ CREATE TABLE `usuario` (
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`nombre` VARCHAR(255) NOT NULL,
 	`apellido` VARCHAR(255) NOT NULL,
-	`cedula` VARCHAR(255) NOT NULL UNIQUE,
+	`cedula` VARCHAR(255) NOT NULL,
 	`email` VARCHAR(255) NOT NULL,
 	`direccion` VARCHAR(255) NOT NULL,
 	`telefono` VARCHAR(255),

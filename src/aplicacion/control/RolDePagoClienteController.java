@@ -477,7 +477,11 @@ public class RolDePagoClienteController implements Initializable {
             if (control.getCliente() != null) {
                 controlTable.setCliente(control.getCliente().getNombre());
             }
-            controlTable.setFecha(new DateTime(control.getFecha().getTime()).toString("dd-MM-yyyy"));
+            DateTime dateTime = new DateTime(control.getFecha().getTime());
+            controlTable.setFecha(dateTime.toString("dd-MM-yyyy"));
+            controlTable.setDia(dateTime.toCalendar(Locale.getDefault())
+                            .getDisplayName(Calendar
+                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
             controlTable.setHorasExtras(control.getHorasExtras());
             controlTable.setHorasSuplementarias(control.getHorasSuplementarias());
             controlTable.setUsuarios(empleado);
@@ -493,33 +497,37 @@ public class RolDePagoClienteController implements Initializable {
         } 
         empleadosTableView.setItems(data);
         
+        TableColumn dia = new TableColumn("Dia");
+        dia.setMinWidth(50);
+        dia.setCellValueFactory(new PropertyValueFactory<>("dia"));
+        
         TableColumn fecha = new TableColumn("Fecha");
-        fecha.setMinWidth(100);
+        fecha.setMinWidth(80);
         fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
        
         TableColumn cliente = new TableColumn("Cliente");
-        cliente.setMinWidth(100);
+        cliente.setMinWidth(200);
         cliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
         
         TableColumn horasExtras = new TableColumn("ST");
-        horasExtras.setMinWidth(100);
+        horasExtras.setMinWidth(40);
         horasExtras.setCellValueFactory(new PropertyValueFactory<>("horasExtras"));
         
         TableColumn horasSuplementarias = new TableColumn("RC");
-        horasSuplementarias.setMinWidth(100);
+        horasSuplementarias.setMinWidth(40);
         horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         
         TableColumn horas = new TableColumn("Horas");
-        horas.setMinWidth(100);
+        horas.setMinWidth(80);
         horas.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         horas.getColumns().addAll(horasExtras, horasSuplementarias);
         
         TableColumn descanso = new TableColumn("Descanso");
-        descanso.setMinWidth(100);
+        descanso.setMinWidth(50);
         descanso.setCellValueFactory(new PropertyValueFactory<>("descanso"));
         
         TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
+        delete.setMinWidth(30);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
             private final Button deleteButton = new Button("Borrar");
@@ -540,7 +548,7 @@ public class RolDePagoClienteController implements Initializable {
             }
         });
         
-        empleadosTableView.getColumns().addAll(fecha, cliente, horas, descanso, delete);
+        empleadosTableView.getColumns().addAll(fecha, dia, cliente, horas, descanso, delete);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<ControlTable> row = new TableRow<>();

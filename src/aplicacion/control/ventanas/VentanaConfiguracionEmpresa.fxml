@@ -55,7 +55,7 @@
          <children>
             <Label text="Valor uniforme por dia" textFill="#fffefe" GridPane.halignment="CENTER" />
             <Label fx:id="valorUniforme" alignment="CENTER" contentDisplay="CENTER" text="0.0$" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <Button mnemonicParsing="false" onAction="#cambiarUniforme" prefHeight="25.0" prefWidth="151.0" text="Cambiar" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#cambiarUniforme" prefHeight="25.0" prefWidth="151.0" text="Cambiar" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
          </children>
       </GridPane>
     </children>
