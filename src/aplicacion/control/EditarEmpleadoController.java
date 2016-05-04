@@ -226,6 +226,11 @@ public class EditarEmpleadoController implements Initializable {
             
             stagePrincipal.close();
             
+            // Registro para auditar
+            String detalles = "edito el empleado " 
+                    + empleado.getNombre() + " " + empleado.getApellido();
+            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+            
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);

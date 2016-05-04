@@ -143,6 +143,12 @@ public class AdministradoresController implements Initializable {
             HibernateSessionFactory.getSession().flush();
             data.remove(administrador);
             dialogStage.close();
+            
+            // Registro para auditar
+            String detalles = "elimino el administrador " 
+                    + administrador.getUsuario().getNombre() + " " 
+                    + administrador.getUsuario().getApellido();
+            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
         });
     }
     

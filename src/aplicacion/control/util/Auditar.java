@@ -29,7 +29,7 @@ public class Auditar {
     public static final String EMPLEADO = "empleado";
     public static final String EMPLEADOS = "empleados";
     public static final String CLIENTE = "cliente";
-    public static final String CLIENTES  = "cliente";
+    public static final String CLIENTES  = "clientes";
     public static final String EMPRESA = "empresa";
     public static final String EMPRESAS = "empresas";
     public static final String CONFIGURACION = "configuraciones";
@@ -75,6 +75,42 @@ public class Auditar {
         registro.setFecha(new Timestamp(new Date().getTime()));
         registro.setUsuario(usuario);
         registro.setAccionTipo((AccionTipo) new AccionTipoDAO().findAll().get(0));
+        new RegistroAccionesDAO().save(registro);
+    }
+    
+    public void saveIngreso(String detalles, Usuario usuario) {
+        RegistroAcciones registro = new RegistroAcciones();
+        registro.setDetalles(usuario.getNombre() + " " + usuario.getApellido() + " " + detalles);
+        registro.setFecha(new Timestamp(new Date().getTime()));
+        registro.setUsuario(usuario);
+        registro.setAccionTipo((AccionTipo) new AccionTipoDAO().findAll().get(0));
+        new RegistroAccionesDAO().save(registro);
+    }
+    
+    public void saveAgrego(String detalles, Usuario usuario) {
+        RegistroAcciones registro = new RegistroAcciones();
+        registro.setDetalles(usuario.getNombre() + " " + usuario.getApellido() + " " + detalles);
+        registro.setFecha(new Timestamp(new Date().getTime()));
+        registro.setUsuario(usuario);
+        registro.setAccionTipo((AccionTipo) new AccionTipoDAO().findAll().get(1));
+        new RegistroAccionesDAO().save(registro);
+    }
+    
+    public void saveEdito(String detalles, Usuario usuario) {
+        RegistroAcciones registro = new RegistroAcciones();
+        registro.setDetalles(usuario.getNombre() + " " + usuario.getApellido() + " " + detalles);
+        registro.setFecha(new Timestamp(new Date().getTime()));
+        registro.setUsuario(usuario);
+        registro.setAccionTipo((AccionTipo) new AccionTipoDAO().findAll().get(2));
+        new RegistroAccionesDAO().save(registro);
+    }
+    
+    public void saveElimino(String detalles, Usuario usuario) {
+        RegistroAcciones registro = new RegistroAcciones();
+        registro.setDetalles(usuario.getNombre() + " " + usuario.getApellido() + " " + detalles);
+        registro.setFecha(new Timestamp(new Date().getTime()));
+        registro.setUsuario(usuario);
+        registro.setAccionTipo((AccionTipo) new AccionTipoDAO().findAll().get(3));
         new RegistroAccionesDAO().save(registro);
     }
     

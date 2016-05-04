@@ -129,6 +129,11 @@ public class RegistrarEmpresaController implements Initializable {
             
             stagePrincipal.close();
             
+            // Registro para auditar
+            String detalles = "agrego la empresa " 
+                    + empresa.getNombre();
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);

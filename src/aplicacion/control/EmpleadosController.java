@@ -5,11 +5,9 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.tableModel.Administrador;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.IdentidadDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
@@ -129,6 +127,7 @@ public class EmpleadosController implements Initializable {
                     ventana.setScene(scene);
                     ActuarialesController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
                     controller.setEmpleado(empleado);
                     ventana.show();
  
@@ -206,6 +205,12 @@ public class EmpleadosController implements Initializable {
                     HibernateSessionFactory.getSession().flush();
                     data.remove(empleadoTable);
                     dialogStage.close();
+                    
+                    // Registro para auditar
+                    String detalles = "elimino el empleado " 
+                            + empleadoTable.getNombre() + " " 
+                            + empleadoTable.getApellido();
+                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                 });
                   
             } else {
@@ -236,7 +241,6 @@ public class EmpleadosController implements Initializable {
             });
            empleadosTableView.setItems(data);
         }
-        
         
         TableColumn nombre = new TableColumn("Nombre");
         nombre.setMinWidth(100);

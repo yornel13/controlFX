@@ -5,12 +5,10 @@
  */
 package aplicacion.control;
 
-import hibernate.dao.ClienteDAO;
+import hibernate.dao.AccionTipoDAO;
 import hibernate.dao.RegistroAccionesDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Cliente;
-import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.AccionTipo;
 import hibernate.model.RegistroAcciones;
 import hibernate.model.Usuario;
 import java.net.URL;
@@ -42,6 +40,8 @@ public class AuditoriaController implements Initializable {
     private AplicacionControl aplicacionControl;
     
     private ArrayList<Usuario> usuarios;
+    
+    private ArrayList<AccionTipo> acciones;
    
     @FXML
     private Button administradoresButton;
@@ -60,6 +60,9 @@ public class AuditoriaController implements Initializable {
     
     @FXML
     private ChoiceBox usuariosSelector;
+    
+    @FXML
+    private ChoiceBox accionesSelector;
     
     @FXML
     private CheckBox checkBoxUsuarios;
@@ -91,8 +94,16 @@ public class AuditoriaController implements Initializable {
     
     @FXML
     private void onVerUsuarios(ActionEvent event) {
-        if (!usuariosSelector.getSelectionModel().isEmpty() && checkBoxUsuarios.isSelected()) {
+        if (!usuariosSelector.getSelectionModel().isEmpty() 
+                && checkBoxUsuarios.isSelected() 
+                && !accionesSelector.getSelectionModel().isEmpty()
+                && accionesSelector.getSelectionModel().getSelectedIndex() != acciones.size()) {
+            setAccionesUsuarioYTipo();
+        } else if (!usuariosSelector.getSelectionModel().isEmpty() && checkBoxUsuarios.isSelected()) {
             setAccionesUsuario();
+        } else if (!accionesSelector.getSelectionModel().isEmpty()
+                && accionesSelector.getSelectionModel().getSelectedIndex() != acciones.size()) {
+            setAccionesTipo();
         } else {
             setAcciones();
         }
@@ -102,7 +113,7 @@ public class AuditoriaController implements Initializable {
     private void returnConfiguracion(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarConfiguracion();
-    } 
+    }
     
     public void setAcciones() {
         RegistroAccionesDAO registroAccionesDAO = new RegistroAccionesDAO();
@@ -120,16 +131,32 @@ public class AuditoriaController implements Initializable {
         accionesTableView.setItems(data); 
     }
     
+    public void setAccionesTipo() {
+        Integer accionId = acciones.get(accionesSelector.getSelectionModel().getSelectedIndex()).getId();
+        
+        RegistroAccionesDAO registroAccionesDAO = new RegistroAccionesDAO();
+        data = FXCollections.observableArrayList(); 
+        data.addAll(registroAccionesDAO.findAllByAccionIdDesc(accionId));
+        accionesTableView.setItems(data); 
+    }
+    
+    public void setAccionesUsuarioYTipo() {
+        Integer usuarioId = usuarios.get(usuariosSelector.getSelectionModel().getSelectedIndex()).getId();
+        Integer accionId = acciones.get(accionesSelector.getSelectionModel().getSelectedIndex()).getId();
+        
+        RegistroAccionesDAO registroAccionesDAO = new RegistroAccionesDAO();
+        data = FXCollections.observableArrayList(); 
+        data.addAll(registroAccionesDAO.findAllDescByUsuarioIdAndAccionId(usuarioId, accionId));
+        accionesTableView.setItems(data); 
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         accionesTableView.setEditable(Boolean.FALSE);
         
         detalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
-        detalles.setMaxWidth(620);
         detalles.setMinWidth(620);
-        detalles.setPrefWidth(620);
         fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        
         
         setAcciones();
         
@@ -145,6 +172,17 @@ public class AuditoriaController implements Initializable {
         usuariosSelector.setItems(FXCollections.observableArrayList(items));
         usuariosSelector.setDisable(true);
         
+        AccionTipoDAO accionTipoDAO = new AccionTipoDAO();
+        acciones = new ArrayList<>();
+        acciones.addAll(accionTipoDAO.findAll());
+        
+        String[] itemsAccion = new String[acciones.size() + 1];
+        acciones.stream().forEach((accion) -> {
+            System.out.println(accion.getNombre());
+            itemsAccion[acciones.indexOf(accion)] = accion.getNombre();
+        });
+        
+        accionesSelector.setItems(FXCollections.observableArrayList(itemsAccion));
     } 
     
     // Login items

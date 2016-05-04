@@ -47,6 +47,7 @@ public class EditarContrasenaController implements Initializable {
     
     @FXML
     private Label errorText;
+    private AplicacionControl aplicacionControl;
     
     @FXML
     public void onCLickGuardar(ActionEvent event) {
@@ -61,6 +62,12 @@ public class EditarContrasenaController implements Initializable {
         } else {
             identidad.setContrasena(Password.MD5(newPassword.getText()));
             HibernateSessionFactory.getSession().flush();
+            
+            // Registro para auditar
+            String detalles = "edito la contraseña de usuario de " 
+                    + identidad.getUsuario().getNombre() + " " 
+                    + identidad.getUsuario().getApellido();
+            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
             
             stagePrincipal.close();
             
@@ -88,6 +95,10 @@ public class EditarContrasenaController implements Initializable {
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
+    }
+    
+    public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
+        this.aplicacionControl = aplicacionControl;
     }
     
     public void setIdentidad(Identidad identidad) {

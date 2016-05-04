@@ -184,7 +184,7 @@ public class EditarHorasExtrasController implements Initializable {
         
         ClienteDAO clienteDAO = new ClienteDAO();
         clientes = new ArrayList<>();
-        clientes.addAll(clienteDAO.findAll());
+        clientes.addAll(clienteDAO.findAllActivo());
         
         String[] items = new String[clientes.size() + 1];
         for (Cliente cli: clientes) {

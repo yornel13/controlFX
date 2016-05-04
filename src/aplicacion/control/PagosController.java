@@ -283,7 +283,7 @@ public class PagosController implements Initializable {
         
         ClienteDAO clienteDAO = new ClienteDAO();
         clientes = new ArrayList<>();
-        clientes.addAll(clienteDAO.findAll());
+        clientes.addAll(clienteDAO.findAllActivo());
         
         String[] items = new String[clientes.size()];
         for (Cliente cli: clientes) {

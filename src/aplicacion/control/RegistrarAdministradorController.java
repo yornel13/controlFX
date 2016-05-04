@@ -46,7 +46,7 @@ import javafx.stage.Stage;
  */
 public class RegistrarAdministradorController implements Initializable {
     
-    private AplicacionControl aplicacionControl;
+    public AplicacionControl aplicacionControl;
     
     private Stage stagePrincipal;
     
@@ -267,6 +267,12 @@ public class RegistrarAdministradorController implements Initializable {
 
         identidadDAO.save(identidad);
         stagePrincipal.close();
+        
+        // Registro para auditar
+        String detalles = "agrego el usuario " 
+                + usuario.getNombre() + " " 
+                + usuario.getApellido();
+        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
         
         seleccionarPermisos(usuario);
     }

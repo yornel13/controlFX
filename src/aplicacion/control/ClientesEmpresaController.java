@@ -85,7 +85,7 @@ public class ClientesEmpresaController implements Initializable {
         
         ClienteDAO clientesDAO = new ClienteDAO();
         clientes = new ArrayList<>();
-        clientes.addAll(clientesDAO.findAll());
+        clientes.addAll(clientesDAO.findAllActivo());
         
         if (!clientes.isEmpty()) {
            data = FXCollections.observableArrayList(); 

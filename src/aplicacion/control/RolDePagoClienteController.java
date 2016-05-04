@@ -13,6 +13,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.PagoDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.model.Actuariales;
@@ -40,6 +41,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -55,6 +58,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
 
@@ -217,6 +223,60 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     @FXML
+    public void onClickPago(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Pago " + new DateTime(pago.getInicio().getTime())
+                .toString("dd-MM-yyyy") + " a " + new DateTime(pago.getFinalizo()
+                        .getTime()).toString("dd-MM-yyyy"));
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Desea generar el pago del empleado " + pago.getEmpleado()),
+                new Text("para el cliente " + pago.getClienteNombre()+ "?"), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(50);
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            generarPago();
+            dialogStage.close();
+            dialogCompletado();
+            
+        });  
+    }
+    
+    public void generarPago() {
+        pago.setDetalles("");
+        new PagoDAO().save(pago);
+        
+        // Registro para auditar
+        String detalles = "genero un pago al empleado " 
+            + empleado.getNombre() + " " + empleado.getApellido() + " para el cliente " 
+                + pago.getClienteNombre();
+        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+    }
+    
+    public void dialogCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Dialogo");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Pago guardado satisfactoriamente"), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            stagePrincipal.close();
+        });
+    }
+    
+    @FXML
     private void mostrarRegistro(ActionEvent event) {
         if (pickerDe.getValue() == null) {
             // error
@@ -315,6 +375,12 @@ public class RolDePagoClienteController implements Initializable {
                
                 new ControlEmpleadoDAO().delete(controlEmpleado);
                 HibernateSessionFactory.getSession().flush();
+                // Registro para auditar
+                String detalles = "elimino un registro diario del empleado " 
+                    + empleado.getNombre() + " " + empleado.getApellido() 
+                    + " con fecha " + new DateTime(controlEmpleado.getFecha()
+                            .getTime()).toString("dd-MM-yyyy");
+                aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                 data.remove(controlTable);
                   
             } else {
@@ -338,6 +404,12 @@ public class RolDePagoClienteController implements Initializable {
         setControlEmpleadoInfo(this.empleado, 
                 Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
                 Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
+        
+        // Registro para auditar
+        String detalles = "agrego un registro diario al empleado " 
+            + empleado.getNombre() + " " + empleado.getApellido() 
+            + " con fecha " + new DateTime(fecha.getTime()).toString("dd-MM-yyyy");
+        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
     }
     
     public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Integer suplementarias, 
@@ -358,6 +430,12 @@ public class RolDePagoClienteController implements Initializable {
         setControlEmpleadoInfo(empleado, 
                 Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
                 Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
+        
+        // Registro para auditar
+        String detalles = "edito un registro diario del empleado " 
+            + empleado.getNombre() + " " + empleado.getApellido() 
+            + " con fecha " + new DateTime(fecha.getTime()).toString("dd-MM-yyyy");
+        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
     }
     
     public void setEmpleado(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) throws ParseException {

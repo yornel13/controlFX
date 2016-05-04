@@ -135,6 +135,11 @@ public class ConfiguracionEmpresaController implements Initializable {
                     new SeguroDAO().save(newSeguro);
                     setEmpresa(empresa);
                     dialogStage.close();
+                    
+                    // Registro para auditar
+                    String detalles = "edito el valor del seguro de la empresa " 
+                            + empresa.getNombre();
+                    aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                 }); 
             } else {
                 aplicacionControl.noPermitido();
@@ -183,6 +188,11 @@ public class ConfiguracionEmpresaController implements Initializable {
                     new UniformeDAO().save(newUniforme);
                     setEmpresa(empresa);
                     dialogStage.close();
+                    
+                    // Registro para auditar
+                    String detalles = "edito el valor del uniforme de la empresa " 
+                            + empresa.getNombre();
+                    aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                 }); 
             } else {
                 aplicacionControl.noPermitido();

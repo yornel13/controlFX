@@ -166,6 +166,13 @@ public class AsignarRolController implements Initializable {
         }
         
         if (permisos > 0) {
+            // Registro para auditar
+            String detalles = "agrego permisos al usuario " 
+                    + usuario.getNombre() + " " 
+                    + usuario.getApellido();
+            AplicacionControl aplicacionControl = registrarAdministradorController.aplicacionControl;
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
             stagePrincipal.close();
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);

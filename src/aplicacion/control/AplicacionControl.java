@@ -545,7 +545,6 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
 
                 } catch (Exception e) {
                      e.printStackTrace();
@@ -875,6 +874,11 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado, inicio, fin);
                     ventana.show();
+                    
+                    // Registro para auditar
+                    String detalles = "ingreso a rol de pago del empleado " 
+                            + empleado.getNombre() + " " + empleado.getApellido();
+                    au.saveIngreso(detalles, permisos.getUsuario());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -909,6 +913,11 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado, cliente, inicio, fin);
                     ventana.show();
+                    
+                    // Registro para auditar
+                    String detalles = "ingreso a rol de pago del empleado " 
+                            + empleado.getNombre() + " " + empleado.getApellido();
+                    au.saveIngreso(detalles, permisos.getUsuario());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -939,6 +948,7 @@ public class AplicacionControl extends Application {
                     ventana.setScene(scene);
                     EditarContrasenaController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
                     controller.setIdentidad(identidad);
                     ventana.show();
 
@@ -971,6 +981,7 @@ public class AplicacionControl extends Application {
                     ventana.setScene(scene);
                     EditarUsuarioController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
                     controller.setIdentidad(identidad);
                     ventana.show();
 
@@ -1003,6 +1014,7 @@ public class AplicacionControl extends Application {
                     ventana.setScene(scene);
                     EditarRolController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
                     controller.setIdentidad(identidad);
                     ventana.show();
 
@@ -1026,7 +1038,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracionEmpresa.fxml"));
                     AnchorPane ventanaConfiguracionEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle(empresa.getSiglas());
+                    ventana.setTitle(empresa.getSiglas() + " - configuracion");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);

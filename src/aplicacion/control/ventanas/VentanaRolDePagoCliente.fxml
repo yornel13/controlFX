@@ -13,6 +13,8 @@
 
 <AnchorPane id="AnchorPane" maxHeight="590.0" maxWidth="600.0" minHeight="590.0" minWidth="600.0" prefHeight="590.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
     <children>
+      <Button layoutX="506.0" layoutY="300.0" mnemonicParsing="false" onAction="#onClickPago" text="Guardar" />
+      <Button layoutX="386.0" layoutY="300.0" mnemonicParsing="false" onAction="#onClickCalcular" text="Calcular" />
       <TextField fx:id="transporteField" layoutX="104.0" layoutY="265.0" promptText="Monto" />
       <TextField fx:id="bonoField" layoutX="104.0" layoutY="300.0" promptText="Monto" />
       <Label layoutX="19.0" layoutY="302.0" text="Transporte" textFill="#fffbfb">
@@ -31,7 +33,6 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="446.0" layoutY="300.0" mnemonicParsing="false" onAction="#onClickCalcular" text="Calcular" />
       <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="502.0" prefHeight="60.0" prefWidth="588.0">
          <children>
             <Label text="Decimo 3ro" textFill="#fffbfb">

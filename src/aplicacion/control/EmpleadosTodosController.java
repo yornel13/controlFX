@@ -8,7 +8,6 @@ package aplicacion.control;
 import aplicacion.control.tableModel.EmpleadoTable;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
@@ -97,6 +96,12 @@ public class EmpleadosTodosController implements Initializable {
             HibernateSessionFactory.getSession().flush();
             data.remove(empleadoTable);
             dialogStage.close();
+            
+            // Registro para auditar
+            String detalles = "elimino el empleado " 
+                    + empleadoTable.getNombre() + " " 
+                    + empleadoTable.getApellido();
+            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
         });
     }
     

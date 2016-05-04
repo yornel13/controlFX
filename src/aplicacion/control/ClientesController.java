@@ -5,26 +5,39 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.tableModel.Administrador;
 import aplicacion.control.tableModel.EmpresaTable;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
 import hibernate.dao.EmpresaDAO;
+import hibernate.dao.IdentidadDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -80,6 +93,32 @@ public class ClientesController implements Initializable {
         stagePrincipal.close();
     } 
     
+    public void deleteCliente(Cliente cliente) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Confirmación de borrado");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));;
+        Button buttonConfirmar = new Button("Si Borrar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Borrar el cliente " + cliente.getNombre()+ "?"), buttonConfirmar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        dialogStage.show();
+        buttonConfirmar.setOnAction((ActionEvent e) -> {
+            
+            new ClienteDAO().findById(cliente.getId()).setActivo(Boolean.FALSE);
+            HibernateSessionFactory.getSession().flush();
+            data.remove(cliente);
+            dialogStage.close();
+            
+            // Registro para auditar
+            String detalles = "elimino el cliente " 
+                    + cliente.getNombre();
+            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+        });
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         clientesTableView.setEditable(Boolean.FALSE);
@@ -87,7 +126,7 @@ public class ClientesController implements Initializable {
         
         ClienteDAO clientesDAO = new ClienteDAO();
         clientes = new ArrayList<>();
-        clientes.addAll(clientesDAO.findAll());
+        clientes.addAll(clientesDAO.findAllActivo());
         
         if (!clientes.isEmpty()) {
            data = FXCollections.observableArrayList(); 
@@ -96,7 +135,7 @@ public class ClientesController implements Initializable {
         }
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(100);
+        nombre.setMinWidth(200);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn detalles = new TableColumn("Detalles");
@@ -112,10 +151,32 @@ public class ClientesController implements Initializable {
         telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
         TableColumn direccion = new TableColumn("Direccion");
-        direccion.setMinWidth(100);
+        direccion.setMinWidth(200);
         direccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+        
+        TableColumn<Cliente, Cliente> delete = new TableColumn<>("Borrar");
+        delete.setMinWidth(40);
+        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        delete.setCellFactory(param -> new TableCell<Cliente, Cliente>() {
+            private final Button deleteButton = new Button("Borrar");
+
+            @Override
+            protected void updateItem(Cliente cliente, boolean empty) {
+                super.updateItem(cliente, empty);
+
+                if (cliente == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                setGraphic(deleteButton);
+                deleteButton.setOnAction(event -> {
+                    deleteCliente(cliente);
+                });
+            }
+        });
        
-        clientesTableView.getColumns().addAll(nombre, detalles, numeracion, telefono, direccion);
+        clientesTableView.getColumns().addAll(nombre, detalles, numeracion, telefono, direccion, delete);
         
         clientesTableView.setRowFactory( (Object tv) -> {
             TableRow<Cliente> row = new TableRow<>();

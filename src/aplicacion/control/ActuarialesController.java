@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.RegistrarEmpleadoController.numDecimalFilter;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.model.Actuariales;
@@ -38,6 +37,8 @@ import javafx.stage.Stage;
 public class ActuarialesController implements Initializable {
     
     private Stage stagePrincipal;
+    
+    private AplicacionControl aplicacionControl;
     
     @FXML
     private Label oldActuarial1;
@@ -76,6 +77,9 @@ public class ActuarialesController implements Initializable {
             
             stagePrincipal.close();
             
+            String detalles = "edito los actuariales de " + empleado.getNombre() + " " + empleado.getApellido();
+            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+            
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
@@ -112,6 +116,10 @@ public class ActuarialesController implements Initializable {
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
+    }
+    
+    public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
+        this.aplicacionControl = aplicacionControl;
     }
 
     @Override

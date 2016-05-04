@@ -80,3 +80,25 @@ INSERT INTO control.constante
 VALUES
 (1, 'decimo_cuarto', '30,5', 1);
 
+
+
+
+INSERT INTO control.accion_tipo
+(`id`,`nombre`,`activo`)
+VALUES
+(1, 'INGRESO', true);
+
+INSERT INTO control.accion_tipo
+(`id`,`nombre`,`activo`)
+VALUES
+(2, 'AGREGO', true);
+
+INSERT INTO control.accion_tipo
+(`id`,`nombre`,`activo`)
+VALUES
+(3, 'EDITO', true);
+
+INSERT INTO control.accion_tipo
+(`id`,`nombre`,`activo`)
+VALUES
+(4, 'ELIMINO', true);

@@ -99,12 +99,34 @@ public class RegistroAccionesDAO extends BaseHibernateDAO {
             return (List<RegistroAcciones>) result;
         }
         
+        public List<RegistroAcciones> findAllByAccionIdDesc(Integer accionId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where accion_tipo_id = "
+                            + ":accion_tipo_id order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("accion_tipo_id", accionId);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
         public List<RegistroAcciones> findAllDescByUsuarioId(Integer usuarioId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM registro_acciones where usuario_id = "
                             + ":usuario_id order by fecha DESC")
                     .addEntity(RegistroAcciones.class)
                     .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
+        public List<RegistroAcciones> findAllDescByUsuarioIdAndAccionId(Integer usuarioId, Integer accionId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where usuario_id = "
+                            + ":usuario_id and accion_tipo_id = :accion_tipo_id "
+                            + "order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("accion_tipo_id", accionId);
             Object result = query.list();
             return (List<RegistroAcciones>) result;
         }

@@ -35,6 +35,9 @@ public class EditarUsuarioController implements Initializable {
     
     private Stage stagePrincipal;
     
+    
+    private AplicacionControl aplicacionControl;
+    
     private Identidad identidad;
     
     @FXML
@@ -59,6 +62,12 @@ public class EditarUsuarioController implements Initializable {
         } else {
             identidad.setNombreUsuario(nombreUsuario.getText());
             HibernateSessionFactory.getSession().flush();
+            
+            // Registro para auditar
+            String detalles = "edito el nombre de usuario de " 
+                    + identidad.getUsuario().getNombre() + " " 
+                    + identidad.getUsuario().getApellido();
+            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
             
             stagePrincipal.close();
             
@@ -86,6 +95,10 @@ public class EditarUsuarioController implements Initializable {
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
+    }
+    
+    public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
+        this.aplicacionControl = aplicacionControl;
     }
     
     public void setIdentidad(Identidad identidad) {

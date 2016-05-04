@@ -63,6 +63,7 @@ public class EditarRolController implements Initializable {
     
     @FXML
     private CheckBox controlTotal;
+    private AplicacionControl aplicacionControl;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -166,6 +167,12 @@ public class EditarRolController implements Initializable {
                 rolesDAO.delete(rol);
                 HibernateSessionFactory.getSession().flush();
             }
+            // Registro para auditar
+            String detalles = "edito los permisos de usuario de " 
+                    + usuario.getNombre() + " " 
+                    + usuario.getApellido();
+            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+            
             stagePrincipal.close();
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -315,6 +322,10 @@ public class EditarRolController implements Initializable {
                 }
             }
         }
+    }
+    
+    public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
+        this.aplicacionControl = aplicacionControl;
     }
 
     @Override

@@ -104,6 +104,11 @@ public class RegistrarClienteController implements Initializable {
             
             stagePrincipal.close();
             
+            // Registro para auditar
+            String detalles = "agrego el cliente " 
+                    + cliente.getNombre();
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);

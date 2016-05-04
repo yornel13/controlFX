@@ -119,7 +119,15 @@ public class ClienteDAO extends BaseHibernateDAO {
 		return findByProperty(ACTIVO, activo);
 	}
 
-	public List findAll() {
+	public List<Cliente> findAllActivo() {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM cliente where activo = true")
+                    .addEntity(Cliente.class);
+            Object result = query.list();
+            return (List<Cliente>)result;
+	}
+        
+        public List findAll() {
 		log.debug("finding all Cliente instances");
 		try {
 			String queryString = "from Cliente";

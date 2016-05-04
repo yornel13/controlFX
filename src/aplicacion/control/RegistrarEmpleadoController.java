@@ -228,6 +228,12 @@ public class RegistrarEmpleadoController implements Initializable {
                 usuariosDAO.save(usuario);
 
                 stagePrincipal.close();
+                
+                // Registro para auditar
+                String detalles = "agrego el empleado " + usuario.getNombre() 
+                        + " " + usuario.getApellido() + " a la empresa " 
+                        + empresa.getNombre() ;
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
 
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);

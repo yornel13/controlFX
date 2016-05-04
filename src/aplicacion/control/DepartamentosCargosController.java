@@ -5,31 +5,22 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
-import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
-import hibernate.dao.SeguroDAO;
-import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cargo;
 import hibernate.model.Departamento;
-import hibernate.model.Empresa;
-import hibernate.model.Seguro;
 import hibernate.model.Usuario;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,14 +29,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -106,6 +93,11 @@ public class DepartamentosCargosController implements Initializable {
                 new CargoDAO().save(cargo);
                 dialogStage.close();
                 setCargoTable();
+                
+                // Registro para auditar
+                String detalles = "agrego el cargo " 
+                        + cargo.getNombre();
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             }
         }); 
     }
@@ -135,6 +127,11 @@ public class DepartamentosCargosController implements Initializable {
                 new DepartamentoDAO().save(departamento);
                 dialogStage.close();
                 setDepartamentoTable();
+                
+                // Registro para auditar
+                String detalles = "agrego el departamento " 
+                        + departamento.getNombre();
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             }
         }); 
     }
@@ -169,6 +166,11 @@ public class DepartamentosCargosController implements Initializable {
                         HibernateSessionFactory.getSession().flush();
                         dialogStage.close();
                         dataCargos.remove(cargo);
+                        
+                        // Registro para auditar
+                        String detalles = "elimino el cargo " 
+                                + cargo.getNombre();
+                        aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                     } else {
                         dialogStage.close();
                         dialogCargoError();
@@ -205,6 +207,11 @@ public class DepartamentosCargosController implements Initializable {
                         HibernateSessionFactory.getSession().flush();
                         dialogStage.close();
                         dataDepartamentos.remove(departamento);
+                        
+                        // Registro para auditar
+                        String detalles = "elimino el departamento " 
+                                + departamento.getNombre();
+                        aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                     } else {
                         dialogStage.close();
                         dialogDepartamentoError();
@@ -253,25 +260,24 @@ public class DepartamentosCargosController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) { 
+        
+        createDepartamentoTable();
+        createCargoTable();
+        
         setDepartamentoTable();
         setCargoTable();
     }
     
-    public void setDepartamentoTable() {
+    public void createDepartamentoTable () {
+        
         departamentosTableView.setEditable(Boolean.FALSE);
         departamentosTableView.getColumns().clear();
         
-        DepartamentoDAO departamentoDAO = new DepartamentoDAO();
-        dataDepartamentos = FXCollections.observableArrayList(); 
-        dataDepartamentos.addAll(departamentoDAO.findAll());
-        departamentosTableView.setItems(dataDepartamentos);
-        
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(100);
+        nombre.setMinWidth(280);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn<Departamento, Departamento> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Departamento, Departamento>() {
             private final Button deleteButton = new Button("Borrar");
@@ -295,21 +301,25 @@ public class DepartamentosCargosController implements Initializable {
         departamentosTableView.getColumns().addAll(nombre, delete); 
     }
     
-    public void setCargoTable() {
+    public void setDepartamentoTable() {
+        
+        DepartamentoDAO departamentoDAO = new DepartamentoDAO();
+        dataDepartamentos = FXCollections.observableArrayList(); 
+        dataDepartamentos.addAll(departamentoDAO.findAll());
+        departamentosTableView.setItems(dataDepartamentos);
+        
+    }
+    
+    public void createCargoTable () {
+        
         cargosTableView.setEditable(Boolean.FALSE);
         cargosTableView.getColumns().clear();
         
-        CargoDAO cargoDAO = new CargoDAO();
-        dataCargos = FXCollections.observableArrayList();
-        dataCargos.addAll(cargoDAO.findAll());
-        cargosTableView.setItems(dataCargos);
-        
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(100);
+        nombre.setMinWidth(280);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn<Cargo, Cargo> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Cargo, Cargo>() {
             private final Button deleteButton = new Button("Borrar");
@@ -331,6 +341,16 @@ public class DepartamentosCargosController implements Initializable {
         });
         
         cargosTableView.getColumns().addAll(nombre, delete); 
+    }
+    
+    public void setCargoTable() {
+        
+        CargoDAO cargoDAO = new CargoDAO();
+        dataCargos = FXCollections.observableArrayList();
+        dataCargos.addAll(cargoDAO.findAll());
+        cargosTableView.setItems(dataCargos);
+        
+        
     }
     
     // Login items
