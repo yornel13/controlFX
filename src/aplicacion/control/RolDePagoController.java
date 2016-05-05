@@ -645,7 +645,7 @@ public class RolDePagoController implements Initializable {
     public double getDecimoCuarto() {
         ConstanteDAO constanteDao = new ConstanteDAO();
         Constante constante;
-        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.DECIMO_TERCERO);
+        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.DECIMO_CUARTO);
         if (constante == null) {
             return 30.5;
         } else {
