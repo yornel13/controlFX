@@ -19,6 +19,8 @@ public class DetallesEmpleado implements java.io.Serializable {
 	private Empresa empresa;
 	private Cargo cargo;
 	private Double sueldo;
+        private Double quincena;
+        private Boolean acumulaDecimos;
 	private String nroCuenta;
 	private String extra;
         private Timestamp fechaInicio;
@@ -92,6 +94,22 @@ public class DetallesEmpleado implements java.io.Serializable {
 	public void setSueldo(Double sueldo) {
 		this.sueldo = sueldo;
 	}
+        
+        public Double getQuincena() {
+            return quincena;
+        }
+
+        public void setQuincena(Double quincena) {
+            this.quincena = quincena;
+        }
+        
+        public Boolean getAcumulaDecimos() {
+            return acumulaDecimos;
+        }
+
+        public void setAcumulaDecimos(Boolean acumulaDecimos) {
+            this.acumulaDecimos = acumulaDecimos;
+        }
 
 	public String getNroCuenta() {
 		return this.nroCuenta;
@@ -131,6 +149,6 @@ public class DetallesEmpleado implements java.io.Serializable {
 
         public void setFechaContrato(Timestamp fechaContrato) {
             this.fechaContrato = fechaContrato;
-        }
-        
+        }   
+ 
 }

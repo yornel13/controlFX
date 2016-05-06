@@ -22,6 +22,12 @@
         <property name="sueldo" type="java.lang.Double">
             <column name="sueldo" precision="10" not-null="true" />
         </property>
+        <property name="quincena" type="java.lang.Double">
+            <column name="quincena" precision="10" />
+        </property>
+        <property name="acumulaDecimos" type="java.lang.Boolean">
+            <column name="acumula_decimos" not-null="true" />
+        </property>
         <property name="nroCuenta" type="java.lang.String">
             <column name="nro_cuenta" length="100" />
         </property>

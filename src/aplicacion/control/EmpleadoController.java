@@ -81,6 +81,12 @@ public class EmpleadoController implements Initializable {
     private Label sueldo;
     
     @FXML
+    private Label quincena;
+    
+    @FXML
+    private Label decimos;
+    
+    @FXML
     private Label extra;
     
     @FXML
@@ -169,12 +175,17 @@ public class EmpleadoController implements Initializable {
         cargo.setText(empleado.getDetallesEmpleado().getCargo().getNombre());
         cuenta.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldo.setText(empleado.getDetallesEmpleado().getSueldo() + " $");
+        quincena.setText(empleado.getDetallesEmpleado().getQuincena()+ " $");
         extra.setText(empleado.getDetallesEmpleado().getExtra());
         DateTime inicio = new DateTime(empleado.getDetallesEmpleado().getFechaInicio().getTime());
         fechaInicio.setText(inicio.getDayOfMonth() + " de " + getMonthName(inicio.getMonthOfYear()) + " " + inicio.getYear());
         DateTime contrato = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
         fechaContrato.setText(contrato.getDayOfMonth() + " de " + getMonthName(contrato.getMonthOfYear()) + " " + contrato.getYear());
-        
+        if (empleado.getDetallesEmpleado().getAcumulaDecimos()) {
+            decimos.setText("Si");
+        } else {
+            decimos.setText("No");
+        }
     }
     
     @Override

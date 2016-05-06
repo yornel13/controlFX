@@ -53,15 +53,12 @@
                   <Label layoutX="25.0" layoutY="78.0" text="Cargo" textFill="WHITE" />
                   <TextField fx:id="cuentaField" layoutX="113.0" layoutY="153.0" prefHeight="25.0" prefWidth="440.0" promptText="Numero de cuenta Bancaria" />
                   <TextField fx:id="extraField" layoutX="113.0" layoutY="193.0" prefHeight="25.0" prefWidth="440.0" promptText="Dato adicional (Opcional)" />
-                  <TextField fx:id="sueldoField" layoutX="113.0" layoutY="233.0" prefHeight="25.0" prefWidth="98.0" promptText="Sueldo mensual" />
                   <Button fx:id="guardarButton1" layoutX="199.0" layoutY="359.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
                   <Label layoutX="25.0" layoutY="158.0" text="Cta. Bancaria" textFill="WHITE" />
-                  <Label layoutX="29.0" layoutY="238.0" text="Sueldo" textFill="WHITE" />
                   <Label layoutX="26.0" layoutY="198.0" text="Extra" textFill="WHITE" />
                   <Button fx:id="cancelarButton1" layoutX="342.0" layoutY="359.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
                   <ChoiceBox fx:id="departamentoChoiceBox" layoutX="113.0" layoutY="34.0" prefHeight="25.0" prefWidth="257.0" />
                   <ChoiceBox fx:id="cargoChoiceBox" layoutX="113.0" layoutY="74.0" prefHeight="25.0" prefWidth="257.0" />
-                  <Label layoutX="217.0" layoutY="237.0" text="\$" textFill="WHITE" />
                   <Label fx:id="errorText2" alignment="CENTER" contentDisplay="CENTER" layoutX="100.0" layoutY="324.0" prefHeight="21.0" prefWidth="400.0" textFill="#ab1010">
                      <font>
                         <Font name="Comic Sans MS" size="14.0" />
@@ -71,6 +68,13 @@
                   <DatePicker fx:id="datePickerContratacion" layoutX="379.0" layoutY="113.0" promptText="Fecha de contratacion" />
                   <Label layoutX="25.0" layoutY="118.0" text="Inicio" textFill="WHITE" />
                   <Label layoutX="295.0" layoutY="118.0" text="Contratacion" textFill="WHITE" />
+                  <CheckBox fx:id="checkBoxDecimos" layoutX="111.0" layoutY="280.0" mnemonicParsing="false" selected="true" text="Acumula decimos" textFill="WHITE" />
+                  <TextField fx:id="quincenaField" layoutX="431.0" layoutY="235.0" prefHeight="25.0" prefWidth="120.0" promptText="Adelanto Quincenal" />
+                  <Label layoutX="316.0" layoutY="239.0" text="Adelanto Quincenal" textFill="WHITE" />
+                  <Label layoutX="561.0" layoutY="239.0" text="\$" textFill="WHITE" />
+                  <Label layoutX="215.0" layoutY="238.0" text="\$" textFill="WHITE" />
+                  <Label layoutX="27.0" layoutY="239.0" text="Sueldo" textFill="WHITE" />
+                  <TextField fx:id="sueldoField" layoutX="111.0" layoutY="234.0" prefHeight="25.0" prefWidth="98.0" promptText="Sueldo mensual" />
                </children>
             </AnchorPane>
          </content>

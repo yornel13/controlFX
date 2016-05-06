@@ -30,6 +30,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -94,6 +95,12 @@ public class EditarEmpleadoController implements Initializable {
     
     @FXML
     private TextField sueldoField;
+    
+    @FXML
+    private TextField quincenaField;
+    
+    @FXML
+    private CheckBox checkBoxDecimos;
     
     @FXML
     private Label errorText1;
@@ -206,6 +213,8 @@ public class EditarEmpleadoController implements Initializable {
             empleado.getDetallesEmpleado().setExtra(extraField.getText());
             empleado.getDetallesEmpleado().setNroCuenta(cuentaField.getText());
             empleado.getDetallesEmpleado().setSueldo(Double.parseDouble(sueldoField.getText()));
+            empleado.getDetallesEmpleado().setQuincena(Double.parseDouble(quincenaField.getText()));
+            empleado.getDetallesEmpleado().setAcumulaDecimos(checkBoxDecimos.isSelected());
             
             empleado.setNombre(nombreField.getText());
             empleado.setApellido(apellidoField.getText());
@@ -264,6 +273,8 @@ public class EditarEmpleadoController implements Initializable {
         emailField.setText(empleado.getEmail());
         cuentaField.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldoField.setText(empleado.getDetallesEmpleado().getSueldo().toString());
+        quincenaField.setText(empleado.getDetallesEmpleado().getQuincena().toString());
+        checkBoxDecimos.setSelected(empleado.getDetallesEmpleado().getAcumulaDecimos());
         extraField.setText(empleado.getDetallesEmpleado().getExtra());
         estadoCivilChoiceBox.getSelectionModel().select(empleado.getEstadoCivil().getNombre());
         departamentoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getDepartamento().getNombre());
@@ -294,21 +305,22 @@ public class EditarEmpleadoController implements Initializable {
         String[] itemsDepartamentos = new String[departamentos.size()];
         String[] itemsCargos = new String[cargos.size()];
         
-        for (EstadoCivil obj: estadosCivil) {
+        estadosCivil.stream().forEach((obj) -> {
             itemsEstadosCivil[estadosCivil.indexOf(obj)] = obj.getNombre();
-        }
-        for (Departamento obj: departamentos) {
+        });
+        departamentos.stream().forEach((obj) -> {
             itemsDepartamentos[departamentos.indexOf(obj)] = obj.getNombre();
-        }
-        for (Cargo obj: cargos) {
+        });
+        cargos.stream().forEach((obj) -> {
             itemsCargos[cargos.indexOf(obj)] = obj.getNombre();
-        }
+        });
         
         estadoCivilChoiceBox.setItems(FXCollections.observableArrayList(itemsEstadosCivil)); 
         departamentoChoiceBox.setItems(FXCollections.observableArrayList(itemsDepartamentos)); 
         cargoChoiceBox.setItems(FXCollections.observableArrayList(itemsCargos)); 
        
         sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        quincenaField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
     }    
     
     public static EventHandler<KeyEvent> numDecimalFilter() {
