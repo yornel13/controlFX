@@ -178,7 +178,8 @@ public class RolDePagoClienteController implements Initializable {
     @FXML
     private CheckBox checkVacaciones;
     
-    @FXML Button expandirButton;
+    @FXML 
+    private Button expandirButton;
     
     private Cliente cliente;
     private Empresa empresa;
@@ -223,7 +224,37 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     @FXML
+    public void onClickMore(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()); 
+        mostrarRegistro(null);
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        mostrarRegistro(null);
+    }
+    
+    @FXML
     public void onClickPago(ActionEvent event) {
+        
+        String faltantes = "";
+        if (pago.getVacaciones() == 0) {
+            faltantes += " Sin transporte.";
+        } 
+        if (pago.getBono() == 0) {
+            faltantes += " Sin bono.";
+        }
+        if (pago.getTransporte()== 0) {
+            faltantes += " Sin vacaciones.";
+        }
+        
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -234,8 +265,8 @@ public class RolDePagoClienteController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Desea generar el pago del empleado " + pago.getEmpleado()),
-                new Text("para el cliente " + pago.getClienteNombre()+ "?"), buttonOk).
+        children(new Text("¿Desea generar el rol de pago del empleado " + pago.getEmpleado()),
+                new Text("para el cliente " + pago.getClienteNombre()+ "?" + faltantes), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setPrefWidth(50);
         dialogStage.show();
@@ -285,8 +316,8 @@ public class RolDePagoClienteController implements Initializable {
         } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
             // error
         } else {       
-            Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-            Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+            fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+            inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
             setControlEmpleadoInfo(empleado, inicio, fin);
         }
     } 
@@ -647,6 +678,10 @@ public class RolDePagoClienteController implements Initializable {
         bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        
+        pickerDe.setEditable(false);
+        pickerHasta.setEditable(false);
+      
     }  
     
     public static String getMonthName(int month){

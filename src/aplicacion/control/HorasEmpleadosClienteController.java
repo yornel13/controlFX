@@ -117,6 +117,24 @@ public class HorasEmpleadosClienteController implements Initializable {
     } 
     
     @FXML
+    public void onClickMore(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        mostrarRegistro(null);
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        mostrarRegistro(null);
+    }
+    
+    @FXML
     private void verRol(ActionEvent event) {
         if (cedulaField != null) {
             Usuario emp = new UsuarioDAO().findByCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
@@ -167,7 +185,7 @@ public class HorasEmpleadosClienteController implements Initializable {
            aplicacionControl.noLogeado();
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
-               
+              
                aplicacionControl.mostrarRolDePagoCliente(empleado, cliente, inicio, fin);
                   
             } else {
@@ -273,6 +291,9 @@ public class HorasEmpleadosClienteController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.FALSE);
         empleadosTableView.getColumns().clear(); 
+        
+        pickerDe.setEditable(false);
+        pickerHasta.setEditable(false);
     }   
     
     public static Timestamp getToday() throws ParseException {

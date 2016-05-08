@@ -97,6 +97,18 @@ public class PagoDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<Pago> findAllByFechaAndEmpleadoId(Timestamp fecha, Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                            + "and usuario_id = :usuario_id "
+                            + "and cliente_id IS NOT NULL")
+                    .addEntity(Pago.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<Pago>) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Pago instance with property: " + propertyName

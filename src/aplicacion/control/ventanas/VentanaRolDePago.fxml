@@ -284,18 +284,18 @@
          </children>
       </GridPane>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <Label layoutX="419.0" layoutY="573.0" text="Total ingresos:" textFill="#fffbfb" underline="true">
+      <Label layoutX="419.0" layoutY="573.0" text="Total ingresos:" textFill="#fffbfb" underline="true" visible="false">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="590.0">
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="590.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
         </columns>
       </TableView>
-      <Label fx:id="totalIngresos" layoutX="541.0" layoutY="573.0" text="0.00" textFill="#fffbfb">
+      <Label fx:id="totalIngresos" layoutX="541.0" layoutY="573.0" text="0.00" textFill="#fffbfb" visible="false">
          <font>
             <Font size="14.0" />
          </font>
@@ -314,6 +314,6 @@
          </font>
       </Label>
       <Button fx:id="ver" layoutX="459.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarRegistro" text="Ver" />
-      <Button fx:id="expandirButton" layoutX="5.0" layoutY="569.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" />
+      <Button fx:id="expandirButton" layoutX="5.0" layoutY="569.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" visible="false" />
     </children>
 </AnchorPane>

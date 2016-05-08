@@ -823,7 +823,6 @@ public class AplicacionControl extends Application {
         } else {
            if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostrarHorasEmpleados()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosCliente.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
@@ -1161,6 +1160,42 @@ public class AplicacionControl extends Application {
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.AUDITORIA, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarTotalPagosEmpleados(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagosTotalEmpleado.fxml"));
+                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Pagos Totales");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaAuditar);
+                    ventana.setScene(scene);
+                    PagosTotalEmpleadoController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
