@@ -6,9 +6,12 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.PagosTable;
+import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import hibernate.dao.ConstanteDAO;
 import hibernate.dao.PagoDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.Constante;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.Usuario;
@@ -184,6 +187,9 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     @FXML
     private Label montoAPercibirText;
+    
+    @FXML
+    private Label iessPorcentaje;
     
     // Totales de el empleado
     
@@ -442,7 +448,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         } else {
             ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor + decimosTotalTextValor;
         }
-        ieesValor = (ingresoValor/100d) * 9.45;  // TODO, sacar de data base
+        ieesValor = (ingresoValor/100d) * getIess();  // TODO, sacar de data base
         quincenaValor = empleado.getDetallesEmpleado().getQuincena();
         deudasValor = 0d; // TODO, sacar de data base
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
@@ -511,6 +517,19 @@ public class PagosTotalEmpleadoController implements Initializable {
         // Calendar numbers months from 0
         cal.set(Calendar.MONTH, month - 1);
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+    }
+    
+    public double getIess() {
+        ConstanteDAO constanteDao = new ConstanteDAO();
+        Constante constante;
+        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.IESS);
+        if (constante == null) {
+            iessPorcentaje.setText("IESS (0.0%)");
+            return 0.0;
+        } else {
+            iessPorcentaje.setText("IESS (" + constante.getValor() + "%)");
+            return Double.valueOf(constante.getValor());
+        }
     }
     
     // Login items

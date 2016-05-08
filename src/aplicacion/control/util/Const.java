@@ -16,4 +16,5 @@ public class Const {
     
     public static final String DECIMO_CUARTO = "decimo_cuarto";
     public static final String DECIMO_TERCERO = "decimo_tercero";
+    public static final String IESS = "iess";
 }

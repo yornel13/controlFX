@@ -5,10 +5,13 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Const;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.ConstanteDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
+import hibernate.model.Constante;
 import hibernate.model.Empresa;
 import hibernate.model.Seguro;
 import hibernate.model.Uniforme;
@@ -49,10 +52,18 @@ public class ConfiguracionEmpresaController implements Initializable {
     @FXML
     private Label valorUniforme;
     
+    @FXML
+    private Label valorDecimoCuarto;
+    
+    @FXML
+    private Label valorIess;
+    
     private Empresa empresa;
     
     Seguro seguro;
     Uniforme uniforme;
+    Constante decimoCuarto;
+    Constante iess;
     
     
     public void setStagePrincipal(Stage stagePrincipal) {
@@ -67,13 +78,14 @@ public class ConfiguracionEmpresaController implements Initializable {
         this.empresa = empresa;
         setSeguro(new SeguroDAO().findByEmpresaId(empresa.getId()));
         setUniforme(new UniformeDAO().findByEmpresaId(empresa.getId()));
-        
+        setDecimoCuarto(new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO));
+        setIess(new ConstanteDAO().findUniqueResultByNombre(Const.IESS)); 
     }
     
     public void setSeguro(Seguro seguro) {
         this.seguro = seguro;
         if (seguro != null) {
-            valorSeguro.setText(seguro.getValor().toString() + "$");
+            valorSeguro.setText(this.seguro.getValor().toString() + "$");
         } else {
             valorSeguro.setText("0.0$");
         }
@@ -82,9 +94,27 @@ public class ConfiguracionEmpresaController implements Initializable {
     public void setUniforme(Uniforme uniforme) {
         this.uniforme = uniforme;
         if (uniforme != null) {
-            valorUniforme.setText(uniforme.getValor().toString() + "$");
+            valorUniforme.setText(this.uniforme.getValor().toString() + "$");
         } else {
             valorUniforme.setText("0.0$");
+        }
+    }
+    
+    public void setDecimoCuarto(Constante decimoCuarto) {
+        this.decimoCuarto = decimoCuarto;
+        if (decimoCuarto != null) {
+            valorDecimoCuarto.setText(this.decimoCuarto.getValor() + " d");
+        } else {
+            valorDecimoCuarto.setText("0.0 d");
+        }
+    }
+    
+    public void setIess(Constante iess) {
+        this.iess = iess;
+        if (iess != null) {
+            valorIess.setText(this.iess.getValor() + "%");
+        } else {
+            valorIess.setText("0.0%");
         }
     }
     
@@ -199,6 +229,106 @@ public class ConfiguracionEmpresaController implements Initializable {
             }
         } 
     }   
+    
+    @FXML
+    private void cambiarDecimoCuarto(ActionEvent event) {
+        if (aplicacionControl.permisos == null) {
+            aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Decimo Cuarto");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValorDecimoCuarto = new Button("Cambiar");
+                TextField fieldDecimoCuarto = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Escriba el nuevo valor?"), fieldDecimoCuarto, cambiarValorDecimoCuarto).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                fieldDecimoCuarto.setPrefWidth(150);
+                cambiarValorDecimoCuarto.setPrefWidth(100);
+                fieldDecimoCuarto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+                dialogStage.show();
+                cambiarValorDecimoCuarto.setOnAction((ActionEvent e) -> {
+                    Double newValorDecimoCuarto;
+                    if (fieldDecimoCuarto.getText().isEmpty()) {
+                        newValorDecimoCuarto = 0d;
+                    } else {
+                        newValorDecimoCuarto = Double.parseDouble(fieldDecimoCuarto.getText());
+                    }
+                    if (decimoCuarto != null) {
+                        decimoCuarto.setActivo(false);
+                        HibernateSessionFactory.getSession().flush();
+                    }
+                    Constante newContante = new Constante();
+                    newContante.setActivo(Boolean.TRUE);
+                    newContante.setNombre(Const.DECIMO_CUARTO);
+                    newContante.setValor(newValorDecimoCuarto.toString());
+                    new ConstanteDAO().save(newContante);
+                    setEmpresa(empresa);
+                    dialogStage.close();
+                    
+                    // Registro para auditar
+                    String detalles = "ajusto el valor del Decimo Cuarto a " + newValorDecimoCuarto;
+                    aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+                }); 
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
+    @FXML
+    private void cambiarIess(ActionEvent event) {
+        if (aplicacionControl.permisos == null) {
+            aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("IESS");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValorDecimoCuarto = new Button("Cambiar");
+                TextField fieldDecimoCuarto = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Escriba el nuevo porcentaje?"), fieldDecimoCuarto, cambiarValorDecimoCuarto).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                fieldDecimoCuarto.setPrefWidth(150);
+                cambiarValorDecimoCuarto.setPrefWidth(100);
+                fieldDecimoCuarto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+                dialogStage.show();
+                cambiarValorDecimoCuarto.setOnAction((ActionEvent e) -> {
+                    Double newValorIess;
+                    if (fieldDecimoCuarto.getText().isEmpty()) {
+                        newValorIess = 0d;
+                    } else {
+                        newValorIess = Double.parseDouble(fieldDecimoCuarto.getText());
+                    }
+                    if (iess != null) {
+                        iess.setActivo(false);
+                        HibernateSessionFactory.getSession().flush();
+                    }
+                    Constante newContante = new Constante();
+                    newContante.setActivo(Boolean.TRUE);
+                    newContante.setNombre(Const.IESS);
+                    newContante.setValor(newValorIess.toString());
+                    new ConstanteDAO().save(newContante);
+                    setEmpresa(empresa);
+                    dialogStage.close();
+                    
+                    // Registro para auditar
+                    String detalles = "ajusto el valor del iess a " + newValorIess + "%";
+                    aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+                }); 
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        } 
+    }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
