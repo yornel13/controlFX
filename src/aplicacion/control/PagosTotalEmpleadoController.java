@@ -82,6 +82,9 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     @FXML
     private Label decimosText;
+    
+    @FXML
+    private Label cargoText;
    
     /// Columnas
     @FXML
@@ -412,6 +415,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         nombreText.setText(empleado.getNombre());
         apellidoText.setText(empleado.getApellido());
         cedulaText.setText(empleado.getCedula());
+        cargoText.setText(empleado.getDetallesEmpleado().getCargo().getNombre());
         sueldoText.setText(empleado.getDetallesEmpleado().getSueldo().toString());
         quincenaText.setText(empleado.getDetallesEmpleado().getQuincena().toString());
         if (empleado.getDetallesEmpleado().getAcumulaDecimos()) {

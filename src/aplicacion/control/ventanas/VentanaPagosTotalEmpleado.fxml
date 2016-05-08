@@ -11,6 +11,9 @@
 
 <AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PagosTotalEmpleadoController">
     <children>
+      <Pane layoutX="23.0" layoutY="438.0" prefHeight="49.0" prefWidth="426.0" style="-fx-background-color: #bbddff;" />
+      <Pane layoutX="449.0" layoutY="438.0" prefHeight="49.0" prefWidth="100.0" style="-fx-background-color: #eea82f;" />
+      <Pane layoutX="79.0" layoutY="87.0" prefHeight="30.0" prefWidth="708.0" style="-fx-background-color: #bbddff;" />
       <Accordion layoutX="40.0" layoutY="14.0" />
       <TableView fx:id="controlClienteTableView" layoutX="8.0" layoutY="151.0" maxHeight="-Infinity" maxWidth="780.0" minHeight="-Infinity" minWidth="780.0" prefHeight="201.0" prefWidth="780.0">
         <columns>
@@ -79,41 +82,42 @@
          </toggleGroup>
       </RadioButton>
       <RadioButton layoutX="218.0" layoutY="54.0" mnemonicParsing="false" onAction="#selectCedula" text="Cedula" textFill="WHITE" toggleGroup="$opcion" />
-      <GridPane gridLinesVisible="true" layoutX="108.0" layoutY="87.0" prefHeight="57.0" prefWidth="676.0">
+      <GridPane gridLinesVisible="true" layoutX="79.0" layoutY="88.0" prefHeight="57.0" prefWidth="708.0">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="168.0" minWidth="10.0" prefWidth="168.0" />
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="199.0" minWidth="10.0" prefWidth="166.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="154.0" minWidth="10.0" prefWidth="115.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="85.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="77.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="91.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="168.0" minWidth="10.0" prefWidth="154.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="199.0" minWidth="10.0" prefWidth="139.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="154.0" minWidth="10.0" prefWidth="88.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="154.0" minWidth="10.0" prefWidth="101.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="79.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="75.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="75.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Nombre" textFill="#fffbfb" GridPane.halignment="CENTER">
+            <Label text="Nombre" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Apellido" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Label text="Apellido" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Cedula" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+            <Label text="Cedula" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Sueldo" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+            <Label text="Sueldo" GridPane.columnIndex="4" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Acu. Decimos" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.halignment="CENTER">
+            <Label text="+ Decimos" GridPane.columnIndex="6" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
@@ -133,29 +137,39 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="sueldoText" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="sueldoText" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="decimosText" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="decimosText" textFill="#fffbfb" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="quincenaText" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="quincenaText" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Quincena" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+            <Label text="Quincena" GridPane.columnIndex="5" GridPane.halignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Cargo" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="cargoText" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
          </children>
       </GridPane>
-      <Label layoutX="27.0" layoutY="105.0" text="Empleado" textFill="#fffbfb">
+      <Label layoutX="9.0" layoutY="106.0" text="Empleado:" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
@@ -346,24 +360,24 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="IESS" textFill="#fffbfb" GridPane.halignment="CENTER">
+                        <Label text="IESS" GridPane.halignment="CENTER">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <Label text="quincena" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                        <Label text="Quincena" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
-                        <Label text="Deudas" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                        <Label text="Deudas" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Label>
                      </children>
                   </GridPane>
-                  <Label text="Deducciones" textFill="#fffbfb" GridPane.halignment="CENTER">
+                  <Label text="Deducciones" GridPane.halignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -380,17 +394,17 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Label fx:id="montoIessText" text="Monto" textFill="#fffbfb" GridPane.halignment="CENTER">
+                  <Label fx:id="montoIessText" textFill="#fffbfb" GridPane.halignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label fx:id="montoDeudasText" text="Monto" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+                  <Label fx:id="montoDeudasText" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label fx:id="montoQuincenaText" text="Monto" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+                  <Label fx:id="montoQuincenaText" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -406,12 +420,12 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="ingreso" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                  <Label text="ingreso" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Total" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+                  <Label text="Total" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -420,12 +434,12 @@
             </GridPane>
             <GridPane GridPane.columnIndex="2">
                <children>
-                  <Label text="deducciones" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                  <Label text="deducciones" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Total" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+                  <Label text="Total" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -441,12 +455,12 @@
             </GridPane>
             <GridPane GridPane.columnIndex="3">
                <children>
-                  <Label text="a percibir" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
+                  <Label text="a percibir" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Total" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
+                  <Label text="Total" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -460,17 +474,17 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
             </GridPane>
-            <Label fx:id="montoIngresoText" text="Monto" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="montoIngresoText" textFill="#fffbfb" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="montoDeduccionesText" text="Monto" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="montoDeduccionesText" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="montoAPercibirText" text="Monto" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+            <Label fx:id="montoAPercibirText" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
@@ -479,5 +493,6 @@
       </GridPane>
       <Button layoutX="609.0" layoutY="443.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="146.0" text="Gestionar Deudas" />
       <Button layoutX="609.0" layoutY="497.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="146.0" text="Generar Recibo" />
+      <Line endX="152.0" layoutX="196.0" layoutY="462.0" startX="-100.0" />
     </children>
 </AnchorPane>
