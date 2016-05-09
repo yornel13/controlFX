@@ -38,7 +38,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
 
@@ -360,7 +359,9 @@ public class PagosTotalEmpleadoController implements Initializable {
         PagoDAO pagoDAO = new PagoDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoId(fin, empleadoId));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, empleadoId));
+        if (pagos.isEmpty())
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, empleadoId));
         
         diasTextValor = 0;
         normalesTextValor = 0;
@@ -384,7 +385,10 @@ public class PagosTotalEmpleadoController implements Initializable {
         pagos.stream().forEach((pago) -> {
             PagosTable pagoTable = new PagosTable();
             pagoTable.setId(pago.getId());
-            pagoTable.setCliente(pago.getClienteNombre());
+            if (pago.getClienteNombre() == null)
+                pagoTable.setCliente("*Sin cliente*");
+            else
+                pagoTable.setCliente(pago.getClienteNombre());
             pagoTable.setDias(pago.getDias());
             pagoTable.setNormales(pago.getHorasNormales().intValue());
             pagoTable.setSuplementarias(pago.getHorasSuplementarias().intValue());

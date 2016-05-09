@@ -98,7 +98,7 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List<Pago> findAllByFechaAndEmpleadoId(Timestamp fecha, Integer empleadoId) {
+        public List<Pago> findAllByFechaAndEmpleadoIdConCliente(Timestamp fecha, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
                             + "and usuario_id = :usuario_id "
@@ -108,6 +108,43 @@ public class PagoDAO extends BaseHibernateDAO {
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();
             return (List<Pago>) result;
+        }
+        
+        public List<Pago> findAllByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                            + "and usuario_id = :usuario_id "
+                            + "and cliente_id IS NULL")
+                    .addEntity(Pago.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<Pago>) result;
+        }
+        
+        public Pago findByFechaAndEmpleadoIdAndClienteId(Timestamp fecha, Integer empleadoId, Integer clienteId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                            + "and usuario_id = :usuario_id "
+                            + "and cliente_id = :cliente_id")
+                    .addEntity(Pago.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("cliente_id", clienteId);
+            Object result = query.uniqueResult();
+            return (Pago) result;
+        }
+        
+        public Pago findByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                            + "and usuario_id = :usuario_id "
+                            + "and cliente_id IS NULL")
+                    .addEntity(Pago.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.uniqueResult();
+            return (Pago) result;
         }
 
 	public List findByProperty(String propertyName, Object value) {
@@ -243,6 +280,14 @@ public class PagoDAO extends BaseHibernateDAO {
                     createSQLQuery("SELECT * FROM pago where cliente_id = :cliente_id")
                     .addEntity(Pago.class)
                     .setParameter("cliente_id", clienteId);
+            Object result = query.list();
+            return (List<Pago>) result;
+        }
+        
+        public List<Pago> findAllSinCliente() {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where cliente_id IS NULL")
+                    .addEntity(Pago.class);
             Object result = query.list();
             return (List<Pago>) result;
         }

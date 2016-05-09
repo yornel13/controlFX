@@ -62,9 +62,8 @@ public class ClientesEmpresaController implements Initializable {
     }
     
     @FXML
-    private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarConfiguracion();
-        stagePrincipal.close();
+    private void mostrarEmpleadosSinCliente(ActionEvent event) {
+        aplicacionControl.mostrarHorasEmpleadosSinCliente(empresa);
     }
     
     @FXML

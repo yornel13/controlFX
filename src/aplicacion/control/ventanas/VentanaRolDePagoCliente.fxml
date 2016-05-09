@@ -13,7 +13,10 @@
 
 <AnchorPane id="AnchorPane" maxHeight="590.0" maxWidth="600.0" minHeight="590.0" minWidth="600.0" prefHeight="590.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
     <children>
-      <Button layoutX="530.0" layoutY="569.0" mnemonicParsing="false" onAction="#onClickPago" text="Guardar" />
+      <Pane layoutX="6.0" layoutY="502.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
+      <Pane layoutX="6.0" layoutY="418.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
+      <Pane layoutX="6.0" layoutY="336.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
+      <Button layoutX="467.0" layoutY="569.0" mnemonicParsing="false" onAction="#onClickPago" text="Guardar Rol De Pago" />
       <Button layoutX="447.0" layoutY="300.0" mnemonicParsing="false" onAction="#onClickCalcular" text="Calcular" />
       <TextField fx:id="transporteField" layoutX="104.0" layoutY="265.0" promptText="Monto" />
       <TextField fx:id="bonoField" layoutX="104.0" layoutY="300.0" promptText="Monto" />
@@ -35,7 +38,7 @@
       </Label>
       <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="502.0" prefHeight="60.0" prefWidth="588.0">
          <children>
-            <Label text="Decimo 3ro" textFill="#fffbfb">
+            <Label text="Decimo 3ro">
                <font>
                   <Font size="14.0" />
                </font>
@@ -45,12 +48,12 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Jub. Patronal" textFill="#fffbfb" GridPane.columnIndex="3">
+            <Label text="Jub. Patronal" GridPane.columnIndex="3">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Ap, Patronal" textFill="#fffbfb" GridPane.columnIndex="4">
+            <Label text="Ap, Patronal" GridPane.columnIndex="4">
                <font>
                   <Font size="14.0" />
                </font>
@@ -75,22 +78,22 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Decimo 4to" textFill="#fffbfb" GridPane.columnIndex="1">
+            <Label text="Decimo 4to" GridPane.columnIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Reserva" textFill="#fffbfb" GridPane.columnIndex="2">
+            <Label text="Reserva" GridPane.columnIndex="2">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Seguros" textFill="#fffbfb" GridPane.columnIndex="5">
+            <Label text="Seguros" GridPane.columnIndex="5">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Uniformes" textFill="#fffbfb" GridPane.columnIndex="6">
+            <Label text="Uniformes" GridPane.columnIndex="6">
                <font>
                   <Font size="14.0" />
                </font>
@@ -122,7 +125,7 @@
       </GridPane>
       <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="418.0" prefHeight="60.0" prefWidth="588.0">
          <children>
-            <Label text="Salario" textFill="#fffbfb">
+            <Label text="Salario">
                <font>
                   <Font size="14.0" />
                </font>
@@ -132,7 +135,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Transporte" textFill="#fffbfb" GridPane.columnIndex="4">
+            <Label text="Transporte" GridPane.columnIndex="4">
                <font>
                   <Font size="14.0" />
                </font>
@@ -157,7 +160,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="B + T" textFill="#fffbfb" GridPane.columnIndex="5">
+            <Label text="B + T" GridPane.columnIndex="5">
                <font>
                   <Font size="14.0" />
                </font>
@@ -167,22 +170,22 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Vacaciones" textFill="#fffbfb" GridPane.columnIndex="6">
+            <Label text="Vacaciones" GridPane.columnIndex="6">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Recargo" textFill="#fffbfb" GridPane.columnIndex="2">
+            <Label text="Recargo" GridPane.columnIndex="2">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Bono" textFill="#fffbfb" GridPane.columnIndex="3">
+            <Label text="Bono" GridPane.columnIndex="3">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Sobre Tiempo" textFill="#fffbfb" GridPane.columnIndex="1">
+            <Label text="Sobre Tiempo" GridPane.columnIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
@@ -197,7 +200,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Sub Total" textFill="#fffbfb" GridPane.columnIndex="7">
+            <Label text="Sub Total" GridPane.columnIndex="7">
                <font>
                   <Font size="14.0" />
                </font>
@@ -231,7 +234,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Dias" textFill="#fffbfb">
+            <Label text="Dias">
                <font>
                   <Font size="14.0" />
                </font>
@@ -241,12 +244,12 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Horas (RC)" textFill="#fffbfb" GridPane.columnIndex="3">
+            <Label text="Horas (RC)" GridPane.columnIndex="3">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Horas (ST+RC)" textFill="#fffbfb" GridPane.columnIndex="4">
+            <Label text="Horas (ST+RC)" GridPane.columnIndex="4">
                <font>
                   <Font size="14.0" />
                </font>
@@ -271,12 +274,12 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Horas (N)" textFill="#fffbfb" GridPane.columnIndex="1">
+            <Label text="Horas (N)" GridPane.columnIndex="1">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Horas (ST)" textFill="#fffbfb" GridPane.columnIndex="2">
+            <Label text="Horas (ST)" GridPane.columnIndex="2">
                <font>
                   <Font size="14.0" />
                </font>
@@ -290,16 +293,6 @@
         </columns>
       </TableView>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <Label layoutX="357.0" layoutY="573.0" text="Total ingresos:" textFill="#fffbfb" underline="true">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label fx:id="totalIngresos" layoutX="479.0" layoutY="573.0" text="0.00" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
       <Button layoutX="530.0" layoutY="5.0" mnemonicParsing="false" onAction="#mostrarHoras" text="Registrar" />
       <DatePicker fx:id="pickerHasta" layoutX="265.0" layoutY="5.0" promptText="fin" />
       <DatePicker fx:id="pickerDe" layoutX="35.0" layoutY="5.0" promptText="inicio" />
@@ -316,5 +309,30 @@
       <Button fx:id="expandirButton" layoutX="5.0" layoutY="569.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" />
       <Button layoutX="415.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
       <Button layoutX="185.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
+      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="255.0" layoutY="570.0" prefHeight="25.0" prefWidth="194.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="104.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="90.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Pane prefHeight="25.0" prefWidth="105.0" style="-fx-background-color: #eea82f;" />
+            <Label prefHeight="20.0" prefWidth="92.0" text="Total ingresos:" textFill="#0d0707" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalIngresos" text="0.00" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
+         </children>
+      </GridPane>
     </children>
 </AnchorPane>

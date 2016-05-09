@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.tableModel.ControlTable;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
@@ -18,6 +19,7 @@ import hibernate.model.Pago;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,6 +32,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -38,6 +41,7 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -170,6 +174,44 @@ public class PagosController implements Initializable {
         });
     }
     
+    private void borrarRolDePago(Pago pago) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
+               
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Confimacion");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));;
+                Button buttonConfirmar = new Button("ok");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Esta seguro que desea eliminar este pago?"), buttonConfirmar).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                dialogStage.show();
+                buttonConfirmar.setOnAction((ActionEvent e) -> {
+                    
+                    new PagoDAO().delete(pago);
+                    HibernateSessionFactory.getSession().flush();
+                    // Registro para auditar
+                    String detalles = "elimino el pago del empleado " 
+                        + pago.getEmpleado() 
+                        + " con fecha " + new DateTime(pago.getFecha()
+                                .getTime()).toString("dd-MM-yyyy");
+                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                    data.remove(pago);
+                    
+                    dialogStage.close();
+                });
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) { 
         pagosTableView.setEditable(Boolean.FALSE);
@@ -270,7 +312,29 @@ public class PagosController implements Initializable {
         
         TableColumn totalIngreso = new TableColumn("Ingreso");
         totalIngreso.setMinWidth(100);
-        totalIngreso.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));;
+        totalIngreso.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
+        
+        TableColumn<Pago, Pago> delete = new TableColumn<>("Borrar");
+        delete.setMinWidth(30);
+        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        delete.setCellFactory(param -> new TableCell<Pago, Pago>() {
+            private final Button deleteButton = new Button("Borrar");
+
+            @Override
+            protected void updateItem(Pago pago, boolean empty) {
+                super.updateItem(pago, empty);
+
+                if (pago == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                setGraphic(deleteButton);
+                deleteButton.setOnAction(event -> {
+                    borrarRolDePago(pago);
+                });
+            }
+        });
         
         pagosTableView.getColumns().addAll(cedula, empleado, inicio, finalizo, 
                 dias, horasNormales, horasSuplementarias, horasSobreTiempo, 
@@ -278,17 +342,18 @@ public class PagosController implements Initializable {
                 montoHorasSobreTiempo, bono, transporte, totalBonos,
                 vacaciones, subtotal, decimoTercero, decimoCuarto,
                 jubilacionPatronal, aportePatronal, seguros, uniformes,
-                totalIngreso); 
+                totalIngreso, delete); 
         setPagoTable();
         
         ClienteDAO clienteDAO = new ClienteDAO();
         clientes = new ArrayList<>();
         clientes.addAll(clienteDAO.findAllActivo());
         
-        String[] items = new String[clientes.size()];
+        String[] items = new String[clientes.size() + 1];
         for (Cliente cli: clientes) {
             items[clientes.indexOf(cli)] = cli.getNombre();
         }
+        items[items.length - 1] = "Sin Cliente";
         
         clienteSelector.setItems(FXCollections.observableArrayList(items));
         clienteSelector.setDisable(true);
@@ -303,12 +368,23 @@ public class PagosController implements Initializable {
     }
     
     public void setPagoClienteTabla() {
-        Integer clienteId = clientes.get(clienteSelector.getSelectionModel().getSelectedIndex()).getId();
         
-        PagoDAO pagoDAO = new PagoDAO();
-        data = FXCollections.observableArrayList(); 
-        data.addAll(pagoDAO.findByClienteId(clienteId));
-        pagosTableView.setItems(data);
+        if (clienteSelector.getSelectionModel().getSelectedIndex() == clientes.size()) {
+            
+            PagoDAO pagoDAO = new PagoDAO();
+            data = FXCollections.observableArrayList(); 
+            data.addAll(pagoDAO.findAllSinCliente());
+            pagosTableView.setItems(data); 
+            
+        } else {
+            Integer clienteId = clientes.get(clienteSelector.getSelectionModel().getSelectedIndex()).getId();
+        
+            PagoDAO pagoDAO = new PagoDAO();
+            data = FXCollections.observableArrayList(); 
+            data.addAll(pagoDAO.findByClienteId(clienteId));
+            pagosTableView.setItems(data); 
+        }
+        
     }
     
     // Login items

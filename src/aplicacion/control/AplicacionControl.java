@@ -790,7 +790,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Rol de pado por empleado");
+                    ventana.setTitle("Rol de pago por empleado");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -826,7 +826,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosCliente.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Rol de pado para el cliente " + cliente.getNombre());
+                    ventana.setTitle("Rol de pago para el cliente " + cliente.getNombre());
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -839,6 +839,40 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setCliente(empresa, cliente);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+               noPermitido();
+           }
+       } 
+    }
+    
+    public void mostrarHorasEmpleadosSinCliente(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+           if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosSinCliente.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Rol de pago");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(700);
+                    ventana.setHeight(468);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    HorasEmpleadosSinClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
                 } catch (Exception e) {
@@ -911,6 +945,45 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado, cliente, inicio, fin);
+                    ventana.show();
+                    
+                    // Registro para auditar
+                    String detalles = "ingreso a rol de pago del empleado " 
+                            + empleado.getNombre() + " " + empleado.getApellido();
+                    au.saveIngreso(detalles, permisos.getUsuario());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       } 
+    }
+    
+    public void mostrarRolDePagoSinCliente(Usuario empleado, Timestamp inicio, Timestamp fin) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+               try {
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoSinCliente.fxml"));
+                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Empleado: " + empleado.getNombre() + " " 
+                            + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRolDePago);
+                    ventana.setScene(scene);
+                    RolDePagoSinClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpleado(empleado, inicio, fin);
                     ventana.show();
                     
                     // Registro para auditar

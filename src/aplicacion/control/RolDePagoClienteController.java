@@ -57,6 +57,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -181,6 +182,9 @@ public class RolDePagoClienteController implements Initializable {
     @FXML 
     private Button expandirButton;
     
+    @FXML
+    private GridPane gridPaneTotal;
+    
     private Cliente cliente;
     private Empresa empresa;
     
@@ -217,9 +221,11 @@ public class RolDePagoClienteController implements Initializable {
         if (expandirButton.getText().equalsIgnoreCase("Expandir")) {
             empleadosTableView.setPrefHeight(525);
             expandirButton.setText("Contraer");
+            gridPaneTotal.setVisible(false);
         } else {
             empleadosTableView.setPrefHeight(220);
             expandirButton.setText("Expandir");
+            gridPaneTotal.setVisible(true);
         }
     }
     
@@ -273,32 +279,58 @@ public class RolDePagoClienteController implements Initializable {
         buttonOk.setOnAction((ActionEvent e) -> {
             generarPago();
             dialogStage.close();
-            dialogCompletado();
             
         });  
     }
     
     public void generarPago() {
-        pago.setDetalles("");
-        new PagoDAO().save(pago);
         
-        // Registro para auditar
-        String detalles = "genero un pago al empleado " 
-            + empleado.getNombre() + " " + empleado.getApellido() + " para el cliente " 
-                + pago.getClienteNombre();
-        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+        if (new PagoDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
+                empleado.getId(), cliente.getId()) == null) {
+        
+            pago.setDetalles("");
+            new PagoDAO().save(pago);
+
+            // Registro para auditar
+            String detalles = "genero un pago al empleado " 
+                + empleado.getNombre() + " " + empleado.getApellido() + " para el cliente " 
+                    + pago.getClienteNombre();
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogCompletado();
+        } else {
+            dialogError();
+        }
     }
     
     public void dialogCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Dialogo");
+        dialogStage.setTitle("Completado");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Pago guardado satisfactoriamente"), buttonOk).
+        children(new Text("Rol de cliente guardado satisfactoriamente."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            stagePrincipal.close();
+        });
+    }
+    
+    public void dialogError() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("No se guardo");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Ya hay un rol creado con esta fecha y con este cliente."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {

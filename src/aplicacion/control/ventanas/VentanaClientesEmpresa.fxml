@@ -12,7 +12,7 @@
 <AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.ClientesEmpresaController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="clientesTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="780.0">
+      <TableView fx:id="clientesTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="436.0" prefWidth="780.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
@@ -36,10 +36,16 @@
                    </Button>
                 </children>
              </Pane>
-      <Label layoutX="68.0" layoutY="9.0" text="Doble click al cliente para ver el rol de pago..." textFill="WHITE">
+      <Label layoutX="245.0" layoutY="9.0" text="Doble click al cliente para ver el rol de pago..." textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
+      <Label layoutX="197.0" layoutY="494.0" text="Para personal administrativo que no labora a ningun cliente..." textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button layoutX="295.0" layoutY="525.0" mnemonicParsing="false" onAction="#mostrarEmpleadosSinCliente" prefHeight="25.0" prefWidth="186.0" text="Personal sin cliente" />
     </children>
 </AnchorPane>
