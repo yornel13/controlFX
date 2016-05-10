@@ -8,10 +8,13 @@ package aplicacion.control;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Permisos;
 import hibernate.dao.ConstanteDAO;
+import hibernate.dao.DeudaDAO;
 import hibernate.dao.PagoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Constante;
+import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.Usuario;
@@ -29,7 +32,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -38,6 +43,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
 
@@ -229,11 +236,11 @@ public class PagosTotalEmpleadoController implements Initializable {
     private Double aPercibirValor;
     
     
-    private Timestamp inicio;
-    private Timestamp fin;
+    public Timestamp inicio;
+    public Timestamp fin;
     
     private Empresa empresa;
-    private Usuario empleado;
+    public Usuario empleado;
     
     ArrayList<Usuario> usuarios;
     ArrayList<Pago> pagos;
@@ -286,6 +293,43 @@ public class PagosTotalEmpleadoController implements Initializable {
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
         mostrarRegistro(null);
+    }
+    
+    @FXML
+    public void onClickGestionarDeudas(ActionEvent event) {
+        if (empleado != null) {
+            if (aplicacionControl.permisos == null) {
+                aplicacionControl.noLogeado();
+            } else {
+                if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaGestionDeudas.fxml"));
+                        AnchorPane ventanaDeudas = (AnchorPane) loader.load();
+                        Stage ventana = new Stage();
+                        ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                        ventana.getIcons().add(new Image(stageIcon));
+                        ventana.setResizable(false);
+                        ventana.setMaxWidth(608);
+                        ventana.initOwner(stagePrincipal);
+                        Scene scene = new Scene(ventanaDeudas);
+                        ventana.setScene(scene);
+                        GestionDeudasController controller = loader.getController();
+                        controller.setStagePrincipal(ventana);
+                        controller.setProgramaPrincipal(aplicacionControl);
+                        controller.setPagoTotalController(this);
+                        controller.setEmpleado(empleado);
+                        ventana.show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //tratar la excepción
+                    }
+                } else {
+                    aplicacionControl.noPermitido();
+                }
+            }
+        }
     }
     
     public void setEmpresa(Empresa empresa) throws ParseException {
@@ -454,16 +498,18 @@ public class PagosTotalEmpleadoController implements Initializable {
         }
         ieesValor = (ingresoValor/100d) * getIess();  // TODO, sacar de data base
         quincenaValor = empleado.getDetallesEmpleado().getQuincena();
-        deudasValor = 0d; // TODO, sacar de data base
+        deudasValor = getDeudas();
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
         aPercibirValor = ingresoValor - deduccionesValor;
         
-        montoIngresoText.setText(String.format( "%.2f", ingresoValor));;
-        montoIessText.setText(String.format( "%.2f", ieesValor));;
-        montoQuincenaText.setText(String.format( "%.2f", quincenaValor));;
-        montoDeudasText.setText(String.format( "%.2f", deudasValor));;
-        montoDeduccionesText.setText(String.format( "%.2f", deduccionesValor));;
-        montoAPercibirText.setText(String.format( "%.2f", aPercibirValor));;
+        montoIngresoText.setText(String.format( "%.2f", ingresoValor));
+        montoIessText.setText(String.format( "%.2f", ieesValor));
+        montoQuincenaText.setText(String.format( "%.2f", quincenaValor));
+        montoDeudasText.setText(String.format( "%.2f", deudasValor));
+        montoDeduccionesText.setText(String.format( "%.2f", deduccionesValor));
+        montoAPercibirText.setText(String.format( "%.2f", aPercibirValor));
+        
+        
     }
     
     @Override
@@ -534,6 +580,17 @@ public class PagosTotalEmpleadoController implements Initializable {
             iessPorcentaje.setText("IESS (" + constante.getValor() + "%)");
             return Double.valueOf(constante.getValor());
         }
+    }
+    
+    public Double getDeudas() {
+        Double monto = 0d;
+        ArrayList<Deuda> deudas = new ArrayList<>();
+        deudas.addAll(new DeudaDAO().findAllByUsuarioId(empleado.getId()));
+        for (Deuda deuda: deudas) {
+            if (!deuda.getPagada() && !deuda.getAplazar())
+                monto += (deuda.getRestante() / deuda.getCuotas());
+        }
+        return monto;
     }
     
     // Login items

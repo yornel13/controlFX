@@ -86,27 +86,60 @@ public class EmpleadosController implements Initializable {
         String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonActuariales = new Button("Actuariales");
-        Button buttonContrasena = new Button("Contraseña");
+        Button buttonDeudas = new Button("Deudas");
         Button buttonPermisos = new Button("Permisos");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Que desea agregar?"), buttonActuariales).
+        children(new Text("¿Que desea editar?"), buttonActuariales, buttonDeudas).
         alignment(Pos.CENTER).padding(new Insets(25)).build()));
         buttonPermisos.setPrefWidth(150);
-        buttonContrasena.setPrefWidth(150);
+        buttonDeudas.setPrefWidth(150);
         buttonActuariales.setPrefWidth(150);
         dialogStage.show();
         buttonActuariales.setOnAction((ActionEvent e) -> {
             mostrarEditarActuariales(empleado);
             dialogStage.close();
         });
-        buttonContrasena.setOnAction((ActionEvent e) -> {
-            //aplicacionControl.mostrarEditarContrasena(identidad);
+        buttonDeudas.setOnAction((ActionEvent e) -> {
+            mostrarDeudas(empleado);
             dialogStage.close();
         });
         buttonPermisos.setOnAction((ActionEvent e) -> {
             //aplicacionControl.mostrarEditarRol(identidad);
             dialogStage.close();
         });
+    }
+    
+    public void mostrarDeudas(Usuario empleado) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudas.fxml"));
+                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setMaxWidth(608);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaDeudas);
+                    ventana.setScene(scene);
+                    DeudasController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setEmpleado(empleado);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }
     }
     
     public void mostrarEditarActuariales(Usuario empleado) {

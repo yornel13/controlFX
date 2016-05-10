@@ -88,5 +88,23 @@
             </key>
             <one-to-many class="hibernate.model.Roles" />
         </set>
+        <set name="deudas" inverse="true">
+            <key>
+                <column name="usuario_id" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.model.Deuda" />
+        </set>
+        <set name="pagoQuincenas" inverse="true">
+            <key>
+                <column name="usuario_id" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.model.PagoQuincena" />
+        </set>
+        <set name="pagoMeses" inverse="true">
+            <key>
+                <column name="usuario_id" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.model.PagoMes" />
+        </set>
     </class>
 </hibernate-mapping>

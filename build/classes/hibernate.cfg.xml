@@ -28,5 +28,9 @@
     <mapping resource="hibernate/hbm/Actuariales.hbm.xml"/>
     <mapping resource="hibernate/hbm/Seguro.hbm.xml"/>
     <mapping resource="hibernate/hbm/Uniforme.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Deuda.hbm.xml"/>
+    <mapping resource="hibernate/hbm/AbonoDeuda.hbm.xml"/>
+    <mapping resource="hibernate/hbm/PagoQuincena.hbm.xml"/>
+    <mapping resource="hibernate/hbm/PagoMes.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

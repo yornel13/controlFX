@@ -33,6 +33,9 @@ public class Usuario implements java.io.Serializable {
 	private Set bonos = new HashSet(0);
 	private Set registroAccioneses = new HashSet(0);
 	private Set roleses = new HashSet(0);
+        private Set deudas = new HashSet(0);
+        private Set pagoQuincenas = new HashSet(0);
+        private Set pagoMeses = new HashSet(0);
 
 	// Constructors
 
@@ -253,7 +256,29 @@ public class Usuario implements java.io.Serializable {
         public void setPagos(Set pagos) {
             this.pagos = pagos;
         }
-        
-        
 
+        public Set getDeudas() {
+            return deudas;
+        }
+
+        public void setDeudas(Set deudas) {
+            this.deudas = deudas;
+        }
+
+        public Set getPagoQuincenas() {
+            return pagoQuincenas;
+        }
+
+        public void setPagoQuincenas(Set pagoQuincenas) {
+            this.pagoQuincenas = pagoQuincenas;
+        }
+
+        public Set getPagoMeses() {
+            return pagoMeses;
+        }
+
+        public void setPagoMeses(Set pagoMeses) {
+            this.pagoMeses = pagoMeses;
+        }
+      
 }
