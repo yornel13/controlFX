@@ -8,7 +8,9 @@ package aplicacion.control;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
+import hibernate.dao.DeudaTipoDAO;
 import hibernate.model.Deuda;
+import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.net.URL;
@@ -18,6 +20,8 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -29,6 +33,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -73,6 +78,9 @@ public class GestionDeudasController implements Initializable {
     
     @FXML
     private TableColumn cuotasColumna;
+    
+    @FXML
+    private TableColumn tipoColumna;
     
     @FXML
     private TableColumn<Deuda, Deuda> borrarColumna;
@@ -123,6 +131,14 @@ public class GestionDeudasController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
                
+                ArrayList<DeudaTipo> deudaTipos = new ArrayList<>();
+                deudaTipos.addAll(new DeudaTipoDAO().findAll());
+                
+                String[] itemsTipos = new String[deudaTipos.size()];
+                deudaTipos.stream().forEach((deudaTipo) -> {
+                    itemsTipos[deudaTipos.indexOf(deudaTipo)] = deudaTipo.getNombre();
+                });
+                
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
@@ -130,34 +146,47 @@ public class GestionDeudasController implements Initializable {
                 String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
                 dialogStage.getIcons().add(new Image(stageIcon));
                 Button buttonConfirmar = new Button("Crear");
+                ChoiceBox choiceBoxTipos = new ChoiceBox();
                 TextField fieldDetalles = new TextField();
                 TextField fieldMonto = new TextField();
                 TextField fieldCuotas = new TextField();
+                Text textTipo = new Text("Tipo");
                 Text textDetalles = new Text("Detalles");
                 Text textMonto = new Text("Monto");
                 Text textCuotas = new Text("Cuotas");
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(textDetalles, fieldDetalles, textMonto, fieldMonto, 
-                        textCuotas, fieldCuotas, buttonConfirmar).
-                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                children(textTipo, choiceBoxTipos, textDetalles, fieldDetalles, textMonto, 
+                        fieldMonto, textCuotas, fieldCuotas, buttonConfirmar).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
                 dialogStage.show();
+                choiceBoxTipos.setItems(FXCollections.observableArrayList(itemsTipos));
                 fieldMonto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+                choiceBoxTipos.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                        fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
+                    }
+                });
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
                     
-                    String detalles = fieldDetalles.getText();
-                    String monto = fieldMonto.getText();
-                    String cuotas = fieldCuotas.getText();
-                    
-                    if (detalles == null) {
+                    if (choiceBoxTipos.getSelectionModel().isEmpty()) {
                         
-                    } else if (monto == null) {
+                    } else if (fieldDetalles.getText().isEmpty()) {
                         
-                    } else if (cuotas == null) {
+                    } else if (fieldMonto.getText().isEmpty()) {
+                        
+                    } else if (fieldCuotas.getText().isEmpty()) {
                         
                     } else {
                         
+                        String tipo = choiceBoxTipos.getSelectionModel().getSelectedItem().toString();
+                        String detalles = fieldDetalles.getText();
+                        String monto = fieldMonto.getText();
+                        String cuotas = fieldCuotas.getText();
+                        
                         Deuda newDeuda = new Deuda();
+                        newDeuda.setTipo(tipo);
                         newDeuda.setDetalles(detalles);
                         newDeuda.setMonto(Double.valueOf(monto));
                         newDeuda.setCuotas(Integer.parseInt(cuotas));
@@ -181,7 +210,7 @@ public class GestionDeudasController implements Initializable {
                         guardar();
                         
                         generacionCompletada();
-                    }
+                    } 
                 });  
                   
             } else {
@@ -350,6 +379,7 @@ public class GestionDeudasController implements Initializable {
         montoColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
         restanteColumna.setCellValueFactory(new PropertyValueFactory<>("restante"));
         cuotasColumna.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
+        tipoColumna.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         borrarColumna.setCellFactory(param -> new TableCell<Deuda, Deuda>() {
             private final CheckBox checkBoxDeuda = new CheckBox();

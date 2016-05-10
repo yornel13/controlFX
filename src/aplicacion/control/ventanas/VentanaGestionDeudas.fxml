@@ -14,12 +14,13 @@
       <Accordion layoutX="40.0" layoutY="14.0" />
       <TableView fx:id="deudasTableView" layoutX="5.0" layoutY="38.0" maxHeight="-Infinity" maxWidth="590.0" minHeight="-Infinity" minWidth="590.0" prefHeight="358.0" prefWidth="590.0">
         <columns>
-          <TableColumn fx:id="fechaColumna" prefWidth="136.0" text="Fecha" />
-          <TableColumn fx:id="detallesColumna" prefWidth="191.0" text="Detalles" />
+          <TableColumn fx:id="fechaColumna" prefWidth="115.0" text="Fecha" />
+          <TableColumn fx:id="detallesColumna" prefWidth="150.0" text="Detalles" />
             <TableColumn fx:id="montoColumna" minWidth="0.0" prefWidth="73.0" text="Monto" />
             <TableColumn fx:id="restanteColumna" minWidth="0.0" prefWidth="69.0" text="Restante" />
-            <TableColumn fx:id="cuotasColumna" prefWidth="54.0" text="Cuotas" />
-            <TableColumn fx:id="borrarColumna" prefWidth="66.0" style="-fx-alignment: CENTER;" text="Aplazar" />
+            <TableColumn fx:id="cuotasColumna" prefWidth="48.0" text="Cuotas" />
+            <TableColumn fx:id="tipoColumna" prefWidth="85.0" text="Tipo" />
+            <TableColumn fx:id="borrarColumna" prefWidth="49.0" style="-fx-alignment: CENTER;" text="Aplazar" />
         </columns>
       </TableView>
       <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />

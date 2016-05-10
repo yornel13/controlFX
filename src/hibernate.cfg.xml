@@ -32,5 +32,6 @@
     <mapping resource="hibernate/hbm/AbonoDeuda.hbm.xml"/>
     <mapping resource="hibernate/hbm/PagoQuincena.hbm.xml"/>
     <mapping resource="hibernate/hbm/PagoMes.hbm.xml"/>
+    <mapping resource="hibernate/hbm/DeudaTipo.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

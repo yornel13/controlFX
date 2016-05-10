@@ -16,6 +16,7 @@ public class Deuda implements java.io.Serializable {
 
 	private Integer id;
 	private Usuario usuario;
+        private String tipo;
 	private String detalles;
 	private Double monto;
 	private Double restante;
@@ -150,5 +151,12 @@ public class Deuda implements java.io.Serializable {
             this.aplazar = aplazar;
         }
 
-        
+        public String getTipo() {
+            return tipo;
+        }
+
+        public void setTipo(String tipo) {
+            this.tipo = tipo;
+        }
+   
 }

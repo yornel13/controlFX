@@ -43,6 +43,6 @@
         </children>
      </Pane>
       <Button layoutX="78.0" layoutY="485.0" mnemonicParsing="false" onAction="#mostarAuditorias" prefWidth="151.0" text="Auditoria" />
-      <Button layoutX="574.0" layoutY="435.0" mnemonicParsing="false" onAction="#mostrarDepartamentosCargos" prefHeight="25.0" prefWidth="151.0" text="Cargos/Departamentos" />
+      <Button layoutX="574.0" layoutY="435.0" mnemonicParsing="false" onAction="#mostrarDepartamentosCargos" prefHeight="25.0" prefWidth="151.0" text="Deudas/Cargos/Departamentos" />
     </children>
 </AnchorPane>

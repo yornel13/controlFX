@@ -301,15 +301,15 @@ public class RegistrarEmpleadoController implements Initializable {
         String[] itemsDepartamentos = new String[departamentos.size()];
         String[] itemsCargos = new String[cargos.size()];
         
-        for (EstadoCivil obj: estadosCivil) {
+        estadosCivil.stream().forEach((obj) -> {
             itemsEstadosCivil[estadosCivil.indexOf(obj)] = obj.getNombre();
-        }
-        for (Departamento obj: departamentos) {
+        });
+        departamentos.stream().forEach((obj) -> {
             itemsDepartamentos[departamentos.indexOf(obj)] = obj.getNombre();
-        }
-        for (Cargo obj: cargos) {
+        });
+        cargos.stream().forEach((obj) -> {
             itemsCargos[cargos.indexOf(obj)] = obj.getNombre();
-        }
+        });
         
         estadoCivilChoiceBox.setItems(FXCollections.observableArrayList(itemsEstadosCivil)); 
         departamentoChoiceBox.setItems(FXCollections.observableArrayList(itemsDepartamentos)); 

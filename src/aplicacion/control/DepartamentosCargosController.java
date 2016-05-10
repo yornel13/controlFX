@@ -10,8 +10,10 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
+import hibernate.dao.DeudaTipoDAO;
 import hibernate.model.Cargo;
 import hibernate.model.Departamento;
+import hibernate.model.DeudaTipo;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -33,6 +36,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -54,9 +58,14 @@ public class DepartamentosCargosController implements Initializable {
     @FXML
     private TableView cargosTableView;
     
+    @FXML
+    private TableView deudasTableView;
+    
     private ObservableList<Departamento> dataDepartamentos;
     
     private ObservableList<Cargo> dataCargos;
+    
+    private ObservableList<DeudaTipo> dataDeudas;
     
     ArrayList<Usuario> usuarios;
     
@@ -131,6 +140,48 @@ public class DepartamentosCargosController implements Initializable {
                 // Registro para auditar
                 String detalles = "agrego el departamento " 
                         + departamento.getNombre();
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            }
+        }); 
+    }
+    
+     @FXML
+    private void agregarDeuda(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("tipo de Deuda");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button cambiarValor = new Button("Agregar");
+        TextField field = new TextField();
+        TextField fieldCuotas = new TextField();
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Escriba el nombre del tipo de deuda"), field, 
+                new Text("Cuotas por defecto"), fieldCuotas, cambiarValor).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        field.setPrefWidth(150);
+        fieldCuotas.setPrefWidth(50);
+        fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        cambiarValor.setPrefWidth(100);
+        dialogStage.show();
+        cambiarValor.setOnAction((ActionEvent e) -> {
+            if (field.getText().isEmpty()) {
+                
+            } else if (fieldCuotas.getText().isEmpty()) {
+                
+            } else {
+                DeudaTipo deudaTipo = new DeudaTipo();
+                deudaTipo.setActivo(Boolean.TRUE);
+                deudaTipo.setNombre(field.getText());
+                deudaTipo.setCuotas(Integer.parseInt(fieldCuotas.getText()));
+                new DeudaTipoDAO().save(deudaTipo);
+                dialogStage.close();
+                setDeudaTable();
+                
+                // Registro para auditar
+                String detalles = "agrego el tipo de deuda " 
+                        + deudaTipo.getNombre();
                 aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             }
         }); 
@@ -224,6 +275,43 @@ public class DepartamentosCargosController implements Initializable {
         } 
     }
     
+    public void deleteDeuda(DeudaTipo deudaTipo) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
+               
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Confirmación de borrado");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));;
+                Button buttonConfirmar = new Button("Si Borrar");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Borrar este tipo de deuda"), buttonConfirmar).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                dialogStage.show();
+                buttonConfirmar.setOnAction((ActionEvent e) -> {
+
+                    new DeudaTipoDAO().delete(deudaTipo);
+                    HibernateSessionFactory.getSession().flush();
+                    dialogStage.close();
+                    dataDeudas.remove(deudaTipo);
+
+                    // Registro para auditar
+                    String detalles = "elimino el tipo de deuda " 
+                            + deudaTipo.getNombre();
+                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+
+                });
+                  
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
     public void dialogCargoError() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -263,9 +351,11 @@ public class DepartamentosCargosController implements Initializable {
         
         createDepartamentoTable();
         createCargoTable();
+        createDeudaTable();
         
         setDepartamentoTable();
         setCargoTable();
+        setDeudaTable();
     }
     
     public void createDepartamentoTable () {
@@ -274,10 +364,11 @@ public class DepartamentosCargosController implements Initializable {
         departamentosTableView.getColumns().clear();
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(280);
+        nombre.setMinWidth(190);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn<Departamento, Departamento> delete = new TableColumn<>("Borrar");
+        delete.setMinWidth(45);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Departamento, Departamento>() {
             private final Button deleteButton = new Button("Borrar");
@@ -316,10 +407,11 @@ public class DepartamentosCargosController implements Initializable {
         cargosTableView.getColumns().clear();
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(280);
+        nombre.setMinWidth(190);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn<Cargo, Cargo> delete = new TableColumn<>("Borrar");
+        delete.setMinWidth(45);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Cargo, Cargo>() {
             private final Button deleteButton = new Button("Borrar");
@@ -350,7 +442,64 @@ public class DepartamentosCargosController implements Initializable {
         dataCargos.addAll(cargoDAO.findAll());
         cargosTableView.setItems(dataCargos);
         
+    }
+    
+    public void createDeudaTable () {
         
+        deudasTableView.setEditable(Boolean.FALSE);
+        deudasTableView.getColumns().clear();
+        
+        TableColumn nombre = new TableColumn("Nombre");
+        nombre.setMinWidth(150);
+        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        
+        TableColumn cuotas = new TableColumn("Cuotas");
+        cuotas.setMinWidth(30);
+        cuotas.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
+        
+        TableColumn<DeudaTipo, DeudaTipo> delete = new TableColumn<>("Borrar");
+        delete.setMinWidth(45);
+        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        delete.setCellFactory(param -> new TableCell<DeudaTipo, DeudaTipo>() {
+            private final Button deleteButton = new Button("Borrar");
+
+            @Override
+            protected void updateItem(DeudaTipo deuda, boolean empty) {
+                super.updateItem(deuda, empty);
+
+                if (deuda == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                setGraphic(deleteButton);
+                deleteButton.setOnAction(event -> {
+                    deleteDeuda(deuda);
+                });
+            }
+        });
+        
+        deudasTableView.getColumns().addAll(nombre, cuotas, delete); 
+    }
+    
+    public void setDeudaTable() {
+        
+        DeudaTipoDAO deudaTipoDAO = new DeudaTipoDAO();
+        dataDeudas = FXCollections.observableArrayList();
+        dataDeudas.addAll(deudaTipoDAO.findAll());
+        deudasTableView.setItems(dataDeudas);
+        
+    }
+    
+    public static EventHandler<KeyEvent> numFilter() {
+
+        EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
+            if (!"0123456789".contains(keyEvent.getCharacter())) {
+                keyEvent.consume();
+                
+            }
+        };
+        return aux;
     }
     
     // Login items
