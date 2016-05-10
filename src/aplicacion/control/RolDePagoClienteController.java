@@ -647,6 +647,9 @@ public class RolDePagoClienteController implements Initializable {
         bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        
+        pickerDe.setEditable(false);
+        pickerHasta.setEditable(false);
     }  
     
     public static String getMonthName(int month){
