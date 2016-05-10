@@ -713,7 +713,6 @@ public class RolDePagoClienteController implements Initializable {
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);
-      
     }  
     
     public static String getMonthName(int month){
