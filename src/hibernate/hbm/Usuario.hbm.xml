@@ -40,7 +40,7 @@
         <property name="ultimaModificacion" type="java.sql.Timestamp">
             <column name="ultima_modificacion" length="19" not-null="true" />
         </property>
-        <property name="foto" type="java.lang.String">
+        <property name="foto" type="binary">
             <column name="foto" />
         </property>
         <property name="activo" type="java.lang.Boolean">

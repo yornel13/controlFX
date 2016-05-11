@@ -23,7 +23,7 @@ public class Usuario implements java.io.Serializable {
 	private String telefono;
 	private Timestamp creacion;
 	private Timestamp ultimaModificacion;
-	private String foto;
+	private byte[] foto;
 	private Boolean activo;
 	private Timestamp nacimiento;
 	private String sexo;
@@ -62,7 +62,7 @@ public class Usuario implements java.io.Serializable {
 	public Usuario(EstadoCivil estadoCivil, DetallesEmpleado detallesEmpleado,
 			String nombre, String apellido, String cedula, String email,
 			String direccion, String telefono, Timestamp creacion,
-			Timestamp ultimaModificacion, String foto, Boolean activo,
+			Timestamp ultimaModificacion, byte[] foto, Boolean activo,
 			Timestamp nacimiento, String sexo, Set pagos, Set identidads,
 			Set controlEmpleados, Set bonos, Set registroAccioneses, Set roleses) {
 		this.estadoCivil = estadoCivil;
@@ -177,11 +177,11 @@ public class Usuario implements java.io.Serializable {
 		this.ultimaModificacion = ultimaModificacion;
 	}
 
-	public String getFoto() {
+	public byte[] getFoto() {
 		return this.foto;
 	}
 
-	public void setFoto(String foto) {
+	public void setFoto(byte[] foto) {
 		this.foto = foto;
 	}
 

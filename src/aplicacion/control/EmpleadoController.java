@@ -6,12 +6,23 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.model.Usuario;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,6 +35,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javax.imageio.ImageIO;
 import org.joda.time.DateTime;
 
 /**
@@ -103,7 +115,7 @@ public class EmpleadoController implements Initializable {
     
     
     @FXML
-    public void changeImage(ActionEvent event) {
+    public void changeImage(ActionEvent event) throws FileNotFoundException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
         fileChooser.setTitle("Selecciona la foto");
@@ -123,19 +135,19 @@ public class EmpleadoController implements Initializable {
             String profile = file.toURI().toString();
 
             Image image = new Image(profile);
-            Rectangle rekt = new Rectangle(40, 40); 
-            ImagePattern imagePattern = new ImagePattern(image);
-            rekt.setFill(imagePattern);
-
-
-            ImageView imageView = new ImageView(image);
-            imageView.setFitWidth(140);
-            imageView.setPreserveRatio(true);
-            imageView.setSmooth(true);
-            imageView.setCache(true);
-
-            profileImage.getChildren().clear();
-            profileImage.getChildren().add(imageView);
+            setProfileImage(image);
+            
+            byte[] bFile = new byte[(int) file.length()];
+            try {
+                FileInputStream fileInputStream = new FileInputStream(file);
+                //convert file into array of bytes
+                fileInputStream.read(bFile);
+                fileInputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            empleado.setFoto(bFile);
+            HibernateSessionFactory.getSession().flush();
         }
     }
     
@@ -162,7 +174,7 @@ public class EmpleadoController implements Initializable {
         } 
     }
     
-    public void setEmpleado(Usuario empleado   ) {
+    public void setEmpleado(Usuario empleado   ) throws IOException, SQLException {
         this.empleado = empleado;
         nombre.setText(empleado.getNombre() + " " + empleado.getApellido());
         cedula.setText(empleado.getCedula());
@@ -186,6 +198,12 @@ public class EmpleadoController implements Initializable {
         } else {
             decimos.setText("No");
         }
+        
+        if (empleado.getFoto() != null) {
+            final BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(empleado.getFoto()));
+            Image image  =  SwingFXUtils.toFXImage(bufferedImage, null);
+            setProfileImage(image);
+        }
     }
     
     @Override
@@ -196,18 +214,7 @@ public class EmpleadoController implements Initializable {
                 + "-fx-background-repeat: stretch;"); */
       
         Image image = new Image(profile);
-        Rectangle rekt = new Rectangle(40, 40); 
-        ImagePattern imagePattern = new ImagePattern(image);
-        rekt.setFill(imagePattern);
-        
-
-        ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(140);
-        imageView.setPreserveRatio(true);
-        imageView.setSmooth(true);
-        imageView.setCache(true);
-        
-        profileImage.getChildren().add(imageView);
+        setProfileImage(image);
         
     }  
     
@@ -218,4 +225,20 @@ public class EmpleadoController implements Initializable {
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
     }
     
+    public void setProfileImage(Image image) {
+        Rectangle rekt = new Rectangle(40, 40); 
+        ImagePattern imagePattern = new ImagePattern(image);
+        rekt.setFill(imagePattern);
+        
+
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(140);
+        imageView.setFitHeight(150);
+        //imageView.setPreserveRatio(true);  // para mantener la escala
+        imageView.setSmooth(true);
+        imageView.setCache(true);
+        
+        profileImage.getChildren().clear();
+        profileImage.getChildren().add(imageView);
+    }
 }

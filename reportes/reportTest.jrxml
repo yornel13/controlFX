@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ed09ab38-1025-4298-be2b-19885ea78f2b">
+	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman"/>
+	<style name="Row" mode="Transparent" fontName="Times New Roman" pdfFontName="Times-Roman">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style mode="Opaque" backcolor="#F0EFEF"/>
+		</conditionalStyle>
+	</style>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+     pago.`id` AS pago_id,
+     pago.`inicio` AS pago_inicio,
+     pago.`finalizo` AS pago_finalizo,
+     pago.`detalles` AS pago_detalles,
+     pago.`fecha` AS pago_fecha,
+     pago.`sueldo` AS pago_sueldo,
+     pago.`dias` AS pago_dias,
+     pago.`horas_normales` AS pago_horas_normales,
+     pago.`horas_suplementarias` AS pago_horas_suplementarias,
+     pago.`horas_sobre_tiempo` AS pago_horas_sobre_tiempo,
+     pago.`total_horas_extras` AS pago_total_horas_extras,
+     pago.`salario` AS pago_salario,
+     pago.`monto_horas_suplementarias` AS pago_monto_horas_suplementarias,
+     pago.`monto_horas_sobre_tiempo` AS pago_monto_horas_sobre_tiempo,
+     pago.`bono` AS pago_bono,
+     pago.`transporte` AS pago_transporte,
+     pago.`total_bonos` AS pago_total_bonos,
+     pago.`vacaciones` AS pago_vacaciones,
+     pago.`subtotal` AS pago_subtotal,
+     pago.`decimo_tercero` AS pago_decimo_tercero,
+     pago.`decimo_cuarto` AS pago_decimo_cuarto,
+     pago.`jubilacion_patronal` AS pago_jubilacion_patronal,
+     pago.`aporte_patronal` AS pago_aporte_patronal,
+     pago.`seguros` AS pago_seguros,
+     pago.`uniformes` AS pago_uniformes,
+     pago.`total_ingreso` AS pago_total_ingreso,
+     pago.`empleado` AS pago_empleado,
+     pago.`cedula` AS pago_cedula,
+     pago.`empresa` AS pago_empresa,
+     pago.`cliente_nombre` AS pago_cliente_nombre,
+     pago.`cliente_id` AS pago_cliente_id,
+     pago.`usuario_id` AS pago_usuario_id
+FROM
+     `pago` pago]]>
+	</queryString>
+	<field name="pago_inicio" class="java.sql.Timestamp"/>
+	<field name="pago_finalizo" class="java.sql.Timestamp"/>
+	<field name="pago_detalles" class="java.lang.String"/>
+	<field name="pago_salario" class="java.math.BigDecimal"/>
+	<field name="pago_bono" class="java.math.BigDecimal"/>
+	<field name="pago_vacaciones" class="java.math.BigDecimal"/>
+	<field name="pago_subtotal" class="java.math.BigDecimal"/>
+	<field name="pago_total_ingreso" class="java.math.BigDecimal"/>
+	<group name="pago_inicio">
+		<groupExpression><![CDATA[$F{pago_inicio}]]></groupExpression>
+		<groupHeader>
+			<band height="37">
+				<frame>
+					<reportElement mode="Opaque" x="0" y="7" width="555" height="24" forecolor="#B89F7D" backcolor="#000000" uuid="bad9da78-e40c-4497-9f86-d62ea699b51b"/>
+					<textField isStretchWithOverflow="true">
+						<reportElement style="SubTitle" isPrintRepeatedValues="false" x="2" y="0" width="479" height="24" forecolor="#FFFFFF" uuid="253638c3-18d7-40e3-b49e-7077d706b54f"/>
+						<textElement>
+							<font isBold="false"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$F{pago_inicio}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<group name="pago_detalles">
+		<groupExpression><![CDATA[$F{pago_detalles}]]></groupExpression>
+		<groupHeader>
+			<band height="30">
+				<textField>
+					<reportElement positionType="Float" x="0" y="4" width="555" height="26" forecolor="#000000" uuid="d9066703-399c-4559-8841-eea8b3a938d9"/>
+					<textElement>
+						<font fontName="Times New Roman" size="16" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pago_detalles}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="pago_bono">
+		<groupExpression><![CDATA[$F{pago_bono}]]></groupExpression>
+	</group>
+	<group name="pago_total_ingreso">
+		<groupExpression><![CDATA[$F{pago_total_ingreso}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="132" splitType="Stretch">
+			<image>
+				<reportElement x="456" y="0" width="99" height="132" uuid="92703d20-a7ce-49f5-b39b-01510b551332"/>
+				<imageExpression><![CDATA["cherry.jpg"]]></imageExpression>
+			</image>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="0" width="451" height="95" backcolor="#000000" uuid="3065521c-c870-4cdd-855f-7aec3854089f"/>
+				<staticText>
+					<reportElement style="Title" x="0" y="0" width="370" height="66" uuid="ad21ac4f-2d99-4224-b387-7acb7ae32b94"/>
+					<textElement>
+						<font isBold="false"/>
+					</textElement>
+					<text><![CDATA[Cherry Title]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="SubTitle" x="157" y="66" width="249" height="29" uuid="b7594f0c-a50b-4d77-92c9-4a3fc1b52b0b"/>
+					<textElement>
+						<font size="22" isBold="false"/>
+					</textElement>
+					<text><![CDATA[Cherry SubTitle]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement mode="Opaque" x="0" y="100" width="451" height="32" forecolor="#000000" backcolor="#CC0000" uuid="aceef736-1e08-4da4-945a-42010266cccd"/>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement x="307" y="12" width="144" height="20" forecolor="#FFFFFF" uuid="e59902b9-d5b5-448b-a376-3670da38cbc8"/>
+					<textElement textAlignment="Right">
+						<font size="12"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement style="Column header" x="0" y="7" width="138" height="18" forecolor="#000000" uuid="546270a5-6ed1-4c92-a251-73445e4db622"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[pago_finalizo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="138" y="7" width="138" height="18" forecolor="#000000" uuid="eb5fcb2e-c89c-4b35-bf59-ea132563e49e"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[pago_salario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="276" y="7" width="138" height="18" forecolor="#000000" uuid="f12d8843-c6a4-475d-8734-4456cfaca0af"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[pago_vacaciones]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="414" y="7" width="138" height="18" forecolor="#000000" uuid="b35d2d2f-deaa-4443-b27d-fe5d866969e3"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<text><![CDATA[pago_subtotal]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<frame>
+				<reportElement style="Row" mode="Opaque" x="0" y="0" width="555" height="18" uuid="80a0ff9e-176a-4b62-b097-fa245468648c"/>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="0" y="0" width="138" height="18" uuid="313765d2-e142-4f0f-8fd7-dc1de392e23e"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pago_finalizo}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="138" y="0" width="138" height="18" uuid="98af6909-7c7a-4ed2-ac7e-b633de7204c9"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pago_salario}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="276" y="0" width="138" height="18" uuid="6aba65d7-da76-48b1-ab4c-423a131eb98f"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pago_vacaciones}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="414" y="0" width="138" height="18" uuid="156824d5-0ef2-45f4-95cf-73f06fced7bf"/>
+					<textElement>
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pago_subtotal}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="7" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="97362ba7-6c9f-4ee5-914b-42585d3d0451"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<frame>
+				<reportElement mode="Opaque" x="0" y="1" width="555" height="24" forecolor="#D0B48E" backcolor="#000000" uuid="c08513f5-b076-4d65-9285-e59a1552e478"/>
+				<textField evaluationTime="Report">
+					<reportElement style="Column header" x="513" y="0" width="40" height="20" forecolor="#FFFFFF" uuid="d435adca-ef47-47eb-ae9f-4dace54c6c99"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement style="Column header" x="433" y="0" width="80" height="20" forecolor="#FFFFFF" uuid="0612851a-68c4-4c99-b524-7fbe412e4620"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+				</textField>
+				<textField pattern="EEEEE dd MMMMM yyyy">
+					<reportElement style="Column header" x="2" y="1" width="197" height="20" forecolor="#FFFFFF" uuid="e5348707-839e-4081-b9eb-9b19a03a7232"/>
+					<textElement verticalAlignment="Middle">
+						<font size="10" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
