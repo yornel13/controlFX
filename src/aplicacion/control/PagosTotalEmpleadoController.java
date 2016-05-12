@@ -430,7 +430,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             PagosTable pagoTable = new PagosTable();
             pagoTable.setId(pago.getId());
             if (pago.getClienteNombre() == null)
-                pagoTable.setCliente("*Sin cliente*");
+                pagoTable.setCliente("*Administrativo*");
             else
                 pagoTable.setCliente(pago.getClienteNombre());
             pagoTable.setDias(pago.getDias());

@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.PagoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
@@ -237,39 +238,44 @@ public class EmpleadosController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.ELIMINAR)) {
                
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Confirmación de borrado");
-                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));;
-                Button buttonConfirmar = new Button("Si Borrar");
-                Button buttonCancelar = new Button("No, no estoy seguro");
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Esta seguro que desea borrar el empleado " + empleadoTable.getNombre()+ "?"), 
-                        buttonConfirmar, buttonCancelar).
-                alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                dialogStage.show();
-                buttonConfirmar.setOnAction((ActionEvent e) -> {
-
-                    new UsuarioDAO().findById(empleadoTable.getId()).setActivo(Boolean.FALSE);
-                    HibernateSessionFactory.getSession().flush();
-                    data.remove(empleadoTable);
-                    dialogStage.close();
+                if (new PagoDAO().findByUsuarioId(empleadoTable.getId()).isEmpty()) { 
                     
-                    // Registro para auditar
-                    String detalles = "elimino el empleado " 
-                            + empleadoTable.getNombre() + " " 
-                            + empleadoTable.getApellido();
-                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-                });
-                buttonCancelar.setOnAction((ActionEvent e) -> {
-                   dialogStage.close();
-                });
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Confirmación de borrado");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));;
+                    Button buttonConfirmar = new Button("Si Borrar");
+                    Button buttonCancelar = new Button("No, no estoy seguro");
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("¿Borrar el empleado " + empleadoTable.getNombre()+ "?"), 
+                            buttonConfirmar, buttonCancelar).
+                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                    buttonConfirmar.setOnAction((ActionEvent e) -> {
 
+                        new UsuarioDAO().findById(empleadoTable.getId()).setActivo(Boolean.FALSE);
+                        HibernateSessionFactory.getSession().flush();
+                        data.remove(empleadoTable);
+                        dialogStage.close();
+
+                        // Registro para auditar
+                        String detalles = "elimino el empleado " 
+                                + empleadoTable.getNombre() + " " 
+                                + empleadoTable.getApellido();
+                        aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                    });
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                       dialogStage.close();
+                    });
+                    dialogStage.showAndWait();
+                    
+                } else {
+                    aplicacionControl.noSePuede();
+                }
                   
             } else {
-               aplicacionControl.noPermitido();
+                aplicacionControl.noPermitido();
             }
         } 
     }
@@ -296,25 +302,25 @@ public class EmpleadosController implements Initializable {
             });
            empleadosTableView.setItems(data);
         }
+          
+        TableColumn cedula = new TableColumn("Cedula");
+        cedula.setMinWidth(100);
+        cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
         TableColumn nombre = new TableColumn("Nombre");
         nombre.setMinWidth(100);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
        
         TableColumn apellido = new TableColumn("Apellido");
-        apellido.setMinWidth(100);
+        apellido.setMinWidth(120);
         apellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
-        
-        TableColumn cedula = new TableColumn("Cedula");
-        cedula.setMinWidth(100);
-        cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
         TableColumn telefono = new TableColumn("Telefono");
         telefono.setMinWidth(100);
         telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
         TableColumn departamento = new TableColumn("Departamento");
-        departamento.setMinWidth(100);
+        departamento.setMinWidth(120);
         departamento.setCellValueFactory(new PropertyValueFactory<>("departamento"));
         
         TableColumn cargo = new TableColumn("Cargo");
@@ -365,7 +371,7 @@ public class EmpleadosController implements Initializable {
             }
         });
         
-        empleadosTableView.getColumns().addAll(nombre, apellido, cedula, 
+        empleadosTableView.getColumns().addAll(cedula, nombre, apellido, 
                 telefono, departamento, cargo, pagos, delete);
         
         empleadosTableView.setRowFactory( (Object tv) -> {

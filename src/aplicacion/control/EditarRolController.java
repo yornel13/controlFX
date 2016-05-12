@@ -41,6 +41,8 @@ public class EditarRolController implements Initializable {
     
     private Usuario usuario;
     
+     private Identidad identidad;
+    
     ArrayList<Roles> roles;
     
     @FXML
@@ -59,11 +61,15 @@ public class EditarRolController implements Initializable {
     private ToggleGroup grupoRol; 
     
     @FXML
+    private ToggleGroup grupoDeudas; 
+    
+    @FXML
     private Pane panelPermisos;
     
     @FXML
     private CheckBox controlTotal;
     private AplicacionControl aplicacionControl;
+   
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -159,6 +165,20 @@ public class EditarRolController implements Initializable {
                 permisos ++;
 
             }
+            if (grupoDeudas.getSelectedToggle() != null) {
+
+                RadioButton radioButton = (RadioButton) grupoDeudas.getSelectedToggle();
+
+                Roles rol = new Roles();
+                rol.setNombre(Permisos.A_DEUDAS);
+                rol.setPermiso(radioButton.getText().toLowerCase());
+                rol.setActivo(Boolean.TRUE);
+                rol.setUsuario(usuario);
+                rolesDAO.save(rol);
+                
+                permisos ++;
+
+            }
 
         }
         
@@ -166,6 +186,11 @@ public class EditarRolController implements Initializable {
             for (Roles rol: roles) {
                 rolesDAO.delete(rol);
                 HibernateSessionFactory.getSession().flush();
+            }
+            
+            AdministradoresController ec = aplicacionControl.changeAdministradoresController;
+            if (ec != null) {
+                ec.administradorEditado(identidad);
             }
             // Registro para auditar
             String detalles = "edito los permisos de usuario de " 
@@ -177,7 +202,7 @@ public class EditarRolController implements Initializable {
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
+            dialogStage.setTitle("Completado");
             String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("ok");
@@ -192,7 +217,7 @@ public class EditarRolController implements Initializable {
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
+            dialogStage.setTitle("Error");
             String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("ok");
@@ -226,12 +251,16 @@ public class EditarRolController implements Initializable {
             if (grupoRol.getSelectedToggle() != null){
                 ((RadioButton) grupoRol.getSelectedToggle()).setSelected(false);
             }
+            if (grupoDeudas.getSelectedToggle() != null){
+                ((RadioButton) grupoDeudas.getSelectedToggle()).setSelected(false);
+            }
         } else {
             panelPermisos.setVisible(true);
         }
     }
     
     public void setIdentidad(Identidad identidad) {
+        this.identidad = identidad;
         this.usuario = identidad.getUsuario();
         obtenerPermisos(identidad.getUsuario().getId());
     }
@@ -318,6 +347,21 @@ public class EditarRolController implements Initializable {
                         break;
                     case 4:
                         grupoHoras.getToggles().get(3).setSelected(true);
+                        break;
+                }
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_DEUDAS)) {
+                switch (Permisos.getNivel(rol.getPermiso())) {
+                    case 1:
+                        grupoDeudas.getToggles().get(0).setSelected(true);
+                        break;
+                    case 2:
+                        grupoDeudas.getToggles().get(1).setSelected(true);
+                        break;
+                    case 3:
+                        grupoDeudas.getToggles().get(2).setSelected(true);
+                        break;
+                    case 4:
+                        grupoDeudas.getToggles().get(3).setSelected(true);
                         break;
                 }
             }

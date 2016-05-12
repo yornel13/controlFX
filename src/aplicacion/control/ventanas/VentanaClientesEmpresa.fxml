@@ -41,7 +41,7 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label layoutX="197.0" layoutY="494.0" text="Para personal administrativo que no labora a ningun cliente..." textFill="WHITE">
+      <Label layoutX="240.0" layoutY="496.0" text="Para personal administrativo de la empresa..." textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>

@@ -147,6 +147,7 @@ public class EmpresasController implements Initializable {
                 empresa.siglas.set(emp.getSiglas());
                 empresa.numeracion.set(emp.getNumeracion().toString());
                 empresa.diaCortePago.set(emp.getDiaCortePago());
+                empresa.creacion.set(emp.getCreacion().toString());
                 empresa.tipo.set(emp.getTipo());
                 data.set(data.indexOf(empresaTable), empresa);
             }
@@ -171,24 +172,25 @@ public class EmpresasController implements Initializable {
                empresa.siglas.set(emp.getSiglas());
                empresa.numeracion.set(emp.getNumeracion().toString());
                empresa.diaCortePago.set(emp.getDiaCortePago());
+               empresa.creacion.set(emp.getCreacion().toString());
                empresa.tipo.set(emp.getTipo());
                data.add(empresa);
            }
            empresasTableView.setItems(data);
         }
         
+        TableColumn numeracion = new TableColumn("Numeracion");
+        numeracion.setMinWidth(100);
+        numeracion.setCellValueFactory(new PropertyValueFactory<>("numeracion"));
+        
         TableColumn siglas = new TableColumn("Siglas");
         siglas.setMinWidth(100);
         siglas.setCellValueFactory(new PropertyValueFactory<>("siglas"));
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(100);
+        nombre.setMinWidth(200);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
      
-        TableColumn numeracion = new TableColumn("Numeracion");
-        numeracion.setMinWidth(100);
-        numeracion.setCellValueFactory(new PropertyValueFactory<>("numeracion"));
-        
         TableColumn diaCortePago = new TableColumn("Dia de corte");
         diaCortePago.setMinWidth(100);
         diaCortePago.setCellValueFactory(new PropertyValueFactory<>("diaCortePago"));
@@ -196,6 +198,10 @@ public class EmpresasController implements Initializable {
         TableColumn tipo = new TableColumn("Tipo");
         tipo.setMinWidth(100);
         tipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
+        
+        TableColumn fecha = new TableColumn("Creada");
+        fecha.setMinWidth(120);
+        fecha.setCellValueFactory(new PropertyValueFactory<>("creacion"));
         
         TableColumn<EmpresaTable, EmpresaTable> delete = new TableColumn<>("Borrar");
         delete.setMinWidth(40);
@@ -219,7 +225,7 @@ public class EmpresasController implements Initializable {
             }
         });
         
-        empresasTableView.getColumns().addAll(siglas, nombre, numeracion, diaCortePago, tipo, delete);
+        empresasTableView.getColumns().addAll(numeracion, siglas, nombre, diaCortePago, tipo, fecha, delete);
         
         empresasTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpresaTable> row = new TableRow<>();

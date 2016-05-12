@@ -19,6 +19,7 @@ public class EmpresaTable {
     public SimpleStringProperty nombre = new SimpleStringProperty();
     public SimpleStringProperty numeracion = new SimpleStringProperty();
     public SimpleIntegerProperty diaCortePago = new SimpleIntegerProperty();
+    public SimpleStringProperty creacion = new SimpleStringProperty();
     public SimpleStringProperty tipo = new SimpleStringProperty();
     
     public Integer getId() {
@@ -45,5 +46,7 @@ public class EmpresaTable {
         return diaCortePago.get();
     }
 
-    
+    public String getCreacion() {
+        return creacion.get();
+    }
 }

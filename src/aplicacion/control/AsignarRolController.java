@@ -55,6 +55,9 @@ public class AsignarRolController implements Initializable {
     private ToggleGroup grupoRol; 
     
     @FXML
+    private ToggleGroup grupoDeudas; 
+    
+    @FXML
     private Pane panelPermisos;
     
     @FXML
@@ -162,6 +165,21 @@ public class AsignarRolController implements Initializable {
                 permisos ++;
 
             }
+            
+            if (grupoDeudas.getSelectedToggle() != null) {
+
+                RadioButton radioButton = (RadioButton) grupoDeudas.getSelectedToggle();
+
+                Roles rol = new Roles();
+                rol.setNombre(Permisos.A_DEUDAS);
+                rol.setPermiso(radioButton.getText().toLowerCase());
+                rol.setActivo(Boolean.TRUE);
+                rol.setUsuario(usuario);
+                rolesDAO.save(rol);
+                
+                permisos ++;
+
+            }
 
         }
         
@@ -173,11 +191,15 @@ public class AsignarRolController implements Initializable {
             AplicacionControl aplicacionControl = registrarAdministradorController.aplicacionControl;
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
+            if (aplicacionControl.changeAdministradoresController != null) {
+                aplicacionControl.changeAdministradoresController.setAdministradores();
+            }
+            
             stagePrincipal.close();
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
+            dialogStage.setTitle("Completado");
             String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("ok");
@@ -225,6 +247,9 @@ public class AsignarRolController implements Initializable {
             }
             if (grupoRol.getSelectedToggle() != null){
                 ((RadioButton) grupoRol.getSelectedToggle()).setSelected(false);
+            }
+            if (grupoDeudas.getSelectedToggle() != null){
+                ((RadioButton) grupoDeudas.getSelectedToggle()).setSelected(false);
             }
         } else {
             panelPermisos.setVisible(true);

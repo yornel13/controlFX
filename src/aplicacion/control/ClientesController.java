@@ -5,8 +5,10 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
+import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import java.net.URL;
@@ -89,29 +91,50 @@ public class ClientesController implements Initializable {
     } 
     
     public void deleteCliente(Cliente cliente) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Confirmación de borrado");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));;
-        Button buttonConfirmar = new Button("Si Borrar");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Borrar el cliente " + cliente.getNombre()+ "?"), buttonConfirmar).
-        alignment(Pos.CENTER).padding(new Insets(25)).build()));
-        dialogStage.show();
-        buttonConfirmar.setOnAction((ActionEvent e) -> {
-            
-            new ClienteDAO().findById(cliente.getId()).setActivo(Boolean.FALSE);
-            HibernateSessionFactory.getSession().flush();
-            data.remove(cliente);
-            dialogStage.close();
-            
-            // Registro para auditar
-            String detalles = "elimino el cliente " 
-                    + cliente.getNombre();
-            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-        });
+        
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.ELIMINAR)) {
+                
+                if (new ControlEmpleadoDAO().findAllByClienteId(cliente.getId()).isEmpty()) { 
+                    
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Confirmación de borrado");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));;
+                    Button buttonConfirmar = new Button("Si Borrar");
+                    Button buttonCancelar = new Button("No, no estoy seguro");
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("¿Borrar el cliente " + cliente.getNombre()+ "?"), 
+                            buttonConfirmar, buttonCancelar).
+                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                    buttonConfirmar.setOnAction((ActionEvent e) -> {
+
+                        new ClienteDAO().delete(new ClienteDAO().findById(cliente.getId()));
+                        HibernateSessionFactory.getSession().flush();
+                        data.remove(cliente);
+                        dialogStage.close();
+
+                        // Registro para auditar
+                        String detalles = "elimino el cliente " 
+                                + cliente.getNombre();
+                        aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                    });
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                       dialogStage.close();
+                    });
+                    dialogStage.showAndWait();
+                    
+                } else {
+                    aplicacionControl.noSePuede();
+                }
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
     }
     
     public void clienteEditado(Cliente cliente) {
@@ -157,7 +180,7 @@ public class ClientesController implements Initializable {
         telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
         TableColumn direccion = new TableColumn("Direccion");
-        direccion.setMinWidth(200);
+        direccion.setMinWidth(220);
         direccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
         
         TableColumn<Cliente, Cliente> delete = new TableColumn<>("Borrar");

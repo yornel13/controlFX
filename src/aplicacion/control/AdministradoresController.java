@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.Administrador;
+import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.IdentidadDAO;
 import hibernate.dao.RolesDAO;
@@ -124,32 +125,49 @@ public class AdministradoresController implements Initializable {
     }
     
     public void deleteAdministrador(Administrador administrador) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Confirmación de borrado");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));;
-        Button buttonConfirmar = new Button("Si Borrar");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Borrar el usuario " +administrador.getNombreUsuario()+ "?"), buttonConfirmar).
-        alignment(Pos.CENTER).padding(new Insets(25)).build()));
-        dialogStage.show();
-        buttonConfirmar.setOnAction((ActionEvent e) -> {
-            new IdentidadDAO().delete(new IdentidadDAO().findById(administrador.getId()));
-            if (administrador.getUsuario().getDetallesEmpleado() == null) {
-                new UsuarioDAO().findById(administrador.getUsuario().getId()).setActivo(Boolean.FALSE);
+        
+        if (aplicacionControl.permisos == null) {
+            aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Confirmación de borrado");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));;
+                Button buttonConfirmar = new Button("Si Borrar");
+                Button buttonCancelar = new Button("No, no estoy seguro");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Estas seguro que deseas borrar el usuario " +administrador.getNombreUsuario()+ "?"), 
+                        buttonConfirmar, buttonCancelar).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                buttonConfirmar.setOnAction((ActionEvent e) -> {
+                    new IdentidadDAO().delete(new IdentidadDAO().findById(administrador.getId()));
+                    if (administrador.getUsuario().getDetallesEmpleado() == null) {
+                        new UsuarioDAO().findById(administrador.getUsuario().getId()).setActivo(Boolean.FALSE);
+                    }
+                    new RolesDAO().findAllByUsuarioId(administrador.getUsuario().getId()).stream().forEach((rol) -> {
+                        new RolesDAO().delete(rol);
+                    });
+                    HibernateSessionFactory.getSession().flush();
+                    data.remove(administrador);
+                    dialogStage.close();
+
+                    // Registro para auditar
+                    String detalles = "elimino el administrador " 
+                            + administrador.getUsuario().getNombre() + " " 
+                            + administrador.getUsuario().getApellido();
+                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                });
+                buttonCancelar.setOnAction((ActionEvent e) -> {
+                       dialogStage.close();
+                    });
+                dialogStage.showAndWait();
+            } else {
+               aplicacionControl.noPermitido();
             }
-            HibernateSessionFactory.getSession().flush();
-            data.remove(administrador);
-            dialogStage.close();
-            
-            // Registro para auditar
-            String detalles = "elimino el administrador " 
-                    + administrador.getUsuario().getNombre() + " " 
-                    + administrador.getUsuario().getApellido();
-            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-        });
+        } 
     }
     
     public void administradorEditado(Identidad ide) {
@@ -187,10 +205,7 @@ public class AdministradoresController implements Initializable {
         }
     }
     
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {   
-        administradoresTable.setEditable(Boolean.FALSE);
-        administradoresTable.getColumns().clear(); 
+    public void setAdministradores() {
         
         IdentidadDAO identidadDAO = new IdentidadDAO();
         RolesDAO rolesDAO = new RolesDAO();
@@ -228,12 +243,17 @@ public class AdministradoresController implements Initializable {
             administrador.setPermisos(permisos);
             administradores.add(administrador);
         }
-        
+        data = FXCollections.observableArrayList(); 
         if (!administradores.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
            data.addAll(administradores);
-           administradoresTable.setItems(data);
         }
+        administradoresTable.setItems(data);
+    }
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {   
+        administradoresTable.setEditable(Boolean.FALSE);
+        administradoresTable.getColumns().clear(); 
         
         TableColumn nombre = new TableColumn("Nombre");
         nombre.setMinWidth(100);
@@ -256,11 +276,11 @@ public class AdministradoresController implements Initializable {
         nombreUsuario.setCellValueFactory(new PropertyValueFactory<>("nombreUsuario"));
         
         TableColumn permisos = new TableColumn("Permisos");
-        permisos.setMinWidth(100);
+        permisos.setMinWidth(115);
         permisos.setCellValueFactory(new PropertyValueFactory<>("permisos"));
         
         TableColumn<Administrador, Administrador> editar = new TableColumn<>("Editar");
-        editar.setMinWidth(40);
+        editar.setMinWidth(35);
         editar.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         editar.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
             private final Button editarButton = new Button("Editar");
@@ -276,13 +296,13 @@ public class AdministradoresController implements Initializable {
 
                 setGraphic(editarButton);
                 editarButton.setOnAction(event -> {
-                    editarAdministrador(identidadDAO.findById(administrador.getId()));
+                    editarAdministrador(new IdentidadDAO().findById(administrador.getId()));
                 });
             }
         });
         
         TableColumn<Administrador, Administrador> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
+        delete.setMinWidth(30);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
             private final Button deleteButton = new Button("Borrar");
@@ -315,6 +335,8 @@ public class AdministradoresController implements Initializable {
             });
             return row ;
         });
+        
+        setAdministradores();
     } 
     
     // Login items
