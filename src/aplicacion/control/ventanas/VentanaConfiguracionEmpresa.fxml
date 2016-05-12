@@ -39,7 +39,7 @@
          </rowConstraints>
          <children>
             <Label alignment="CENTER" contentDisplay="CENTER" text="Valor seguro por dia" textAlignment="CENTER" textFill="#fffefe" GridPane.halignment="CENTER" />
-            <Label fx:id="valorSeguro" alignment="CENTER" contentDisplay="CENTER" text="0.0$" textAlignment="CENTER" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label fx:id="valorSeguro" alignment="CENTER" contentDisplay="CENTER" textAlignment="CENTER" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#cambiarSeguro" prefHeight="25.0" prefWidth="151.0" text="Cambiar" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
          </children>
       </GridPane>
@@ -54,14 +54,14 @@
          </rowConstraints>
          <children>
             <Label text="Valor uniforme por dia" textFill="#fffefe" GridPane.halignment="CENTER" />
-            <Label fx:id="valorUniforme" alignment="CENTER" contentDisplay="CENTER" text="0.0$" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label fx:id="valorUniforme" alignment="CENTER" contentDisplay="CENTER" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#cambiarUniforme" prefHeight="25.0" prefWidth="151.0" text="Cambiar" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
          </children>
       </GridPane>
       <GridPane alignment="CENTER" gridLinesVisible="true" layoutX="150.0" layoutY="339.0" prefHeight="110.0" prefWidth="198.0">
          <children>
             <Label text="Decimo Cuarto" textFill="#fffefe" GridPane.halignment="CENTER" />
-            <Label fx:id="valorDecimoCuarto" alignment="CENTER" contentDisplay="CENTER" text="0.0 d" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label fx:id="valorDecimoCuarto" alignment="CENTER" contentDisplay="CENTER" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#cambiarDecimoCuarto" prefHeight="25.0" prefWidth="151.0" text="Cambiar" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
          </children>
          <columnConstraints>
@@ -76,7 +76,7 @@
       <GridPane alignment="CENTER" gridLinesVisible="true" layoutX="453.0" layoutY="339.0" prefHeight="110.0" prefWidth="198.0">
          <children>
             <Label text="Porcentaje IESS" textFill="#fffefe" GridPane.halignment="CENTER" />
-            <Label fx:id="valorIess" alignment="CENTER" contentDisplay="CENTER" text="0.0%" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label fx:id="valorIess" alignment="CENTER" contentDisplay="CENTER" textFill="#fffefe" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#cambiarIess" prefHeight="25.0" prefWidth="151.0" text="Cambiar" textAlignment="CENTER" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
          </children>
          <columnConstraints>

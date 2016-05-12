@@ -22,7 +22,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import net.sf.jasperreports.engine.JRException;
 
 /**
  *
@@ -48,7 +47,7 @@ public class PrincipalController implements Initializable {
     private Stage stagePrincipal;
     
     @FXML
-    private void handleButtonAction(ActionEvent event) throws JRException {
+    private void handleButtonAction(ActionEvent event) {
         if (!empresas.isEmpty() && !selector.getSelectionModel().isEmpty()) {
             aplicacionControl.mostrarInEmpresa(empresas.get(selector.getSelectionModel().getSelectedIndex()));
         }  else {

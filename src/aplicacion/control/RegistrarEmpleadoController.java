@@ -100,9 +100,6 @@ public class RegistrarEmpleadoController implements Initializable {
     private TextField sueldoField;
     
     @FXML
-    private TextField quincenaField;
-    
-    @FXML
     private CheckBox checkBoxDecimos;
     
     @FXML
@@ -193,9 +190,6 @@ public class RegistrarEmpleadoController implements Initializable {
         } else if (sueldoField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
-        } else if (quincenaField.getText().isEmpty()) {
-            errorText1.setText("Debe ingresar el monto del adelanto quincenal del empleado");
-            errorText2.setText("Debe ingresar el monto del adelanto quincenal del empleado");
         } else {
             UsuarioDAO usuariosDAO = new UsuarioDAO();
             DetallesEmpleadoDAO detallesEmpleadoDAO = new DetallesEmpleadoDAO();
@@ -211,7 +205,6 @@ public class RegistrarEmpleadoController implements Initializable {
                 detallesEmpleado.setExtra(extraField.getText());
                 detallesEmpleado.setNroCuenta(cuentaField.getText());
                 detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
-                detallesEmpleado.setQuincena(Double.parseDouble(quincenaField.getText()));
                 detallesEmpleado.setAcumulaDecimos(checkBoxDecimos.isSelected());
                 
                 detallesEmpleadoDAO.save(detallesEmpleado);
@@ -319,7 +312,6 @@ public class RegistrarEmpleadoController implements Initializable {
         roles = (ArrayList<Roles>) rolesDAO.findAll();
         
         sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        quincenaField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         
         cedulaField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
     }    

@@ -90,10 +90,7 @@ public class EmpleadoController implements Initializable {
     private Label sueldo;
     
     @FXML
-    private Label quincena;
-    
-    @FXML
-    private Label decimos;
+    private Label cumpleano;
     
     @FXML
     private Label extra;
@@ -183,18 +180,14 @@ public class EmpleadoController implements Initializable {
         departamento.setText(empleado.getDetallesEmpleado().getDepartamento().getNombre());
         cargo.setText(empleado.getDetallesEmpleado().getCargo().getNombre());
         cuenta.setText(empleado.getDetallesEmpleado().getNroCuenta());
-        sueldo.setText(empleado.getDetallesEmpleado().getSueldo() + " $");
-        quincena.setText(empleado.getDetallesEmpleado().getQuincena()+ " $");
+        sueldo.setText("$"+empleado.getDetallesEmpleado().getSueldo());
         extra.setText(empleado.getDetallesEmpleado().getExtra());
         DateTime inicio = new DateTime(empleado.getDetallesEmpleado().getFechaInicio().getTime());
         fechaInicio.setText(inicio.getDayOfMonth() + " de " + getMonthName(inicio.getMonthOfYear()) + " " + inicio.getYear());
         DateTime contrato = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
         fechaContrato.setText(contrato.getDayOfMonth() + " de " + getMonthName(contrato.getMonthOfYear()) + " " + contrato.getYear());
-        if (empleado.getDetallesEmpleado().getAcumulaDecimos()) {
-            decimos.setText("Si");
-        } else {
-            decimos.setText("No");
-        }
+        DateTime nacimiento = new DateTime(empleado.getNacimiento().getTime());
+        cumpleano.setText(nacimiento.getDayOfMonth() + " de " + getMonthName(nacimiento.getMonthOfYear()) + " " + nacimiento.getYear());
         
         if (empleado.getFoto() != null) {
             final BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(empleado.getFoto()));
@@ -230,7 +223,7 @@ public class EmpleadoController implements Initializable {
 
         ImageView imageView = new ImageView(image);
         imageView.setFitWidth(140);
-        imageView.setFitHeight(150);
+        imageView.setFitHeight(160);
         //imageView.setPreserveRatio(true);  // para mantener la escala
         imageView.setSmooth(true);
         imageView.setCache(true);

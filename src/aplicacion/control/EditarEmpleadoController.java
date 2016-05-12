@@ -20,7 +20,6 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -30,10 +29,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -98,9 +94,6 @@ public class EditarEmpleadoController implements Initializable {
     
     @FXML
     private TextField sueldoField;
-    
-    @FXML
-    private TextField quincenaField;
     
     @FXML
     private CheckBox checkBoxDecimos;
@@ -217,7 +210,6 @@ public class EditarEmpleadoController implements Initializable {
             empleado.getDetallesEmpleado().setExtra(extraField.getText());
             empleado.getDetallesEmpleado().setNroCuenta(cuentaField.getText());
             empleado.getDetallesEmpleado().setSueldo(Double.parseDouble(sueldoField.getText()));
-            empleado.getDetallesEmpleado().setQuincena(Double.parseDouble(quincenaField.getText()));
             empleado.getDetallesEmpleado().setAcumulaDecimos(checkBoxDecimos.isSelected());
             
             empleado.setNombre(nombreField.getText());
@@ -328,7 +320,6 @@ public class EditarEmpleadoController implements Initializable {
         emailField.setText(empleado.getEmail());
         cuentaField.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldoField.setText(empleado.getDetallesEmpleado().getSueldo().toString());
-        quincenaField.setText(empleado.getDetallesEmpleado().getQuincena().toString());
         checkBoxDecimos.setSelected(empleado.getDetallesEmpleado().getAcumulaDecimos());
         extraField.setText(empleado.getDetallesEmpleado().getExtra());
         estadoCivilChoiceBox.getSelectionModel().select(empleado.getEstadoCivil().getNombre());
@@ -375,7 +366,6 @@ public class EditarEmpleadoController implements Initializable {
         cargoChoiceBox.setItems(FXCollections.observableArrayList(itemsCargos)); 
        
         sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        quincenaField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
     }    
     
     public static EventHandler<KeyEvent> numDecimalFilter() {

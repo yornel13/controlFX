@@ -68,13 +68,10 @@
                   <DatePicker fx:id="datePickerContratacion" layoutX="379.0" layoutY="113.0" promptText="Fecha de contratacion" />
                   <Label layoutX="25.0" layoutY="118.0" text="Inicio" textFill="WHITE" />
                   <Label layoutX="295.0" layoutY="118.0" text="Contratacion" textFill="WHITE" />
-                  <CheckBox fx:id="checkBoxDecimos" layoutX="111.0" layoutY="280.0" mnemonicParsing="false" selected="true" text="Acumula decimos" textFill="WHITE" />
-                  <TextField fx:id="quincenaField" layoutX="431.0" layoutY="235.0" prefHeight="25.0" prefWidth="120.0" promptText="Adelanto Quincenal" />
-                  <Label layoutX="316.0" layoutY="239.0" text="Adelanto Quincenal" textFill="WHITE" />
-                  <Label layoutX="561.0" layoutY="239.0" text="\$" textFill="WHITE" />
-                  <Label layoutX="215.0" layoutY="238.0" text="\$" textFill="WHITE" />
+                  <CheckBox fx:id="checkBoxDecimos" layoutX="364.0" layoutY="239.0" mnemonicParsing="false" selected="true" text="Acumula decimos" textFill="WHITE" />
+                  <Label layoutX="110.0" layoutY="238.0" text="\$" textFill="WHITE" />
                   <Label layoutX="27.0" layoutY="239.0" text="Sueldo" textFill="WHITE" />
-                  <TextField fx:id="sueldoField" layoutX="111.0" layoutY="234.0" prefHeight="25.0" prefWidth="98.0" promptText="Sueldo mensual" />
+                  <TextField fx:id="sueldoField" layoutX="123.0" layoutY="234.0" prefHeight="25.0" prefWidth="98.0" promptText="Sueldo mensual" />
                </children>
             </AnchorPane>
          </content>

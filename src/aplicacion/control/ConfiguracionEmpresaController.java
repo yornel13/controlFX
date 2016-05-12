@@ -85,27 +85,27 @@ public class ConfiguracionEmpresaController implements Initializable {
     public void setSeguro(Seguro seguro) {
         this.seguro = seguro;
         if (seguro != null) {
-            valorSeguro.setText(this.seguro.getValor().toString() + "$");
+            valorSeguro.setText("$" + this.seguro.getValor().toString());
         } else {
-            valorSeguro.setText("0.0$");
+            valorSeguro.setText("$0.0");
         }
     }
     
     public void setUniforme(Uniforme uniforme) {
         this.uniforme = uniforme;
         if (uniforme != null) {
-            valorUniforme.setText(this.uniforme.getValor().toString() + "$");
+            valorUniforme.setText("$" + this.uniforme.getValor().toString());
         } else {
-            valorUniforme.setText("0.0$");
+            valorUniforme.setText("$0.0");
         }
     }
     
     public void setDecimoCuarto(Constante decimoCuarto) {
         this.decimoCuarto = decimoCuarto;
         if (decimoCuarto != null) {
-            valorDecimoCuarto.setText(this.decimoCuarto.getValor() + " d");
+            valorDecimoCuarto.setText("$" + this.decimoCuarto.getValor());
         } else {
-            valorDecimoCuarto.setText("0.0 d");
+            valorDecimoCuarto.setText("$0.0");
         }
     }
     
