@@ -5,6 +5,7 @@
  */
 package aplicacion.control.tableModel;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -26,6 +27,9 @@ public class EmpleadoTable {
     public SimpleIntegerProperty horas = new SimpleIntegerProperty();
     public SimpleIntegerProperty suplementarias = new SimpleIntegerProperty();
     public SimpleIntegerProperty sobreTiempo = new SimpleIntegerProperty();
+    public SimpleDoubleProperty actuarial1 = new SimpleDoubleProperty();
+    public SimpleDoubleProperty actuarial2 = new SimpleDoubleProperty();
+    public SimpleDoubleProperty quincenal = new SimpleDoubleProperty();
 
     public Integer getDias() {
         return dias.get();
@@ -73,6 +77,18 @@ public class EmpleadoTable {
     
     public String getEmpresa() {
         return empresa.get();
+    }
+    
+    public Double getActuarial1() {
+        return actuarial1.get();
+    }
+    
+    public Double getActuarial2() {
+        return actuarial2.get();
+    }
+    
+    public Double getQuincenal() {
+        return quincenal.get();
     }
    
 }

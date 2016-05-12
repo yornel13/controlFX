@@ -241,7 +241,7 @@ public class RegistrarEmpleadoController implements Initializable {
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
-                dialogStage.setTitle("Dialogo");
+                dialogStage.setTitle("Completado");
                 String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
                 dialogStage.getIcons().add(new Image(stageIcon));
                 Button buttonOk = new Button("ok");

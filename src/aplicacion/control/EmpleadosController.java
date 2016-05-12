@@ -304,15 +304,15 @@ public class EmpleadosController implements Initializable {
         }
           
         TableColumn cedula = new TableColumn("Cedula");
-        cedula.setMinWidth(100);
+        cedula.setMinWidth(80);
         cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(100);
+        nombre.setMinWidth(140);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
        
         TableColumn apellido = new TableColumn("Apellido");
-        apellido.setMinWidth(120);
+        apellido.setMinWidth(140);
         apellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         
         TableColumn telefono = new TableColumn("Telefono");
@@ -320,34 +320,12 @@ public class EmpleadosController implements Initializable {
         telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
         TableColumn departamento = new TableColumn("Departamento");
-        departamento.setMinWidth(120);
+        departamento.setMinWidth(140);
         departamento.setCellValueFactory(new PropertyValueFactory<>("departamento"));
         
         TableColumn cargo = new TableColumn("Cargo");
-        cargo.setMinWidth(100);
+        cargo.setMinWidth(120);
         cargo.setCellValueFactory(new PropertyValueFactory<>("cargo"));
-        
-        TableColumn<EmpleadoTable, EmpleadoTable> pagos = new TableColumn<>("Pagos");
-        pagos.setMinWidth(40);
-        pagos.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        pagos.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
-            private final Button pagosButton = new Button("Agregar");
-
-            @Override
-            protected void updateItem(EmpleadoTable empleadoTable, boolean empty) {
-                super.updateItem(empleadoTable, empty);
-
-                if (empleadoTable == null) {
-                    setGraphic(null);
-                    return;
-                }
-
-                setGraphic(pagosButton);
-                pagosButton.setOnAction(event -> {
-                    pagos(new UsuarioDAO().findById(empleadoTable.getId()));
-                });
-            }
-        });
         
         TableColumn<EmpleadoTable, EmpleadoTable> delete = new TableColumn<>("Borrar");
         delete.setMinWidth(40);
@@ -372,7 +350,7 @@ public class EmpleadosController implements Initializable {
         });
         
         empleadosTableView.getColumns().addAll(cedula, nombre, apellido, 
-                telefono, departamento, cargo, pagos, delete);
+                telefono, departamento, cargo, delete);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();

@@ -56,6 +56,7 @@ public class AplicacionControl extends Application {
     public ClientesController changeClientesController;
     public EmpresasController changeEmpresasController;
     public AdministradoresController changeAdministradoresController;
+    public ActuarialesEmpleadosController changeActuarialesEmpleadosController;
     
     @Override
     public void start(Stage stagePrincipal) throws Exception {
@@ -363,6 +364,79 @@ public class AplicacionControl extends Application {
                     ventana.setScene(scene);
                     EmpleadosController controller = loader.getController();
                     changeEmpleadosController = controller;
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarActuarialesEmpleados(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_DEUDAS, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaActuarialesEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Actuariales");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    ActuarialesEmpleadosController controller = loader.getController();
+                    changeActuarialesEmpleadosController = controller;
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarQuincenalEmpleados(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_DEUDAS, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaQuincenalEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Adelanto Quincenal");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    QuincenalEmpleadosController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);

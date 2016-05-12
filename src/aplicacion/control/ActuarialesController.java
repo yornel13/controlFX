@@ -40,6 +40,8 @@ public class ActuarialesController implements Initializable {
     
     private AplicacionControl aplicacionControl;
     
+    private ActuarialesEmpleadosController actuarialesEmpleadosController;
+    
     @FXML
     private Label oldActuarial1;
     
@@ -77,18 +79,20 @@ public class ActuarialesController implements Initializable {
             
             stagePrincipal.close();
             
+            actuarialesEmpleadosController.empleadoEditado(empleado);
+            
             String detalles = "edito los actuariales de " + empleado.getNombre() + " " + empleado.getApellido();
             aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
             
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
+            dialogStage.setTitle("Completado");
             String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("ok");
             dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("Actuarial agregado satisfactoriamente"), buttonOk).
+            children(new Text("Actuariales editados satisfactoriamente."), buttonOk).
             alignment(Pos.CENTER).padding(new Insets(10)).build()));
             dialogStage.show();
             buttonOk.setOnAction((ActionEvent e) -> {
@@ -120,6 +124,10 @@ public class ActuarialesController implements Initializable {
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
         this.aplicacionControl = aplicacionControl;
+    }
+    
+    public void setProgramaActuariales(ActuarialesEmpleadosController actuarialesEmpleadosController) {
+        this.actuarialesEmpleadosController = actuarialesEmpleadosController;
     }
 
     @Override

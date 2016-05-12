@@ -1,0 +1,228 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package aplicacion.control;
+
+import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.util.Permisos;
+import hibernate.dao.ActuarialesDAO;
+import hibernate.dao.UsuarioDAO;
+import hibernate.model.Actuariales;
+import hibernate.model.Empresa;
+import hibernate.model.Usuario;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+
+/**
+ *
+ * @author Yornel
+ */
+public class ActuarialesEmpleadosController implements Initializable {
+    
+    private Stage stagePrincipal;
+    
+    private AplicacionControl aplicacionControl;
+   
+    @FXML
+    private Button administradoresButton;
+    
+    @FXML
+    private TableView empleadosTableView;
+    
+    @FXML 
+    private TableColumn cedulaColumna;
+    
+    @FXML 
+    private TableColumn nombreColumna;
+    
+    @FXML 
+    private TableColumn apellidoColumna;
+    
+    @FXML 
+    private TableColumn departamentoColumna;
+    
+    @FXML 
+    private TableColumn cargoColumna;
+    
+    @FXML 
+    private TableColumn actuarial1Columna;
+    
+    @FXML 
+    private TableColumn actuarial2Columna;
+    
+    private ObservableList<EmpleadoTable> data;
+    
+    ArrayList<Usuario> usuarios;
+    private Empresa empresa;
+    
+    public void setStagePrincipal(Stage stagePrincipal) {
+        this.stagePrincipal = stagePrincipal;
+    }
+    
+    public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
+        this.aplicacionControl = aplicacionControl;
+    }
+    
+    @FXML
+    private void returnConfiguracion(ActionEvent event) {
+        stagePrincipal.close();
+        aplicacionControl.mostrarInEmpresa(empresa);
+    } 
+    
+    public void mostrarEditarActuariales(Usuario empleado) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarActuariales.fxml"));
+                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaHoras);
+                    ventana.setScene(scene);
+                    ActuarialesController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setProgramaActuariales(this);
+                    controller.setEmpleado(empleado);
+                    ventana.showAndWait();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }
+    }
+    
+    public void empleadoEditado(Usuario user) {
+        for (EmpleadoTable empleadoTable: data) {
+            if(empleadoTable.getId() == user.getId()) {
+               EmpleadoTable empleado = new EmpleadoTable();
+               empleado.id.set(user.getId());
+               empleado.nombre.set(user.getNombre());
+               empleado.apellido.set(user.getApellido());
+               empleado.cedula.set(user.getCedula());
+               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+               empleado.telefono.set(user.getTelefono());
+               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+               Actuariales actuariales = new Actuariales();
+               actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
+               if (actuariales != null) {
+                   empleado.actuarial1.set(actuariales.getPrimario());
+                   empleado.actuarial2.set(actuariales.getSecundario());
+               } else {
+                   empleado.actuarial1.set(0d);
+                   empleado.actuarial2.set(0d);
+               }
+                 data.set(data.indexOf(empleadoTable), empleado);
+            }
+        }
+    }
+    
+    public void setEmpresa(Empresa empresa) {
+        this.empresa = empresa;
+        
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        usuarios = new ArrayList<>();
+        usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
+        if (!usuarios.isEmpty()) {
+           data = FXCollections.observableArrayList(); 
+           usuarios.stream().map((user) -> {
+               EmpleadoTable empleado = new EmpleadoTable();
+               empleado.id.set(user.getId());
+               empleado.nombre.set(user.getNombre());
+               empleado.apellido.set(user.getApellido());
+               empleado.cedula.set(user.getCedula());
+               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+               empleado.telefono.set(user.getTelefono());
+               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+               Actuariales actuariales = new Actuariales();
+               actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
+               if (actuariales != null) {
+                   empleado.actuarial1.set(actuariales.getPrimario());
+                   empleado.actuarial2.set(actuariales.getSecundario());
+               } else {
+                   empleado.actuarial1.set(0d);
+                   empleado.actuarial2.set(0d);
+               }
+               
+                return empleado;
+            }).forEach((empleado) -> {
+                data.add(empleado);
+            });
+           empleadosTableView.setItems(data);
+        }
+    }
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {   
+        empleadosTableView.setEditable(Boolean.FALSE);
+        
+        cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+       
+        apellidoColumna.setCellValueFactory(new PropertyValueFactory<>("apellido"));
+        
+        departamentoColumna.setCellValueFactory(new PropertyValueFactory<>("departamento"));
+        
+        cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
+        
+        actuarial1Columna.setCellValueFactory(new PropertyValueFactory<>("actuarial1"));
+        
+        actuarial2Columna.setCellValueFactory(new PropertyValueFactory<>("actuarial2"));
+        
+        empleadosTableView.setRowFactory( (Object tv) -> {
+            TableRow<EmpleadoTable> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    EmpleadoTable rowData = row.getItem();
+                    mostrarEditarActuariales(new UsuarioDAO().findById(rowData.getId()));
+                }
+            });
+            return row ;
+        });
+    } 
+    
+    // Login items
+    @FXML
+    public Button login;
+    
+    @FXML 
+    public Label usuarioLogin;
+    
+    @FXML
+    public void onClickLoginButton(ActionEvent event) {
+        aplicacionControl.login(login, usuarioLogin);
+    }
+    
+}
