@@ -5,9 +5,7 @@
  */
 package aplicacion.control;
 
-import hibernate.dao.DetallesEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.DetallesEmpleado;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.net.URL;
@@ -115,15 +113,9 @@ public class EmpresaController implements Initializable {
         email.setText(empresa.getEmail());
         diaCorte.setText(empresa.getDiaCortePago() + " de cada mes");
         UsuarioDAO usuariosDAO = new UsuarioDAO();
-        ArrayList<Usuario> empleadosAll = new ArrayList<>();
         ArrayList<Usuario> empleados = new ArrayList<>();
-        empleadosAll.addAll(usuariosDAO.findAll());
-        for (Usuario user: empleadosAll) {
-            if (user.getDetallesEmpleado() != null && 
-                    user.getDetallesEmpleado().getEmpresa().getId() == empresa.getId()) {
-                empleados.add(user);
-            }
-        }
+        empleados.addAll(usuariosDAO.findByEmpresaIdActivo(empresa.getId()));
+           
         totalEmpleados.setText(String.valueOf(empleados.size()));
         gerente.setText("no aplica");
     }

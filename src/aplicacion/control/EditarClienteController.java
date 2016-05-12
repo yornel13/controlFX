@@ -7,11 +7,13 @@ package aplicacion.control;
 
 import aplicacion.control.util.FilterMaxValue;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.ClienteDAO;
 import hibernate.model.Cliente;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,7 +22,9 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -99,36 +103,84 @@ public class EditarClienteController implements Initializable {
         } else if (direccionField.getText().isEmpty()) {
             errorText.setText("Debe ingresar la direccion del cliente");
         }  else {
+            cliente = new ClienteDAO().findById(cliente.getId());
+            
             cliente.setNombre(nombreField.getText());
             cliente.setDetalles(detallesField.getText());
             cliente.setRuc(Integer.parseInt(numeracionField.getText()));
             cliente.setTelefono(telefonoField.getText());
             cliente.setDireccion(direccionField.getText());
             cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
-            HibernateSessionFactory.getSession().flush();
             
-            stagePrincipal.close();
-            
-            // Registro para auditar
-            String detalles = "edito el cliente " 
-                    + cliente.getNombre();
-            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-            
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
-            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-            dialogStage.getIcons().add(new Image(stageIcon));
-            Button buttonOk = new Button("ok");
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("Cliente editado satisfactoriamente"), buttonOk).
-            alignment(Pos.CENTER).padding(new Insets(10)).build()));
-            dialogStage.show();
-            buttonOk.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
+            confirmarGuardado();
         }
+    }
+    
+    public void confirmacionPositiva() {
+        stagePrincipal.close();
+
+        // Registro para auditar
+        String detalles = "edito el cliente " 
+                + cliente.getNombre();
+        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+
+        completado();
+
+        ClientesController ec = aplicacionControl.changeClientesController;
+        if (ec != null) {
+            ec.clienteEditado(cliente);
+        }
+    }
+    
+    public void completado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Completado");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Cliente editado satisfactoriamente."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public void confirmarGuardado() {
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Confirmar modificación");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("Si, modificar");
+        Button buttonCancelar = new Button("No, no estoy seguro");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Seguro que desea modificar este cliente?"), buttonOk, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            HibernateSessionFactory.getSession().flush();
+            confirmacionPositiva();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event) -> {
+            dialogStage.close();
+            HibernateSessionFactory.getSession().flush();
+            confirmacionPositiva();
+        });
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            HibernateSessionFactory.getSession().clear();
+        });
+        dialogStage.showAndWait();
+        
     }
     
     @FXML

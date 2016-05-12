@@ -21,6 +21,8 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JRException;
 
 /**
  *
@@ -41,13 +43,34 @@ public class PrincipalController implements Initializable {
     
     ArrayList<Empresa> empresas;
     
+    public static final String REPORTE_IMPORTE = "/report/prueba_Mano.jrxml";
+    
+    private Stage stagePrincipal;
+    
     @FXML
-    private void handleButtonAction(ActionEvent event) {
+    private void handleButtonAction(ActionEvent event) throws JRException {
         if (!empresas.isEmpty() && !selector.getSelectionModel().isEmpty()) {
             aplicacionControl.mostrarInEmpresa(empresas.get(selector.getSelectionModel().getSelectedIndex()));
         }  else {
             label.setText("Selecciona una empresa primero.");
         }
+        
+        
+        
+        //File file = new File("dfsd");
+        
+        //JasperReport reporte = (JasperReport) JRLoader.loadObjectFromFile(REPORTE_IMPORTE);
+        
+        //Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        
+        //JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, new Em);
+       
+    }
+    
+    
+    
+    public void setStagePrincipal(Stage stagePrincipal) {
+        this.stagePrincipal = stagePrincipal;
     }
     
     @FXML
@@ -73,9 +96,9 @@ public class PrincipalController implements Initializable {
         
         String[] items = new String[empresas.size()];
         
-        for (Empresa emp: empresas) {
+        empresas.stream().forEach((emp) -> {
             items[empresas.indexOf(emp)] = emp.getNombre();
-        }
+        });
         
         selector.setItems(FXCollections.observableArrayList(items)); 
         

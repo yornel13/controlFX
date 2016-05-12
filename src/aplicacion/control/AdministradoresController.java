@@ -152,6 +152,41 @@ public class AdministradoresController implements Initializable {
         });
     }
     
+    public void administradorEditado(Identidad ide) {
+        for (Administrador admin: data) {
+            if(admin.getId() == ide.getId()) {
+                Administrador administrador = new Administrador();
+                administrador.setId(ide.getId());
+                administrador.setUsuario(ide.getUsuario());
+                administrador.setNombreUsuario(ide.getNombreUsuario());
+                administrador.setContrasena(ide.getContrasena());
+                administrador.setNombre(ide.getUsuario().getNombre() + " " + ide.getUsuario().getApellido());
+                administrador.setApellido(ide.getUsuario().getApellido());
+                administrador.setCedula(ide.getUsuario().getCedula());
+                if (ide.getUsuario().getDetallesEmpleado() != null) {
+                    administrador.setNombreEmpresa(ide.getUsuario().getDetallesEmpleado()
+                            .getEmpresa().getNombre());
+                }
+                String permisos = "";
+                ArrayList<Roles> roles = new ArrayList<>();
+                roles.addAll(new RolesDAO().findAllByUsuarioId(administrador.getUsuario().getId()));
+                int cantidad = roles.size();
+                for (Roles rol: roles){
+                    String next;
+                    if (cantidad == 1) {
+                        next = ".";
+                    } else {
+                        next = ", ";
+                    }
+                    permisos = permisos + rol.getNombre() + next;
+                    cantidad --;
+                }
+                administrador.setPermisos(permisos);
+                data.set(data.indexOf(admin), administrador);
+            }
+        }
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         administradoresTable.setEditable(Boolean.FALSE);

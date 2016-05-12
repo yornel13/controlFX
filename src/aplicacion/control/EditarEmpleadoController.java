@@ -10,6 +10,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.EstadoCivilDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cargo;
 import hibernate.model.Departamento;
 import hibernate.model.EstadoCivil;
@@ -17,9 +18,9 @@ import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -29,7 +30,10 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -42,7 +46,6 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -205,6 +208,7 @@ public class EditarEmpleadoController implements Initializable {
             errorText1.setText("Debe ingresar el sueldo del empleado");
             errorText2.setText("Debe ingresar el sueldo del empleado");
         } else {
+            empleado = new UsuarioDAO().findById(empleado.getId());
             
             empleado.getDetallesEmpleado().setDepartamento(departamentos.get(departamentoChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.getDetallesEmpleado().setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
@@ -231,30 +235,81 @@ public class EditarEmpleadoController implements Initializable {
             empleado.setTelefono(telefonoField.getText());
             empleado.setEstadoCivil(estadosCivil.get(estadoCivilChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.setUltimaModificacion(new Timestamp(new Date().getTime()));
-            HibernateSessionFactory.getSession().flush();
             
-            stagePrincipal.close();
-            
-            // Registro para auditar
-            String detalles = "edito el empleado " 
-                    + empleado.getNombre() + " " + empleado.getApellido();
-            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-            
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("Dialogo");
-            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-            dialogStage.getIcons().add(new Image(stageIcon));
-            Button buttonOk = new Button("ok");
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("Empleado editado satisfactoriamente"), buttonOk).
-            alignment(Pos.CENTER).padding(new Insets(10)).build()));
-            dialogStage.show();
-            buttonOk.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
+            confirmarGuardado();
         }
+    }
+    
+    public void confirmacionPositiva() {
+        stagePrincipal.close();
+
+        // Registro para auditar
+        String detalles = "edito el empleado " 
+                + empleado.getNombre() + " " + empleado.getApellido();
+        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+
+        completado();
+
+        EmpleadosController ec = aplicacionControl.changeEmpleadosController;
+        EmpleadosTodosController etc = aplicacionControl.changeEmpleadosTodosController;
+        if (ec != null) {
+            ec.empleadoEditado(empleado);
+        }
+        if (etc != null) {
+            etc.empleadoEditado(empleado);
+        }
+    }
+    
+    public void completado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Completado");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Empleado editado satisfactoriamente."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(15)).build()));
+        buttonOk.setMaxWidth(40);
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public void confirmarGuardado() {
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Confirmar modificación");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("Si, modificar");
+        Button buttonCancelar = new Button("No, no estoy seguro");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Seguro que desea modificar este empleado?"), buttonOk, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            HibernateSessionFactory.getSession().flush();
+            confirmacionPositiva();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event) -> {
+            dialogStage.close();
+            HibernateSessionFactory.getSession().flush();
+            confirmacionPositiva();
+        });
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            HibernateSessionFactory.getSession().clear();
+        });
+        dialogStage.showAndWait();
+        
     }
     
     @FXML

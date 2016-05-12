@@ -5,13 +5,8 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.tableModel.Administrador;
-import aplicacion.control.tableModel.EmpresaTable;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
-import hibernate.dao.EmpresaDAO;
-import hibernate.dao.IdentidadDAO;
-import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import java.net.URL;
@@ -117,6 +112,17 @@ public class ClientesController implements Initializable {
                     + cliente.getNombre();
             aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
         });
+    }
+    
+    public void clienteEditado(Cliente cliente) {
+        int posicion = 0;
+        for (Cliente cli: data) {
+            if (cli.getId() == cliente.getId()) {
+               posicion = data.indexOf(cli);
+               break;
+            }
+        }
+        data.set(posicion, cliente);
     }
     
     @Override

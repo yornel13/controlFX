@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" snapToPixel="false" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PrincipalController">
+<AnchorPane id="AnchorPane" fx:id="mainAppPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" snapToPixel="false" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PrincipalController">
     <children>
         <Label fx:id="label" layoutX="55.0" layoutY="73.0" minHeight="16" minWidth="69" textFill="RED">
          <font>

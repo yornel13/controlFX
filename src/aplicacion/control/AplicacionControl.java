@@ -28,6 +28,10 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import static javafx.application.Application.launch;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
+import javafx.stage.WindowEvent;
 
 /**
  *
@@ -46,6 +50,12 @@ public class AplicacionControl extends Application {
     public Label usuarioLogin;
     
     public Auditar au;
+    
+    public EmpleadosController changeEmpleadosController;
+    public EmpleadosTodosController changeEmpleadosTodosController;
+    public ClientesController changeClientesController;
+    public EmpresasController changeEmpresasController;
+    public AdministradoresController changeAdministradoresController;
     
     @Override
     public void start(Stage stagePrincipal) throws Exception {
@@ -104,8 +114,8 @@ public class AplicacionControl extends Application {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Dialogo");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+        dialogStage.setTitle("No hay usuario");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
@@ -115,14 +125,37 @@ public class AplicacionControl extends Application {
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public void noSePuede() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Lo siento!");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Ya no se puede realizar esta acción."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
     }
     
     public void noPermitido() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Dialogo");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+        dialogStage.setTitle("No permitido");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
@@ -130,6 +163,37 @@ public class AplicacionControl extends Application {
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    private EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
+        // close event handling logic.
+        // consume the event if you wish to cancel the close operation.
+        cerrarWindows(stagePrincipal);
+    }; 
+    
+    public void cerrarWindows(Stage stage) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Precaución");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("Si");
+        Button buttonNo = new Button("no");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Seguro que desea salir de la aplicacion?"), buttonOk, buttonNo).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        dialogStage.show();
+        buttonOk.setOnAction((ActionEvent e) -> {
+            stage.close();
+            dialogStage.close();
+        });
+        buttonNo.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
     }
@@ -163,6 +227,7 @@ public class AplicacionControl extends Application {
             stagePrincipal.setHeight(630);
             stagePrincipal.setScene(scene);
             PrincipalController controller = loader.getController();
+            controller.setStagePrincipal(stagePrincipal);
             controller.setProgramaPrincipal(this);
             insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
             stagePrincipal.show();
@@ -178,7 +243,6 @@ public class AplicacionControl extends Application {
            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
                try {
                     stagePrincipal.close();
-                    System.out.println("aplicacion.control.AplicacionControl.mostarConfiguracion()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracion.fxml"));
                     AnchorPane ventanaConfiguracion = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
@@ -254,12 +318,11 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.CREAR)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpresa()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpresa.fxml"));
                     AnchorPane ventanaRegistrarEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Registrar empresa");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
@@ -286,7 +349,6 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
@@ -300,6 +362,7 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaEmpleados);
                     ventana.setScene(scene);
                     EmpleadosController controller = loader.getController();
+                    changeEmpleadosController = controller;
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
@@ -323,7 +386,6 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarEmpleados()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleadosTodos.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
@@ -337,6 +399,7 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaEmpleados);
                     ventana.setScene(scene);
                     EmpleadosTodosController controller = loader.getController();
+                    changeEmpleadosTodosController = controller;
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
@@ -359,12 +422,11 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.CREAR)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
                     TabPane ventanaRegistrarEmpleado = (TabPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Nuevo empleado");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
@@ -392,11 +454,12 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
                     AnchorPane ventanaEmpleado = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Detalles de empleado");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_mostrar.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEmpleado);
@@ -428,6 +491,8 @@ public class AplicacionControl extends Application {
                     TabPane ventanaEditarEmpleado = (TabPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Editar empleado");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEditarEmpleado);
@@ -468,6 +533,7 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaEmpresas);
                     ventana.setScene(scene);
                     EmpresasController controller = loader.getController();
+                    changeEmpresasController = controller;
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
@@ -504,6 +570,7 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaClientes);
                     ventana.setScene(scene);
                     ClientesController controller = loader.getController();
+                    changeClientesController = controller;
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
@@ -576,6 +643,7 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaAdministradores);
                     ventana.setScene(scene);
                     AdministradoresController controller = loader.getController();
+                    changeAdministradoresController = controller;
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
@@ -603,7 +671,7 @@ public class AplicacionControl extends Application {
                     AnchorPane ventanaRegistrarAdministrador = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Nuevo Administrador");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
@@ -630,11 +698,12 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostrarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresa.fxml"));
                     AnchorPane ventanaEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Detalles de empresa");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_mostrar.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEmpresa);
@@ -666,7 +735,9 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpresa.fxml"));
                     AnchorPane ventanaEditarEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Editar empleado");
+                    ventana.setTitle("Editar empresa");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEditarEmpresa);
@@ -693,11 +764,12 @@ public class AplicacionControl extends Application {
         } else {
             if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.CREAR)) {
                 try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarCliente()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarCliente.fxml"));
                     AnchorPane ventanaRegistrarCliente = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Registrar cliente");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaRegistrarCliente);
@@ -728,6 +800,8 @@ public class AplicacionControl extends Application {
                     AnchorPane ventanaCliente = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Detalles de cliente");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_mostrar.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaCliente);
@@ -760,6 +834,8 @@ public class AplicacionControl extends Application {
                     AnchorPane ventanaEditarCliente = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Editar cliente");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEditarCliente);
@@ -1012,7 +1088,7 @@ public class AplicacionControl extends Application {
                     AnchorPane ventanaEditarContrasena = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Usuario: " + identidad.getNombreUsuario());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
@@ -1040,12 +1116,11 @@ public class AplicacionControl extends Application {
        } else {
            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
                try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarUsuario.fxml"));
                     AnchorPane ventanaEditarUsuario = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Usuario: " + identidad.getNombreUsuario());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);
@@ -1073,12 +1148,11 @@ public class AplicacionControl extends Application {
        } else {
            if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
                try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostarRegistrarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarRol.fxml"));
                     AnchorPane ventanaEditarPermisos = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Usuario: " + identidad.getNombreUsuario());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
                     ventana.initOwner(stagePrincipal);

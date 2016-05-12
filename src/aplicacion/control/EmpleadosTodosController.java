@@ -105,6 +105,22 @@ public class EmpleadosTodosController implements Initializable {
         });
     }
     
+    public void empleadoEditado(Usuario user) {
+        for (EmpleadoTable empleadoTable: data) {
+            if(empleadoTable.getId() == user.getId()) {
+                 EmpleadoTable empleado = new EmpleadoTable();
+                 empleado.id.set(user.getId());
+                 empleado.nombre.set(user.getNombre());
+                 empleado.apellido.set(user.getApellido());
+                 empleado.cedula.set(user.getCedula());
+                 empleado.telefono.set(user.getTelefono());
+                 empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+                 empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                 data.set(data.indexOf(empleadoTable), empleado);
+            }
+        }
+    }
+    
     public void setDataToTable() {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();

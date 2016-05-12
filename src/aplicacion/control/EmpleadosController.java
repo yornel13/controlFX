@@ -209,6 +209,22 @@ public class EmpleadosController implements Initializable {
         } 
     }
     
+    public void empleadoEditado(Usuario user) {
+        for (EmpleadoTable empleadoTable: data) {
+            if(empleadoTable.getId() == user.getId()) {
+                 EmpleadoTable empleado = new EmpleadoTable();
+                 empleado.id.set(user.getId());
+                 empleado.nombre.set(user.getNombre());
+                 empleado.apellido.set(user.getApellido());
+                 empleado.cedula.set(user.getCedula());
+                 empleado.telefono.set(user.getTelefono());
+                 empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+                 empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                 data.set(data.indexOf(empleadoTable), empleado);
+            }
+        }
+    }
+    
     @FXML
     private void returnEmpresa(ActionEvent event) {
         aplicacionControl.mostrarInEmpresa(empresa);
@@ -225,11 +241,13 @@ public class EmpleadosController implements Initializable {
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
                 dialogStage.setTitle("Confirmación de borrado");
-                String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
                 dialogStage.getIcons().add(new Image(stageIcon));;
                 Button buttonConfirmar = new Button("Si Borrar");
+                Button buttonCancelar = new Button("No, no estoy seguro");
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Borrar el empleado " + empleadoTable.getNombre()+ "?"), buttonConfirmar).
+                children(new Text("¿Esta seguro que desea borrar el empleado " + empleadoTable.getNombre()+ "?"), 
+                        buttonConfirmar, buttonCancelar).
                 alignment(Pos.CENTER).padding(new Insets(25)).build()));
                 dialogStage.show();
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
@@ -245,6 +263,10 @@ public class EmpleadosController implements Initializable {
                             + empleadoTable.getApellido();
                     aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                 });
+                buttonCancelar.setOnAction((ActionEvent e) -> {
+                   dialogStage.close();
+                });
+
                   
             } else {
                aplicacionControl.noPermitido();
