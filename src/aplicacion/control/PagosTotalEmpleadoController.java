@@ -18,6 +18,7 @@ import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.Usuario;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -283,16 +284,20 @@ public class PagosTotalEmpleadoController implements Initializable {
         pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
-        mostrarRegistro(null);
+        if (empleado != null) {
+            setTableInfo(inicio, fin, empleado.getId());
+        }
     }
     
     @FXML
-    public void onClickLess(ActionEvent event) {
+    public void onClickLess(ActionEvent event)  {
         pickerDe.setValue(pickerDe.getValue().minusMonths(1));
         pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-        mostrarRegistro(null);
+        if (empleado != null) {
+            setTableInfo(inicio, fin, empleado.getId());
+        }
     }
     
     @FXML
@@ -335,19 +340,6 @@ public class PagosTotalEmpleadoController implements Initializable {
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
         
-        usuarios = new ArrayList<>();
-        
-        usuarios.addAll(new UsuarioDAO().findByEmpresaIdActivo(empresa.getId()));
-        
-        String[] itemsEmpleados = new String[usuarios.size()];
-        
-        usuarios.stream().forEach((obj) -> {
-            itemsEmpleados[usuarios.indexOf(obj)] = obj.getNombre() 
-                    + " " + obj.getApellido();
-        });
-        
-        empleadosChoiceBox.setItems(FXCollections.observableArrayList(itemsEmpleados));
-        
         DateTime dateTime;
         
         dateTime = new DateTime(getToday().getTime());
@@ -360,7 +352,27 @@ public class PagosTotalEmpleadoController implements Initializable {
     }
     
     @FXML
-    private void mostrarRegistro(ActionEvent event) {
+    private void mostrarRegistro(ActionEvent event) throws IOException {
+        
+        FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaFiltroEmpleados.fxml"));
+        AnchorPane ventanaFiltro = (AnchorPane) loader.load();
+        Stage ventana = new Stage();
+        ventana.setTitle("Selecciona el empleado");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
+        ventana.getIcons().add(new Image(stageIcon));
+        ventana.setResizable(false);
+        ventana.initOwner(stagePrincipal);
+        Scene scene = new Scene(ventanaFiltro);
+        ventana.setScene(scene);
+        FiltrarEmpleadoController controller = loader.getController();
+        controller.setStagePrincipal(ventana);
+        controller.setProgramaPrincipal(aplicacionControl);
+        controller.setPagosController(this);
+        controller.setEmpresa(empresa);
+        ventana.showAndWait();
+        
+        
+        /*
         if (pickerDe.getValue() == null) {
             errorText.setText("Fechas incorrectas");
         } else if (pickerHasta.getValue() == null) {
@@ -394,8 +406,13 @@ public class PagosTotalEmpleadoController implements Initializable {
             
                 setTableInfo(inicio, fin, this.empleado.getId());
             }
-        }
+        } */
     } 
+    
+    public void setEmpleado(Usuario empleado) {
+        this.empleado = empleado;
+        setTableInfo(inicio, fin, this.empleado.getId());
+    }
     
     public void setTableInfo(Timestamp inicio, Timestamp fin, Integer empleadoId) {
         this.inicio = inicio;

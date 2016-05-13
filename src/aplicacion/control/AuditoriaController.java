@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -25,6 +27,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -66,6 +69,9 @@ public class AuditoriaController implements Initializable {
     
     @FXML
     private CheckBox checkBoxUsuarios;
+    
+    @FXML 
+    private TextField filterField;
     
     @FXML
     private TableColumn detalles;
@@ -183,6 +189,30 @@ public class AuditoriaController implements Initializable {
         });
         
         accionesSelector.setItems(FXCollections.observableArrayList(itemsAccion));
+        
+        FilteredList<RegistroAcciones> filteredData = new FilteredList<>(data, p -> true);
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(acciones -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (acciones.getUsuario().getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                } else if (acciones.getUsuario().getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                }
+                return false; // Does not match.
+            });
+        });
+        
+        SortedList<RegistroAcciones> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(accionesTableView.comparatorProperty());
+        accionesTableView.setItems(sortedData);
     } 
     
     // Login items

@@ -100,6 +100,11 @@ public class GestionDeudasController implements Initializable {
         this.aplicacionControl = aplicacionControl;
     }
     
+    @FXML
+    public void listo(ActionEvent event) {
+        stagePrincipal.close();
+    }
+    
     public void setPagoTotalController(PagosTotalEmpleadoController pagosTotalEmpleadoController) {
         this.pagosTotalEmpleadoController = pagosTotalEmpleadoController;
     }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="430.0" maxWidth="620.0" minHeight="430.0" minWidth="620.0" prefHeight="430.0" prefWidth="620.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.FiltrarEmpleadoController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="620.0" minHeight="-Infinity" minWidth="620.0" prefHeight="391.0" prefWidth="620.0">
+        <columns>
+          <TableColumn fx:id="cedulaColumna" prefWidth="100.0" text="Cedula" />
+          <TableColumn fx:id="nombreColumna" prefWidth="160.0" text="Nombre" />
+            <TableColumn fx:id="apellidoColumna" prefWidth="160.0" text="Apellido" />
+            <TableColumn fx:id="departamentoColumna" prefWidth="100.0" text="Departamento" />
+            <TableColumn fx:id="cargoColumna" prefWidth="100.0" text="Cargo" />
+        </columns>
+      </TableView>
+      <Accordion layoutX="184.0" layoutY="14.0" />
+      <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
+      <TextField fx:id="filterField" layoutX="139.0" layoutY="7.0" prefHeight="25.0" prefWidth="484.0" promptText="Cedula, nombre, o apellido" />
+      <Label layoutX="17.0" layoutY="10.0" text="Escriba para filtrar" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>
