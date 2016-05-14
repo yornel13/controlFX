@@ -128,8 +128,8 @@ public class DecimosEmpleadosController implements Initializable {
                         completado();
 
                         // Registro para auditar
-                        String detalles = "marco que no acumula decimos el " 
-                                + empleado.getNombre() + " " + empleado.getApellido();
+                        String detalles = "marco que el empleado " 
+                                + empleado.getNombre() + " " + empleado.getApellido() + " no acumula decimos";
                         aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                     }); 
                     buttonCancelar.setOnAction((ActionEvent e) -> {
@@ -181,8 +181,8 @@ public class DecimosEmpleadosController implements Initializable {
                         completado();
 
                         // Registro para auditar
-                        String detalles = "marco que si acumula decimos el " 
-                                + empleado.getNombre() + " " + empleado.getApellido();
+                        String detalles = "marco que el empleado " 
+                                + empleado.getNombre() + " " + empleado.getApellido() + " si acumula decimos";
                         aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                     }); 
                     buttonCancelar.setOnAction((ActionEvent e) -> {

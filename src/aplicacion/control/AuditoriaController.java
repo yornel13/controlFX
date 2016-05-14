@@ -62,13 +62,7 @@ public class AuditoriaController implements Initializable {
     private TableView accionesTableView;
     
     @FXML
-    private ChoiceBox usuariosSelector;
-    
-    @FXML
     private ChoiceBox accionesSelector;
-    
-    @FXML
-    private CheckBox checkBoxUsuarios;
     
     @FXML 
     private TextField filterField;
@@ -90,24 +84,9 @@ public class AuditoriaController implements Initializable {
     }
     
     @FXML
-    private void onCheckUsuarios(ActionEvent event) {
-        if (checkBoxUsuarios.isSelected()) {
-            usuariosSelector.setDisable(false);
-        } else {
-            usuariosSelector.setDisable(true);
-        }
-    }
-    
-    @FXML
     private void onVerUsuarios(ActionEvent event) {
-        if (!usuariosSelector.getSelectionModel().isEmpty() 
-                && checkBoxUsuarios.isSelected() 
-                && !accionesSelector.getSelectionModel().isEmpty()
-                && accionesSelector.getSelectionModel().getSelectedIndex() != acciones.size()) {
-            setAccionesUsuarioYTipo();
-        } else if (!usuariosSelector.getSelectionModel().isEmpty() && checkBoxUsuarios.isSelected()) {
-            setAccionesUsuario();
-        } else if (!accionesSelector.getSelectionModel().isEmpty()
+        filterField.clear();
+        if (!accionesSelector.getSelectionModel().isEmpty()
                 && accionesSelector.getSelectionModel().getSelectedIndex() != acciones.size()) {
             setAccionesTipo();
         } else {
@@ -126,15 +105,7 @@ public class AuditoriaController implements Initializable {
         data = FXCollections.observableArrayList(); 
         data.addAll(registroAccionesDAO.findAllDesc());
         accionesTableView.setItems(data); 
-    }
-    
-    public void setAccionesUsuario() {
-        Integer usuarioId = usuarios.get(usuariosSelector.getSelectionModel().getSelectedIndex()).getId();
-        
-        RegistroAccionesDAO registroAccionesDAO = new RegistroAccionesDAO();
-        data = FXCollections.observableArrayList(); 
-        data.addAll(registroAccionesDAO.findAllDescByUsuarioId(usuarioId));
-        accionesTableView.setItems(data); 
+        setFiltro();
     }
     
     public void setAccionesTipo() {
@@ -144,53 +115,11 @@ public class AuditoriaController implements Initializable {
         data = FXCollections.observableArrayList(); 
         data.addAll(registroAccionesDAO.findAllByAccionIdDesc(accionId));
         accionesTableView.setItems(data); 
+        setFiltro();
     }
     
-    public void setAccionesUsuarioYTipo() {
-        Integer usuarioId = usuarios.get(usuariosSelector.getSelectionModel().getSelectedIndex()).getId();
-        Integer accionId = acciones.get(accionesSelector.getSelectionModel().getSelectedIndex()).getId();
-        
-        RegistroAccionesDAO registroAccionesDAO = new RegistroAccionesDAO();
-        data = FXCollections.observableArrayList(); 
-        data.addAll(registroAccionesDAO.findAllDescByUsuarioIdAndAccionId(usuarioId, accionId));
-        accionesTableView.setItems(data); 
-    }
-    
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {   
-        accionesTableView.setEditable(Boolean.FALSE);
-        
-        detalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
-        detalles.setMinWidth(620);
-        fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        
-        setAcciones();
-        
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAll());
-        
-        String[] items = new String[usuarios.size()];
-        usuarios.stream().forEach((user) -> {
-            items[usuarios.indexOf(user)] = user.getNombre() + " " + user.getApellido();
-        });
-        
-        usuariosSelector.setItems(FXCollections.observableArrayList(items));
-        usuariosSelector.setDisable(true);
-        
-        AccionTipoDAO accionTipoDAO = new AccionTipoDAO();
-        acciones = new ArrayList<>();
-        acciones.addAll(accionTipoDAO.findAll());
-        
-        String[] itemsAccion = new String[acciones.size() + 1];
-        acciones.stream().forEach((accion) -> {
-            System.out.println(accion.getNombre());
-            itemsAccion[acciones.indexOf(accion)] = accion.getNombre();
-        });
-        
-        accionesSelector.setItems(FXCollections.observableArrayList(itemsAccion));
-        
-        FilteredList<RegistroAcciones> filteredData = new FilteredList<>(data, p -> true);
+    public void setFiltro() {
+       FilteredList<RegistroAcciones> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(acciones -> {
                 // If filter text is empty, display all persons.
@@ -205,6 +134,8 @@ public class AuditoriaController implements Initializable {
                     return true; // Filter matches first name.
                 } else if (acciones.getUsuario().getApellido().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
+                } else if (acciones.getDetalles().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
                 }
                 return false; // Does not match.
             });
@@ -212,7 +143,30 @@ public class AuditoriaController implements Initializable {
         
         SortedList<RegistroAcciones> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(accionesTableView.comparatorProperty());
-        accionesTableView.setItems(sortedData);
+        accionesTableView.setItems(sortedData); 
+    }
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {   
+        accionesTableView.setEditable(Boolean.FALSE);
+        
+        detalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+        detalles.setMinWidth(620);
+        fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+        
+        setAcciones();
+        
+        AccionTipoDAO accionTipoDAO = new AccionTipoDAO();
+        acciones = new ArrayList<>();
+        acciones.addAll(accionTipoDAO.findAll());
+        
+        String[] itemsAccion = new String[acciones.size() + 1];
+        acciones.stream().forEach((accion) -> {
+            System.out.println(accion.getNombre());
+            itemsAccion[acciones.indexOf(accion)] = accion.getNombre();
+        });
+        
+        accionesSelector.setItems(FXCollections.observableArrayList(itemsAccion));
     } 
     
     // Login items

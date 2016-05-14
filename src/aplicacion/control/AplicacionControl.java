@@ -13,6 +13,8 @@ import hibernate.model.Identidad;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -28,11 +30,13 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import static javafx.application.Application.launch;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import static javafx.application.Application.launch;
+import javafx.application.Platform;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 
 /**
  *
@@ -172,13 +176,7 @@ public class AplicacionControl extends Application {
         });
     }
     
-    private EventHandler<WindowEvent> confirmCloseEventHandler = event -> {
-        // close event handling logic.
-        // consume the event if you wish to cancel the close operation.
-        cerrarWindows(stagePrincipal);
-    }; 
-    
-    public void cerrarWindows(Stage stage) {
+    public void cerrarWindows() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -187,17 +185,26 @@ public class AplicacionControl extends Application {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("Si");
         Button buttonNo = new Button("no");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonOk, buttonNo)
+                .build();
+        hBox.maxWidth(120);
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Seguro que desea salir de la aplicacion?"), buttonOk, buttonNo).
+        children(new Text("¿Seguro que desea salir de la aplicacion?"), hBox).
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
-        dialogStage.show();
+        buttonOk.setMinWidth(50);
+        buttonNo.setMinWidth(50);
         buttonOk.setOnAction((ActionEvent e) -> {
-            stage.close();
+            Platform.exit();
             dialogStage.close();
         });
         buttonNo.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
+        dialogStage.showAndWait();
     }
     
     private void insertarDatosDeUsuarios(Button login, Label usuarioLogin) {
@@ -232,6 +239,14 @@ public class AplicacionControl extends Application {
             controller.setStagePrincipal(stagePrincipal);
             controller.setProgramaPrincipal(this);
             insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+            Platform.setImplicitExit(false);
+            stagePrincipal.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    cerrarWindows();
+                    event.consume();
+                }
+            });
             stagePrincipal.show();
         } catch (IOException e) {
             //tratar la excepción.
@@ -242,7 +257,7 @@ public class AplicacionControl extends Application {
        if (permisos == null) {
            noLogeado();
        } else {
-           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+           if (true) {
                try {
                     stagePrincipal.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracion.fxml"));
@@ -261,6 +276,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.CONFIGURACION, permisos.getUsuario(), null);
 
@@ -301,6 +324,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.EMPRESA, permisos.getUsuario(), empresa.getNombre());
  
@@ -369,6 +400,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
  
@@ -406,6 +445,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
@@ -442,6 +489,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
@@ -478,6 +533,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
@@ -514,6 +577,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
@@ -550,6 +621,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
  
@@ -684,6 +763,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.EMPRESAS, permisos.getUsuario(), null);
  
@@ -721,6 +808,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.CLIENTES, permisos.getUsuario(), null);
 
@@ -758,6 +853,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
 
                 } catch (Exception e) {
@@ -794,6 +897,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.ADMINITRADORES, permisos.getUsuario(), null);
  
@@ -1027,6 +1138,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
  
@@ -1345,6 +1464,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.CONFIGURACION, permisos.getUsuario(), null);
  
@@ -1362,7 +1489,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
        } else {
-           if (permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.VER)) {
+           if (true) {
                try {
                     stagePrincipal.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDepartamentosCargos.fxml"));
@@ -1381,6 +1508,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
  
                 } catch (Exception e) {
@@ -1417,6 +1552,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
@@ -1452,6 +1595,14 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.AUDITORIA, permisos.getUsuario(), null);
  
@@ -1488,6 +1639,14 @@ public class AplicacionControl extends Application {
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  

@@ -6,8 +6,11 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Const;
+import aplicacion.control.util.DJCorreoTexto;
+import aplicacion.control.util.SendMail;
 import hibernate.dao.EmpresaDAO;
 import hibernate.model.Empresa;
+import java.awt.Component;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -54,7 +58,8 @@ public class PrincipalController implements Initializable {
             label.setText("Selecciona una empresa primero.");
         }
         
-        
+        DJCorreoTexto dJCorreoTexto = new DJCorreoTexto();
+        dJCorreoTexto.mandarCorreo();
         
         //File file = new File("dfsd");
         

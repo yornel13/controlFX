@@ -37,10 +37,13 @@
             </children>
          </Pane>
       <Button layoutX="693.0" layoutY="5.0" mnemonicParsing="false" onAction="#onVerUsuarios" text="ver" />
-      <ChoiceBox fx:id="usuariosSelector" layoutX="157.0" layoutY="5.0" prefHeight="25.0" prefWidth="286.0" />
-      <CheckBox fx:id="checkBoxUsuarios" layoutX="79.0" layoutY="9.0" mnemonicParsing="false" onAction="#onCheckUsuarios" text="Usuario:" textFill="#fffefe" />
       <ChoiceBox fx:id="accionesSelector" layoutX="513.0" layoutY="5.0" prefHeight="25.0" prefWidth="164.0" />
       <Label layoutX="461.0" layoutY="9.0" text="Acción:" textFill="WHITE" />
-      <TextField fx:id="filterField" layoutX="220.0" layoutY="5.0" prefHeight="25.0" prefWidth="223.0" visible="false" />
+      <TextField fx:id="filterField" layoutX="181.0" layoutY="5.0" prefHeight="25.0" prefWidth="271.0" />
+      <Label layoutX="59.0" layoutY="8.0" text="Escriba para filtrar" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>

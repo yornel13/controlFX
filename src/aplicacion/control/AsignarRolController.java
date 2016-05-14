@@ -55,7 +55,7 @@ public class AsignarRolController implements Initializable {
     private ToggleGroup grupoRol; 
     
     @FXML
-    private ToggleGroup grupoDeudas; 
+    private ToggleGroup grupoPagos; 
     
     @FXML
     private Pane panelPermisos;
@@ -166,9 +166,9 @@ public class AsignarRolController implements Initializable {
 
             }
             
-            if (grupoDeudas.getSelectedToggle() != null) {
+            if (grupoPagos.getSelectedToggle() != null) {
 
-                RadioButton radioButton = (RadioButton) grupoDeudas.getSelectedToggle();
+                RadioButton radioButton = (RadioButton) grupoPagos.getSelectedToggle();
 
                 Roles rol = new Roles();
                 rol.setNombre(Permisos.A_PAGOS);
@@ -248,8 +248,8 @@ public class AsignarRolController implements Initializable {
             if (grupoRol.getSelectedToggle() != null){
                 ((RadioButton) grupoRol.getSelectedToggle()).setSelected(false);
             }
-            if (grupoDeudas.getSelectedToggle() != null){
-                ((RadioButton) grupoDeudas.getSelectedToggle()).setSelected(false);
+            if (grupoPagos.getSelectedToggle() != null){
+                ((RadioButton) grupoPagos.getSelectedToggle()).setSelected(false);
             }
         } else {
             panelPermisos.setVisible(true);

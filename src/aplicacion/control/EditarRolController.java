@@ -61,7 +61,7 @@ public class EditarRolController implements Initializable {
     private ToggleGroup grupoRol; 
     
     @FXML
-    private ToggleGroup grupoDeudas; 
+    private ToggleGroup grupoPagos; 
     
     @FXML
     private Pane panelPermisos;
@@ -165,9 +165,9 @@ public class EditarRolController implements Initializable {
                 permisos ++;
 
             }
-            if (grupoDeudas.getSelectedToggle() != null) {
+            if (grupoPagos.getSelectedToggle() != null) {
 
-                RadioButton radioButton = (RadioButton) grupoDeudas.getSelectedToggle();
+                RadioButton radioButton = (RadioButton) grupoPagos.getSelectedToggle();
 
                 Roles rol = new Roles();
                 rol.setNombre(Permisos.A_PAGOS);
@@ -251,8 +251,8 @@ public class EditarRolController implements Initializable {
             if (grupoRol.getSelectedToggle() != null){
                 ((RadioButton) grupoRol.getSelectedToggle()).setSelected(false);
             }
-            if (grupoDeudas.getSelectedToggle() != null){
-                ((RadioButton) grupoDeudas.getSelectedToggle()).setSelected(false);
+            if (grupoPagos.getSelectedToggle() != null){
+                ((RadioButton) grupoPagos.getSelectedToggle()).setSelected(false);
             }
         } else {
             panelPermisos.setVisible(true);
@@ -352,16 +352,16 @@ public class EditarRolController implements Initializable {
             } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_PAGOS)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
-                        grupoDeudas.getToggles().get(0).setSelected(true);
+                        grupoPagos.getToggles().get(0).setSelected(true);
                         break;
                     case 2:
-                        grupoDeudas.getToggles().get(1).setSelected(true);
+                        grupoPagos.getToggles().get(1).setSelected(true);
                         break;
                     case 3:
-                        grupoDeudas.getToggles().get(2).setSelected(true);
+                        grupoPagos.getToggles().get(2).setSelected(true);
                         break;
                     case 4:
-                        grupoDeudas.getToggles().get(3).setSelected(true);
+                        grupoPagos.getToggles().get(3).setSelected(true);
                         break;
                 }
             }

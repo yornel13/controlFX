@@ -79,112 +79,136 @@ public class DepartamentosCargosController implements Initializable {
     
     @FXML
     private void agregarCargo(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Cargo");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button cambiarValor = new Button("Agregar");
-        TextField field = new TextField();
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Escriba el nombre del cargo"), field, cambiarValor).
-        alignment(Pos.CENTER).padding(new Insets(25)).build()));
-        field.setPrefWidth(150);
-        cambiarValor.setPrefWidth(100);
-        dialogStage.show();
-        cambiarValor.setOnAction((ActionEvent e) -> {
-            if (field.getText().isEmpty()) {
-            } else {
-                Cargo cargo = new Cargo();
-                cargo.setActivo(Boolean.TRUE);
-                cargo.setNombre(field.getText());
-                new CargoDAO().save(cargo);
-                dialogStage.close();
-                setCargoTable();
-                
-                // Registro para auditar
-                String detalles = "agrego el cargo " 
-                        + cargo.getNombre();
-                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+        if (aplicacionControl.permisos == null) {
+            aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Cargo");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValor = new Button("Agregar");
+                TextField field = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Escriba el nombre del cargo"), field, cambiarValor).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                field.setPrefWidth(150);
+                cambiarValor.setPrefWidth(100);
+                dialogStage.show();
+                cambiarValor.setOnAction((ActionEvent e) -> {
+                    if (field.getText().isEmpty()) {
+                    } else {
+                        Cargo cargo = new Cargo();
+                        cargo.setActivo(Boolean.TRUE);
+                        cargo.setNombre(field.getText());
+                        new CargoDAO().save(cargo);
+                        dialogStage.close();
+                        setCargoTable();
+
+                        // Registro para auditar
+                        String detalles = "agrego el cargo " 
+                                + cargo.getNombre();
+                        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    }
+                }); 
+             } else {
+                aplicacionControl.noPermitido();
             }
-        }); 
+        }     
     }
     
     @FXML
     private void agregarDepartamento(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Departamento");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button cambiarValor = new Button("Agregar");
-        TextField field = new TextField();
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Escriba el nombre del departamento"), field, cambiarValor).
-        alignment(Pos.CENTER).padding(new Insets(25)).build()));
-        field.setPrefWidth(150);
-        cambiarValor.setPrefWidth(100);
-        dialogStage.show();
-        cambiarValor.setOnAction((ActionEvent e) -> {
-            if (field.getText().isEmpty()) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Departamento");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValor = new Button("Agregar");
+                TextField field = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Escriba el nombre del departamento"), field, cambiarValor).
+                alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                field.setPrefWidth(150);
+                cambiarValor.setPrefWidth(100);
+                dialogStage.show();
+                cambiarValor.setOnAction((ActionEvent e) -> {
+                    if (field.getText().isEmpty()) {
+                    } else {
+                        Departamento departamento = new Departamento();
+                        departamento.setActivo(Boolean.TRUE);
+                        departamento.setNombre(field.getText());
+                        new DepartamentoDAO().save(departamento);
+                        dialogStage.close();
+                        setDepartamentoTable();
+
+                        // Registro para auditar
+                        String detalles = "agrego el departamento " 
+                                + departamento.getNombre();
+                        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    }
+                }); 
             } else {
-                Departamento departamento = new Departamento();
-                departamento.setActivo(Boolean.TRUE);
-                departamento.setNombre(field.getText());
-                new DepartamentoDAO().save(departamento);
-                dialogStage.close();
-                setDepartamentoTable();
-                
-                // Registro para auditar
-                String detalles = "agrego el departamento " 
-                        + departamento.getNombre();
-                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                aplicacionControl.noPermitido();
             }
-        }); 
+        } 
     }
     
      @FXML
     private void agregarDeuda(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("tipo de Deuda");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button cambiarValor = new Button("Agregar");
-        TextField field = new TextField();
-        TextField fieldCuotas = new TextField();
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Escriba el nombre del tipo de deuda"), field, 
-                new Text("Cuotas por defecto"), fieldCuotas, cambiarValor).
-        alignment(Pos.CENTER).padding(new Insets(20)).build()));
-        field.setPrefWidth(150);
-        fieldCuotas.setPrefWidth(50);
-        fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        cambiarValor.setPrefWidth(100);
-        dialogStage.show();
-        cambiarValor.setOnAction((ActionEvent e) -> {
-            if (field.getText().isEmpty()) {
-                
-            } else if (fieldCuotas.getText().isEmpty()) {
-                
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("tipo de Deuda");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValor = new Button("Agregar");
+                TextField field = new TextField();
+                TextField fieldCuotas = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Escriba el nombre del tipo de deuda"), field, 
+                        new Text("Cuotas por defecto"), fieldCuotas, cambiarValor).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                field.setPrefWidth(150);
+                fieldCuotas.setPrefWidth(50);
+                fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+                cambiarValor.setPrefWidth(100);
+                dialogStage.show();
+                cambiarValor.setOnAction((ActionEvent e) -> {
+                    if (field.getText().isEmpty()) {
+
+                    } else if (fieldCuotas.getText().isEmpty()) {
+
+                    } else {
+                        DeudaTipo deudaTipo = new DeudaTipo();
+                        deudaTipo.setActivo(Boolean.TRUE);
+                        deudaTipo.setNombre(field.getText());
+                        deudaTipo.setCuotas(Integer.parseInt(fieldCuotas.getText()));
+                        new DeudaTipoDAO().save(deudaTipo);
+                        dialogStage.close();
+                        setDeudaTable();
+
+                        // Registro para auditar
+                        String detalles = "agrego el tipo de deuda " 
+                                + deudaTipo.getNombre();
+                        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    }
+                }); 
             } else {
-                DeudaTipo deudaTipo = new DeudaTipo();
-                deudaTipo.setActivo(Boolean.TRUE);
-                deudaTipo.setNombre(field.getText());
-                deudaTipo.setCuotas(Integer.parseInt(fieldCuotas.getText()));
-                new DeudaTipoDAO().save(deudaTipo);
-                dialogStage.close();
-                setDeudaTable();
-                
-                // Registro para auditar
-                String detalles = "agrego el tipo de deuda " 
-                        + deudaTipo.getNombre();
-                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+               aplicacionControl.noPermitido();
             }
-        }); 
+        } 
     }
     
     @FXML

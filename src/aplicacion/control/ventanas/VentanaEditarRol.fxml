@@ -134,15 +134,15 @@
             </GridPane>
             <GridPane layoutX="550.0" layoutY="12.0">
                <children>
-                  <Label text="Deudas" textFill="WHITE" />
+                  <Label text="Pagos" textFill="WHITE" />
                   <RadioButton mnemonicParsing="false" text="Ver" GridPane.rowIndex="1">
                      <toggleGroup>
-                        <ToggleGroup fx:id="grupoDeudas" />
+                        <ToggleGroup fx:id="grupoPagos" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Crear" toggleGroup="$grupoDeudas" GridPane.rowIndex="2" />
-                  <RadioButton mnemonicParsing="false" text="Editar" toggleGroup="$grupoDeudas" GridPane.rowIndex="3" />
-                  <RadioButton mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoDeudas" GridPane.rowIndex="4" />
+                  <RadioButton mnemonicParsing="false" text="Crear" toggleGroup="$grupoPagos" GridPane.rowIndex="2" />
+                  <RadioButton mnemonicParsing="false" text="Editar" toggleGroup="$grupoPagos" GridPane.rowIndex="3" />
+                  <RadioButton mnemonicParsing="false" text="Eliminar" toggleGroup="$grupoPagos" GridPane.rowIndex="4" />
                </children>
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
