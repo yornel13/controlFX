@@ -57,18 +57,6 @@ public class PrincipalController implements Initializable {
         }  else {
             label.setText("Selecciona una empresa primero.");
         }
-        
-        DJCorreoTexto dJCorreoTexto = new DJCorreoTexto();
-        dJCorreoTexto.mandarCorreo();
-        
-        //File file = new File("dfsd");
-        
-        //JasperReport reporte = (JasperReport) JRLoader.loadObjectFromFile(REPORTE_IMPORTE);
-        
-        //Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        
-        //JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, new Em);
-       
     }
     
     
