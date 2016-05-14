@@ -32,7 +32,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -90,12 +89,18 @@ public class DeudasController implements Initializable {
     
     ArrayList<Deuda> deudas;
     
+    private DeudasEmpleadosController deudasEmpleadosController;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
         this.aplicacionControl = aplicacionControl;
+    }
+    
+    public void setProgramaDeudas(DeudasEmpleadosController deudasEmpleadosController) {
+        this.deudasEmpleadosController = deudasEmpleadosController;
     }
     
     @FXML
@@ -146,7 +151,6 @@ public class DeudasController implements Initializable {
                 children(textTipo, choiceBoxTipos, textDetalles, fieldDetalles, textMonto, 
                         fieldMonto, textCuotas, fieldCuotas, buttonConfirmar).
                 alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                dialogStage.show();
                 choiceBoxTipos.setItems(FXCollections.observableArrayList(itemsTipos));
                 fieldMonto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
@@ -194,11 +198,13 @@ public class DeudasController implements Initializable {
                         aplicacionControl.au.saveElimino(detalle, aplicacionControl.permisos.getUsuario());
                         
                         setEmpleado(empleado);
+                        deudasEmpleadosController.empleadoEditado(empleado);
                         
                         generacionCompletada();
                     }
                 });  
-                  
+                dialogStage.showAndWait();
+                
             } else {
                aplicacionControl.noPermitido();
             }
@@ -231,15 +237,16 @@ public class DeudasController implements Initializable {
             String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("Borrar");
+            Button buttonNo= new Button("Cancelar");
             dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("¿Seguro que desea eliminar esta deuda?"), buttonOk).
+            children(new Text("¿Seguro que desea eliminar esta deuda?"), buttonOk, buttonNo).
             alignment(Pos.CENTER).padding(new Insets(10)).build()));
-            dialogStage.show();
             buttonOk.setOnAction((ActionEvent e) -> {
                 new DeudaDAO().delete(deuda);
                 HibernateSessionFactory.getSession().flush();
                 data.remove(deuda);
                 dialogStage.close();
+                deudasEmpleadosController.empleadoEditado(empleado);
                 
                 // Registro para auditar
                 String detalles = "elimino la deuda '" + deuda.getDetalles() + "' del empleado " 
@@ -249,6 +256,10 @@ public class DeudasController implements Initializable {
                     
                 borradoCompleto();
             });
+            buttonNo.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.showAndWait();
         } else {
             borradoFallido();
         }
@@ -270,7 +281,6 @@ public class DeudasController implements Initializable {
             children(new Text("Ingrese la cantidad de cuotas:"), fieldCuotas, buttonOk).
             alignment(Pos.CENTER).padding(new Insets(10)).build()));
             fieldCuotas.setMaxWidth(50);
-            dialogStage.show();
             fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
             fieldCuotas.setText(deuda.getCuotas().toString());
             buttonOk.setOnAction((ActionEvent e) -> {
@@ -281,6 +291,7 @@ public class DeudasController implements Initializable {
                     HibernateSessionFactory.getSession().flush();
                     data.set(data.indexOf(deuda), deuda);
                     dialogStage.close();
+                    deudasEmpleadosController.empleadoEditado(empleado);
                         
                     // Registro para auditar
                     String detalles = "edito las cuotas de la deuda '" + deuda.getDetalles() + "' del empleado " 
@@ -291,6 +302,7 @@ public class DeudasController implements Initializable {
                     edicionCompletada();
                 }
             });
+            dialogStage.showAndWait();
         }
     }
     
@@ -303,7 +315,7 @@ public class DeudasController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Deuda editada satisfactoriamente"), buttonOk).
+        children(new Text("Deuda editada satisfactoriamente."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {

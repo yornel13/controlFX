@@ -6,16 +6,8 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
-import aplicacion.control.util.Fechas;
-import aplicacion.control.util.Permisos;
-import hibernate.dao.ActuarialesDAO;
-import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Actuariales;
-import hibernate.model.Cliente;
-import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.RegistroAcciones;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -35,16 +27,13 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -143,6 +132,10 @@ public class FiltrarEmpleadoController implements Initializable {
                 } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
                 } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
                 }
                 return false; // Does not match.

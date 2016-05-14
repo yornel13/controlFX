@@ -171,7 +171,7 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoDeudas.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_DEUDAS);
+                rol.setNombre(Permisos.A_PAGOS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);

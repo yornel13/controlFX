@@ -17,6 +17,8 @@ import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -29,6 +31,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -61,6 +64,9 @@ public class EmpleadosTodosController implements Initializable {
     
     @FXML
     private TableView empleadosTableView;
+    
+    @FXML
+    private TextField filterField;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -131,15 +137,16 @@ public class EmpleadosTodosController implements Initializable {
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
             if(empleadoTable.getId() == user.getId()) {
-                 EmpleadoTable empleado = new EmpleadoTable();
-                 empleado.id.set(user.getId());
-                 empleado.nombre.set(user.getNombre());
-                 empleado.apellido.set(user.getApellido());
-                 empleado.cedula.set(user.getCedula());
-                 empleado.telefono.set(user.getTelefono());
-                 empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-                 empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-                 data.set(data.indexOf(empleadoTable), empleado);
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.id.set(user.getId());
+                empleado.nombre.set(user.getNombre());
+                empleado.apellido.set(user.getApellido());
+                empleado.cedula.set(user.getCedula());
+                empleado.telefono.set(user.getTelefono());
+                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                data.set(data.indexOf(empleadoTable), empleado);
+                return;
             }
         }
     }
@@ -231,6 +238,40 @@ public class EmpleadosTodosController implements Initializable {
             });
             return row ;
         });
+        
+        FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(empleado -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getEmpresa().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getTelefono().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                }
+                return false; // Does not match.
+            });
+        });
+        
+        SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
+        empleadosTableView.setItems(sortedData);
     }
     
     @Override

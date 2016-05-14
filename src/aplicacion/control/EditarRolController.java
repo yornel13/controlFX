@@ -170,7 +170,7 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoDeudas.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_DEUDAS);
+                rol.setNombre(Permisos.A_PAGOS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -349,7 +349,7 @@ public class EditarRolController implements Initializable {
                         grupoHoras.getToggles().get(3).setSelected(true);
                         break;
                 }
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_DEUDAS)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_PAGOS)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoDeudas.getToggles().get(0).setSelected(true);

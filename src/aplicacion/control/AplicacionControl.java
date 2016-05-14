@@ -32,6 +32,7 @@ import static javafx.application.Application.launch;
 import javafx.event.EventHandler;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
+import static javafx.application.Application.launch;
 
 /**
  *
@@ -220,7 +221,7 @@ public class AplicacionControl extends Application {
             String image = AplicacionControl.class.getResource("imagenes/fondo_principal.jpg").toExternalForm();
             rootPane.setStyle("-fx-background-image: url('" + image + "'); " + "-fx-background-position: center center; " + "-fx-background-repeat: stretch;");
             Scene scene = new Scene(rootPane);
-            stagePrincipal.setTitle("Principal");
+            stagePrincipal.setTitle("Bienvenido");
             String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
             stagePrincipal.getIcons().add(new Image(stageIcon));
             stagePrincipal.setResizable(false);
@@ -385,7 +386,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_DEUDAS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaActuarialesEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
@@ -406,7 +407,7 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -422,7 +423,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_DEUDAS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaQuincenalEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
@@ -442,7 +443,79 @@ public class AplicacionControl extends Application {
                     controller.setEmpresa(empresa);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.EMPLEADOS, permisos.getUsuario(), null);
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarDecimosEmpleados(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDecimosEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Acumulacion de decimos");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    DecimosEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarDeudasEmpleados(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudasEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Deudas");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    DeudasEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();

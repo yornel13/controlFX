@@ -5,11 +5,13 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
+import hibernate.dao.ActuarialesDAO;
+import hibernate.dao.DeudaDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.Actuariales;
+import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.net.URL;
@@ -21,9 +23,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,17 +34,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBoxBuilder;
-import javafx.scene.text.Text;
-import javafx.stage.Modality;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
  *
  * @author Yornel
  */
-public class QuincenalEmpleadosController implements Initializable {
+public class DeudasEmpleadosController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -74,7 +72,7 @@ public class QuincenalEmpleadosController implements Initializable {
     private TableColumn cargoColumna;
     
     @FXML 
-    private TableColumn quincenalColumna;
+    private TableColumn deudasColumna;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -95,58 +93,29 @@ public class QuincenalEmpleadosController implements Initializable {
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
     
-    public void mostrarEditarQuincenal(Usuario empleado) {
+    public void mostrarDeudas(Usuario empleado) {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
                 try {
-                    
-                    Stage dialogStage = new Stage();
-                    dialogStage.initModality(Modality.APPLICATION_MODAL);
-                    dialogStage.setResizable(false);
-                    dialogStage.setTitle("Adelanto Quincenal");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                    dialogStage.getIcons().add(new Image(stageIcon));
-                    Button buttonGuardar = new Button("Cambiar");
-                    Button buttonCancelar = new Button("Cancelar");
-                    TextField fieldAdelanto = new TextField();
-                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("Ingrese el nuevo valor del adelanto"), fieldAdelanto, buttonGuardar, buttonCancelar).
-                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                    fieldAdelanto.setPrefWidth(150);
-                    buttonGuardar.setPrefWidth(100);
-                    buttonCancelar.setPrefWidth(100);
-                    fieldAdelanto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-                    dialogStage.show();
-                    buttonGuardar.setOnAction((ActionEvent e) -> {
-                        Double newAdelantoValue;
-                        if (fieldAdelanto.getText().isEmpty()) {
-                            newAdelantoValue = 0d;
-                        } else {
-                            newAdelantoValue = Double.parseDouble(fieldAdelanto.getText());
-                        }
-                        
-                        double oldMonto = 0;
-                        if (empleado.getDetallesEmpleado().getQuincena() != null) {
-                            oldMonto = empleado.getDetallesEmpleado().getQuincena();
-                        }
-                        
-                        empleado.getDetallesEmpleado().setQuincena(newAdelantoValue);
-                        HibernateSessionFactory.getSession().flush();
-                        
-                        dialogStage.close();
-                        
-                        empleadoEditado(empleado);
-                        
-                        completado();
-
-                        // Registro para auditar
-                        String detalles = "edito el adelanto quincenal de " 
-                                + empleado.getNombre() + " " + empleado.getApellido()
-                                + " de " + oldMonto + " a " + newAdelantoValue;
-                        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-                    }); 
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudas.fxml"));
+                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setMaxWidth(608);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaDeudas);
+                    ventana.setScene(scene);
+                    DeudasController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setProgramaDeudas(this);
+                    controller.setEmpleado(empleado);
+                    ventana.show();
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -156,23 +125,6 @@ public class QuincenalEmpleadosController implements Initializable {
                 aplicacionControl.noPermitido();
             }
         }
-    }
-    
-    public void completado() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Completado");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Adelanto quincenal modificado con exito."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        dialogStage.show();
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
     }
     
     public void empleadoEditado(Usuario user) {
@@ -187,11 +139,13 @@ public class QuincenalEmpleadosController implements Initializable {
                empleado.telefono.set(user.getTelefono());
                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
-               } else {
-                    empleado.quincenal.set(0d);
+               ArrayList<Deuda> deudas = new ArrayList<>();
+               deudas.addAll(new DeudaDAO().findAllByUsuarioId(user.getId()));
+               Double montoDeuda = 0d;
+               for (Deuda deuda: deudas) {
+                   montoDeuda += deuda.getRestante();
                }
+               empleado.totalMontoDeudas.set(montoDeuda);
                data.set(data.indexOf(empleadoTable), empleado);
                return;
             }
@@ -216,12 +170,13 @@ public class QuincenalEmpleadosController implements Initializable {
                empleado.telefono.set(user.getTelefono());
                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
-               } else {
-                    empleado.quincenal.set(0d);
+               ArrayList<Deuda> deudas = new ArrayList<>();
+               deudas.addAll(new DeudaDAO().findAllByUsuarioId(user.getId()));
+               Double montoDeuda = 0d;
+               for (Deuda deuda: deudas) {
+                   montoDeuda += deuda.getRestante();
                }
-               
+               empleado.totalMontoDeudas.set(montoDeuda);
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);
@@ -274,14 +229,14 @@ public class QuincenalEmpleadosController implements Initializable {
         
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
-        quincenalColumna.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+        deudasColumna.setCellValueFactory(new PropertyValueFactory<>("totalMontoDeudas"));
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    mostrarDeudas(new UsuarioDAO().findById(rowData.getId()));
                 }
             });
             return row ;

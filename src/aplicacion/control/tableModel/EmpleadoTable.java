@@ -5,6 +5,7 @@
  */
 package aplicacion.control.tableModel;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,6 +31,8 @@ public class EmpleadoTable {
     public SimpleDoubleProperty actuarial1 = new SimpleDoubleProperty();
     public SimpleDoubleProperty actuarial2 = new SimpleDoubleProperty();
     public SimpleDoubleProperty quincenal = new SimpleDoubleProperty();
+    public SimpleDoubleProperty totalMontoDeudas = new SimpleDoubleProperty();
+    public SimpleBooleanProperty acumulaDecimos = new SimpleBooleanProperty();
 
     public Integer getDias() {
         return dias.get();
@@ -89,6 +92,14 @@ public class EmpleadoTable {
     
     public Double getQuincenal() {
         return quincenal.get();
+    }
+    
+    public Double getTotalMontoDeudas() {
+        return totalMontoDeudas.get();
+    }
+    
+    public Boolean getAcumulaDecimos() {
+        return acumulaDecimos.get();
     }
    
 }

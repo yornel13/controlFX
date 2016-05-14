@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -15,6 +14,7 @@ import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -26,14 +26,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -43,7 +44,7 @@ import javafx.stage.Stage;
  *
  * @author Yornel
  */
-public class QuincenalEmpleadosController implements Initializable {
+public class DecimosEmpleadosController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -74,7 +75,7 @@ public class QuincenalEmpleadosController implements Initializable {
     private TableColumn cargoColumna;
     
     @FXML 
-    private TableColumn quincenalColumna;
+    private TableColumn<EmpleadoTable, EmpleadoTable>  decimosColumna;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -95,44 +96,29 @@ public class QuincenalEmpleadosController implements Initializable {
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
     
-    public void mostrarEditarQuincenal(Usuario empleado) {
+    public void mostrarNoAcumulaDecimos(Usuario empleado) {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.EDITAR)) {
                 try {
                     
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(Modality.APPLICATION_MODAL);
                     dialogStage.setResizable(false);
-                    dialogStage.setTitle("Adelanto Quincenal");
+                    dialogStage.setTitle(empleado.getNombre() + " " + empleado.getApellido());
                     String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
                     dialogStage.getIcons().add(new Image(stageIcon));
-                    Button buttonGuardar = new Button("Cambiar");
-                    Button buttonCancelar = new Button("Cancelar");
-                    TextField fieldAdelanto = new TextField();
+                    Button buttonOk = new Button("Si, no acumula");
+                    Button buttonCancelar = new Button("No, cancelar.");
                     dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("Ingrese el nuevo valor del adelanto"), fieldAdelanto, buttonGuardar, buttonCancelar).
+                    children(new Text("¿Seguro que desea marcar que NO acumula decimos el empleado?"), buttonOk, buttonCancelar).
                     alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                    fieldAdelanto.setPrefWidth(150);
-                    buttonGuardar.setPrefWidth(100);
+                    buttonOk.setPrefWidth(100);
                     buttonCancelar.setPrefWidth(100);
-                    fieldAdelanto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-                    dialogStage.show();
-                    buttonGuardar.setOnAction((ActionEvent e) -> {
-                        Double newAdelantoValue;
-                        if (fieldAdelanto.getText().isEmpty()) {
-                            newAdelantoValue = 0d;
-                        } else {
-                            newAdelantoValue = Double.parseDouble(fieldAdelanto.getText());
-                        }
+                    buttonOk.setOnAction((ActionEvent e) -> {
                         
-                        double oldMonto = 0;
-                        if (empleado.getDetallesEmpleado().getQuincena() != null) {
-                            oldMonto = empleado.getDetallesEmpleado().getQuincena();
-                        }
-                        
-                        empleado.getDetallesEmpleado().setQuincena(newAdelantoValue);
+                        empleado.getDetallesEmpleado().setAcumulaDecimos(false);
                         HibernateSessionFactory.getSession().flush();
                         
                         dialogStage.close();
@@ -142,11 +128,69 @@ public class QuincenalEmpleadosController implements Initializable {
                         completado();
 
                         // Registro para auditar
-                        String detalles = "edito el adelanto quincenal de " 
-                                + empleado.getNombre() + " " + empleado.getApellido()
-                                + " de " + oldMonto + " a " + newAdelantoValue;
+                        String detalles = "marco que no acumula decimos el " 
+                                + empleado.getNombre() + " " + empleado.getApellido();
                         aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                     }); 
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                        empleadoEditado(empleado);
+                    }); 
+                    
+                    dialogStage.showAndWait();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarAcumulaDecimos(Usuario empleado) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.EDITAR)) {
+                try {
+                    
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    Button buttonOk = new Button("Si, si acumula");
+                    Button buttonCancelar = new Button("No, cancelar.");
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("¿Seguro que desea marcar que SI acumula decimos el empleado?"), buttonOk, buttonCancelar).
+                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                    buttonOk.setPrefWidth(100);
+                    buttonCancelar.setPrefWidth(100);
+                    buttonOk.setOnAction((ActionEvent e) -> {
+                        
+                        empleado.getDetallesEmpleado().setAcumulaDecimos(true);
+                        HibernateSessionFactory.getSession().flush();
+                        
+                        dialogStage.close();
+                        
+                        empleadoEditado(empleado);
+                        
+                        completado();
+
+                        // Registro para auditar
+                        String detalles = "marco que si acumula decimos el " 
+                                + empleado.getNombre() + " " + empleado.getApellido();
+                        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+                    }); 
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                        empleadoEditado(empleado);
+                    }); 
+                    
+                    dialogStage.showAndWait();
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -167,7 +211,7 @@ public class QuincenalEmpleadosController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Adelanto quincenal modificado con exito."), buttonOk).
+        children(new Text("Acumulación de decimos modificado con exito."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -187,11 +231,7 @@ public class QuincenalEmpleadosController implements Initializable {
                empleado.telefono.set(user.getTelefono());
                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
-               } else {
-                    empleado.quincenal.set(0d);
-               }
+               empleado.acumulaDecimos.set(user.getDetallesEmpleado().getAcumulaDecimos());
                data.set(data.indexOf(empleadoTable), empleado);
                return;
             }
@@ -216,11 +256,7 @@ public class QuincenalEmpleadosController implements Initializable {
                empleado.telefono.set(user.getTelefono());
                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
-               } else {
-                    empleado.quincenal.set(0d);
-               }
+               empleado.acumulaDecimos.set(user.getDetallesEmpleado().getAcumulaDecimos());
                
                 return empleado;
             }).forEach((empleado) -> {
@@ -274,14 +310,40 @@ public class QuincenalEmpleadosController implements Initializable {
         
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
-        quincenalColumna.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+        decimosColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        decimosColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
+            private final CheckBox checkBoxDeuda = new CheckBox();
+
+            @Override
+            protected void updateItem(EmpleadoTable empleado, boolean empty) {
+                super.updateItem(empleado, empty);
+
+                if (empleado == null) {
+                    setGraphic(null);
+                    return;
+                }
+                
+                setGraphic(checkBoxDeuda);
+                if (checkBoxDeuda != null)
+                    checkBoxDeuda.setSelected(empleado.getAcumulaDecimos());
+                checkBoxDeuda.setOnAction(event -> {
+                     if (empleado.getAcumulaDecimos()) {
+                         mostrarNoAcumulaDecimos(new UsuarioDAO().findById(empleado.getId()));
+                     } else {
+                         mostrarAcumulaDecimos(new UsuarioDAO().findById(empleado.getId()));
+                     }
+                });
+            }
+
+            
+        });
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    //mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
                 }
             });
             return row ;
