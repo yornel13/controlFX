@@ -12,7 +12,6 @@ import aplicacion.control.util.Permisos;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.PagoDAO;
-import hibernate.dao.UsuarioDAO;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;

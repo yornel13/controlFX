@@ -199,10 +199,6 @@ public class EmpleadoController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         String profile = AplicacionControl.class.getResource("imagenes/empty_profile.jpg").toExternalForm();
-        /*profileImage.setStyle("-fx-background-image: url('" + profile + "'); " 
-                + "-fx-background-position: center top; " 
-                + "-fx-background-repeat: stretch;"); */
-      
         Image image = new Image(profile);
         setProfileImage(image);
         

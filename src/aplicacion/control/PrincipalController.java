@@ -5,12 +5,15 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.reports.ReportTest1;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.DJCorreoTexto;
 import aplicacion.control.util.SendMail;
 import hibernate.dao.EmpresaDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import java.awt.Component;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -26,6 +29,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javax.swing.SwingUtilities;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 /**
  *
@@ -51,12 +62,23 @@ public class PrincipalController implements Initializable {
     private Stage stagePrincipal;
     
     @FXML
-    private void handleButtonAction(ActionEvent event) {
+    private void handleButtonAction(ActionEvent event) throws JRException {
         if (!empresas.isEmpty() && !selector.getSelectionModel().isEmpty()) {
             aplicacionControl.mostrarInEmpresa(empresas.get(selector.getSelectionModel().getSelectedIndex()));
         }  else {
             label.setText("Selecciona una empresa primero.");
         }
+        
+        /*
+        File file = new File("SueldoPersonal.jasper");
+        JasperReport reporte = (JasperReport) JRLoader.loadObject(file);
+        ReportTest1 report = new ReportTest1();
+        report.addAll(new UsuarioDAO().findAllEmpleadosActivosOrderByCedula());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, null, report);
+        JRExporter exporter = new JRPdfExporter();  
+        exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint); 
+        exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new java.io.File("reporte2PDF.pdf")); 
+        exporter.exportReport();  */
     }
     
     
@@ -78,21 +100,25 @@ public class PrincipalController implements Initializable {
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
         this.aplicacionControl = aplicacionControl;
+        try {
+            EmpresaDAO empresaDao = new EmpresaDAO();
+            empresas = new ArrayList<>();
+            empresas.addAll(empresaDao.findAll());
+
+            String[] items = new String[empresas.size()];
+
+            empresas.stream().forEach((emp) -> {
+                items[empresas.indexOf(emp)] = emp.getNombre();
+            });
+
+            selector.setItems(FXCollections.observableArrayList(items)); 
+        } catch (Exception e) {
+            label.setText("ERROR DE CONEXION A BASE DE DATOS.");
+        }
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        EmpresaDAO empresaDao = new EmpresaDAO();
-        empresas = new ArrayList<>();
-        empresas.addAll(empresaDao.findAll());
-        
-        String[] items = new String[empresas.size()];
-        
-        empresas.stream().forEach((emp) -> {
-            items[empresas.indexOf(emp)] = emp.getNombre();
-        });
-        
-        selector.setItems(FXCollections.observableArrayList(items)); 
         
         String image = AplicacionControl.class.getResource("imagenes/config_admin.png").toExternalForm();
         
@@ -101,6 +127,7 @@ public class PrincipalController implements Initializable {
         configuracion.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
         
     }
+    
     
     // Login items
     @FXML

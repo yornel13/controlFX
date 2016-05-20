@@ -5,6 +5,8 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.EmpleadoController.getMonthName;
+import aplicacion.control.reports.ReporteDeudas;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
@@ -13,12 +15,21 @@ import hibernate.model.Deuda;
 import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -45,6 +56,15 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -338,6 +358,33 @@ public class DeudasController implements Initializable {
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
+    }
+    
+    @FXML
+    public void imprimir(ActionEvent event) throws JRException {
+        
+        InputStream inputStream = null;
+        
+        try {
+            inputStream = new FileInputStream("deudas_empleado.jrxml");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DeudasController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ReporteDeudas datasource = new ReporteDeudas();
+        datasource.addAll((List<Deuda>) deudasTableView.getItems());
+        
+        Map<String, String> parametros = new HashMap();
+        parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+        parametros.put("cedula", empleado.getCedula());
+        parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
+        DateTime now = new DateTime();
+        parametros.put("fecha", now.getDayOfMonth() + " de " 
+                + getMonthName(now.getMonthOfYear()) + " del " + now.getYear());
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
+        JasperExportManager.exportReportToPdfFile(jasperPrint, "prueba.pdf");
+        
     }
     
     public void borradoCompleto() {
