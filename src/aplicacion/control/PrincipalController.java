@@ -5,15 +5,9 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.reports.ReportTest1;
 import aplicacion.control.util.Const;
-import aplicacion.control.util.DJCorreoTexto;
-import aplicacion.control.util.SendMail;
 import hibernate.dao.EmpresaDAO;
-import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
-import java.awt.Component;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,15 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import javax.swing.SwingUtilities;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.export.JRPdfExporter;
-import net.sf.jasperreports.engine.util.JRLoader;
 
 /**
  *
@@ -68,17 +54,6 @@ public class PrincipalController implements Initializable {
         }  else {
             label.setText("Selecciona una empresa primero.");
         }
-        
-        /*
-        File file = new File("SueldoPersonal.jasper");
-        JasperReport reporte = (JasperReport) JRLoader.loadObject(file);
-        ReportTest1 report = new ReportTest1();
-        report.addAll(new UsuarioDAO().findAllEmpleadosActivosOrderByCedula());
-        JasperPrint jasperPrint = JasperFillManager.fillReport(reporte, null, report);
-        JRExporter exporter = new JRPdfExporter();  
-        exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint); 
-        exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new java.io.File("reporte2PDF.pdf")); 
-        exporter.exportReport();  */
     }
     
     
