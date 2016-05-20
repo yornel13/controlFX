@@ -36,10 +36,10 @@ public class ReporteDeudas implements JRDataSource {
                 valor = lista.get(indiceActual).getDetalles();
                 break;
             case "monto":
-                valor = lista.get(indiceActual).getMonto().toString();
+                valor = lista.get(indiceActual).getMonto();
                 break;
             case "restante":
-                valor = lista.get(indiceActual).getRestante().toString();
+                valor = lista.get(indiceActual).getRestante();
                 break;
             case "fecha":
                 DateTime time = new DateTime(lista.get(indiceActual).getCreacion().getTime());

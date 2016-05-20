@@ -10,7 +10,6 @@ package aplicacion.control.util;
  * @author Yornel
  */
 import java.util.Enumeration;
-import javafx.scene.control.ToggleGroup;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 
