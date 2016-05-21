@@ -17,4 +17,14 @@ public class Const {
     public static final String DECIMO_CUARTO = "decimo_cuarto";
     public static final String DECIMO_TERCERO = "decimo_tercero";
     public static final String IESS = "iess";
+    
+    
+   // Pago tipos
+    public static final String ROL_PAGO_INDIVIDUAL = "rol_pago_individual";
+    public static final String ROL_PAGO_CLIENTE = "rol_pago_cliente";
+    public static final String ROL_PAGO_ADMINISTRATIVO = "rol_pago_administrativo";
+    
+    // Reportes
+    public static final String REPORTE_ROL_INDIVIDUAL = "rol_pago_individual.jrxml";
+   
 }

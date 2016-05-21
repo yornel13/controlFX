@@ -146,6 +146,19 @@ public class PagoDAO extends BaseHibernateDAO {
             Object result = query.uniqueResult();
             return (Pago) result;
         }
+        
+        public Pago findByFechaAndEmpleadoIdAndDetalles(Timestamp fecha, Integer empleadoId, String detalles) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                            + "and usuario_id = :usuario_id and detalles = :detalles "
+                            + "and cliente_id IS NULL")
+                    .addEntity(Pago.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("detalles", detalles)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.uniqueResult();
+            return (Pago) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Pago instance with property: " + propertyName

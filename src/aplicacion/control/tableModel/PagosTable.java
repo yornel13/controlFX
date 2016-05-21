@@ -23,6 +23,8 @@ public class PagosTable {
     private Double vacaciones;
     private Double subtotal;
     private Double decimos;
+    private Double tercero;
+    private Double cuarto;
     private Double total;
 
     public Integer getId() {
@@ -127,6 +129,22 @@ public class PagosTable {
 
     public void setTotal(Double total) {
         this.total = total;
+    }
+
+    public Double getTercero() {
+        return tercero;
+    }
+
+    public void setTercero(Double tercero) {
+        this.tercero = tercero;
+    }
+
+    public Double getCuarto() {
+        return cuarto;
+    }
+
+    public void setCuarto(Double cuarto) {
+        this.cuarto = cuarto;
     }
     
     

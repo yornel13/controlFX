@@ -48,7 +48,7 @@
 				</textElement>
 				<text><![CDATA[Rol de pago individual]]></text>
 			</staticText>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField pattern="dd MMMMM yyyy">
 				<reportElement mode="Transparent" x="370" y="35" width="185" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>

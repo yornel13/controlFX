@@ -111,7 +111,6 @@ public class EmpleadoController implements Initializable {
     @FXML
     public void changeImage(ActionEvent event) throws FileNotFoundException {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
         fileChooser.setTitle("Selecciona la foto");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));                 
         fileChooser.getExtensionFilters().addAll(

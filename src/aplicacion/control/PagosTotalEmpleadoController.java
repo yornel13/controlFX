@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.EmpleadoController.getMonthName;
 import aplicacion.control.ReportModel.RolPagoIndividual;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
@@ -20,6 +19,7 @@ import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.Usuario;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,12 +39,15 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -55,8 +58,17 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javax.swing.JFileChooser;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -155,6 +167,12 @@ public class PagosTotalEmpleadoController implements Initializable {
     private TableColumn columnaDecimos;
     
     @FXML
+    private TableColumn columnaTercero;
+    
+    @FXML
+    private TableColumn columnaCuarto;
+    
+    @FXML
     private TableColumn columnaTotal;
     
     // Totales Text
@@ -237,8 +255,28 @@ public class PagosTotalEmpleadoController implements Initializable {
     private Double subTotalTextValor;
 
     private Double decimosTotalTextValor;
+    
+    private Double decimoTerceroTotalTextValor;
+    
+    private Double decimoCuartoTotalTextValor;
 
     private Double totalTextValor;
+    
+    private Double montoSumplementariasTextValor; // No Visible en ventana
+    
+    private Double montoSobreTiempoTextValor; // No Visible en ventana
+    
+    private Double montoBonoTextValor; // No Visible en ventana
+    
+    private Double montoTransporteTextValor; // No Visible en ventana
+    
+    private Double montoJubilacionTextValor; // No Visible en ventana
+    
+    private Double montoAportePatronalTextValor; // No Visible en ventana
+    
+    private Double montoSegurosTextValor; // No Visible en ventana
+    
+    private Double montoUniformasTextValor; // No Visible en ventana
    
     // Totales de a percibir
     
@@ -268,6 +306,8 @@ public class PagosTotalEmpleadoController implements Initializable {
     private ObservableList<PagosTable> data;
     
     private ArrayList<RolPagoIndividual> rolPagoIndividuales;
+    
+    private Pago pagoRol;
     
     @FXML
     private Label errorText;
@@ -357,16 +397,15 @@ public class PagosTotalEmpleadoController implements Initializable {
         }
     }
     
-    @FXML
-    public void onClickGenerarRecibo(ActionEvent event) throws JRException {
+    public void seleccionarDirectorio() {
         
-       if (empleado != null) {
-           
-       }
+    }
+    
+    public void imprimir() {
         
         InputStream inputStream = null;
         try {
-            inputStream = new FileInputStream("rol_pago_individual.jrxml");
+            inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(DeudasController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -378,7 +417,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         parametros.put("cedula", empleado.getCedula());
         parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
         parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
-        parametros.put("numero", "154");  // TODO
+        parametros.put("numero", pagoRol.getId().toString());  // TODO
         parametros.put("lapso", Fechas.getDateFromTimestamp(inicio).getDayOfMonth() + " de " 
                         + getMonthName(Fechas.getDateFromTimestamp(inicio).getMonthValue())
                         +  " " + Fechas.getDateFromTimestamp(inicio).getYear()
@@ -386,10 +425,140 @@ public class PagosTotalEmpleadoController implements Initializable {
                         + " de " + getMonthName(Fechas.getDateFromTimestamp(fin).getMonthValue())
                         + " " + Fechas.getDateFromTimestamp(fin).getYear());
         parametros.put("total", round(aPercibirValor, 2).toString());
-        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
-        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
-        JasperExportManager.exportReportToPdfFile(jasperPrint, "rol1.pdf");
+        JasperDesign jasperDesign;
+        try {
+            DirectoryChooser fileChooser = new DirectoryChooser();
+            fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
+
+            File file = fileChooser.showDialog(stagePrincipal);
+
+            if (file != null) {
+                jasperDesign = JRXmlLoader.load(inputStream);
+                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\rol_individual_" + pagoRol.getId() +".pdf"); 
+                dialogGenerarRolIndividualCompleted();
+            }
+        } catch (JRException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    public void generarRolIndividual() {
+        
+        new PagoDAO().save(pagoRol);
+        
+        // Registro para auditar
+        String detalles = "genero el rol individual nro: " + pagoRol.getId() + " para el empleado "
+            + empleado.getNombre() + " " + empleado.getApellido();
+        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+        
+        imprimir();
+    }
+    
+    public void dialogGenerarRolIndividualCompleted() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Rol individua");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se genero el recibo de pago con exito."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    @FXML
+    public void onClickGenerarRecibo(ActionEvent event) {
+        
+        if (empleado != null) {
+           
+            if (new PagoDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
+            
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Generar Rol individual");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button buttonOk = new Button("Si");
+                Button buttonNo = new Button("no");
+                HBox hBox = HBoxBuilder.create()
+                        .spacing(10.0) //In case you are using HBoxBuilder
+                        .padding(new Insets(5, 5, 5, 5))
+                        .alignment(Pos.CENTER)
+                        .children(buttonOk, buttonNo)
+                        .build();
+                hBox.maxWidth(120);
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Seguro que desea generar el rol individual para este empleado?"), hBox).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                buttonOk.setMinWidth(50);
+                buttonNo.setMinWidth(50);
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                    generarRolIndividual();
+                    
+                });
+                buttonNo.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+                dialogStage.showAndWait();
+                
+            } else {
+               {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Rol individua");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button buttonOk = new Button("ok");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+                children(new Text("Ya el empleado tiene un rol individual para esta fecha."), buttonOk).
+                alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+                buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                    dialogStage.close();
+                });
+                dialogStage.showAndWait();
+            } 
+            }
+            
+            
+        } else {
+            {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Rol individua");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button buttonOk = new Button("ok");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+                children(new Text("No hay empleado seleccionado."), buttonOk).
+                alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+                buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                    dialogStage.close();
+                });
+                dialogStage.showAndWait();
+            }
+        }
     }
     
     public void setEmpresa(Empresa empresa) throws ParseException {
@@ -455,7 +624,17 @@ public class PagosTotalEmpleadoController implements Initializable {
         vacacionesTextValor = 0d;
         subTotalTextValor = 0d;
         decimosTotalTextValor = 0d;
+        decimoTerceroTotalTextValor = 0d;
+        decimoCuartoTotalTextValor = 0d;
         totalTextValor = 0d;
+        montoSumplementariasTextValor = 0d; // No Visible en ventana
+        montoSobreTiempoTextValor = 0d; // No Visible en ventana
+        montoBonoTextValor = 0d; // No Visible en ventana
+        montoTransporteTextValor = 0d; // No Visible en ventana
+        montoJubilacionTextValor = 0d; // No Visible en ventana
+        montoAportePatronalTextValor = 0d; // No Visible en ventana
+        montoSegurosTextValor = 0d; // No Visible en ventana
+        montoUniformasTextValor = 0d; // No Visible en ventana
         
         ingresoValor = 0d;
         ieesValor = 0d;
@@ -481,6 +660,8 @@ public class PagosTotalEmpleadoController implements Initializable {
             pagoTable.setVacaciones(pago.getVacaciones());
             pagoTable.setSubtotal(pago.getSubtotal());
             pagoTable.setDecimos(pago.getDecimoCuarto() + pago.getDecimoTercero());
+            pagoTable.setTercero(pago.getDecimoTercero());
+            pagoTable.setCuarto(pago.getDecimoCuarto());
             pagoTable.setTotal(pago.getTotalIngreso());
             pagosTable.add(pagoTable);
             
@@ -494,8 +675,18 @@ public class PagosTotalEmpleadoController implements Initializable {
             vacacionesTextValor += pagoTable.getVacaciones();
             subTotalTextValor += pagoTable.getSubtotal();
             decimosTotalTextValor += pagoTable.getDecimos();
+            decimoTerceroTotalTextValor += pagoTable.getTercero();
+            decimoCuartoTotalTextValor += pagoTable.getCuarto();
             totalTextValor += pagoTable.getTotal();
             
+            montoSumplementariasTextValor += pago.getMontoHorasSuplementarias(); // No Visible en ventana
+            montoSobreTiempoTextValor += pago.getMontoHorasSobreTiempo(); // No Visible en ventana
+            montoBonoTextValor += pago.getBono(); // No Visible en ventana
+            montoTransporteTextValor += pago.getTransporte(); // No Visible en ventana
+            montoJubilacionTextValor += pago.getJubilacionPatronal(); // No Visible en ventana
+            montoAportePatronalTextValor += pago.getAportePatronal(); // No Visible en ventana
+            montoSegurosTextValor += pago.getSeguros(); // No Visible en ventana
+            montoUniformasTextValor += pago.getUniformes(); // No Visible en ventana
         });
         
         data = FXCollections.observableArrayList(); 
@@ -546,7 +737,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         }
         vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
         subTotalText.setText(String.format( "%.2f", subTotalTextValor));
-        decimosTotalText.setText(String.format( "%.2f", decimosTotalTextValor));
+        decimosTotalText.setText(String.format( "%.2f", decimoTerceroTotalTextValor) + " + " + String.format( "%.2f", decimoCuartoTotalTextValor));
         totalText.setText(String.format( "%.2f", totalTextValor));
         
         // Calculando montos
@@ -556,8 +747,14 @@ public class PagosTotalEmpleadoController implements Initializable {
             ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor + decimosTotalTextValor;
             {
                 RolPagoIndividual rol = new RolPagoIndividual();
-                rol.setDescripscion("Decimos");
-                rol.setIngreso(round(decimosTotalTextValor,2));
+                rol.setDescripscion("Decimo Tercero");
+                rol.setIngreso(round(decimoTerceroTotalTextValor, 2));
+                rolPagoIndividuales.add(rol);
+            }
+            {
+                RolPagoIndividual rol = new RolPagoIndividual();
+                rol.setDescripscion("Decimo Cuarto");
+                rol.setIngreso(round(decimoCuartoTotalTextValor, 2));
                 rolPagoIndividuales.add(rol);
             }
         }
@@ -586,7 +783,38 @@ public class PagosTotalEmpleadoController implements Initializable {
         montoDeduccionesText.setText(String.format( "%.2f", deduccionesValor));
         montoAPercibirText.setText(String.format( "%.2f", aPercibirValor));
         
-        
+        {
+            pagoRol = new Pago();
+            pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
+            pagoRol.setFecha(new Timestamp(new Date().getTime()));
+            pagoRol.setInicio(inicio);
+            pagoRol.setFinalizo(fin);
+            pagoRol.setDias(diasTextValor);
+            pagoRol.setHorasNormales(Double.valueOf(normalesTextValor));
+            pagoRol.setHorasSuplementarias(Double.valueOf(suplementariasTextValor));  // RC
+            pagoRol.setHorasSobreTiempo(Double.valueOf(sobreTiempoTextValor));         // ST
+            pagoRol.setTotalHorasExtras(Double.valueOf(sobreTiempoTextValor + suplementariasTextValor));
+            pagoRol.setSalario(sueldoTotalTextValor);
+            pagoRol.setMontoHorasSuplementarias(montoSumplementariasTextValor);
+            pagoRol.setMontoHorasSobreTiempo(montoSobreTiempoTextValor);
+            pagoRol.setBono(montoBonoTextValor);
+            pagoRol.setTransporte(montoTransporteTextValor);
+            pagoRol.setTotalBonos(bonosTextValor);
+            pagoRol.setVacaciones(vacacionesTextValor);
+            pagoRol.setSubtotal(subTotalTextValor);
+            pagoRol.setDecimoTercero(decimoTerceroTotalTextValor);
+            pagoRol.setDecimoCuarto(decimoCuartoTotalTextValor);
+            pagoRol.setJubilacionPatronal(montoJubilacionTextValor);
+            pagoRol.setAportePatronal(montoAportePatronalTextValor);
+            pagoRol.setSeguros(montoSegurosTextValor);
+            pagoRol.setUniformes(montoUniformasTextValor);
+            pagoRol.setTotalIngreso(totalTextValor);
+            pagoRol.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
+            pagoRol.setCedula(empleado.getCedula());
+            pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
+            pagoRol.setUsuario(empleado);
+        }
     }
     
     @Override
@@ -619,7 +847,11 @@ public class PagosTotalEmpleadoController implements Initializable {
         
         columnaSubTotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
         
-        columnaDecimos.setCellValueFactory(new PropertyValueFactory<>("decimos"));
+        columnaTercero.setCellValueFactory(new PropertyValueFactory<>("tercero"));
+        columnaCuarto.setCellValueFactory(new PropertyValueFactory<>("cuarto"));
+        
+        columnaDecimos.getColumns().clear();
+        columnaDecimos.getColumns().addAll(columnaTercero, columnaCuarto);
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         
@@ -684,6 +916,15 @@ public class PagosTotalEmpleadoController implements Initializable {
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
+    }
+    
+    public Pago findPagoById(Integer id) {
+        for (Pago pago: pagos) {
+            if (pago.getId() == id) {
+                return  pago;
+            }
+        }
+        return null;
     }
     
     // Login items
