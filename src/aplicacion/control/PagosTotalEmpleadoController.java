@@ -5,6 +5,9 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.EmpleadoController.getMonthName;
+import aplicacion.control.ReportModel.RolPagoIndividual;
+import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
@@ -17,7 +20,10 @@ import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.Usuario;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -26,8 +32,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -46,6 +57,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 
 /**
@@ -248,6 +267,8 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     private ObservableList<PagosTable> data;
     
+    private ArrayList<RolPagoIndividual> rolPagoIndividuales;
+    
     @FXML
     private Label errorText;
     
@@ -336,6 +357,41 @@ public class PagosTotalEmpleadoController implements Initializable {
         }
     }
     
+    @FXML
+    public void onClickGenerarRecibo(ActionEvent event) throws JRException {
+        
+       if (empleado != null) {
+           
+       }
+        
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream("rol_pago_individual.jrxml");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(DeudasController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
+        datasource.addAll((List<RolPagoIndividual>) rolPagoIndividuales);
+        
+        Map<String, String> parametros = new HashMap();
+        parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+        parametros.put("cedula", empleado.getCedula());
+        parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
+        parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
+        parametros.put("numero", "154");  // TODO
+        parametros.put("lapso", Fechas.getDateFromTimestamp(inicio).getDayOfMonth() + " de " 
+                        + getMonthName(Fechas.getDateFromTimestamp(inicio).getMonthValue())
+                        +  " " + Fechas.getDateFromTimestamp(inicio).getYear()
+                        + " al " + Fechas.getDateFromTimestamp(fin).getDayOfMonth() 
+                        + " de " + getMonthName(Fechas.getDateFromTimestamp(fin).getMonthValue())
+                        + " " + Fechas.getDateFromTimestamp(fin).getYear());
+        parametros.put("total", round(aPercibirValor, 2).toString());
+        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
+        JasperExportManager.exportReportToPdfFile(jasperPrint, "rol1.pdf");
+    }
+    
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
         
@@ -369,43 +425,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         controller.setPagosController(this);
         controller.setEmpresa(empresa);
         ventana.showAndWait();
-        
-        
-        /*
-        if (pickerDe.getValue() == null) {
-            errorText.setText("Fechas incorrectas");
-        } else if (pickerHasta.getValue() == null) {
-            errorText.setText("Fechas incorrectas");
-        } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
-            errorText.setText("Fechas incorrectas");
-        } else {   
-            
-            Usuario empleado = null;
-            
-            if (cedulaField.isVisible()) {
-                
-                empleado = new UsuarioDAO().findByCedulaActivo(cedulaField.getText());
-
-            } else if (!empleadosChoiceBox.getSelectionModel().isEmpty()) {
-                
-                empleado = usuarios.get(empleadosChoiceBox.getSelectionModel().getSelectedIndex());
-                
-            }
-            
-            if (empleado == null) {
-                
-               errorText.setText("Empleado no encontrado"); 
-                
-            } else {
-                
-                this.empleado = empleado;
-                
-                fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-                inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-            
-                setTableInfo(inicio, fin, this.empleado.getId());
-            }
-        } */
+   
     } 
     
     public void setEmpleado(Usuario empleado) {
@@ -422,6 +442,8 @@ public class PagosTotalEmpleadoController implements Initializable {
         pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, empleadoId));
         if (pagos.isEmpty())
             pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, empleadoId));
+        
+        rolPagoIndividuales = new ArrayList<>();
         
         diasTextValor = 0;
         normalesTextValor = 0;
@@ -499,8 +521,29 @@ public class PagosTotalEmpleadoController implements Initializable {
         suplementariasText.setText(suplementariasTextValor.toString());
         sobreTiempoText.setText(sobreTiempoTextValor.toString());
         sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
+        {
+            RolPagoIndividual rol = new RolPagoIndividual();
+            rol.setDescripscion("Sueldo");
+            rol.setIngreso(round(sueldoTotalTextValor, 2));
+            rol.setDias(diasTextValor);
+            rol.setHoras(normalesTextValor);
+            rolPagoIndividuales.add(rol);
+        }
         extraText.setText(String.format( "%.2f", extraTextValor));
+        {
+            RolPagoIndividual rol = new RolPagoIndividual();
+            rol.setDescripscion("Horas Extras");
+            rol.setIngreso(extraTextValor);
+            rol.setHoras(suplementariasTextValor + sobreTiempoTextValor);
+            rolPagoIndividuales.add(rol);
+        }
         bonosText.setText(String.format( "%.2f", bonosTextValor));
+        {
+            RolPagoIndividual rol = new RolPagoIndividual();
+            rol.setDescripscion("Bonos");
+            rol.setIngreso(bonosTextValor);
+            rolPagoIndividuales.add(rol);
+        }
         vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
         subTotalText.setText(String.format( "%.2f", subTotalTextValor));
         decimosTotalText.setText(String.format( "%.2f", decimosTotalTextValor));
@@ -511,9 +554,27 @@ public class PagosTotalEmpleadoController implements Initializable {
             ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor;
         } else {
             ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor + decimosTotalTextValor;
+            {
+                RolPagoIndividual rol = new RolPagoIndividual();
+                rol.setDescripscion("Decimos");
+                rol.setIngreso(round(decimosTotalTextValor,2));
+                rolPagoIndividuales.add(rol);
+            }
         }
         ieesValor = (ingresoValor/100d) * getIess();  // TODO, sacar de data base
+        {
+            RolPagoIndividual rol = new RolPagoIndividual();
+            rol.setDescripscion(iessPorcentaje.getText());
+            rol.setDeduccion(round(ieesValor, 2));
+            rolPagoIndividuales.add(rol);
+        }
         quincenaValor = empleado.getDetallesEmpleado().getQuincena();
+        {
+            RolPagoIndividual rol = new RolPagoIndividual();
+            rol.setDescripscion("Adelanto quincenal");
+            rol.setDeduccion(quincenaValor);
+            rolPagoIndividuales.add(rol);
+        }
         deudasValor = getDeudas();
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
         aPercibirValor = ingresoValor - deduccionesValor;
@@ -603,10 +664,26 @@ public class PagosTotalEmpleadoController implements Initializable {
         ArrayList<Deuda> deudas = new ArrayList<>();
         deudas.addAll(new DeudaDAO().findAllByUsuarioId(empleado.getId()));
         for (Deuda deuda: deudas) {
-            if (!deuda.getPagada() && !deuda.getAplazar())
+            if (!deuda.getPagada() && !deuda.getAplazar()) {
                 monto += (deuda.getRestante() / deuda.getCuotas());
+                {
+                    RolPagoIndividual rol = new RolPagoIndividual();
+                    rol.setDescripscion("Deuda - " + deuda.getTipo());
+                    rol.setDeduccion(deuda.getRestante() / deuda.getCuotas());
+                    rolPagoIndividuales.add(rol);
+                }
+            } 
         }
         return monto;
+    }
+    
+    public static Double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
     
     // Login items
