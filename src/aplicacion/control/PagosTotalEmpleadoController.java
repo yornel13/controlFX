@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getMonthName;
@@ -34,8 +35,10 @@ import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -60,6 +63,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -412,61 +416,68 @@ public class PagosTotalEmpleadoController implements Initializable {
                     aplicacionControl.noPermitido();
                 }
             }
+        } else {
+            
         }
     }
-    
-    public void seleccionarDirectorio() {
-        
-    }
-    
     public void generarPago () {
         
     }
     
-    public void imprimir() {
+    public void imprimir(File file, Boolean enviarCorreo) {
         
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DeudasController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        dialogWait();
+        
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
         datasource.addAll(pagoMesItemses);
         
-        Map<String, String> parametros = new HashMap();
-        parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
-        parametros.put("cedula", empleado.getCedula());
-        parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
-        parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
-        parametros.put("numero", pagoRol.getId().toString());  // TODO
-        parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
-        parametros.put("total", round(aPercibirValor, 2).toString());
-        JasperDesign jasperDesign;
         try {
-            dialogLoading.close();
-            DirectoryChooser fileChooser = new DirectoryChooser();
-            fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
-            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
-
-            File file = fileChooser.showDialog(stagePrincipal);
-
+            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
+        
+            Map<String, String> parametros = new HashMap();
+            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("cedula", empleado.getCedula());
+            parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
+            parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            parametros.put("numero", pagoRol.getId().toString()); 
+            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            parametros.put("total", round(aPercibirValor, 2).toString());
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = "rol_individual_" + pagoRol.getId();
+            
             if (file != null) {
-                dialogWait();
-                jasperDesign = JRXmlLoader.load(inputStream);
-                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
-                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\rol_individual_" + pagoRol.getId() +".pdf"); 
-                dialogLoading.close();
-                dialogGenerarRolIndividualCompleted();
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            if (enviarCorreo) {
+                File pdf = File.createTempFile(filename, ".pdf");
+                JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
+                CorreoUtil.mandarCorreo(empleado.getDetallesEmpleado().getEmpresa().getNombre(), 
+                        empleado.getEmail(), Const.ASUNTO_ROL_INDIVIDUAL, 
+                        "Recibo de rol de pago del mes que empieza el " 
+                                + getFechaConMes(inicio) 
+                                + " y termina el " 
+                                + getFechaConMes(fin), 
+                        pdf.getPath(), filename + ".pdf");
             }
-        } catch (JRException ex) {
+            
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
             Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
         }
         
     }
     
     public void generarRolIndividual() {
+       
+        dialogWait();
         
         new RolIndividualDAO().save(pagoRol);
         
@@ -507,7 +518,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             new AbonoDeudaDAO().save(abonoDeuda);  
         }
         
-        textError.setTextFill(Color.RED);
+        textError.setTextFill(Color.YELLOW);
         textError.setText("Ya se creo el rol de pago individual de este mes");
         
         // Registro para auditar
@@ -516,10 +527,53 @@ public class PagosTotalEmpleadoController implements Initializable {
                 + " para el empleado " + empleado.getNombre() + " " + empleado.getApellido();
         aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
         
-        imprimir();
+        dialogLoading.close();
+        
+        dialogoGenerarRolCompletado();
     }
     
-    public void dialogGenerarRolIndividualCompleted() {
+    public void dialogoGenerarRolCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Rol individua");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Guardar Documento");
+        Button buttonNoDocumento = new Button("No Guardar");
+        CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se genero el rol de pago individual con exito, \n"
+                + " ¿Desea guardar el documento de pago?."), 
+                buttonSiDocumento, buttonNoDocumento, enviarCorreo).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                imprimir(file, enviarCorreo.isSelected());
+            }
+        });
+        buttonNoDocumento.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            if (enviarCorreo.isSelected()) {
+                imprimir(null, enviarCorreo.isSelected());
+            } else {
+                dialogoCompletado();
+            }
+        });
+        enviarCorreo.setSelected(true);
+        dialogStage.showAndWait();
+    }
+    
+    public File seleccionarDirectorio() {
+        DirectoryChooser fileChooser = new DirectoryChooser();
+        fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
+        return fileChooser.showDialog(stagePrincipal);
+    }
+    
+    public void dialogoCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -528,7 +582,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se genero el recibo de pago con exito."), buttonOk).
+        children(new Text("Completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -581,7 +635,6 @@ public class PagosTotalEmpleadoController implements Initializable {
                 buttonNo.setMinWidth(50);
                 buttonOk.setOnAction((ActionEvent e) -> {
                     dialogStage.close();
-                    dialogWait();
                     generarRolIndividual();
                     
                 });
@@ -893,7 +946,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         }
         
         if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
-            textError.setTextFill(Color.RED);
+            textError.setTextFill(Color.YELLOW);
             textError.setText("Ya se creo el rol de pago individual de este mes");
         } else {
             textError.setTextFill(Color.BLACK);

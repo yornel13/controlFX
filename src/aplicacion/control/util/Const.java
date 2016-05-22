@@ -26,5 +26,12 @@ public class Const {
     
     // Reportes
     public static final String REPORTE_ROL_INDIVIDUAL = "rol_pago_individual.jrxml";
+    
+    
+    /************* Correo **************/
+    // Asunto
+    public static final String ASUNTO_ROL_INDIVIDUAL = "Pago mensual";
+    // Mensaje
+    public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";
    
 }

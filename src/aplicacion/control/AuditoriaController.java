@@ -165,7 +165,7 @@ public class AuditoriaController implements Initializable {
             System.out.println(accion.getNombre());
             itemsAccion[acciones.indexOf(accion)] = accion.getNombre();
         });
-        
+        itemsAccion[acciones.size()] = "TODO";
         accionesSelector.setItems(FXCollections.observableArrayList(itemsAccion));
     } 
     
