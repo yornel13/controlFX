@@ -106,5 +106,11 @@
             </key>
             <one-to-many class="hibernate.model.PagoMes" />
         </set>
+        <set name="rolIndividuals" inverse="true">
+            <key>
+                <column name="usuario_id" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.model.RolIndividual" />
+        </set>
     </class>
 </hibernate-mapping>

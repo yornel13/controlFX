@@ -482,9 +482,9 @@
             </Label>
          </children>
       </GridPane>
-      <Button layoutX="609.0" layoutY="443.0" mnemonicParsing="false" onAction="#onClickGestionarDeudas" prefHeight="25.0" prefWidth="146.0" text="Gestionar Deudas" />
-      <Button layoutX="609.0" layoutY="497.0" mnemonicParsing="false" onAction="#onClickGenerarRecibo" prefHeight="25.0" prefWidth="146.0" text="Generar Recibo" />
+      <Button layoutX="624.0" layoutY="438.0" mnemonicParsing="false" onAction="#onClickGestionarDeudas" prefHeight="25.0" prefWidth="117.0" text="Gestionar Deudas" />
+      <Button layoutX="609.0" layoutY="497.0" mnemonicParsing="false" onAction="#onClickGenerarRecibo" prefHeight="25.0" prefWidth="146.0" text="Generar Rol Individual" />
       <Line endX="152.0" layoutX="196.0" layoutY="462.0" startX="-100.0" />
-      <Label layoutX="30.0" layoutY="539.0" text="Al creal el rol de pago individual los roles asociados (clientes o administrativos) no podran ser borrados" underline="true" />
+      <Label fx:id="textError" layoutX="30.0" layoutY="539.0" text="Al creal el rol de pago individual los roles asociados (clientes o administrativos) no podran ser borrados" underline="true" />
     </children>
 </AnchorPane>

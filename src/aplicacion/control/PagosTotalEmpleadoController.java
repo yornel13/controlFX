@@ -5,19 +5,31 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.ReportModel.RolPagoIndividual;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getMonthName;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
+import com.sun.deploy.ui.ProgressDialog;
+import hibernate.HibernateSessionFactory;
+import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.PagoDAO;
+import hibernate.dao.PagoMesDAO;
+import hibernate.dao.PagoMesItemsDAO;
+import hibernate.dao.RolIndividualDAO;
+import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
+import hibernate.model.PagoMes;
+import hibernate.model.PagoMesItems;
+import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,18 +42,16 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,6 +63,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import static javafx.scene.control.ProgressIndicator.INDETERMINATE_PROGRESS;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -63,12 +75,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javax.swing.JFileChooser;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -234,6 +245,9 @@ public class PagosTotalEmpleadoController implements Initializable {
     @FXML
     private Label iessPorcentaje;
     
+    @FXML
+    private Label textError;
+    
     // Totales de el empleado
     
     private Integer diasTextValor;
@@ -305,12 +319,16 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     private ObservableList<PagosTable> data;
     
-    private ArrayList<RolPagoIndividual> rolPagoIndividuales;
+    private ArrayList<PagoMesItems> pagoMesItemses;
     
-    private Pago pagoRol;
+    ArrayList<Deuda> deudasAPagar = new ArrayList<>();
+    
+    private RolIndividual pagoRol;
     
     @FXML
     private Label errorText;
+    
+    Stage dialogLoading;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -401,6 +419,10 @@ public class PagosTotalEmpleadoController implements Initializable {
         
     }
     
+    public void generarPago () {
+        
+    }
+    
     public void imprimir() {
         
         InputStream inputStream = null;
@@ -410,7 +432,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             Logger.getLogger(DeudasController.class.getName()).log(Level.SEVERE, null, ex);
         }
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
-        datasource.addAll((List<RolPagoIndividual>) rolPagoIndividuales);
+        datasource.addAll(pagoMesItemses);
         
         Map<String, String> parametros = new HashMap();
         parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
@@ -418,15 +440,11 @@ public class PagosTotalEmpleadoController implements Initializable {
         parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
         parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
         parametros.put("numero", pagoRol.getId().toString());  // TODO
-        parametros.put("lapso", Fechas.getDateFromTimestamp(inicio).getDayOfMonth() + " de " 
-                        + getMonthName(Fechas.getDateFromTimestamp(inicio).getMonthValue())
-                        +  " " + Fechas.getDateFromTimestamp(inicio).getYear()
-                        + " al " + Fechas.getDateFromTimestamp(fin).getDayOfMonth() 
-                        + " de " + getMonthName(Fechas.getDateFromTimestamp(fin).getMonthValue())
-                        + " " + Fechas.getDateFromTimestamp(fin).getYear());
+        parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
         parametros.put("total", round(aPercibirValor, 2).toString());
         JasperDesign jasperDesign;
         try {
+            dialogLoading.close();
             DirectoryChooser fileChooser = new DirectoryChooser();
             fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
@@ -434,10 +452,12 @@ public class PagosTotalEmpleadoController implements Initializable {
             File file = fileChooser.showDialog(stagePrincipal);
 
             if (file != null) {
+                dialogWait();
                 jasperDesign = JRXmlLoader.load(inputStream);
                 JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\rol_individual_" + pagoRol.getId() +".pdf"); 
+                dialogLoading.close();
                 dialogGenerarRolIndividualCompleted();
             }
         } catch (JRException ex) {
@@ -448,11 +468,52 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     public void generarRolIndividual() {
         
-        new PagoDAO().save(pagoRol);
+        new RolIndividualDAO().save(pagoRol);
+        
+        PagoMes pagoMes = new PagoMes();
+        pagoMes.setFecha(new Timestamp(new Date().getTime()));
+        pagoMes.setInicioMes(inicio);
+        pagoMes.setFinMes(fin);
+        pagoMes.setMonto(round(aPercibirValor, 2));
+        pagoMes.setUsuario(empleado);
+        pagoMes.setRolIndividual(pagoRol);
+        new PagoMesDAO().save(pagoMes);
+        
+        for (PagoMesItems pago: pagoMesItemses) {
+            pago.setPagoMes(pagoMes);
+            new PagoMesItemsDAO().save(pago);
+        }
+        
+        for (Deuda deuda: deudasAPagar) {
+            Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas(), 2);
+            Integer newCuotas = deuda.getCuotas() - 1;
+            if (newCuotas == 0) {
+                deuda.setPagada(Boolean.TRUE);
+                deuda.setRestante(0d);  
+                deuda.setCuotas(newCuotas);
+            } else {
+                deuda.setPagada(Boolean.FALSE);
+                deuda.setRestante(round(deuda.getRestante() - montoAPagar, 2));
+                deuda.setCuotas(newCuotas);
+            }
+            deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
+            HibernateSessionFactory.getSession().flush();
+            
+            AbonoDeuda abonoDeuda = new AbonoDeuda();
+            abonoDeuda.setDeuda(deuda);
+            abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
+            abonoDeuda.setMonto(montoAPagar);
+            abonoDeuda.setPagoMes(pagoMes);
+            new AbonoDeudaDAO().save(abonoDeuda);  
+        }
+        
+        textError.setTextFill(Color.RED);
+        textError.setText("Ya se creo el rol de pago individual de este mes");
         
         // Registro para auditar
-        String detalles = "genero el rol individual nro: " + pagoRol.getId() + " para el empleado "
-            + empleado.getNombre() + " " + empleado.getApellido();
+        String detalles = "genero el rol individual nro: " + pagoRol.getId() 
+                + " del lapso " + getFechaConMes(inicio)+ " a " + getFechaConMes(fin) 
+                + " para el empleado " + empleado.getNombre() + " " + empleado.getApellido();
         aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
         
         imprimir();
@@ -478,12 +539,25 @@ public class PagosTotalEmpleadoController implements Initializable {
         dialogStage.showAndWait();
     }
     
+    public void dialogWait() {
+        dialogLoading = new Stage();
+        dialogLoading.initModality(Modality.APPLICATION_MODAL);
+        dialogLoading.setResizable(false);
+        dialogLoading.setTitle("Cargando...");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        dialogLoading.getIcons().add(new Image(stageIcon));
+        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Cargando espere...")).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogLoading.show();
+    }
+    
     @FXML
     public void onClickGenerarRecibo(ActionEvent event) {
         
         if (empleado != null) {
            
-            if (new PagoDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
+            if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
             
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -507,6 +581,7 @@ public class PagosTotalEmpleadoController implements Initializable {
                 buttonNo.setMinWidth(50);
                 buttonOk.setOnAction((ActionEvent e) -> {
                     dialogStage.close();
+                    dialogWait();
                     generarRolIndividual();
                     
                 });
@@ -517,24 +592,24 @@ public class PagosTotalEmpleadoController implements Initializable {
                 
             } else {
                {
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Rol individua");
-                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));
-                Button buttonOk = new Button("ok");
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-                children(new Text("Ya el empleado tiene un rol individual para esta fecha."), buttonOk).
-                alignment(Pos.CENTER).padding(new Insets(10)).build()));
-                buttonOk.setOnAction((ActionEvent e) -> {
-                    dialogStage.close();
-                });
-                buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-                    dialogStage.close();
-                });
-                dialogStage.showAndWait();
-            } 
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Rol individua");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    Button buttonOk = new Button("ok");
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+                    children(new Text("Ya el empleado tiene un rol individual para esta fecha."), buttonOk).
+                    alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                    buttonOk.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                    });
+                    buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                        dialogStage.close();
+                    });
+                    dialogStage.showAndWait();
+                } 
             }
             
             
@@ -612,7 +687,8 @@ public class PagosTotalEmpleadoController implements Initializable {
         if (pagos.isEmpty())
             pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, empleadoId));
         
-        rolPagoIndividuales = new ArrayList<>();
+        pagoMesItemses = new ArrayList<>();
+        deudasAPagar = new ArrayList<>();
         
         diasTextValor = 0;
         normalesTextValor = 0;
@@ -713,27 +789,27 @@ public class PagosTotalEmpleadoController implements Initializable {
         sobreTiempoText.setText(sobreTiempoTextValor.toString());
         sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
         {
-            RolPagoIndividual rol = new RolPagoIndividual();
-            rol.setDescripscion("Sueldo");
+            PagoMesItems rol = new PagoMesItems();
+            rol.setDescripcion("Sueldo");
             rol.setIngreso(round(sueldoTotalTextValor, 2));
             rol.setDias(diasTextValor);
             rol.setHoras(normalesTextValor);
-            rolPagoIndividuales.add(rol);
+            pagoMesItemses.add(rol);
         }
         extraText.setText(String.format( "%.2f", extraTextValor));
         {
-            RolPagoIndividual rol = new RolPagoIndividual();
-            rol.setDescripscion("Horas Extras");
+            PagoMesItems rol = new PagoMesItems();
+            rol.setDescripcion("Horas Extras");
             rol.setIngreso(extraTextValor);
             rol.setHoras(suplementariasTextValor + sobreTiempoTextValor);
-            rolPagoIndividuales.add(rol);
+            pagoMesItemses.add(rol);
         }
         bonosText.setText(String.format( "%.2f", bonosTextValor));
         {
-            RolPagoIndividual rol = new RolPagoIndividual();
-            rol.setDescripscion("Bonos");
+            PagoMesItems rol = new PagoMesItems();
+            rol.setDescripcion("Bonos");
             rol.setIngreso(bonosTextValor);
-            rolPagoIndividuales.add(rol);
+            pagoMesItemses.add(rol);
         }
         vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
         subTotalText.setText(String.format( "%.2f", subTotalTextValor));
@@ -746,31 +822,31 @@ public class PagosTotalEmpleadoController implements Initializable {
         } else {
             ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor + decimosTotalTextValor;
             {
-                RolPagoIndividual rol = new RolPagoIndividual();
-                rol.setDescripscion("Decimo Tercero");
+                PagoMesItems rol = new PagoMesItems();
+                rol.setDescripcion("Decimo Tercero");
                 rol.setIngreso(round(decimoTerceroTotalTextValor, 2));
-                rolPagoIndividuales.add(rol);
+                pagoMesItemses.add(rol);
             }
             {
-                RolPagoIndividual rol = new RolPagoIndividual();
-                rol.setDescripscion("Decimo Cuarto");
+                PagoMesItems rol = new PagoMesItems();
+                rol.setDescripcion("Decimo Cuarto");
                 rol.setIngreso(round(decimoCuartoTotalTextValor, 2));
-                rolPagoIndividuales.add(rol);
+                pagoMesItemses.add(rol);
             }
         }
         ieesValor = (ingresoValor/100d) * getIess();  // TODO, sacar de data base
         {
-            RolPagoIndividual rol = new RolPagoIndividual();
-            rol.setDescripscion(iessPorcentaje.getText());
+            PagoMesItems rol = new PagoMesItems();
+            rol.setDescripcion(iessPorcentaje.getText());
             rol.setDeduccion(round(ieesValor, 2));
-            rolPagoIndividuales.add(rol);
+            pagoMesItemses.add(rol);
         }
         quincenaValor = empleado.getDetallesEmpleado().getQuincena();
         {
-            RolPagoIndividual rol = new RolPagoIndividual();
-            rol.setDescripscion("Adelanto quincenal");
+            PagoMesItems rol = new PagoMesItems();
+            rol.setDescripcion("Adelanto quincenal");
             rol.setDeduccion(quincenaValor);
-            rolPagoIndividuales.add(rol);
+            pagoMesItemses.add(rol);
         }
         deudasValor = getDeudas();
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
@@ -784,7 +860,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         montoAPercibirText.setText(String.format( "%.2f", aPercibirValor));
         
         {
-            pagoRol = new Pago();
+            pagoRol = new RolIndividual();
             pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
             pagoRol.setFecha(new Timestamp(new Date().getTime()));
             pagoRol.setInicio(inicio);
@@ -814,6 +890,14 @@ public class PagosTotalEmpleadoController implements Initializable {
             pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
             pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
             pagoRol.setUsuario(empleado);
+        }
+        
+        if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
+            textError.setTextFill(Color.RED);
+            textError.setText("Ya se creo el rol de pago individual de este mes");
+        } else {
+            textError.setTextFill(Color.BLACK);
+            textError.setText("Al creal el rol de pago individual los roles asociados (clientes o administrativos) no podran ser borrados");
         }
     }
     
@@ -871,13 +955,6 @@ public class PagosTotalEmpleadoController implements Initializable {
         return new Timestamp(todayWithZeroTime.getTime());
     }
     
-    public static String getMonthName(int month){
-        Calendar cal = Calendar.getInstance();
-        // Calendar numbers months from 0
-        cal.set(Calendar.MONTH, month - 1);
-        return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-    }
-    
     public double getIess() {
         ConstanteDAO constanteDao = new ConstanteDAO();
         Constante constante;
@@ -894,28 +971,19 @@ public class PagosTotalEmpleadoController implements Initializable {
     public Double getDeudas() {
         Double monto = 0d;
         ArrayList<Deuda> deudas = new ArrayList<>();
-        deudas.addAll(new DeudaDAO().findAllByUsuarioId(empleado.getId()));
+        deudas.addAll(new DeudaDAO().findAllByUsuarioIdNoPagadaSinAplazar(empleado.getId()));
+        deudasAPagar.addAll(deudas);
         for (Deuda deuda: deudas) {
-            if (!deuda.getPagada() && !deuda.getAplazar()) {
-                monto += (deuda.getRestante() / deuda.getCuotas());
-                {
-                    RolPagoIndividual rol = new RolPagoIndividual();
-                    rol.setDescripscion("Deuda - " + deuda.getTipo());
-                    rol.setDeduccion(deuda.getRestante() / deuda.getCuotas());
-                    rolPagoIndividuales.add(rol);
-                }
-            } 
+            monto += (deuda.getRestante() / deuda.getCuotas());
+            {
+                PagoMesItems rol = new PagoMesItems();
+                rol.setDescripcion("Deuda - " + deuda.getTipo());
+                rol.setDeduccion(deuda.getRestante() / deuda.getCuotas());
+                pagoMesItemses.add(rol);
+            }
+            
         }
         return monto;
-    }
-    
-    public static Double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        long factor = (long) Math.pow(10, places);
-        value = value * factor;
-        long tmp = Math.round(value);
-        return (double) tmp / factor;
     }
     
     public Pago findPagoById(Integer id) {

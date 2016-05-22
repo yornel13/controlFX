@@ -5,7 +5,7 @@
  */
 package aplicacion.control.reports;
 
-import aplicacion.control.ReportModel.RolPagoIndividual;
+import hibernate.model.PagoMesItems;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -18,7 +18,7 @@ import net.sf.jasperreports.engine.JRField;
  */
 public class ReporteRolDePagoIndividual implements JRDataSource {
     
-    private final List<RolPagoIndividual> lista = new ArrayList<>();
+    private final List<PagoMesItems> lista = new ArrayList<>();
     private int indiceActual = -1;
     
     @Override
@@ -28,7 +28,7 @@ public class ReporteRolDePagoIndividual implements JRDataSource {
 
     if( null != jrField.getName()) switch (jrField.getName()) {
             case "descripcion":
-                valor = lista.get(indiceActual).getDescripscion();
+                valor = lista.get(indiceActual).getDescripcion();
                 break; 
             case "ingresos":
                 valor = lista.get(indiceActual).getIngreso();
@@ -54,11 +54,11 @@ public class ReporteRolDePagoIndividual implements JRDataSource {
         return ++indiceActual < lista.size(); 
     }
     
-    public void add(RolPagoIndividual rol) {
+    public void add(PagoMesItems rol) {
         this.lista.add(rol);
     }
 
-    public void addAll(List<RolPagoIndividual> rol) {
+    public void addAll(List<PagoMesItems> rol) {
         this.lista.addAll(rol);
     }
 }

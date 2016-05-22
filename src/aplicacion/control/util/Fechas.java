@@ -7,6 +7,8 @@ package aplicacion.control.util;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Locale;
 import org.joda.time.DateTime;
 
 /**
@@ -22,5 +24,36 @@ public class Fechas {
             DateTime dateTime = new DateTime(timestamp.getTime());
             return LocalDate.of(dateTime.getYear(), dateTime.getMonthOfYear(), dateTime.getDayOfMonth());
         }
+    }
+    
+    public static String getMonthName(int month){
+        Calendar cal = Calendar.getInstance();
+        // Calendar numbers months from 0
+        cal.set(Calendar.MONTH, month - 1);
+        return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
+    }
+    
+    public static String getFechaConMes(DateTime dateTime) {
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear()) 
+                + " " + dateTime.getYear();
+        return fecha;
+    }
+    
+    public static String getFechaConMes(Timestamp timestamp) {
+        DateTime dateTime = new DateTime(timestamp.getTime());
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear()) 
+                + " " + dateTime.getYear();
+        return fecha;
+    }
+    
+    public static String getFechaCorta(Timestamp timestamp) {
+        DateTime dateTime = new DateTime(timestamp.getTime());
+        return dateTime.toString("dd/MM/yyyy");
+    }
+    
+    public static String getFechaCorta(DateTime dateTime) {
+        return dateTime.toString("dd/MM/yyyy");
     }
 }

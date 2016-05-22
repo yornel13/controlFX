@@ -87,6 +87,19 @@ public class DeudaDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<Deuda>) result;
 	}
+        
+        public List<Deuda> findAllByUsuarioIdNoPagadaSinAplazar(Integer UsuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM deuda WHERE "
+                            + "usuario_id = :usuario_id and "
+                            + "pagada = 0 and "
+                            + "aplazar = 0 "
+                            + "order by creacion DESC")
+                    .addEntity(Deuda.class)
+                    .setParameter("usuario_id", UsuarioId);
+            Object result = query.list();
+            return (List<Deuda>) result;
+	}
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Deuda instance with property: " + propertyName

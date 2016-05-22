@@ -17,11 +17,13 @@ public class PagoMes implements java.io.Serializable {
 
 	private Integer id;
 	private Usuario usuario;
+        private RolIndividual rolIndividual;
 	private Double monto;
 	private Timestamp fecha;
 	private Timestamp inicioMes;
 	private Timestamp finMes;
 	private Set abonoDeudas = new HashSet(0);
+        private Set pagoMesItemses = new HashSet(0);
 
 	// Constructors
 
@@ -68,6 +70,14 @@ public class PagoMes implements java.io.Serializable {
 		this.usuario = usuario;
 	}
 
+        public RolIndividual getRolIndividual() {
+            return rolIndividual;
+        }
+
+        public void setRolIndividual(RolIndividual rolIndividual) {
+            this.rolIndividual = rolIndividual;
+        }
+        
 	public Double getMonto() {
 		return this.monto;
 	}
@@ -108,4 +118,13 @@ public class PagoMes implements java.io.Serializable {
 		this.abonoDeudas = abonoDeudas;
 	}
 
+        public Set getPagoMesItemses() {
+            return pagoMesItemses;
+        }
+
+        public void setPagoMesItemses(Set pagoMesItemses) {
+            this.pagoMesItemses = pagoMesItemses;
+        }
+
+        
 }
