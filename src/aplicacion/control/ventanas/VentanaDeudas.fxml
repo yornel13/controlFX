@@ -25,6 +25,6 @@
       </TableView>
       <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
       <Button layoutX="545.0" layoutY="5.0" mnemonicParsing="false" onAction="#agregarDeuda" prefWidth="50.0" text="Crear" />
-      <Button layoutX="405.0" layoutY="5.0" mnemonicParsing="false" onAction="#imprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
+      <Button layoutX="467.0" layoutY="5.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
     </children>
 </AnchorPane>

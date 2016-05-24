@@ -5,8 +5,7 @@
  */
 package aplicacion.control.reports;
 
-import aplicacion.control.util.Fechas;
-import hibernate.model.Deuda;
+import aplicacion.control.tableModel.EmpleadoTable;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -17,9 +16,9 @@ import net.sf.jasperreports.engine.JRField;
  *
  * @author Yornel
  */
-public class ReporteDeudas implements JRDataSource {
+public class ReporteActuarialesVarios implements JRDataSource {
     
-    private final List<Deuda> lista = new ArrayList<>();
+    private final List<EmpleadoTable> lista = new ArrayList<>();
     private int indiceActual = -1;
     
     @Override
@@ -28,23 +27,23 @@ public class ReporteDeudas implements JRDataSource {
     Object valor = null;  
 
     if( null != jrField.getName()) switch (jrField.getName()) {
-            case "tipo":
-                valor = lista.get(indiceActual).getTipo();
+            case "cedula":
+                valor = lista.get(indiceActual).getCedula();
                 break; 
-            case "detalles":
-                valor = lista.get(indiceActual).getDetalles();
+            case "nombre":
+                valor = lista.get(indiceActual).getNombre();
                 break;
-            case "monto":
-                valor = lista.get(indiceActual).getMonto();
+            case "apellido":
+                valor = lista.get(indiceActual).getApellido();
                 break;
-            case "restante":
-                valor = lista.get(indiceActual).getRestante();
+            case "cargo":
+                valor = lista.get(indiceActual).getCargo();
                 break;
-             case "cuotas":
-                valor = lista.get(indiceActual).getCuotas();
+            case "primero":
+                valor = lista.get(indiceActual).getActuarial1();
                 break;
-            case "fecha":
-                valor = Fechas.getFechaConMes(lista.get(indiceActual).getCreacion());
+            case "segundo":
+                valor = lista.get(indiceActual).getActuarial2();
                 break;
             default:
                 break; 
@@ -58,11 +57,11 @@ public class ReporteDeudas implements JRDataSource {
         return ++indiceActual < lista.size(); 
     }
     
-    public void add(Deuda deuda) {
-        this.lista.add(deuda);
+    public void add(EmpleadoTable lista) {
+        this.lista.add(lista);
     }
 
-    public void addAll(List<Deuda> deudas) {
-        this.lista.addAll(deudas);
+    public void addAll(List<EmpleadoTable> lista) {
+        this.lista.addAll(lista);
     }
 }

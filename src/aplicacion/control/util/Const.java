@@ -26,11 +26,16 @@ public class Const {
     
     // Reportes
     public static final String REPORTE_ROL_INDIVIDUAL = "rol_pago_individual.jrxml";
-    
+    public static final String REPORTE_DEUDAS_EMPLEADO = "deudas_empleado.jrxml";
+    public static final String REPORTE_DEUDAS_EMPLEADOS = "deudas_varios.jrxml";
+    public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "adelanto_quincenal_varios.jrxml";
+    public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "acumulacion_decimos_varios.jrxml";
+    public static final String REPORTE_ACTUARIALES_EMPLEADOS = "actuariales_varios.jrxml";
     
     /************* Correo **************/
     // Asunto
     public static final String ASUNTO_ROL_INDIVIDUAL = "Pago mensual";
+    public static final String ASUNTO_DEUDAS = "Deudas pendientes";
     // Mensaje
     public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";
    

@@ -32,6 +32,7 @@ public class EmpleadoTable {
     public SimpleDoubleProperty actuarial2 = new SimpleDoubleProperty();
     public SimpleDoubleProperty quincenal = new SimpleDoubleProperty();
     public SimpleDoubleProperty totalMontoDeudas = new SimpleDoubleProperty();
+    public SimpleIntegerProperty totalDeudas = new SimpleIntegerProperty();
     public SimpleBooleanProperty acumulaDecimos = new SimpleBooleanProperty();
 
     public Integer getDias() {
@@ -101,5 +102,11 @@ public class EmpleadoTable {
     public Boolean getAcumulaDecimos() {
         return acumulaDecimos.get();
     }
+
+    public Integer getTotalDeudas() {
+        return totalDeudas.get();
+    }
+    
+    
    
 }

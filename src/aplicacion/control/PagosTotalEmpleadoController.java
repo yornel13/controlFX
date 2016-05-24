@@ -420,9 +420,6 @@ public class PagosTotalEmpleadoController implements Initializable {
             
         }
     }
-    public void generarPago () {
-        
-    }
     
     public void imprimir(File file, Boolean enviarCorreo) {
         

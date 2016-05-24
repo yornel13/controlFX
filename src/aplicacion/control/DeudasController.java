@@ -5,8 +5,12 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.EmpleadoController.getMonthName;
 import aplicacion.control.reports.ReporteDeudas;
+import aplicacion.control.reports.ReporteRolDePagoIndividual;
+import aplicacion.control.util.Const;
+import aplicacion.control.util.CorreoUtil;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
@@ -15,8 +19,11 @@ import hibernate.model.Deuda;
 import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -42,6 +49,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -53,6 +61,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import net.sf.jasperreports.engine.JRException;
@@ -63,7 +72,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -107,6 +115,8 @@ public class DeudasController implements Initializable {
     private ObservableList<Deuda> data;
     
     ArrayList<Deuda> deudas;
+    
+    Stage dialogLoading;
     
     private DeudasEmpleadosController deudasEmpleadosController;
     
@@ -359,31 +369,126 @@ public class DeudasController implements Initializable {
         });
     }
     
-    @FXML
-    public void imprimir(ActionEvent event) throws JRException {
+    public void imprimir(File file, Boolean enviarCorreo) {
         
-        InputStream inputStream = null;
+        dialogWait();
         
-        try {
-            inputStream = new FileInputStream("deudas_empleado.jrxml");
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(DeudasController.class.getName()).log(Level.SEVERE, null, ex);
-        }
         ReporteDeudas datasource = new ReporteDeudas();
         datasource.addAll((List<Deuda>) deudasTableView.getItems());
         
-        Map<String, String> parametros = new HashMap();
-        parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
-        parametros.put("cedula", empleado.getCedula());
-        parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
-        DateTime now = new DateTime();
-        parametros.put("fecha", now.getDayOfMonth() + " de " 
-                + getMonthName(now.getMonthOfYear()) + " del " + now.getYear());
-        JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
-        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource); 
-        JasperExportManager.exportReportToPdfFile(jasperPrint, "prueba.pdf");
+        try {
+            InputStream inputStream = new FileInputStream(Const.REPORTE_DEUDAS_EMPLEADO);
         
+            Map<String, String> parametros = new HashMap();
+            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("cedula", empleado.getCedula());
+            parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = "deudas_" + empleado.getNombre();
+            
+            if (file != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            if (enviarCorreo) {
+                File pdf = File.createTempFile(filename, ".pdf");
+                JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
+                CorreoUtil.mandarCorreo(empleado.getDetallesEmpleado().getEmpresa().getNombre(), 
+                        empleado.getEmail(), Const.ASUNTO_DEUDAS, 
+                        "Reportes de deudas", 
+                        pdf.getPath(), filename + ".pdf");
+            }
+            
+            // Registro para auditar
+            String detalles = "genero el recibo de deudas del empleado "
+                    + empleado.getNombre() + " " + empleado.getApellido();
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
+        }
+        
+    }
+    
+    public void dialogoCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Imprimir deudas");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Completado."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public File seleccionarDirectorio() {
+        DirectoryChooser fileChooser = new DirectoryChooser();
+        fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
+        return fileChooser.showDialog(stagePrincipal);
+    }
+    
+    @FXML
+    public void dialogoImprimir(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Imprimir Deudas");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Guardar Documento");
+        Button buttonNoDocumento = new Button("No Guardar");
+        CheckBox enviarCorreo = new CheckBox("Enviar documento al empleado");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("¿Que desea hacer?"), 
+                buttonSiDocumento, buttonNoDocumento, enviarCorreo).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                imprimir(file, enviarCorreo.isSelected());
+            }
+        });
+        buttonNoDocumento.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            if (enviarCorreo.isSelected()) {
+                imprimir(null, enviarCorreo.isSelected());
+            } 
+        });
+        enviarCorreo.setSelected(true);
+        dialogStage.showAndWait();
+    }
+    
+    public void dialogWait() {
+        dialogLoading = new Stage();
+        dialogLoading.initModality(Modality.APPLICATION_MODAL);
+        dialogLoading.setResizable(false);
+        dialogLoading.setTitle("Cargando...");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        dialogLoading.getIcons().add(new Image(stageIcon));
+        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Cargando espere...")).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogLoading.show();
     }
     
     public void borradoCompleto() {
