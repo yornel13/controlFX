@@ -382,8 +382,14 @@ public class DeudasController implements Initializable {
             Map<String, String> parametros = new HashMap();
             parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
             parametros.put("cedula", empleado.getCedula());
-            parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
+            parametros.put("empresa", empresa.getNombre());
+            parametros.put("siglas", empresa.getSiglas());
+            parametros.put("correo", "Correo: " + empresa.getEmail());
+            parametros.put("detalles", 
+                         "Ruc: " + empresa.getNumeracion() 
+                    + " - Direccion: " + empresa.getDireccion() 
+                    + " - Tel: " + empresa.getTelefono1());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -510,6 +516,7 @@ public class DeudasController implements Initializable {
     
     public void setEmpleado(Usuario empleado) {
         this.empleado = empleado;
+        this.empresa = empleado.getDetallesEmpleado().getEmpresa();
         DeudaDAO deudaDao = new DeudaDAO();
         deudas = new ArrayList<>();
         deudas.addAll(deudaDao.findAllByUsuarioId(empleado.getId()));

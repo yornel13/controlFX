@@ -180,6 +180,12 @@ public class ActuarialesEmpleadosController implements Initializable {
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
+            parametros.put("siglas", empresa.getSiglas());
+            parametros.put("correo", "Correo: " + empresa.getEmail());
+            parametros.put("detalles", 
+                         "Ruc: " + empresa.getNumeracion() 
+                    + " - Direccion: " + empresa.getDireccion() 
+                    + " - Tel: " + empresa.getTelefono1());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

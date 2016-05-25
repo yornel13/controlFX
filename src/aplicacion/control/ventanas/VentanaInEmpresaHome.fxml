@@ -56,8 +56,9 @@
       <Label layoutX="590.0" layoutY="77.0" text="Pagos" textFill="WHITE" />
       <Line endX="100.0" layoutX="676.0" layoutY="100.0" startX="-100.0" />
       <Button layoutX="600.0" layoutY="130.0" mnemonicParsing="false" onAction="#verActuarialesEmpleados" prefHeight="25.0" prefWidth="151.0" text="Actuariales" />
-      <Button layoutX="601.0" layoutY="250.0" mnemonicParsing="false" onAction="#verQuincenalEmpleados" prefHeight="25.0" prefWidth="151.0" text="Adelanto Quincenal" />
-      <Button layoutX="601.0" layoutY="310.0" mnemonicParsing="false" onAction="#verDeudasEmpleados" prefHeight="25.0" prefWidth="151.0" text="Deudas" />
-      <Button layoutX="601.0" layoutY="190.0" mnemonicParsing="false" onAction="#verDecimosEmpleados" prefHeight="25.0" prefWidth="151.0" text="Decimos" />
+      <Button layoutX="601.0" layoutY="180.0" mnemonicParsing="false" onAction="#verQuincenalEmpleados" prefHeight="25.0" prefWidth="151.0" text="Adelanto Quincenal" />
+      <Button layoutX="601.0" layoutY="280.0" mnemonicParsing="false" onAction="#verDeudasEmpleados" prefHeight="25.0" prefWidth="151.0" text="Deudas" />
+      <Button layoutX="601.0" layoutY="230.0" mnemonicParsing="false" onAction="#verDecimosEmpleados" prefHeight="25.0" prefWidth="151.0" text="Decimos" />
+      <Button layoutX="600.0" layoutY="330.0" mnemonicParsing="false" onAction="#verIessEmpleados" prefHeight="25.0" prefWidth="151.0" text="IESS" />
     </children>
 </AnchorPane>

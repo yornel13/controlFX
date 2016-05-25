@@ -4,9 +4,12 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="empleado" class="java.lang.String"/>
-	<parameter name="empresa" class="java.lang.String"/>
 	<parameter name="cedula" class="java.lang.String"/>
 	<parameter name="cargo" class="java.lang.String"/>
+	<parameter name="empresa" class="java.lang.String"/>
+	<parameter name="detalles" class="java.lang.String"/>
+	<parameter name="correo" class="java.lang.String"/>
+	<parameter name="siglas" class="java.lang.String"/>
 	<field name="tipo" class="java.lang.String"/>
 	<field name="detalles" class="java.lang.String"/>
 	<field name="monto" class="java.lang.Double"/>
@@ -20,46 +23,67 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="68" splitType="Stretch">
+		<band height="120" splitType="Stretch">
 			<staticText>
-				<reportElement mode="Transparent" x="0" y="32" width="555" height="34"/>
+				<reportElement mode="Transparent" x="10" y="93" width="555" height="27"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="20" isBold="true"/>
+					<font size="16" isBold="true" isUnderline="true"/>
 				</textElement>
-				<text><![CDATA[Reporte Deudas]]></text>
+				<text><![CDATA[Reporte de Deudas.]]></text>
 			</staticText>
 			<textField>
-				<reportElement mode="Transparent" x="10" y="10" width="200" height="20"/>
-				<textElement verticalAlignment="Middle">
-					<font size="12" isBold="true" isUnderline="true"/>
+				<reportElement mode="Transparent" x="20" y="10" width="121" height="20" forecolor="#666666"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{siglas}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement mode="Transparent" x="430" y="10" width="135" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="141" y="30" width="289" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Adobe Hebrew" size="20" isBold="true" isUnderline="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd MMMMM yyyy">
-				<reportElement mode="Transparent" x="370" y="10" width="185" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			<textField>
+				<reportElement mode="Transparent" x="10" y="50" width="555" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{detalles}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="10" y="65" width="555" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{correo}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="72" splitType="Stretch">
+		<band height="90" splitType="Stretch">
 			<textField>
-				<reportElement mode="Transparent" x="10" y="0" width="324" height="20"/>
+				<reportElement mode="Transparent" x="30" y="24" width="324" height="20"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Empleado: " + $P{empleado}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Transparent" x="10" y="20" width="324" height="20"/>
+				<reportElement mode="Transparent" x="30" y="44" width="324" height="20"/>
 				<textElement verticalAlignment="Top">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Cedula: " + $P{cedula}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Transparent" x="10" y="40" width="317" height="20"/>
+				<reportElement mode="Transparent" x="30" y="64" width="317" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA["Cargo: " + $P{cargo}]]></textFieldExpression>
 			</textField>
@@ -230,7 +254,7 @@
 	<summary>
 		<band height="42" splitType="Stretch">
 			<textField pattern="###0.00" isBlankWhenNull="false">
-				<reportElement mode="Transparent" x="322" y="15" width="55" height="20">
+				<reportElement mode="Transparent" x="307" y="15" width="55" height="20">
 					<property name="net.sf.jasperreports.export.pdf.tag.td"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
@@ -250,13 +274,13 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Total Deuda:]]></text>
+				<text><![CDATA[Total por pagar:]]></text>
 			</staticText>
 			<line>
 				<reportElement mode="Opaque" x="287" y="4" width="80" height="1"/>
 			</line>
 			<staticText>
-				<reportElement mode="Transparent" x="314" y="15" width="8" height="20"/>
+				<reportElement mode="Transparent" x="299" y="15" width="8" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<text><![CDATA[$]]></text>
 			</staticText>

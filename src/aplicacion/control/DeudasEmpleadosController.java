@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteDeudasVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.UsuarioDAO;
@@ -203,6 +204,12 @@ public class DeudasEmpleadosController implements Initializable {
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
+            parametros.put("siglas", empresa.getSiglas());
+            parametros.put("correo", "Correo: " + empresa.getEmail());
+            parametros.put("detalles", 
+                         "Ruc: " + empresa.getNumeracion() 
+                    + " - Direccion: " + empresa.getDireccion() 
+                    + " - Tel: " + empresa.getTelefono1());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -311,7 +318,7 @@ public class DeudasEmpleadosController implements Initializable {
                    }
                }
                empleado.totalDeudas.set(cantidad);
-               empleado.totalMontoDeudas.set(montoDeuda);
+               empleado.totalMontoDeudas.set(Numeros.round(montoDeuda, 2));
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);
