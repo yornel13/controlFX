@@ -133,6 +133,12 @@ public class InEmpresaController implements Initializable {
         aplicacionControl.mostrarIessEmpleados(empresa);
         
     }
+    
+    @FXML
+    private void verSueldoEmpleados(ActionEvent event) {
+        stagePrincipal.close();
+        aplicacionControl.mostrarSueldoEmpleados(empresa);
+    }
 
     @FXML
     private void rolCliente(ActionEvent event) {

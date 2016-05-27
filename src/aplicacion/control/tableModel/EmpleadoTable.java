@@ -35,6 +35,7 @@ public class EmpleadoTable {
     public SimpleIntegerProperty totalDeudas = new SimpleIntegerProperty();
     public SimpleBooleanProperty acumulaDecimos = new SimpleBooleanProperty();
     public SimpleDoubleProperty totalIess = new SimpleDoubleProperty();
+    public SimpleDoubleProperty sueldo = new SimpleDoubleProperty();
 
     public Integer getDias() {
         return dias.get();
@@ -110,6 +111,10 @@ public class EmpleadoTable {
 
     public Double getTotalIess() {
         return totalIess.get();
+    }
+    
+    public Double getSueldo() {
+        return sueldo.get();
     }
     
 }
