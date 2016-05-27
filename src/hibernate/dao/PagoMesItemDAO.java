@@ -2,7 +2,7 @@ package hibernate.dao;
 
 // default package
 
-import hibernate.model.PagoMesItems;
+import hibernate.model.PagoMesItem;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -12,18 +12,18 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A data access object (DAO) providing persistence and search support for
- * PagoMesItems entities. Transaction control of the save(), update() and
+ * PagoMesItem entities. Transaction control of the save(), update() and
  * delete() operations can directly support Spring container-managed
  * transactions or they can be augmented to handle user-managed Spring
  * transactions. Each of these methods provides additional information for how
  * to configure it for the desired type of transaction control.
  * 
- * @see .PagoMesItems
+ * @see .PagoMesItem
  * @author MyEclipse Persistence Tools
  */
-public class PagoMesItemsDAO extends BaseHibernateDAO {
+public class PagoMesItemDAO extends BaseHibernateDAO {
 	private static final Logger log = LoggerFactory
-			.getLogger(PagoMesItemsDAO.class);
+			.getLogger(PagoMesItemDAO.class);
 	// property constants
 	public static final String DESCRIPCION = "descripcion";
 	public static final String DIAS = "dias";
@@ -31,8 +31,8 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 	public static final String INGRESO = "ingreso";
 	public static final String DEDUCCION = "deduccion";
 
-	public void save(PagoMesItems transientInstance) {
-		log.debug("saving PagoMesItems instance");
+	public void save(PagoMesItem transientInstance) {
+		log.debug("saving PagoMesItem instance");
 		try {
 			getSession().save(transientInstance);
 			log.debug("save successful");
@@ -42,8 +42,8 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void delete(PagoMesItems persistentInstance) {
-		log.debug("deleting PagoMesItems instance");
+	public void delete(PagoMesItem persistentInstance) {
+		log.debug("deleting PagoMesItem instance");
 		try {
 			getSession().delete(persistentInstance);
 			log.debug("delete successful");
@@ -53,22 +53,43 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public PagoMesItems findById(java.lang.Integer id) {
-		log.debug("getting PagoMesItems instance with id: " + id);
+	public PagoMesItem findById(java.lang.Integer id) {
+		log.debug("getting PagoMesItem instance with id: " + id);
 		try {
-			PagoMesItems instance = (PagoMesItems) getSession().get(
-					"hibernate.model.PagoMesItems", id);
+			PagoMesItem instance = (PagoMesItem) getSession().get(
+					"hibernate.model.PagoMesItem", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
 			throw re;
 		}
 	}
+        
+        public List<PagoMesItem> findByPagoMesId(Integer pagoMesId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes_items where pago_mes_id = :pago_mes_id")
+                    .addEntity(PagoMesItem.class)
+                    .setParameter("pago_mes_id", pagoMesId);
+            Object result = query.list();
+            return (List<PagoMesItem>) result;
+        }
+        
+        public List<PagoMesItem> findByEmpleadoIdAndClave(Integer empleadoId, String clave) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes_item JOIN pago_mes "
+                            + "ON pago_mes.id = pago_mes_item.pago_mes_id "
+                            + "where usuario_id = :usuario_id  and clave = :clave")
+                    .addEntity(PagoMesItem.class)
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("clave", clave);
+            Object result = query.list();
+            return (List<PagoMesItem>) result;
+        }
 
-	public List findByExample(PagoMesItems instance) {
-		log.debug("finding PagoMesItems instance by example");
+	public List findByExample(PagoMesItem instance) {
+		log.debug("finding PagoMesItem instance by example");
 		try {
-			List results = getSession().createCriteria("hibernate.model.PagoMesItems")
+			List results = getSession().createCriteria("hibernate.model.PagoMesItem")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());
@@ -80,10 +101,10 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 	}
 
 	public List findByProperty(String propertyName, Object value) {
-		log.debug("finding PagoMesItems instance with property: "
+		log.debug("finding PagoMesItem instance with property: "
 				+ propertyName + ", value: " + value);
 		try {
-			String queryString = "from PagoMesItems as model where model."
+			String queryString = "from PagoMesItem as model where model."
 					+ propertyName + "= ?";
 			Query queryObject = getSession().createQuery(queryString);
 			queryObject.setParameter(0, value);
@@ -115,9 +136,9 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 	}
 
 	public List findAll() {
-		log.debug("finding all PagoMesItems instances");
+		log.debug("finding all PagoMesItem instances");
 		try {
-			String queryString = "from PagoMesItems";
+			String queryString = "from PagoMesItem";
 			Query queryObject = getSession().createQuery(queryString);
 			return queryObject.list();
 		} catch (RuntimeException re) {
@@ -126,10 +147,10 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public PagoMesItems merge(PagoMesItems detachedInstance) {
-		log.debug("merging PagoMesItems instance");
+	public PagoMesItem merge(PagoMesItem detachedInstance) {
+		log.debug("merging PagoMesItem instance");
 		try {
-			PagoMesItems result = (PagoMesItems) getSession().merge(
+			PagoMesItem result = (PagoMesItem) getSession().merge(
 					detachedInstance);
 			log.debug("merge successful");
 			return result;
@@ -139,8 +160,8 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachDirty(PagoMesItems instance) {
-		log.debug("attaching dirty PagoMesItems instance");
+	public void attachDirty(PagoMesItem instance) {
+		log.debug("attaching dirty PagoMesItem instance");
 		try {
 			getSession().saveOrUpdate(instance);
 			log.debug("attach successful");
@@ -150,8 +171,8 @@ public class PagoMesItemsDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachClean(PagoMesItems instance) {
-		log.debug("attaching clean PagoMesItems instance");
+	public void attachClean(PagoMesItem instance) {
+		log.debug("attaching clean PagoMesItem instance");
 		try {
 			getSession().buildLockRequest(LockOptions.NONE).lock(instance);
 			log.debug("attach successful");

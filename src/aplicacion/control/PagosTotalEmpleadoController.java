@@ -21,7 +21,7 @@ import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.PagoDAO;
 import hibernate.dao.PagoMesDAO;
-import hibernate.dao.PagoMesItemsDAO;
+import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
@@ -29,7 +29,7 @@ import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.PagoMes;
-import hibernate.model.PagoMesItems;
+import hibernate.model.PagoMesItem;
 import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
@@ -93,6 +93,9 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -323,7 +326,7 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     private ObservableList<PagosTable> data;
     
-    private ArrayList<PagoMesItems> pagoMesItemses;
+    private ArrayList<PagoMesItem> pagoMesItems;
     
     ArrayList<Deuda> deudasAPagar = new ArrayList<>();
     
@@ -426,7 +429,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         dialogWait();
         
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
-        datasource.addAll(pagoMesItemses);
+        datasource.addAll(pagoMesItems);
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
@@ -487,9 +490,9 @@ public class PagosTotalEmpleadoController implements Initializable {
         pagoMes.setRolIndividual(pagoRol);
         new PagoMesDAO().save(pagoMes);
         
-        for (PagoMesItems pago: pagoMesItemses) {
+        for (PagoMesItem pago: pagoMesItems) {
             pago.setPagoMes(pagoMes);
-            new PagoMesItemsDAO().save(pago);
+            new PagoMesItemDAO().save(pago);
         }
         
         for (Deuda deuda: deudasAPagar) {
@@ -737,7 +740,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         if (pagos.isEmpty())
             pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, empleadoId));
         
-        pagoMesItemses = new ArrayList<>();
+        pagoMesItems = new ArrayList<>();
         deudasAPagar = new ArrayList<>();
         
         diasTextValor = 0;
@@ -839,27 +842,30 @@ public class PagosTotalEmpleadoController implements Initializable {
         sobreTiempoText.setText(sobreTiempoTextValor.toString());
         sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
         {
-            PagoMesItems rol = new PagoMesItems();
+            PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Sueldo");
             rol.setIngreso(round(sueldoTotalTextValor, 2));
             rol.setDias(diasTextValor);
             rol.setHoras(normalesTextValor);
-            pagoMesItemses.add(rol);
+            rol.setClave(Const.IP_SUELDO);
+            pagoMesItems.add(rol);
         }
         extraText.setText(String.format( "%.2f", extraTextValor));
         {
-            PagoMesItems rol = new PagoMesItems();
+            PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
             rol.setIngreso(extraTextValor);
             rol.setHoras(suplementariasTextValor + sobreTiempoTextValor);
-            pagoMesItemses.add(rol);
+            rol.setClave(Const.IP_HORAS_EXTRAS);
+            pagoMesItems.add(rol);
         }
         bonosText.setText(String.format( "%.2f", bonosTextValor));
         {
-            PagoMesItems rol = new PagoMesItems();
+            PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Bonos");
             rol.setIngreso(bonosTextValor);
-            pagoMesItemses.add(rol);
+            rol.setClave(Const.IP_BONOS);
+            pagoMesItems.add(rol);
         }
         vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
         subTotalText.setText(String.format( "%.2f", subTotalTextValor));
@@ -872,31 +878,35 @@ public class PagosTotalEmpleadoController implements Initializable {
         } else {
             ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor + decimosTotalTextValor;
             {
-                PagoMesItems rol = new PagoMesItems();
+                PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Decimo Tercero");
                 rol.setIngreso(round(decimoTerceroTotalTextValor, 2));
-                pagoMesItemses.add(rol);
+                rol.setClave(Const.IP_DECIMO_TERCERO);
+                pagoMesItems.add(rol);
             }
             {
-                PagoMesItems rol = new PagoMesItems();
+                PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Decimo Cuarto");
                 rol.setIngreso(round(decimoCuartoTotalTextValor, 2));
-                pagoMesItemses.add(rol);
+                rol.setClave(Const.IP_DECIMO_CUARTO);
+                pagoMesItems.add(rol);
             }
         }
         ieesValor = (ingresoValor/100d) * getIess();  // TODO, sacar de data base
         {
-            PagoMesItems rol = new PagoMesItems();
+            PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion(iessPorcentaje.getText());
             rol.setDeduccion(round(ieesValor, 2));
-            pagoMesItemses.add(rol);
+            rol.setClave(Const.IP_IESS);
+            pagoMesItems.add(rol);
         }
         quincenaValor = empleado.getDetallesEmpleado().getQuincena();
         {
-            PagoMesItems rol = new PagoMesItems();
-            rol.setDescripcion("Adelanto quincenal");
+            PagoMesItem rol = new PagoMesItem();
+            rol.setDescripcion("Adelanto Quincenal");
             rol.setDeduccion(quincenaValor);
-            pagoMesItemses.add(rol);
+            rol.setClave(Const.IP_ADELANTO_QUINCENAL);
+            pagoMesItems.add(rol);
         }
         deudasValor = getDeudas();
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
@@ -1013,7 +1023,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             iessPorcentaje.setText("IESS (0.0%)");
             return 0.0;
         } else {
-            iessPorcentaje.setText("IESS (" + constante.getValor() + "%)");
+            iessPorcentaje.setText(Const.IP_IESS + " (" + constante.getValor() + "%)");
             return Double.valueOf(constante.getValor());
         }
     }
@@ -1026,10 +1036,12 @@ public class PagosTotalEmpleadoController implements Initializable {
         for (Deuda deuda: deudas) {
             monto += (deuda.getRestante() / deuda.getCuotas());
             {
-                PagoMesItems rol = new PagoMesItems();
+                PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Deuda - " + deuda.getTipo());
                 rol.setDeduccion(deuda.getRestante() / deuda.getCuotas());
-                pagoMesItemses.add(rol);
+                rol.setClave(Const.IP_DEUDA);
+                pagoMesItems.add(rol);
+                
             }
             
         }

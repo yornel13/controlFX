@@ -129,8 +129,8 @@ public class InEmpresaController implements Initializable {
     
     @FXML
     private void verIessEmpleados(ActionEvent event) {
-        //stagePrincipal.close();
-        //  TODO, abrir ventana aqui
+        stagePrincipal.close();
+        aplicacionControl.mostrarIessEmpleados(empresa);
         
     }
 

@@ -6,7 +6,7 @@ package hibernate.model;
  * PagoMesItems entity. @author MyEclipse Persistence Tools
  */
 
-public class PagoMesItems implements java.io.Serializable {
+public class PagoMesItem implements java.io.Serializable {
 
 	// Fields
 
@@ -17,21 +17,22 @@ public class PagoMesItems implements java.io.Serializable {
 	private Integer horas;
 	private Double ingreso;
 	private Double deduccion;
+        private String clave;
 
 	// Constructors
 
 	/** default constructor */
-	public PagoMesItems() {
+	public PagoMesItem() {
 	}
 
 	/** minimal constructor */
-	public PagoMesItems(PagoMes pagoMes, String descripcion) {
+	public PagoMesItem(PagoMes pagoMes, String descripcion) {
 		this.pagoMes = pagoMes;
 		this.descripcion = descripcion;
 	}
 
 	/** full constructor */
-	public PagoMesItems(PagoMes pagoMes, String descripcion, Integer dias,
+	public PagoMesItem(PagoMes pagoMes, String descripcion, Integer dias,
 			Integer horas, Double ingreso, Double deduccion) {
 		this.pagoMes = pagoMes;
 		this.descripcion = descripcion;
@@ -98,5 +99,15 @@ public class PagoMesItems implements java.io.Serializable {
 	public void setDeduccion(Double deduccion) {
 		this.deduccion = deduccion;
 	}
+
+        public String getClave() {
+            return clave;
+        }
+
+        public void setClave(String clave) {
+            this.clave = clave;
+        }
+        
+        
 
 }

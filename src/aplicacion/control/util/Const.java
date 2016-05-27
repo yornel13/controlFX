@@ -23,6 +23,15 @@ public class Const {
     public static final String ROL_PAGO_INDIVIDUAL = "rol_pago_individual";
     public static final String ROL_PAGO_CLIENTE = "rol_pago_cliente";
     public static final String ROL_PAGO_ADMINISTRATIVO = "rol_pago_administrativo";
+    // Constantes de items de pago
+    public static final String IP_DECIMO_TERCERO = "decimo_tercero";
+    public static final String IP_DECIMO_CUARTO = "decimo_cuarto";
+    public static final String IP_ADELANTO_QUINCENAL = "adelanto_quincenal";
+    public static final String IP_HORAS_EXTRAS = "horas_extras";
+    public static final String IP_BONOS = "bonos";
+    public static final String IP_SUELDO = "sueldo";
+    public static final String IP_IESS = "iess";
+    public static final String IP_DEUDA = "deuda";
     
     // Reportes
     public static final String REPORTE_ROL_INDIVIDUAL = "rol_pago_individual.jrxml";
@@ -31,6 +40,7 @@ public class Const {
     public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "adelanto_quincenal_varios.jrxml";
     public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "acumulacion_decimos_varios.jrxml";
     public static final String REPORTE_ACTUARIALES_EMPLEADOS = "actuariales_varios.jrxml";
+    public static final String REPORTE_IESS_EMPLEADOS = "iess_varios.jrxml";
     
     /************* Correo **************/
     // Asunto
@@ -38,5 +48,7 @@ public class Const {
     public static final String ASUNTO_DEUDAS = "Deudas pendientes";
     // Mensaje
     public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";
+    
+  
    
 }

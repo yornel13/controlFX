@@ -61,6 +61,15 @@ public class PagoMesDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<PagoMes> findByEmpleadoId(Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes where usuario_id = :usuario_id")
+                    .addEntity(PagoMes.class)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<PagoMes>) result;
+        }
 
 	public List findByExample(PagoMes instance) {
 		log.debug("finding PagoMes instance by example");

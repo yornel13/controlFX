@@ -5,7 +5,7 @@
  */
 package aplicacion.control.reports;
 
-import hibernate.model.PagoMesItem;
+import aplicacion.control.tableModel.EmpleadoTable;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -16,9 +16,9 @@ import net.sf.jasperreports.engine.JRField;
  *
  * @author Yornel
  */
-public class ReporteRolDePagoIndividual implements JRDataSource {
+public class ReporteIessVarios implements JRDataSource {
     
-    private final List<PagoMesItem> lista = new ArrayList<>();
+    private final List<EmpleadoTable> lista = new ArrayList<>();
     private int indiceActual = -1;
     
     @Override
@@ -27,20 +27,20 @@ public class ReporteRolDePagoIndividual implements JRDataSource {
     Object valor = null;  
 
     if( null != jrField.getName()) switch (jrField.getName()) {
-            case "descripcion":
-                valor = lista.get(indiceActual).getDescripcion();
+            case "cedula":
+                valor = lista.get(indiceActual).getCedula();
                 break; 
-            case "ingresos":
-                valor = lista.get(indiceActual).getIngreso();
+            case "nombre":
+                valor = lista.get(indiceActual).getNombre();
                 break;
-            case "deducciones":
-                valor = lista.get(indiceActual).getDeduccion();
+            case "apellido":
+                valor = lista.get(indiceActual).getApellido();
                 break;
-            case "dias":
-                valor = lista.get(indiceActual).getDias();
+            case "cargo":
+                valor = lista.get(indiceActual).getCargo();
                 break;
-            case "horas":
-                valor = lista.get(indiceActual).getHoras();
+            case "iess":
+                valor = lista.get(indiceActual).getTotalIess();
                 break;
             default:
                 break; 
@@ -54,11 +54,11 @@ public class ReporteRolDePagoIndividual implements JRDataSource {
         return ++indiceActual < lista.size(); 
     }
     
-    public void add(PagoMesItem rol) {
-        this.lista.add(rol);
+    public void add(EmpleadoTable lista) {
+        this.lista.add(lista);
     }
 
-    public void addAll(List<PagoMesItem> rol) {
-        this.lista.addAll(rol);
+    public void addAll(List<EmpleadoTable> lista) {
+        this.lista.addAll(lista);
     }
 }

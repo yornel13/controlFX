@@ -113,6 +113,16 @@ public class RolIndividualDAO extends BaseHibernateDAO {
             Object result = query.uniqueResult();
             return (RolIndividual) result;
         }
+        
+        public List<RolIndividual> findByEmpleadoId(Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_individual where "
+                            + "usuario_id = :usuario_id")
+                    .addEntity(RolIndividual.class)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<RolIndividual>) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding RolIndividual instance with property: "

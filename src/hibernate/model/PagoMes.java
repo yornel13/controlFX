@@ -23,7 +23,7 @@ public class PagoMes implements java.io.Serializable {
 	private Timestamp inicioMes;
 	private Timestamp finMes;
 	private Set abonoDeudas = new HashSet(0);
-        private Set pagoMesItemses = new HashSet(0);
+        private Set pagoMesItems = new HashSet(0);
 
 	// Constructors
 
@@ -118,12 +118,12 @@ public class PagoMes implements java.io.Serializable {
 		this.abonoDeudas = abonoDeudas;
 	}
 
-        public Set getPagoMesItemses() {
-            return pagoMesItemses;
+        public Set getPagoMesItems() {
+            return pagoMesItems;
         }
 
-        public void setPagoMesItemses(Set pagoMesItemses) {
-            this.pagoMesItemses = pagoMesItemses;
+        public void setPagoMesItems(Set pagoMesItems) {
+            this.pagoMesItems = pagoMesItems;
         }
 
         
