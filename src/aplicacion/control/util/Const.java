@@ -41,6 +41,7 @@ public class Const {
     public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "acumulacion_decimos_varios.jrxml";
     public static final String REPORTE_ACTUARIALES_EMPLEADOS = "actuariales_varios.jrxml";
     public static final String REPORTE_IESS_EMPLEADOS = "iess_varios.jrxml";
+    public static final String REPORTE_AUDITORIA = "auditoria.jrxml";
     
     /************* Correo **************/
     // Asunto

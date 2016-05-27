@@ -36,8 +36,8 @@
                </Button>
             </children>
          </Pane>
-      <Button layoutX="693.0" layoutY="5.0" mnemonicParsing="false" onAction="#onVerUsuarios" text="ver" />
-      <ChoiceBox fx:id="accionesSelector" layoutX="513.0" layoutY="5.0" prefHeight="25.0" prefWidth="164.0" />
+      <Button layoutX="656.0" layoutY="5.0" mnemonicParsing="false" onAction="#onVerUsuarios" text="ver" />
+      <ChoiceBox fx:id="accionesSelector" layoutX="513.0" layoutY="5.0" prefHeight="25.0" prefWidth="136.0" />
       <Label layoutX="461.0" layoutY="9.0" text="Acción:" textFill="WHITE" />
       <TextField fx:id="filterField" layoutX="181.0" layoutY="5.0" prefHeight="25.0" prefWidth="271.0" />
       <Label layoutX="59.0" layoutY="8.0" text="Escriba para filtrar" textFill="#fffbfb">
@@ -45,5 +45,6 @@
             <Font size="14.0" />
          </font>
       </Label>
+      <Button layoutX="719.0" layoutY="5.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
     </children>
 </AnchorPane>

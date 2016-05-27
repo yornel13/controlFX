@@ -5,7 +5,6 @@
  */
 package aplicacion.control.util;
 
-import java.util.Date;
 import org.joda.time.DateTime;
 
 /**
@@ -20,7 +19,8 @@ public class Test {
     public static void main(String[] args) {
         // TODO code application logic here
         DateTime date = new DateTime();
-        System.err.println(date.toString("dd/MM/yyyy"));
+        System.err.println(date.toString("HH:mm:ss"));
+        System.err.println(date.toString("HH:mm:ss"));
         
     }
     

@@ -48,6 +48,23 @@ public class Fechas {
         return fecha;
     }
     
+    public static String getFechaConMesYHora(DateTime dateTime) {
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear()) 
+                + " " + dateTime.getYear() + " a las "
+                + dateTime.toString("HH:mm:ss");
+        return fecha;
+    }
+    
+    public static String getFechaConMesYHora(Timestamp timestamp) {
+        DateTime dateTime = new DateTime(timestamp.getTime());
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear()) 
+                + " " + dateTime.getYear() + " a las " 
+                + dateTime.toString("HH:mm:ss");
+        return fecha;
+    }
+    
     public static String getFechaCorta(Timestamp timestamp) {
         DateTime dateTime = new DateTime(timestamp.getTime());
         return dateTime.toString("dd/MM/yyyy");

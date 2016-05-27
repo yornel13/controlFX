@@ -67,7 +67,7 @@ public class PagoMesItemDAO extends BaseHibernateDAO {
         
         public List<PagoMesItem> findByPagoMesId(Integer pagoMesId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago_mes_items where pago_mes_id = :pago_mes_id")
+                    createSQLQuery("SELECT * FROM pago_mes_item where pago_mes_id = :pago_mes_id")
                     .addEntity(PagoMesItem.class)
                     .setParameter("pago_mes_id", pagoMesId);
             Object result = query.list();
