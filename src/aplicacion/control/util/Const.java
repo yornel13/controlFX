@@ -34,7 +34,7 @@ public class Const {
     public static final String IP_DEUDA = "deuda";
     
     // Reportes
-    public static final String REPORTE_ROL_INDIVIDUAL = "rol_pago_individual.jrxml";
+    public static final String REPORTE_ROL_PAGO_INDIVIDUAL = "rol_pago_individual.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADO = "deudas_empleado.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADOS = "deudas_varios.jrxml";
     public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "adelanto_quincenal_varios.jrxml";
@@ -42,6 +42,8 @@ public class Const {
     public static final String REPORTE_ACTUARIALES_EMPLEADOS = "actuariales_varios.jrxml";
     public static final String REPORTE_IESS_EMPLEADOS = "iess_varios.jrxml";
     public static final String REPORTE_AUDITORIA = "auditoria.jrxml";
+    public static final String REPORTE_ROL_CLIENTE = "rol_cliente.jrxml";
+    public static final String REPORTE_ROL_INDIVIDUAL = "rol_individual.jrxml";
     
     /************* Correo **************/
     // Asunto

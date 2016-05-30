@@ -145,6 +145,12 @@ public class InEmpresaController implements Initializable {
         stagePrincipal.close();
         aplicacionControl.mostrarClientesEmpresa(empresa);
     }
+    
+    @FXML
+    private void mostrarRolCliente(ActionEvent event) {
+        stagePrincipal.close();
+        aplicacionControl.mostrarClientesParaRol(empresa);
+    }
 
     @FXML
     public void rolEmpleado(ActionEvent event) {

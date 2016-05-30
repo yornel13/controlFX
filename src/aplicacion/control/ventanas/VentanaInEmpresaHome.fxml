@@ -12,9 +12,9 @@
 <AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.InEmpresaController">
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <Button layoutX="57.0" layoutY="340.0" mnemonicParsing="false" onAction="#rolEmpleado" prefHeight="25.0" prefWidth="151.0" text="Horas Empleados" />
-      <Button layoutX="57.0" layoutY="460.0" mnemonicParsing="false" onAction="#verConfiguracion" prefHeight="25.0" prefWidth="151.0" text="Configuracion" />
-      <Button fx:id="buttonClientes" layoutX="601.0" layoutY="442.0" mnemonicParsing="false" onAction="#rolCliente" prefHeight="25.0" prefWidth="151.0" text="Por Cliente" />
+      <Button layoutX="56.0" layoutY="330.0" mnemonicParsing="false" onAction="#rolEmpleado" prefHeight="25.0" prefWidth="151.0" text="Horas Empleados" />
+      <Button layoutX="57.0" layoutY="382.0" mnemonicParsing="false" onAction="#verConfiguracion" prefHeight="25.0" prefWidth="151.0" text="Configuracion" />
+      <Button fx:id="buttonClientes" layoutX="601.0" layoutY="388.0" mnemonicParsing="false" onAction="#rolCliente" prefHeight="25.0" prefWidth="151.0" text="Rol Cliente" />
       <Button fx:id="empleadosButton" layoutX="56.0" layoutY="280.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="151.0" text="Empleados" />
       <Accordion layoutX="40.0" layoutY="14.0" />
       <Line endX="660.0" layoutX="117.0" layoutY="40.0" startX="-100.0">
@@ -49,17 +49,19 @@
         </children>
      </Pane>
       <Button fx:id="homeButton1" layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#goHome" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
-      <Label layoutX="587.0" layoutY="388.0" text="Rol de pago" textFill="WHITE" />
-      <Line endX="100.0" layoutX="676.0" layoutY="412.0" startX="-100.0" />
-      <Button layoutX="57.0" layoutY="400.0" mnemonicParsing="false" onAction="#verPagos" prefHeight="25.0" prefWidth="151.0" text="Roles Generados" />
-      <Button layoutX="601.0" layoutY="501.0" mnemonicParsing="false" onAction="#controlPagos" prefHeight="25.0" prefWidth="151.0" text="Pago Empleado" />
-      <Label layoutX="590.0" layoutY="77.0" text="Pagos" textFill="WHITE" />
-      <Line endX="100.0" layoutX="676.0" layoutY="100.0" startX="-100.0" />
-      <Button layoutX="600.0" layoutY="130.0" mnemonicParsing="false" onAction="#verActuarialesEmpleados" prefHeight="25.0" prefWidth="151.0" text="Actuariales" />
-      <Button layoutX="601.0" layoutY="180.0" mnemonicParsing="false" onAction="#verQuincenalEmpleados" prefHeight="25.0" prefWidth="151.0" text="Adelanto Quincenal" />
-      <Button layoutX="601.0" layoutY="280.0" mnemonicParsing="false" onAction="#verDeudasEmpleados" prefHeight="25.0" prefWidth="151.0" text="Deudas" />
-      <Button layoutX="601.0" layoutY="230.0" mnemonicParsing="false" onAction="#verDecimosEmpleados" prefHeight="25.0" prefWidth="151.0" text="Decimos" />
-      <Button layoutX="600.0" layoutY="330.0" mnemonicParsing="false" onAction="#verIessEmpleados" prefHeight="25.0" prefWidth="151.0" text="IESS" />
-      <Button layoutX="423.0" layoutY="330.0" mnemonicParsing="false" onAction="#verSueldoEmpleados" prefHeight="25.0" prefWidth="151.0" text="Sueldo" />
+      <Label layoutX="587.0" layoutY="334.0" text="Rol de pago" textFill="WHITE" />
+      <Line endX="100.0" layoutX="676.0" layoutY="358.0" startX="-100.0" />
+      <Button layoutX="51.0" layoutY="477.0" mnemonicParsing="false" onAction="#verPagos" prefHeight="25.0" prefWidth="151.0" text="Roles Generados" />
+      <Button layoutX="601.0" layoutY="477.0" mnemonicParsing="false" onAction="#controlPagos" prefHeight="25.0" prefWidth="151.0" text="Pago Empleados" />
+      <Label layoutX="423.0" layoutY="78.0" text="Pagos" textFill="WHITE" />
+      <Line endX="270.0" layoutX="506.0" layoutY="100.0" startX="-100.0" />
+      <Button layoutX="601.0" layoutY="180.0" mnemonicParsing="false" onAction="#verActuarialesEmpleados" prefHeight="25.0" prefWidth="151.0" text="Actuariales" />
+      <Button layoutX="423.0" layoutY="125.0" mnemonicParsing="false" onAction="#verQuincenalEmpleados" prefHeight="25.0" prefWidth="151.0" text="Adelanto Quincenal" />
+      <Button layoutX="423.0" layoutY="232.0" mnemonicParsing="false" onAction="#verDeudasEmpleados" prefHeight="25.0" prefWidth="151.0" text="Deudas" />
+      <Button layoutX="601.0" layoutY="232.0" mnemonicParsing="false" onAction="#verDecimosEmpleados" prefHeight="25.0" prefWidth="151.0" text="Decimos" />
+      <Button layoutX="423.0" layoutY="180.0" mnemonicParsing="false" onAction="#verIessEmpleados" prefHeight="25.0" prefWidth="151.0" text="IESS" />
+      <Button layoutX="601.0" layoutY="125.0" mnemonicParsing="false" onAction="#verSueldoEmpleados" prefHeight="25.0" prefWidth="151.0" text="Sueldo" />
+      <Button layoutX="601.0" layoutY="431.0" mnemonicParsing="false" onAction="#verDeudasEmpleados" prefHeight="25.0" prefWidth="151.0" text="Rol Individual" />
+      <Button fx:id="buttonClientes1" layoutX="364.0" layoutY="395.0" mnemonicParsing="false" onAction="#mostrarRolCliente" prefHeight="25.0" prefWidth="151.0" text="Rol Cliente" />
     </children>
 </AnchorPane>

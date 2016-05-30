@@ -674,10 +674,10 @@ public class RolDePagoClienteController implements Initializable {
         pago.setInicio(inicio);
         pago.setFinalizo(fin);
         pago.setDias(dias);
-        pago.setHorasNormales(Double.valueOf(normales));
-        pago.setHorasSuplementarias(Double.valueOf(suplementarias));  // RC
-        pago.setHorasSobreTiempo(Double.valueOf(sobreTiempo));         // ST
-        pago.setTotalHorasExtras(Double.valueOf(sobreTiempo + suplementarias));
+        pago.setHorasNormales(normales);
+        pago.setHorasSuplementarias(suplementarias);  // RC
+        pago.setHorasSobreTiempo(sobreTiempo);         // ST
+        pago.setTotalHorasExtras(sobreTiempo + suplementarias);
         pago.setSalario(totalSalarioDouble);
         pago.setMontoHorasSuplementarias(totalRecargoDouble);
         pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);

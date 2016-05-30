@@ -19,13 +19,14 @@ public class Pago implements java.io.Serializable {
 	private Timestamp fecha;
 	private Double sueldo;
 	private Integer dias;
-	private Double horasNormales;
-	private Double horasSuplementarias;
-	private Double horasSobreTiempo;
-	private Double totalHorasExtras;
+	private Integer horasNormales;
+	private Integer horasSuplementarias;
+	private Integer horasSobreTiempo;
+	private Integer totalHorasExtras;
 	private Double salario;
 	private Double montoHorasSuplementarias;
 	private Double montoHorasSobreTiempo;
+        private Double montoHorasExtras;
 	private Double bono;
 	private Double transporte;
 	private Double totalBonos;
@@ -53,9 +54,9 @@ public class Pago implements java.io.Serializable {
 
 	/** minimal constructor */
 	public Pago(Timestamp inicio, Timestamp finalizo, Timestamp fecha,
-			Double sueldo, Integer dias, Double horasNormales,
-			Double horasSuplementarias, Double horasSobreTiempo,
-			Double totalHorasExtras, Double salario,
+			Double sueldo, Integer dias, Integer horasNormales,
+			Integer horasSuplementarias, Integer horasSobreTiempo,
+			Integer totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
 			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
 			Double decimoTercero, Double decimoCuarto,
@@ -93,9 +94,9 @@ public class Pago implements java.io.Serializable {
 
 	/** full constructor */
 	public Pago(String detalles, Timestamp inicio, Timestamp finalizo,
-			Timestamp fecha, Double sueldo, Integer dias, Double horasNormales,
-			Double horasSuplementarias, Double horasSobreTiempo,
-			Double totalHorasExtras, Double salario,
+			Timestamp fecha, Double sueldo, Integer dias, Integer horasNormales,
+			Integer horasSuplementarias, Integer horasSobreTiempo,
+			Integer totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
 			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
 			Double decimoTercero, Double decimoCuarto,
@@ -191,35 +192,35 @@ public class Pago implements java.io.Serializable {
 		this.dias = dias;
 	}
 
-	public Double getHorasNormales() {
+	public Integer getHorasNormales() {
 		return this.horasNormales;
 	}
 
-	public void setHorasNormales(Double horasNormales) {
+	public void setHorasNormales(Integer horasNormales) {
 		this.horasNormales = horasNormales;
 	}
 
-	public Double getHorasSuplementarias() {
+	public Integer getHorasSuplementarias() {
 		return this.horasSuplementarias;
 	}
 
-	public void setHorasSuplementarias(Double horasSuplementarias) {
+	public void setHorasSuplementarias(Integer horasSuplementarias) {
 		this.horasSuplementarias = horasSuplementarias;
 	}
 
-	public Double getHorasSobreTiempo() {
+	public Integer getHorasSobreTiempo() {
 		return this.horasSobreTiempo;
 	}
 
-	public void setHorasSobreTiempo(Double horasSobreTiempo) {
+	public void setHorasSobreTiempo(Integer horasSobreTiempo) {
 		this.horasSobreTiempo = horasSobreTiempo;
 	}
 
-	public Double getTotalHorasExtras() {
+	public Integer getTotalHorasExtras() {
 		return this.totalHorasExtras;
 	}
 
-	public void setTotalHorasExtras(Double totalHorasExtras) {
+	public void setTotalHorasExtras(Integer totalHorasExtras) {
 		this.totalHorasExtras = totalHorasExtras;
 	}
 
@@ -390,5 +391,14 @@ public class Pago implements java.io.Serializable {
         public void setUsuario(Usuario usuario) {
             this.usuario = usuario;
         }
-           
+
+        public Double getMontoHorasExtras() {
+            return montoHorasExtras;
+        }
+
+        public void setMontoHorasExtras(Double montoHorasExtras) {
+            this.montoHorasExtras = montoHorasExtras;
+        }
+
+        
 }

@@ -29,13 +29,28 @@ import javafx.stage.Stage;
  *
  * @author Yornel
  */
-public class ClientesEmpresaController implements Initializable {
+public class ClientesParaRolController implements Initializable {
     
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
     
     private Empresa empresa;
+    
+    @FXML
+    private TableColumn columnaNumeracion;
+    
+    @FXML
+    private TableColumn columnaNombre;
+    
+    @FXML
+    private TableColumn columnaDetalles;
+    
+    @FXML
+    private TableColumn columnaTelefono;
+    
+    @FXML
+    private TableColumn columnaDireccion;
    
     @FXML
     private Button agregarButton;
@@ -92,34 +107,26 @@ public class ClientesEmpresaController implements Initializable {
            clientesTableView.setItems(data);
         }
         
-        TableColumn nombre = new TableColumn("Cliente");
-        nombre.setMinWidth(120);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        columnaNumeracion.setCellValueFactory(new PropertyValueFactory<>("ruc"));
         
-        TableColumn detalles = new TableColumn("Detalles");
-        detalles.setMinWidth(100);
-        detalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+        columnaNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        
+        columnaDetalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
      
-        TableColumn numeracion = new TableColumn("Numeracion");
-        numeracion.setMinWidth(80);
-        numeracion.setCellValueFactory(new PropertyValueFactory<>("ruc"));
+        columnaTelefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
-        TableColumn telefono = new TableColumn("Telefono");
-        telefono.setMinWidth(100);
-        telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        
-        TableColumn direccion = new TableColumn("Direccion");
-        direccion.setMinWidth(100);
-        direccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+        columnaDireccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
        
-        clientesTableView.getColumns().addAll(numeracion, nombre, detalles, telefono, direccion);
+        clientesTableView.getColumns().addAll(columnaNumeracion, columnaNombre, 
+                columnaDetalles, columnaTelefono, columnaDireccion);
         
         clientesTableView.setRowFactory( (Object tv) -> {
             TableRow<Cliente> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     Cliente rowData = row.getItem();
-                    aplicacionControl.mostrarHorasEmpleadosCliente(empresa, clientesDAO.findById(rowData.getId()));
+                    stagePrincipal.close();
+                    aplicacionControl.mostrarRolCliente(empresa, clientesDAO.findById(rowData.getId()));
                 }
             });
             return row ;

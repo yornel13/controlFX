@@ -10,11 +10,8 @@ import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getMonthName;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
-import com.sun.deploy.ui.ProgressDialog;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
@@ -34,11 +31,9 @@ import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -53,8 +48,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -67,8 +60,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import static javafx.scene.control.ProgressIndicator.INDETERMINATE_PROGRESS;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -93,7 +84,6 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 
@@ -432,7 +422,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         datasource.addAll(pagoMesItems);
         
         try {
-            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
+            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());

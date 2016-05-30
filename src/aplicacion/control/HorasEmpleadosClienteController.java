@@ -242,15 +242,11 @@ public class HorasEmpleadosClienteController implements Initializable {
         cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
         TableColumn nombre = new TableColumn("Empleado");
-        nombre.setMinWidth(100);
+        nombre.setMinWidth(120);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-       
-        TableColumn apellido = new TableColumn("Apellido");
-        apellido.setMinWidth(100);
-        apellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         
         TableColumn cargo = new TableColumn("Cargo");
-        cargo.setMinWidth(100);
+        cargo.setMinWidth(120);
         cargo.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
         TableColumn dias = new TableColumn("Dias");
@@ -258,15 +254,15 @@ public class HorasEmpleadosClienteController implements Initializable {
         dias.setCellValueFactory(new PropertyValueFactory<>("dias"));
         
         TableColumn horas = new TableColumn("Horas(N)");
-        horas.setMinWidth(100);
+        horas.setMinWidth(80);
         horas.setCellValueFactory(new PropertyValueFactory<>("horas"));
         
         TableColumn suplementarias = new TableColumn("Horas(RC)");
-        suplementarias.setMinWidth(100);
+        suplementarias.setMinWidth(80);
         suplementarias.setCellValueFactory(new PropertyValueFactory<>("suplementarias"));
         
         TableColumn sobreTiempo = new TableColumn("Horas(ST)");
-        sobreTiempo.setMinWidth(100);
+        sobreTiempo.setMinWidth(80);
         sobreTiempo.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
         
         

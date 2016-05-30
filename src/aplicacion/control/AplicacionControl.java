@@ -981,6 +981,49 @@ public class AplicacionControl extends Application {
         }
     }
     
+    public void mostrarClientesParaRol(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesParaRol.fxml"));
+                    AnchorPane ventanaClientesEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Cliente");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaClientesEmpresa);
+                    ventana.setScene(scene);
+                    ClientesParaRolController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+
+                } catch (Exception e) {
+                     e.printStackTrace();
+                     //tratar la excepción
+                }
+            } else {
+               noPermitido();
+            }
+        }
+    }
+    
     public void mostrarAdminitradores() {
         if (permisos == null) {
            noLogeado();
@@ -1757,6 +1800,50 @@ public class AplicacionControl extends Application {
                     });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarRolCliente(Empresa empresa, Cliente cliente) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolCliente.fxml"));
+                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Rol del Cliente " + cliente.getNombre());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaAuditar);
+                    ventana.setScene(scene);
+                    RolClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setCliente(cliente, empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();

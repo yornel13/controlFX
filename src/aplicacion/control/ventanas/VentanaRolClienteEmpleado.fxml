@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
+    <children>
+      <Pane layoutX="6.0" layoutY="282.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
+      <Pane layoutX="6.0" layoutY="198.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
+      <Pane layoutX="6.0" layoutY="116.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
+      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="282.0" prefHeight="60.0" prefWidth="588.0">
+         <children>
+            <Label text="Decimo 3ro">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalDecimo4" text="0.00" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Jub. Patronal" GridPane.columnIndex="3">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Ap. Patronal" GridPane.columnIndex="4">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalReserva" text="0.00" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalJubilacion" text="0.00" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalAporte" text="0.00" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalDecimo3" text="0.00" textFill="#fffbfb" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Decimo 4to" GridPane.columnIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="F. Reserva" GridPane.columnIndex="2">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Seguros" GridPane.columnIndex="5">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Uniformes" GridPane.columnIndex="6">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalUniformes" text="0.00" textFill="#fffbfb" GridPane.columnIndex="6" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalSeguros" text="0.00" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="88.0" minWidth="10.0" prefWidth="88.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="91.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="71.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="94.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="90.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="78.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="85.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
+      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="198.0" prefHeight="60.0" prefWidth="588.0">
+         <children>
+            <Label text="Salario">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalSobreTiempo" text="0.00" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Transporte" GridPane.columnIndex="4">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalRecargo" text="0.00" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalBono" text="0.00" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalTransporte" text="0.00" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalSalario" text="0.00" textFill="#fffbfb" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="B + T" GridPane.columnIndex="5">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalBonos" text="0.00" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Vacaciones" GridPane.columnIndex="6">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Recargo" GridPane.columnIndex="2">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Bono" GridPane.columnIndex="3">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Sobre Tiempo" GridPane.columnIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalVacaciones" text="0.00" textFill="#fffbfb" GridPane.columnIndex="6" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="subTotal" text="0.00" textFill="#fffbfb" GridPane.columnIndex="7" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Sub Total" GridPane.columnIndex="7">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="69.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="92.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="66.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="176.0" minWidth="10.0" prefWidth="65.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="73.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="79.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="71.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="79.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
+      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="116.0" prefHeight="60.0" prefWidth="588.0">
+        <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="72.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="121.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="148.0" minWidth="10.0" prefWidth="71.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="162.0" minWidth="10.0" prefWidth="74.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="185.0" minWidth="10.0" prefWidth="96.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Dias">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalHorasN" text="0" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Horas (RC)" GridPane.columnIndex="3">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Horas (ST+RC)" GridPane.columnIndex="4">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalHorasST" text="0" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalHorasRC" text="0" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalHorasExtras" text="0" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalDias" text="0" textFill="#fffbfb" GridPane.rowIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Horas (N)" GridPane.columnIndex="1">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label text="Horas (ST)" GridPane.columnIndex="2">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </GridPane>
+      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="255.0" layoutY="350.0" prefHeight="25.0" prefWidth="194.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="104.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="90.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Pane prefHeight="25.0" prefWidth="105.0" style="-fx-background-color: #eea82f;" />
+            <Label prefHeight="20.0" prefWidth="92.0" text="Total ingresos:" textFill="#0d0707" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="totalIngresos" text="0.00" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
+         </children>
+      </GridPane>
+      <Label layoutX="23.0" layoutY="14.0" prefHeight="17.0" prefWidth="267.0" text="Empleado : Yornel Marval" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="23.0" layoutY="66.0" prefHeight="17.0" prefWidth="267.0" text="Cargo: Supervisor" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label layoutX="23.0" layoutY="40.0" prefHeight="17.0" prefWidth="267.0" text="Cedula: 20356841" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER_RIGHT" layoutX="383.0" layoutY="40.0" prefHeight="17.0" prefWidth="203.0" text="Cliente Cliente Nou" textAlignment="RIGHT" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Button layoutX="520.0" layoutY="5.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
+    </children>
+</AnchorPane>

@@ -28,16 +28,16 @@
         <property name="dias" type="java.lang.Integer">
             <column name="dias" not-null="true" />
         </property>
-        <property name="horasNormales" type="java.lang.Double">
+        <property name="horasNormales" type="java.lang.Integer">
             <column name="horas_normales" precision="10" not-null="true" />
         </property>
-        <property name="horasSuplementarias" type="java.lang.Double">
+        <property name="horasSuplementarias" type="java.lang.Integer">
             <column name="horas_suplementarias" precision="10" not-null="true" />
         </property>
-        <property name="horasSobreTiempo" type="java.lang.Double">
+        <property name="horasSobreTiempo" type="java.lang.Integer">
             <column name="horas_sobre_tiempo" precision="10" not-null="true" />
         </property>
-        <property name="totalHorasExtras" type="java.lang.Double">
+        <property name="totalHorasExtras" type="java.lang.Integer">
             <column name="total_horas_extras" precision="10" not-null="true" />
         </property>
         <property name="salario" type="java.lang.Double">
