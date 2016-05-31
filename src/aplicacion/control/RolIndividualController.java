@@ -6,14 +6,13 @@
 package aplicacion.control;
 
 import static aplicacion.control.PagosTotalEmpleadoController.getToday;
-import aplicacion.control.reports.ReporteActuarialesVarios;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import hibernate.dao.PagoDAO;
-import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
+import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,8 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -42,8 +39,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -66,18 +63,18 @@ import org.joda.time.DateTime;
  *
  * @author Yornel
  */
-public class RolClienteController implements Initializable {
+public class RolIndividualController implements Initializable {
     
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
     
     @FXML
-    private TableView controlClienteTableView;
+    private TableView controlIndividualTableView;
     
     /// Columnas
     @FXML
-    private TableColumn columnaCedula;
+    private TableColumn columnaCliente;
     
     @FXML
     private TableColumn columnaHoras;
@@ -220,16 +217,13 @@ public class RolClienteController implements Initializable {
     public Timestamp inicio;
     public Timestamp fin;
     
-    @FXML
-    private TextField filterField;
-    
     private ObservableList<Pago> data;
     
     ArrayList<Pago> pagos;
     
     private Empresa empresa;
     
-    private Cliente cliente;
+    private Usuario empleado;
     
     private Stage dialogLoading;
     
@@ -244,7 +238,7 @@ public class RolClienteController implements Initializable {
     @FXML
     private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
-        aplicacionControl.mostrarClientesParaRol(empresa);
+        aplicacionControl.mostrarEmpleadosParaRol(empresa);
     } 
     
     public void dialogWait() {
@@ -285,10 +279,10 @@ public class RolClienteController implements Initializable {
         dialogWait();
         
         ReporteRolCliente datasource = new ReporteRolCliente();
-        datasource.addAll((List<Pago>) controlClienteTableView.getItems());
+        datasource.addAll((List<Pago>) controlIndividualTableView.getItems());
         
         try {
-            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_CLIENTE);
+            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
@@ -298,22 +292,24 @@ public class RolClienteController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
-            parametros.put("cliente", cliente.getNombre());
-            parametros.put("numeracion", cliente.getRuc().toString());
-            parametros.put("fecha", Fechas.getFechaConMes(inicio) + " a " + Fechas.getFechaConMes(fin));
+            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("cedula", empleado.getCedula());
+            parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
+            parametros.put("fecha", Fechas.getFechaConMes(inicio) + " al " + Fechas.getFechaConMes(fin));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
-            String filename = "rol_cliente_" + System.currentTimeMillis();
+            String filename = "rol_individual_" + System.currentTimeMillis();
             
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
             } 
             
             // Registro para auditar
-            String detalles = "genero el recibo rol del cliente " + cliente.getNombre();
+            String detalles = "genero el recibo del rol individual del empleado " 
+                    + empleado.getNombre() + " " + empleado.getApellido();
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();
@@ -330,7 +326,7 @@ public class RolClienteController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Rol Cliente");
+        dialogStage.setTitle("Imprimir Rol Individual");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
@@ -358,7 +354,7 @@ public class RolClienteController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Rol Cliente");
+        dialogStage.setTitle("Imprimir Rol Individual");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Seleccionar ruta");
@@ -380,9 +376,9 @@ public class RolClienteController implements Initializable {
         dialogStage.showAndWait();
     }
     
-    public void setCliente(Cliente cliente, Empresa empresa) throws ParseException {
+    public void setEmpleado(Usuario empleado, Empresa empresa) throws ParseException {
         this.empresa = empresa;
-        this.cliente = cliente;
+        this.empleado = empleado;
         
         DateTime dateTime;
         
@@ -401,7 +397,7 @@ public class RolClienteController implements Initializable {
         
         PagoDAO pagoDAO = new PagoDAO();
         pagos = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndClienteId(fin, cliente.getId()));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoId(fin, empleado.getId()));
         
         sueldoTotalTextValor = 0d;
         extraTextValor = 0d;
@@ -445,36 +441,8 @@ public class RolClienteController implements Initializable {
         
         data = FXCollections.observableArrayList(); 
         data.addAll(pagos);
-        controlClienteTableView.setItems(data);
+        controlIndividualTableView.setItems(data);
       
-        FilteredList<Pago> filteredData = new FilteredList<>(data, p -> true);
-        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredData.setPredicate(pago -> {
-                // If filter text is empty, display all persons.
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
-
-                // Compare first name and last name of every person with filter text.
-                String lowerCaseFilter = newValue.toLowerCase();
-
-                if (pago.getEmpleado().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches first name.
-                } else if (pago.getUsuario().getDetallesEmpleado().getCargo().getNombre().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
-                } else if (pago.getUsuario().getDetallesEmpleado().getDepartamento().getNombre().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
-                } else if (pago.getUsuario().getCedula().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
-                }
-                return false; // Does not match.
-            });
-        });
-        
-        SortedList<Pago> sortedData = new SortedList<>(filteredData);
-        sortedData.comparatorProperty().bind(controlClienteTableView.comparatorProperty());
-        controlClienteTableView.setItems(sortedData);
-        
         sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
         extraText.setText(String.format( "%.2f", extraTextValor));
         bonosText.setText(String.format( "%.2f", bonosTextValor));
@@ -489,10 +457,11 @@ public class RolClienteController implements Initializable {
     }
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {   
-        controlClienteTableView.setEditable(Boolean.FALSE);
+    public void initialize(URL url, ResourceBundle rb) {  
         
-        columnaCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        controlIndividualTableView.setEditable(Boolean.FALSE);
+        
+        columnaCliente.setCellValueFactory(new PropertyValueFactory<>("clienteNombre"));
         
         columnaNormales.setCellValueFactory(new PropertyValueFactory<>("horasNormales"));
         
@@ -531,6 +500,17 @@ public class RolClienteController implements Initializable {
         columnaUniforme.setCellValueFactory(new PropertyValueFactory<>("uniformes"));
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
+        
+        controlIndividualTableView.setRowFactory( (Object tv) -> {
+            TableRow<Pago> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Pago rowData = row.getItem();
+                    aplicacionControl.mostrarRolClienteEmpleado(rowData);
+                }
+            });
+            return row ;
+        });
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);

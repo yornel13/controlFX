@@ -5,95 +5,71 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.tableModel.ControlTable;
+import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
-import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
-import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.dao.PagoDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.model.Actuariales;
 import hibernate.model.Cliente;
 import hibernate.model.Constante;
-import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
 import hibernate.model.Seguro;
 import hibernate.model.Uniforme;
-import hibernate.model.Usuario;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.joda.time.DateTime;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 /**
  *
  * @author Yornel
  */
-public class RolDePagoClienteController implements Initializable {
+public class RolClienteEmpleadoController implements Initializable {
     
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-    
-    private Usuario empleado;
-    
-    public ArrayList<ControlEmpleado> controlEmpleado;
-    private ArrayList<ControlTable> controlEmpleadoTable;
-   
-    @FXML
-    private Button administradoresButton;
-    
-    @FXML
-    private Button agregarButton;
-    
-    @FXML
-    private Pane imagenLabel;
-    
-    @FXML
-    private Button ver;
-    
-    @FXML
-    private TableView empleadosTableView;
     
     @FXML
     private Label totalDias;
@@ -162,25 +138,22 @@ public class RolDePagoClienteController implements Initializable {
     private Label textEmpleado;
     
     @FXML
-    private DatePicker pickerDe;
-    
-    @FXML 
-    private DatePicker pickerHasta;
+    private Label empleadoText;
     
     @FXML
-    private TextField bonoField;
+    private Label cedulaText;
     
     @FXML
-    private TextField transporteField;
+    private Label cargoText;
     
     @FXML
-    private TextField vacacionesField;
+    private Label clienteText;
     
     @FXML
-    private CheckBox checkVacaciones;
+    private Label numeracionText;
     
-    @FXML 
-    private Button expandirButton;
+    @FXML
+    private Label lapsoText;
     
     @FXML
     private GridPane gridPaneTotal;
@@ -188,14 +161,8 @@ public class RolDePagoClienteController implements Initializable {
     private Cliente cliente;
     private Empresa empresa;
     
-    private ObservableList<ControlTable> data;
-    
-    ArrayList<Usuario> usuarios;
-    
     private Pago pago;
-    
-    Timestamp fin;
-    Timestamp inicio;
+    private Stage dialogLoading;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -205,595 +172,166 @@ public class RolDePagoClienteController implements Initializable {
         this.aplicacionControl = aplicacionControl;
     }
     
-    @FXML
-    private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarVentanaPrincipal();
-        stagePrincipal.close();
-    }
-    
-    @FXML
-    private void onClickCalcular(ActionEvent event) {
-        setControlEmpleadoInfo(empleado, inicio, fin);
-    }
-    
-    @FXML
-    private void expandir(ActionEvent event) {
-        if (expandirButton.getText().equalsIgnoreCase("Expandir")) {
-            empleadosTableView.setPrefHeight(525);
-            expandirButton.setText("Contraer");
-            gridPaneTotal.setVisible(false);
-        } else {
-            empleadosTableView.setPrefHeight(220);
-            expandirButton.setText("Expandir");
-            gridPaneTotal.setVisible(true);
-        }
-    }
-    
-    @FXML
-    public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()); 
-        mostrarRegistro(null);
-    }
-    
-    @FXML
-    public void onClickLess(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-        mostrarRegistro(null);
-    }
-    
-    @FXML
-    public void onClickPago(ActionEvent event) {
-        
-        String faltantes = "";
-        if (pago.getVacaciones() == 0) {
-            faltantes += " Sin transporte.";
-        } 
-        if (pago.getBono() == 0) {
-            faltantes += " Sin bono.";
-        }
-        if (pago.getTransporte()== 0) {
-            faltantes += " Sin vacaciones.";
-        }
-        
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago " + new DateTime(pago.getInicio().getTime())
-                .toString("dd-MM-yyyy") + " a " + new DateTime(pago.getFinalizo()
-                        .getTime()).toString("dd-MM-yyyy"));
-        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Desea generar el rol de pago del empleado " + pago.getEmpleado()),
-                new Text("para el cliente " + pago.getClienteNombre()+ "?" + faltantes), buttonOk).
+    public void dialogWait() {
+        dialogLoading = new Stage();
+        dialogLoading.initModality(Modality.APPLICATION_MODAL);
+        dialogLoading.setResizable(false);
+        dialogLoading.setTitle("Cargando...");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        dialogLoading.getIcons().add(new Image(stageIcon));
+        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Cargando espere...")).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonOk.setPrefWidth(50);
-        dialogStage.show();
-        buttonOk.setOnAction((ActionEvent e) -> {
-            generarPago();
-            dialogStage.close();
-            
-        });  
+        dialogLoading.show();
     }
     
-    public void generarPago() {
+    public void imprimir(File file) {
         
-        if (new PagoDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
-                empleado.getId(), cliente.getId()) == null) {
+        dialogWait();
         
-            pago.setDetalles("");
-            new PagoDAO().save(pago);
-
+        ReporteRolCliente datasource = new ReporteRolCliente();
+        datasource.add(pago);
+        
+        try {
+            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_UNITARIO);
+        
+            Map<String, String> parametros = new HashMap();
+            parametros.put("empresa", pago.getUsuario().getDetallesEmpleado().getEmpresa().getNombre());
+            parametros.put("siglas", pago.getUsuario().getDetallesEmpleado().getEmpresa().getSiglas());
+            parametros.put("correo", "Correo: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getEmail());
+            parametros.put("detalles", 
+                         "Ruc: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getNumeracion() 
+                    + " - Direccion: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getDireccion() 
+                    + " - Tel: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getTelefono1());
+            parametros.put("empleado", pago.getEmpleado());
+            parametros.put("cedula", pago.getCedula());
+            parametros.put("cargo", pago.getUsuario().getDetallesEmpleado().getCargo().getNombre());
+            parametros.put("fecha", Fechas.getFechaConMes(pago.getInicio()) + " al " + Fechas.getFechaConMes(pago.getFinalizo()));
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = "rol_" + System.currentTimeMillis();
+            
+            if (file != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            
             // Registro para auditar
-            String detalles = "genero un pago al empleado " 
-                + empleado.getNombre() + " " + empleado.getApellido() + " para el cliente " 
-                    + pago.getClienteNombre();
+            String detalles = "genero el recibo de rol de pago individual del empleado " 
+                    + pago.getUsuario().getNombre() + " " 
+                    + pago.getUsuario().getApellido();
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
-            dialogCompletado();
-        } else {
-            dialogError();
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
         }
     }
     
-    public void dialogCompletado() {
+    public void dialogoCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Completado");
+        dialogStage.setTitle("Imprimir Rol de Pago");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Rol de cliente guardado satisfactoriamente."), buttonOk).
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            stagePrincipal.close();
         });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
     }
     
-    public void dialogError() {
+    public File seleccionarDirectorio() {
+        DirectoryChooser fileChooser = new DirectoryChooser();
+        fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
+        return fileChooser.showDialog(stagePrincipal);
+    }
+    
+    @FXML
+    public void dialogoImprimir(ActionEvent event) {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("No se guardo");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.setTitle("Imprimir Rol de Pago");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Ya hay un rol creado con esta fecha y con este cliente."), buttonOk).
+        Button buttonSiDocumento = new Button("Seleccionar ruta");
+        Button buttonNoDocumento = new Button("Salir");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Seleccione la ruta de guardado"), 
+                buttonSiDocumento, buttonNoDocumento).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        dialogStage.show();
-        buttonOk.setOnAction((ActionEvent e) -> {
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                imprimir(file);
+            }
+        });
+        buttonNoDocumento.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            stagePrincipal.close();
         });
+        dialogStage.showAndWait();
     }
     
-    @FXML
-    private void mostrarRegistro(ActionEvent event) {
-        if (pickerDe.getValue() == null) {
-            // error
-        } else if (pickerHasta.getValue() == null) {
-            // error 
-        } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
-            // error
-        } else {       
-            fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-            inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-            setControlEmpleadoInfo(empleado, inicio, fin);
-        }
-    } 
-    
-    @FXML
-    public void mostrarHoras(ActionEvent event) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
+    public void setRolInfo(Pago pago) {
+        this.pago = pago;
+        
+        empleadoText.setText(pago.getUsuario().getNombre() + " " 
+                + pago.getUsuario().getApellido());
+        cedulaText.setText(pago.getUsuario().getCedula());
+        cargoText.setText(pago.getUsuario().getDetallesEmpleado()
+                .getCargo().getNombre());
+        if (pago.getCliente() == null) {
+            clienteText.setText("Personal Administrativo");
+            numeracionText.setVisible(false);
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasCliente.fxml"));
-                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaHoras);
-                    ventana.setScene(scene);
-                    HorasExtrasClienteController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpleado(empleado, cliente);
-                    ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
+            clienteText.setText("Cliente: " + pago.getClienteNombre());
+            numeracionText.setText("Ruc: " + pago.getCliente().getRuc().toString());
         }
-    }
-    
-    @FXML
-    public void mostrarEditarHoras(ControlEmpleado controlEmpleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtrasCliente.fxml"));
-                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaHoras);
-                    ventana.setScene(scene);
-                    EditarHorasExtrasClienteController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setControlEmpleado(controlEmpleado);
-                    ventana.show();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
-    }
-    
-    @FXML
-    private void onClickVacaciones(ActionEvent event) {
-        if (checkVacaciones.isSelected()) {
-            vacacionesField.setDisable(false);
-        } else {
-            vacacionesField.setDisable(true);
-            vacacionesField.setText("");
-        }
-    }
-    
-    private void borrarHoras(ControlEmpleado controlEmpleado, ControlTable controlTable) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.ELIMINAR)) {
-               
-                new ControlEmpleadoDAO().delete(controlEmpleado);
-                HibernateSessionFactory.getSession().flush();
-                // Registro para auditar
-                String detalles = "elimino un registro diario del empleado " 
-                    + empleado.getNombre() + " " + empleado.getApellido() 
-                    + " con fecha " + new DateTime(controlEmpleado.getFecha()
-                            .getTime()).toString("dd-MM-yyyy");
-                aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-                data.remove(controlTable);
-                  
-            } else {
-               aplicacionControl.noPermitido();
-            }
-        } 
-    }
-    
-    public void guardarRegistro(Usuario empleado, Integer suplementarias, 
-            Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
-        ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
-        ControlEmpleado controlEmpleado = new ControlEmpleado();
-        controlEmpleado = new ControlEmpleado();
-        controlEmpleado.setFecha(fecha);
-        controlEmpleado.setLibre(libre);
-        controlEmpleado.setUsuario(empleado);
-        controlEmpleado.setHorasExtras(sobreTiempo);
-        controlEmpleado.setHorasSuplementarias(suplementarias);
-        controlEmpleado.setCliente(cliente);
-        controlEmpleadoDAO.save(controlEmpleado);
-        setControlEmpleadoInfo(this.empleado, 
-                Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
-                Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
-        
-        // Registro para auditar
-        String detalles = "agrego un registro diario al empleado " 
-            + empleado.getNombre() + " " + empleado.getApellido() 
-            + " con fecha " + new DateTime(fecha.getTime()).toString("dd-MM-yyyy");
-        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
-    }
-    
-    public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Integer suplementarias, 
-            Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
-        
-        controlEmpleado.setFecha(fecha);
-        controlEmpleado.setCliente(cliente);
-        controlEmpleado.setLibre(libre);
-        if (libre) {
-            controlEmpleado.setHorasExtras(0);
-            controlEmpleado.setHorasSuplementarias(0);
-        } else {
-            controlEmpleado.setHorasExtras(sobreTiempo);
-            controlEmpleado.setHorasSuplementarias(suplementarias);
-        }
-        HibernateSessionFactory.getSession().flush();
-        
-        setControlEmpleadoInfo(empleado, 
-                Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
-                Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
-        
-        // Registro para auditar
-        String detalles = "edito un registro diario del empleado " 
-            + empleado.getNombre() + " " + empleado.getApellido() 
-            + " con fecha " + new DateTime(fecha.getTime()).toString("dd-MM-yyyy");
-        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-    }
-    
-    public void setEmpleado(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) throws ParseException {
-        this.empleado = empleado;
-        this.cliente = cliente;
-        this.inicio = inicio;
-        this.fin = fin;
-        
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
-        
-        setControlEmpleadoInfo(empleado, inicio, fin);
-    }
-    
-    public void setControlEmpleadoInfo(Usuario empleado, Timestamp inicio, Timestamp fin) {
-        
-        empleadosTableView.getColumns().clear(); 
-        
-        ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
-        
-        Integer dias = 0;
-        Integer normales = 0;
-        Integer sobreTiempo = 0;
-        Integer suplementarias = 0;
-        
-        controlEmpleado = new ArrayList<>();
-        controlEmpleadoTable = new ArrayList<>();
-        controlEmpleado.addAll(controlDAO.findAllByEmpleadoIdClienteIdInDeterminateTime(empleado.getId(), cliente.getId(), inicio, fin));
-        
-        for (ControlEmpleado control: controlEmpleado) {
-            dias = dias + 1;
-            normales = normales + 8;
-            sobreTiempo = sobreTiempo + control.getHorasExtras();
-            suplementarias = suplementarias + control.getHorasSuplementarias();
-            
-            ControlTable controlTable = new ControlTable();
-            
-            controlTable.setId(control.getId());
-            if (control.getCliente() != null) {
-                controlTable.setCliente(control.getCliente().getNombre());
-            }
-            DateTime dateTime = new DateTime(control.getFecha().getTime());
-            controlTable.setFecha(dateTime.toString("dd-MM-yyyy"));
-            controlTable.setDia(dateTime.toCalendar(Locale.getDefault())
-                            .getDisplayName(Calendar
-                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
-            controlTable.setHorasExtras(control.getHorasExtras());
-            controlTable.setHorasSuplementarias(control.getHorasSuplementarias());
-            controlTable.setUsuarios(empleado);
-            if (control.getLibre() != null && control.getLibre()) {
-               controlTable.setDescanso("Libre"); 
-            } 
-            controlEmpleadoTable.add(controlTable);
-        }
+        lapsoText.setText(Fechas.getFechaConMes(pago.getInicio()) + " a " 
+                + Fechas.getFechaConMes(pago.getFinalizo()));
        
-        data = FXCollections.observableArrayList(); 
-        if (!controlEmpleadoTable.isEmpty()) {
-           data.addAll(controlEmpleadoTable);
-        } 
-        empleadosTableView.setItems(data);
-        
-        TableColumn dia = new TableColumn("Dia");
-        dia.setMinWidth(50);
-        dia.setCellValueFactory(new PropertyValueFactory<>("dia"));
-        
-        TableColumn fecha = new TableColumn("Fecha");
-        fecha.setMinWidth(80);
-        fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-       
-        TableColumn cliente = new TableColumn("Cliente");
-        cliente.setMinWidth(200);
-        cliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
-        
-        TableColumn horasExtras = new TableColumn("ST");
-        horasExtras.setMinWidth(40);
-        horasExtras.setCellValueFactory(new PropertyValueFactory<>("horasExtras"));
-        
-        TableColumn horasSuplementarias = new TableColumn("RC");
-        horasSuplementarias.setMinWidth(40);
-        horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
-        
-        TableColumn horas = new TableColumn("Horas");
-        horas.setMinWidth(80);
-        horas.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
-        horas.getColumns().addAll(horasExtras, horasSuplementarias);
-        
-        TableColumn descanso = new TableColumn("Descanso");
-        descanso.setMinWidth(50);
-        descanso.setCellValueFactory(new PropertyValueFactory<>("descanso"));
-        
-        TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(30);
-        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
-            private final Button deleteButton = new Button("Borrar");
-
-            @Override
-            protected void updateItem(ControlTable controlTable, boolean empty) {
-                super.updateItem(controlTable, empty);
-
-                if (controlTable == null) {
-                    setGraphic(null);
-                    return;
-                }
-
-                setGraphic(deleteButton);
-                deleteButton.setOnAction(event -> {
-                    borrarHoras(controlDAO.findById(controlTable.getId()), controlTable);
-                });
-            }
-        });
-        
-        empleadosTableView.getColumns().addAll(fecha, dia, cliente, horas, descanso, delete);
-        
-        empleadosTableView.setRowFactory( (Object tv) -> {
-            TableRow<ControlTable> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    ControlTable rowData = row.getItem();
-                    mostrarEditarHoras(controlDAO.findById(rowData.getId()));
-                }
-            });
-            return row ;
-        });
-        
-        Double sueldoDia = empleado.getDetallesEmpleado().getSueldo() / 30d;
-        Double sueldoHoras = empleado.getDetallesEmpleado().getSueldo() / 240d;
-        
-        totalDias.setText(dias.toString());
-        totalHorasN.setText(normales.toString());
-        totalHorasRC.setText(suplementarias.toString());
-        totalHorasST.setText(sobreTiempo.toString());
-        totalHorasExtras.setText(String.valueOf(sobreTiempo + suplementarias));
-        
-        // Salario
-        Double totalSalarioDouble = sueldoDia * Double.valueOf(dias);
-        totalSalario.setText(String.format( "%.2f", totalSalarioDouble));
-        Double totalSobreTiempoDouble = sueldoHoras * Double.valueOf(sobreTiempo);
-        totalSobreTiempo.setText(String.format( "%.2f", totalSobreTiempoDouble));
-        Double totalRecargoDouble = sueldoHoras * Double.valueOf(suplementarias);
-        totalRecargo.setText(String.format( "%.2f", totalRecargoDouble));
-        Double totalBonoDouble = getBono();
-        totalBono.setText(String.format( "%.2f", totalBonoDouble));
-        Double totalTransporteDouble = getTransporte();
-        totalTransporte.setText(String.format( "%.2f", totalTransporteDouble));
-        Double totalBonosDouble = totalBonoDouble + totalTransporteDouble;
-        totalBonos.setText(String.format( "%.2f", totalBonosDouble));
-        Double totalVacacionesDouble = getVacaciones();
-        totalVacaciones.setText(String.format( "%.2f", totalVacacionesDouble));
-        Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonosDouble + totalVacacionesDouble;
-        subTotal.setText(String.format( "%.2f", subTotalDouble));
-        ////////////////////////////////////////////////////
-        Double decimoTercero = subTotalDouble / 12d;
-        totalDecimo3.setText(String.format( "%.2f", decimoTercero));
-        Double decimoCuarto = (getDecimoCuarto()/30d) * Double.valueOf(dias);
-        totalDecimo4.setText(String.format( "%.2f", decimoCuarto));
-        totalReserva.setText(String.format( "%.2f", decimoTercero));
-        Double jubilacionPatronal = getActuariales(empleado.getId())/ 360d * Double.valueOf(dias);
-        totalJubilacion.setText(String.format( "%.2f", jubilacionPatronal));
-        Double aportePatronal = subTotalDouble * 12.5d / 100d;
-        totalAporte.setText(String.format( "%.2f", aportePatronal));
-        Double segurosDecimal = getSeguro(empleado.getDetallesEmpleado().getEmpresa().getId()) * Double.valueOf(dias);
-        totalSeguros.setText(String.format( "%.2f", segurosDecimal));
-        Double uniformeDecimal = getUniforme(empleado.getDetallesEmpleado().getEmpresa().getId()) * Double.valueOf(dias);
-        totalUniformes.setText(String.format( "%.2f", uniformeDecimal));
-        
-        Double ingresoTotal = subTotalDouble + decimoTercero + decimoCuarto + decimoTercero 
-                + jubilacionPatronal + aportePatronal + segurosDecimal + uniformeDecimal;
-        totalIngresos.setText(String.format( "%.2f", ingresoTotal));
-        
-        pago = new Pago();
-        pago.setFecha(new Timestamp(new Date().getTime()));
-        pago.setInicio(inicio);
-        pago.setFinalizo(fin);
-        pago.setDias(dias);
-        pago.setHorasNormales(normales);
-        pago.setHorasSuplementarias(suplementarias);  // RC
-        pago.setHorasSobreTiempo(sobreTiempo);         // ST
-        pago.setTotalHorasExtras(sobreTiempo + suplementarias);
-        pago.setSalario(totalSalarioDouble);
-        pago.setMontoHorasSuplementarias(totalRecargoDouble);
-        pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);
-        pago.setBono(totalBonoDouble);
-        pago.setTransporte(totalTransporteDouble);
-        pago.setTotalBonos(totalBonosDouble);
-        pago.setVacaciones(totalVacacionesDouble);
-        pago.setSubtotal(subTotalDouble);
-        pago.setDecimoTercero(decimoTercero);
-        pago.setDecimoCuarto(decimoCuarto);
-        pago.setJubilacionPatronal(jubilacionPatronal);
-        pago.setAportePatronal(aportePatronal);
-        pago.setSeguros(segurosDecimal);
-        pago.setUniformes(uniformeDecimal);
-        pago.setTotalIngreso(ingresoTotal);
-        pago.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
-        pago.setCedula(empleado.getCedula());
-        pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
-        pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
-        pago.setUsuario(empleado);
-        pago.setCliente(this.cliente);
-        pago.setClienteNombre(this.cliente.getNombre());
+        totalDias.setText(pago.getDias().toString());
+        totalHorasN.setText(pago.getHorasNormales().toString());
+        totalHorasRC.setText(pago.getHorasSuplementarias().toString());
+        totalHorasST.setText(pago.getHorasSobreTiempo().toString());
+        totalHorasExtras.setText(String.valueOf(pago.getHorasSuplementarias() 
+                + pago.getHorasSobreTiempo()));
+        totalSalario.setText(String.format( "%.2f", pago.getSalario()));
+        totalSobreTiempo.setText(String.format( "%.2f", pago.getMontoHorasSobreTiempo()));
+        totalRecargo.setText(String.format( "%.2f", pago.getMontoHorasSuplementarias()));
+        totalBono.setText(String.format( "%.2f", pago.getBono()));
+        totalTransporte.setText(String.format( "%.2f", pago.getTransporte()));
+        totalBonos.setText(String.format( "%.2f", pago.getTotalBonos()));
+        totalVacaciones.setText(String.format( "%.2f", pago.getVacaciones()));
+        subTotal.setText(String.format( "%.2f", pago.getSubtotal()));
+        totalDecimo3.setText(String.format( "%.2f", pago.getDecimoTercero()));
+        totalDecimo4.setText(String.format( "%.2f", pago.getDecimoCuarto()));
+        totalReserva.setText(String.format( "%.2f", pago.getDecimoTercero()));
+        totalJubilacion.setText(String.format( "%.2f", pago.getJubilacionPatronal()));
+        totalAporte.setText(String.format( "%.2f", pago.getAportePatronal()));
+        totalSeguros.setText(String.format( "%.2f", pago.getSeguros()));
+        totalUniformes.setText(String.format( "%.2f", pago.getUniformes()));
+        totalIngresos.setText("$" + String.format( "%.2f", pago.getTotalIngreso()));
     }
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {   
-        empleadosTableView.setEditable(Boolean.TRUE);
-        empleadosTableView.getColumns().clear(); 
-        
-        bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        
-        pickerDe.setEditable(false);
-        pickerHasta.setEditable(false);
+    public void initialize(URL url, ResourceBundle rb) {  
+        // Nada por aqui
     }  
-    
-    public static String getMonthName(int month){
-        Calendar cal = Calendar.getInstance();
-        // Calendar numbers months from 0
-        cal.set(Calendar.MONTH, month - 1);
-        return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
-    }
-    
-    public double getDecimoCuarto() {
-        ConstanteDAO constanteDao = new ConstanteDAO();
-        Constante constante;
-        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.DECIMO_CUARTO);
-        if (constante == null) {
-            return 30.5;
-        } else {
-            return Double.valueOf(constante.getValor());
-        }
-    }
-    
-    public double getActuariales(Integer empleadoId) {
-        ActuarialesDAO actuarialesDAO = new ActuarialesDAO();
-        Actuariales actuariales;
-        actuariales = actuarialesDAO.findByEmpleadoId(empleadoId);
-        if (actuariales == null) {
-            return 0;
-        } else {
-            return actuariales.getPrimario() + actuariales.getSecundario();
-        }
-    }
-    
-    public double getSeguro(Integer empresaId) {
-        Seguro seguro = new SeguroDAO().findByEmpresaId(empresaId);
-        if (seguro == null) {
-          return 0;  
-        } else {
-            return seguro.getValor();
-        }  
-    }
-    
-    public double getUniforme(Integer empresaId) {
-        Uniforme uniforme = new UniformeDAO().findByEmpresaId(empresaId);
-        if (uniforme == null) {
-          return 0;  
-        } else {
-            return uniforme.getValor();
-        }  
-    }
-    
-    public double getBono() {
-        if (bonoField.getText().isEmpty()) {
-            return 0;
-        } else {
-            return Double.valueOf(bonoField.getText());
-        }
-    }
-    
-    public double getTransporte() {
-        if (transporteField.getText().isEmpty()) {
-            return 0;
-        } else {
-            return Double.valueOf(transporteField.getText());
-        }
-    }
-    
-    public double getVacaciones() {
-        if (vacacionesField.getText().isEmpty()) {
-            return 0;
-        } else {
-            return Double.valueOf(vacacionesField.getText());
-        }
-    }
-    
-    public static EventHandler<KeyEvent> numDecimalFilter() {
-
-        EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
-            if (!"0123456789.".contains(keyEvent.getCharacter())) {
-                keyEvent.consume();
-                
-            }
-        };
-        return aux;
-    }
 }

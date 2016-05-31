@@ -6,7 +6,6 @@
 package aplicacion.control;
 
 import static aplicacion.control.PagosTotalEmpleadoController.getToday;
-import aplicacion.control.reports.ReporteActuarialesVarios;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
@@ -42,6 +41,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -489,7 +489,8 @@ public class RolClienteController implements Initializable {
     }
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {   
+    public void initialize(URL url, ResourceBundle rb) {  
+        
         controlClienteTableView.setEditable(Boolean.FALSE);
         
         columnaCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
@@ -531,6 +532,17 @@ public class RolClienteController implements Initializable {
         columnaUniforme.setCellValueFactory(new PropertyValueFactory<>("uniformes"));
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
+        
+        controlClienteTableView.setRowFactory( (Object tv) -> {
+            TableRow<Pago> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Pago rowData = row.getItem();
+                    aplicacionControl.mostrarRolClienteEmpleado(rowData);
+                }
+            });
+            return row ;
+        });
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);

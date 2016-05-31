@@ -98,6 +98,17 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
         
+        public List<Pago> findAllByFechaAndEmpleadoId(Timestamp fecha, Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                            + "and usuario_id = :usuario_id")
+                    .addEntity(Pago.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<Pago>) result;
+        }
+        
         public List<Pago> findAllByFechaAndEmpleadoIdConCliente(Timestamp fecha, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago where finalizo = :fecha "

@@ -94,6 +94,16 @@ public class ReporteRolCliente implements JRDataSource {
             case "total":
                 valor = lista.get(indiceActual).getTotalIngreso();
                 break;
+            case "cliente":
+                if (lista.get(indiceActual).getCliente() != null) {
+                    valor = "Cliente: " 
+                            + lista.get(indiceActual).getCliente().getNombre() 
+                            + " - RUC: " 
+                            + lista.get(indiceActual).getCliente().getRuc();
+                } else {
+                   valor = "Personal Administrativo"; 
+                }
+                break;
             default:
                 break; 
         }
