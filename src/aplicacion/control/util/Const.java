@@ -34,17 +34,17 @@ public class Const {
     public static final String IP_DEUDA = "deuda";
     
     // Reportes
-    public static final String REPORTE_ROL_PAGO_INDIVIDUAL = "rol_pago_individual.jrxml";
-    public static final String REPORTE_DEUDAS_EMPLEADO = "deudas_empleado.jrxml";
-    public static final String REPORTE_DEUDAS_EMPLEADOS = "deudas_varios.jrxml";
-    public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "adelanto_quincenal_varios.jrxml";
-    public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "acumulacion_decimos_varios.jrxml";
-    public static final String REPORTE_ACTUARIALES_EMPLEADOS = "actuariales_varios.jrxml";
-    public static final String REPORTE_IESS_EMPLEADOS = "iess_varios.jrxml";
-    public static final String REPORTE_AUDITORIA = "auditoria.jrxml";
-    public static final String REPORTE_ROL_CLIENTE = "rol_cliente.jrxml";
-    public static final String REPORTE_ROL_INDIVIDUAL = "rol_individual.jrxml";
-    public static final String REPORTE_ROL_UNITARIO = "rol_unitario.jrxml";
+    public static final String REPORTE_ROL_PAGO_INDIVIDUAL = "report/rol_pago_individual.jrxml";
+    public static final String REPORTE_DEUDAS_EMPLEADO = "report/deudas_empleado.jrxml";
+    public static final String REPORTE_DEUDAS_EMPLEADOS = "report/deudas_varios.jrxml";
+    public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "report/adelanto_quincenal_varios.jrxml";
+    public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "report/acumulacion_decimos_varios.jrxml";
+    public static final String REPORTE_ACTUARIALES_EMPLEADOS = "report/actuariales_varios.jrxml";
+    public static final String REPORTE_IESS_EMPLEADOS = "report/iess_varios.jrxml";
+    public static final String REPORTE_AUDITORIA = "report/auditoria.jrxml";
+    public static final String REPORTE_ROL_CLIENTE = "report/rol_cliente.jrxml";
+    public static final String REPORTE_ROL_INDIVIDUAL = "report/rol_individual.jrxml";
+    public static final String REPORTE_ROL_UNITARIO = "report/rol_unitario.jrxml";
     
     /************* Correo **************/
     // Asunto

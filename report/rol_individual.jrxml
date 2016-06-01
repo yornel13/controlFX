@@ -135,17 +135,17 @@
 				</textElement>
 				<text><![CDATA[Rol de Pago Individual.]]></text>
 			</staticText>
-			<textField>
-				<reportElement mode="Transparent" x="131" y="30" width="536" height="25"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Adobe Hebrew" size="20" isBold="true" isUnderline="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{empresa}]]></textFieldExpression>
-			</textField>
 			<textField pattern="dd MMMMM yyyy">
 				<reportElement mode="Transparent" x="667" y="10" width="135" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="112" y="30" width="555" height="25"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Calisto MT" size="20" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

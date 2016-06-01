@@ -134,7 +134,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="131" y="30" width="536" height="25"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Adobe Hebrew" size="20" isBold="true" isUnderline="false"/>
+					<font fontName="Calisto MT" size="20" isBold="true" isUnderline="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>

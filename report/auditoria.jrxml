@@ -17,12 +17,12 @@
 		<band height="120" splitType="Stretch">
 			<image>
 				<reportElement mode="Transparent" x="461" y="10" width="94" height="83"/>
-				<imageExpression class="java.lang.String"><![CDATA["C:\\Users\\Yornel\\Documents\\NetBeansProjects\\Aplicacion Control\\src\\aplicacion\\control\\imagenes\\security_dialog.png"]]></imageExpression>
+				<imageExpression class="java.lang.String"><![CDATA["report/security_dialog.png"]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement mode="Transparent" x="131" y="30" width="289" height="25"/>
+				<reportElement mode="Transparent" x="131" y="25" width="289" height="25"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font fontName="Adobe Hebrew" size="20" isBold="true" isUnderline="false"/>
+					<font fontName="Calisto MT" size="20" isBold="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Auditoria]]></text>
 			</staticText>
@@ -48,7 +48,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{detalles2}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd MMMMM yyyy">
-				<reportElement mode="Transparent" x="10" y="10" width="121" height="20"/>
+				<reportElement mode="Transparent" x="10" y="10" width="100" height="20"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
