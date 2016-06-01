@@ -54,14 +54,12 @@ public class ConfiguracionController implements Initializable {
     
     @FXML
     private void mostrarDepartamentosCargos(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarCargosDepartamentos();
+        aplicacionControl.mostrarCargosDepartamentos(stagePrincipal);
     }
     
     @FXML
     private void mostarAuditorias(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarAuditoria();
+        aplicacionControl.mostrarAuditoria(stagePrincipal);
     }
     
     @FXML
@@ -76,8 +74,7 @@ public class ConfiguracionController implements Initializable {
     
     @FXML
     private void mostrarEmpresas(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarEmpresas();
+        aplicacionControl.mostrarEmpresas(stagePrincipal);
     }
             
     @FXML
@@ -87,20 +84,17 @@ public class ConfiguracionController implements Initializable {
     
     @FXML
     private void mostrarClientes(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarClientes();
+        aplicacionControl.mostrarClientes(stagePrincipal);
     }
     
     @FXML
     private void verAdministradores(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarAdminitradores();
+        aplicacionControl.mostrarAdminitradores(stagePrincipal);
     }
             
     @FXML
     private void verEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarEmpleadosTodos();
+        aplicacionControl.mostrarEmpleadosTodos(stagePrincipal);
     }       
     
     @Override

@@ -126,7 +126,8 @@ public class ClientesParaRolController implements Initializable {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     Cliente rowData = row.getItem();
                     stagePrincipal.close();
-                    aplicacionControl.mostrarRolCliente(empresa, clientesDAO.findById(rowData.getId()));
+                    aplicacionControl.mostrarRolCliente(empresa, 
+                            clientesDAO.findById(rowData.getId()), stagePrincipal);
                 }
             });
             return row ;

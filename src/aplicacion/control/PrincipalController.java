@@ -42,8 +42,6 @@ public class PrincipalController implements Initializable {
     
     ArrayList<Empresa> empresas;
     
-    public static final String REPORTE_IMPORTE = "/report/prueba_Mano.jrxml";
-    
     private Stage stagePrincipal;
     
     @FXML
@@ -54,8 +52,6 @@ public class PrincipalController implements Initializable {
             label.setText("Selecciona una empresa primero.");
         }
     }
-    
-    
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;

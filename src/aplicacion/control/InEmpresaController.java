@@ -87,87 +87,73 @@ public class InEmpresaController implements Initializable {
 
     @FXML
     private void controlPagos(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarTotalPagosEmpleados(empresa);
+        aplicacionControl.mostrarTotalPagosEmpleados(empresa, stagePrincipal);
     }
 
     @FXML
     private void verEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarEmpleados(empresa);
+        aplicacionControl.mostrarEmpleados(empresa, stagePrincipal);
     }
 
     @FXML
     private void verConfiguracion(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarConfiguracionEmpresa(empresa);
+        aplicacionControl.mostrarConfiguracionEmpresa(empresa, stagePrincipal);
     }
     
     @FXML
     private void verActuarialesEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarActuarialesEmpleados(empresa);
+        aplicacionControl.mostrarActuarialesEmpleados(empresa, stagePrincipal);
     }
     
     @FXML
     private void verDecimosEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarDecimosEmpleados(empresa);
+        aplicacionControl.mostrarDecimosEmpleados(empresa, stagePrincipal);
     }
     
     @FXML
     private void verQuincenalEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarQuincenalEmpleados(empresa);
+        aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
     }
     
     @FXML
     private void verDeudasEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarDeudasEmpleados(empresa);
+        aplicacionControl.mostrarDeudasEmpleados(empresa, stagePrincipal);
     }
     
     @FXML
     private void verIessEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarIessEmpleados(empresa);
+        aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
         
     }
     
     @FXML
     private void verSueldoEmpleados(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarSueldoEmpleados(empresa);
+        aplicacionControl.mostrarSueldoEmpleados(empresa, stagePrincipal);
     }
 
     @FXML
     private void rolCliente(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarClientesEmpresa(empresa);
+        aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
     }
     
     @FXML
     private void mostrarRolCliente(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarClientesParaRol(empresa);
+        aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
     }
     
     @FXML
     private void mostrarRolIndividual(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarEmpleadosParaRol(empresa);
+        aplicacionControl.mostrarEmpleadosParaRol(empresa, stagePrincipal);
     }
 
     @FXML
     public void rolEmpleado(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarHorasEmpleados(empresa);
+        aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
     }
 
     @FXML
     private void verPagos(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarPagos(empresa);
+        aplicacionControl.mostrarPagos(empresa, stagePrincipal);
     }
 
     public void setEmpresa(Empresa empresa) {

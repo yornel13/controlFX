@@ -32,6 +32,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -243,8 +244,7 @@ public class RolClienteController implements Initializable {
     
     @FXML
     private void returnEmpresa(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarClientesParaRol(empresa);
+        aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
     } 
     
     public void dialogWait() {
@@ -470,11 +470,70 @@ public class RolClienteController implements Initializable {
                 return false; // Does not match.
             });
         });
+        filterField.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent event) {
+                calcular();
+            }
+        });
         
         SortedList<Pago> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(controlClienteTableView.comparatorProperty());
         controlClienteTableView.setItems(sortedData);
         
+        sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
+        extraText.setText(String.format( "%.2f", extraTextValor));
+        bonosText.setText(String.format( "%.2f", bonosTextValor));
+        vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
+        subTotalText.setText(String.format( "%.2f", subTotalTextValor));
+        decimosTotalText.setText(String.format( "%.2f", decimoTerceroTotalTextValor) + "|" + String.format( "%.2f", decimoCuartoTotalTextValor));
+        totalText.setText(String.format( "%.2f", totalTextValor));
+        jubilacionText.setText(String.format( "%.2f", montoJubilacionTextValor));
+        aporteText.setText(String.format( "%.2f", montoAportePatronalTextValor));
+        segurosText.setText(String.format( "%.2f", montoSegurosTextValor));
+        uniformeText.setText(String.format( "%.2f", montoUniformesTextValor));
+    }
+    
+    void calcular() {
+        
+        sueldoTotalTextValor = 0d;
+        extraTextValor = 0d;
+        bonosTextValor = 0d;
+        vacacionesTextValor = 0d;
+        subTotalTextValor = 0d;
+        decimosTotalTextValor = 0d;
+        decimoTerceroTotalTextValor = 0d;
+        decimoCuartoTotalTextValor = 0d;
+        totalTextValor = 0d;
+        montoSumplementariasTextValor = 0d; 
+        montoSobreTiempoTextValor = 0d;
+        montoBonoTextValor = 0d; 
+        montoTransporteTextValor = 0d;
+        montoJubilacionTextValor = 0d; 
+        montoAportePatronalTextValor = 0d; 
+        montoSegurosTextValor = 0d; 
+        montoUniformesTextValor = 0d;
+        
+        for (Pago pago: (List<Pago>) controlClienteTableView.getItems()) {
+            sueldoTotalTextValor += pago.getSueldo();
+            extraTextValor += pago.getMontoHorasSobreTiempo() + pago.getMontoHorasSuplementarias();
+            pago.setMontoHorasExtras(extraTextValor);
+            bonosTextValor += pago.getTotalBonos();
+            vacacionesTextValor += pago.getVacaciones();
+            subTotalTextValor += pago.getSubtotal();
+            decimosTotalTextValor += pago.getDecimoTercero()+ pago.getDecimoCuarto();
+            decimoTerceroTotalTextValor += pago.getDecimoTercero();
+            decimoCuartoTotalTextValor += pago.getDecimoCuarto();
+            totalTextValor += pago.getTotalIngreso();
+            
+            montoSumplementariasTextValor += pago.getMontoHorasSuplementarias(); 
+            montoSobreTiempoTextValor += pago.getMontoHorasSobreTiempo(); 
+            montoBonoTextValor += pago.getBono(); 
+            montoTransporteTextValor += pago.getTransporte(); 
+            montoJubilacionTextValor += pago.getJubilacionPatronal(); 
+            montoAportePatronalTextValor += pago.getAportePatronal(); 
+            montoSegurosTextValor += pago.getSeguros(); 
+            montoUniformesTextValor += pago.getUniformes();
+        }
         sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
         extraText.setText(String.format( "%.2f", extraTextValor));
         bonosText.setText(String.format( "%.2f", bonosTextValor));

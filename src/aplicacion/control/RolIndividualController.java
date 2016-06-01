@@ -237,8 +237,7 @@ public class RolIndividualController implements Initializable {
     
     @FXML
     private void returnEmpresa(ActionEvent event) {
-        stagePrincipal.close();
-        aplicacionControl.mostrarEmpleadosParaRol(empresa);
+        aplicacionControl.mostrarEmpleadosParaRol(empresa, stagePrincipal);
     } 
     
     public void dialogWait() {

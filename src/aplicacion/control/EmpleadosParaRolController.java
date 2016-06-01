@@ -200,7 +200,7 @@ public class EmpleadosParaRolController implements Initializable {
                     EmpleadoTable rowData = row.getItem();
                     stagePrincipal.close();
                     aplicacionControl.mostrarRolIndividual(empresa, 
-                            new UsuarioDAO().findById(rowData.getId()));
+                            new UsuarioDAO().findById(rowData.getId()), stagePrincipal);
                 }
             });
             return row ;
