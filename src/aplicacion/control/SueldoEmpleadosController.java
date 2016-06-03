@@ -136,8 +136,8 @@ public class SueldoEmpleadosController implements Initializable {
                             .getResource("imagenes/admin.png").toExternalForm();
                     dialogStage.getIcons().add(new Image(stageIcon));
                     Button buttonCargo = new Button("Por cargo");
-                    Button buttonLista = new Button("A los visibles en la lista");
-                    Button buttonTodo = new Button("A todos");
+                    Button buttonLista = new Button("Empleados seleccionados");
+                    Button buttonTodo = new Button("Todos los empleados");
                     Button buttonCancelar = new Button("Cancelar");
                     dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
                     children(new Text("Elija el modo de gestion de el aumento a los empleados."), 
