@@ -119,6 +119,19 @@ public class UsuarioDAO extends BaseHibernateDAO {
             return (List<Usuario>) result;
         }
         
+        public List<Usuario> findAllByEmpresaYCargoActivo(Integer empresaId, Integer cargoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "WHERE empresa_id = :empresa_id and cargo_id = :cargo_id "
+                            + "and activo = true")
+                    .addEntity(Usuario.class)
+                    .setParameter("cargo_id", cargoId)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<Usuario>) result;
+        }
+        
         public List<Usuario> findAllEmpleadosActivos() {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario where activo = true and detalles_empleado_id is not null")

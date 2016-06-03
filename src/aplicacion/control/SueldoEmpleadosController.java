@@ -11,7 +11,9 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.CargoDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.Cargo;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.io.File;
@@ -37,6 +39,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -103,6 +106,8 @@ public class SueldoEmpleadosController implements Initializable {
     
     Stage dialogLoading;
     
+    private Boolean editable = true;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -117,7 +122,219 @@ public class SueldoEmpleadosController implements Initializable {
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
     
-    public void mostrarEditarQuincenal(Usuario empleado) {
+    public void aumentoAvanzado(ActionEvent event) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+                try {
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Aumento de Sueldo");
+                    String stageIcon = AplicacionControl.class
+                            .getResource("imagenes/admin.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    Button buttonCargo = new Button("Por cargo");
+                    Button buttonLista = new Button("A los visibles en la lista");
+                    Button buttonTodo = new Button("A todos");
+                    Button buttonCancelar = new Button("Cancelar");
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("Elija el modo de gestion de el aumento a los empleados."), 
+                            buttonCargo, buttonLista, buttonTodo, buttonCancelar).
+                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                    buttonCargo.setPrefWidth(150);
+                    buttonLista.setPrefWidth(150);
+                    buttonTodo.setPrefWidth(150);
+                    buttonCancelar.setPrefWidth(80); 
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                    });
+                     buttonCargo.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                        aumentoPorCargo();
+                    });
+                    dialogStage.showAndWait();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }       
+    }
+    
+    public void aumentoPorCargo() {
+        ArrayList<Cargo> cargos;
+        ChoiceBox cargoChoiceBox = new ChoiceBox();
+        CargoDAO cargoDAO = new CargoDAO();
+        cargos = (ArrayList<Cargo>) cargoDAO.findAll();
+        String[] itemsCargos = new String[cargos.size()];
+        cargos.stream().forEach((obj) -> {
+            itemsCargos[cargos.indexOf(obj)] = obj.getNombre();
+        });
+        cargoChoiceBox.setItems(FXCollections.observableArrayList(itemsCargos)); 
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Sueldo por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonContinuar = new Button("continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Elija el cargo a aumentar el sueldo."), 
+                cargoChoiceBox, buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        cargoChoiceBox.setPrefWidth(150);
+        buttonContinuar.setPrefWidth(80);
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (!cargoChoiceBox.getSelectionModel().isEmpty()) {
+                dialogStage.close();
+                selecionarForma(cargos.get(cargoChoiceBox
+                        .getSelectionModel().getSelectedIndex()));
+            }
+        }); 
+        dialogStage.show();
+    }
+    
+    public void selecionarForma(Cargo cargo) {
+        String texto = "Aumento a empleados con el cargo " + cargo.getNombre() + ".";
+  
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Sueldo por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonPorcentaje = new Button("Por pocentaje");
+        Button buttonMonto = new Button("Por valor fijo");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Ahora elija la forma de aumento."), 
+                buttonPorcentaje, buttonMonto, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        buttonPorcentaje.setPrefWidth(150);
+        buttonMonto.setPrefWidth(150);
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonPorcentaje.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            porPocentaje(cargo);
+        });
+        dialogStage.show();
+    }
+    
+    public void porPocentaje(Cargo cargo) {
+        String texto = "Aumento a empleados con el cargo " + cargo.getNombre() + ".";
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Sueldo por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        TextField fieldPorcentaje = new TextField();
+        Button buttonContinuar = new Button("Continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Por favor ingrese el pocentaje del aumento."), 
+                fieldPorcentaje, new Text("Valor valido entre 0.0 y 1000.0"), 
+                buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        fieldPorcentaje.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        fieldPorcentaje.setPrefWidth(50);
+        fieldPorcentaje.setMaxWidth(50);
+        buttonContinuar.setPrefWidth(80); 
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (Double.valueOf(fieldPorcentaje.getText()) < 1000.0d) {
+                dialogStage.close();
+                setEmpleadoNuevoSueldo(cargo, Double.valueOf(fieldPorcentaje.getText()));
+            }
+        }); 
+        dialogStage.show();
+    }
+    
+    public void setEmpleadoNuevoSueldo(Cargo cargo, Double porcentaje) {
+        usuarios = new ArrayList<>();
+        usuarios.addAll(new UsuarioDAO()
+                .findAllByEmpresaYCargoActivo(empresa.getId(), cargo.getId()));
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.id.set(user.getId());
+            empleado.nombre.set(user.getNombre());
+            empleado.apellido.set(user.getApellido());
+            empleado.cedula.set(user.getCedula());
+            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+            empleado.telefono.set(user.getTelefono());
+            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
+            empleado.nuevoSueldo.set(user.getDetallesEmpleado().getSueldo() 
+                    + (user.getDetallesEmpleado().getSueldo()/100d) * porcentaje);
+             return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
+        empleadosTableView.getColumns().clear();
+        
+        TableColumn sueldoViejo = new TableColumn("Viejo");
+        sueldoViejo.setMinWidth(60);
+        sueldoViejo.setCellValueFactory(new PropertyValueFactory<>("sueldo"));
+
+        TableColumn sueldoNuevo = new TableColumn("Nuevo");
+        sueldoNuevo.setMinWidth(60);
+        sueldoNuevo.setCellValueFactory(new PropertyValueFactory<>("nuevoSueldo"));
+        
+        sueldoColumna = new TableColumn("Sueldo"); 
+        sueldoColumna.getColumns().addAll(sueldoViejo, sueldoNuevo);
+        
+        empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
+                apellidoColumna, cargoColumna, departamentoColumna, sueldoColumna);
+        
+        editable = false;
+        
+        filtro();
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Sueldo por cargo");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Sueldos aumentados, pero no guardados,"), 
+                new Text("En la lista ahora se muestran los sueldo viejos y nuevos"),
+                new Text("Verifiquelos y luego use el boton \"Guardar\""),
+                new Text("Sí no guarda los cambios seran desechados."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(80);
+        
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void mostrarEditarSueldo(Usuario empleado) {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
@@ -127,14 +344,14 @@ public class SueldoEmpleadosController implements Initializable {
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(Modality.APPLICATION_MODAL);
                     dialogStage.setResizable(false);
-                    dialogStage.setTitle("Adelanto Quincenal");
+                    dialogStage.setTitle("Aumento de Sueldo");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
                     dialogStage.getIcons().add(new Image(stageIcon));
                     Button buttonGuardar = new Button("Cambiar");
                     Button buttonCancelar = new Button("Cancelar");
                     TextField fieldAdelanto = new TextField();
                     dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("Ingrese el nuevo valor del adelanto"), fieldAdelanto, buttonGuardar, buttonCancelar).
+                    children(new Text("Ingrese el nuevo sueldo del empleado"), fieldAdelanto, buttonGuardar, buttonCancelar).
                     alignment(Pos.CENTER).padding(new Insets(25)).build()));
                     fieldAdelanto.setPrefWidth(150);
                     buttonGuardar.setPrefWidth(100);
@@ -142,19 +359,19 @@ public class SueldoEmpleadosController implements Initializable {
                     fieldAdelanto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                     dialogStage.show();
                     buttonGuardar.setOnAction((ActionEvent e) -> {
-                        Double newAdelantoValue;
+                        Double newSueldoValue;
                         if (fieldAdelanto.getText().isEmpty()) {
-                            newAdelantoValue = 0d;
+                            newSueldoValue = 0d;
                         } else {
-                            newAdelantoValue = Double.parseDouble(fieldAdelanto.getText());
+                            newSueldoValue = Double.parseDouble(fieldAdelanto.getText());
                         }
                         
                         double oldMonto = 0;
-                        if (empleado.getDetallesEmpleado().getQuincena() != null) {
-                            oldMonto = empleado.getDetallesEmpleado().getQuincena();
+                        if (empleado.getDetallesEmpleado().getSueldo()!= null) {
+                            oldMonto = empleado.getDetallesEmpleado().getSueldo();
                         }
                         
-                        empleado.getDetallesEmpleado().setQuincena(newAdelantoValue);
+                        empleado.getDetallesEmpleado().setSueldo(newSueldoValue);
                         HibernateSessionFactory.getSession().flush();
                         
                         dialogStage.close();
@@ -164,10 +381,13 @@ public class SueldoEmpleadosController implements Initializable {
                         completado();
 
                         // Registro para auditar
-                        String detalles = "edito el adelanto quincenal de " 
+                        String detalles = "edito el sueldo de " 
                                 + empleado.getNombre() + " " + empleado.getApellido()
-                                + " de " + oldMonto + " a " + newAdelantoValue;
+                                + " de " + oldMonto + " a " + newSueldoValue;
                         aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+                    }); 
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
                     }); 
  
                 } catch (Exception e) {
@@ -189,7 +409,7 @@ public class SueldoEmpleadosController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Adelanto quincenal modificado con exito."), buttonOk).
+        children(new Text("Sueldo modificado con exito."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -361,6 +581,10 @@ public class SueldoEmpleadosController implements Initializable {
            empleadosTableView.setItems(data);
         }
         
+        filtro();
+    }
+    
+    public void filtro() {
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empleado -> {
@@ -411,9 +635,10 @@ public class SueldoEmpleadosController implements Initializable {
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
+                if (editable)
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    mostrarEditarSueldo(new UsuarioDAO().findById(rowData.getId()));
                 }
             });
             return row ;

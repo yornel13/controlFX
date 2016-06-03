@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.util.Auditar;
 import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import hibernate.model.Identidad;
@@ -217,7 +218,9 @@ public class AplicacionControl extends Application {
         buttonOk.setMinWidth(50);
         buttonNo.setMinWidth(50);
         buttonOk.setOnAction((ActionEvent e) -> {
+            HibernateSessionFactory.closeSession();
             Platform.exit();
+            System.exit(0);
             dialogStage.close();
         });
         buttonNo.setOnAction((ActionEvent e) -> {
