@@ -10,9 +10,12 @@ import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
 import aplicacion.control.reports.ReporteDeudasVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.CargoDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.Cargo;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.io.File;
@@ -38,6 +41,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -107,6 +111,10 @@ public class QuincenalEmpleadosController implements Initializable {
     
     Stage dialogLoading;
     
+    String textoParaUditar;
+    
+    private Boolean editable = true;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -124,10 +132,653 @@ public class QuincenalEmpleadosController implements Initializable {
     @FXML
     public void aumentoAvanzado(ActionEvent event) {
          if (aumentoButton.getText().equals("Guardar")) {
-             //guardarAumento();
+             guardarAumento();
          } else {
-             //empezarAumento();
+             empezarAumento();
          }
+    }
+    
+    public void guardarAumento() {
+        ArrayList<EmpleadoTable> empleadosIndex = new ArrayList<>();
+        empleadosIndex.addAll((List<EmpleadoTable>) data);
+        empleadosIndex.stream().forEach((empleado) -> {
+            Usuario user = usuarios.get(empleadosIndex.indexOf(empleado));
+            if (user.getId().equals(empleado.getId())) {
+                user.getDetallesEmpleado()
+                    .setQuincena(empleado.getNuevoQuincenal());
+            }
+        });
+        HibernateSessionFactory.getSession().flush();
+            aplicacionControl.au.saveAgrego(textoParaUditar, aplicacionControl.permisos.getUsuario());
+        completado();
+        quincenalColumna = new TableColumn("Adelanto Quincenal");
+        quincenalColumna.setMinWidth(150);
+        quincenalColumna.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+        empleadosTableView.getColumns().clear();
+        empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
+                apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
+        
+        editable = true;
+        aumentoButton.setText("Aumento Avanzado");
+        filterField.clear();
+        setEmpresa(empresa);
+    }
+    
+    public void empezarAumento() {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+                try {
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Aumento de Adelanto Quincenal");
+                    String stageIcon = AplicacionControl.class
+                            .getResource("imagenes/admin.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    Button buttonCargo = new Button("Por cargo");
+                    Button buttonLista = new Button("Empleados seleccionados");
+                    Button buttonCancelar = new Button("Cancelar");
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("Elija el modo de gestion de el aumento a los empleados."), 
+                            buttonCargo, buttonLista, buttonCancelar).
+                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                    buttonCargo.setPrefWidth(170);
+                    buttonLista.setPrefWidth(170);
+                    buttonCancelar.setPrefWidth(80); 
+                    buttonCancelar.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                    });
+                     buttonCargo.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                        aumentoPorCargo();
+                    });
+                    buttonLista.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                        aumentoPorSeleccion();
+                    });
+                    dialogStage.showAndWait();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }   
+    }
+    
+    public void aumentoPorCargo() {
+        ArrayList<Cargo> cargos;
+        ChoiceBox cargoChoiceBox = new ChoiceBox();
+        CargoDAO cargoDAO = new CargoDAO();
+        cargos = (ArrayList<Cargo>) cargoDAO.findAll();
+        String[] itemsCargos = new String[cargos.size()];
+        cargos.stream().forEach((obj) -> {
+            itemsCargos[cargos.indexOf(obj)] = obj.getNombre();
+        });
+        cargoChoiceBox.setItems(FXCollections.observableArrayList(itemsCargos)); 
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonContinuar = new Button("continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Elija el cargo a aumentar el adelanto quincenal."), 
+                cargoChoiceBox, buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        cargoChoiceBox.setPrefWidth(150);
+        buttonContinuar.setPrefWidth(80);
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (!cargoChoiceBox.getSelectionModel().isEmpty()) {
+                dialogStage.close();
+                selecionarForma(cargos.get(cargoChoiceBox
+                        .getSelectionModel().getSelectedIndex()));
+            }
+        }); 
+        dialogStage.show();
+    }
+    
+    public void aumentoPorSeleccion() {
+        String texto = "Aumento a empleados seleccionados "
+                + "en la tabla de empleados.";
+  
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por selección.");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonPorcentaje = new Button("Por pocentaje");
+        Button buttonMonto = new Button("Por valor fijo");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Ahora elija la forma de aumento."), 
+                buttonPorcentaje, buttonMonto, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        buttonPorcentaje.setPrefWidth(150);
+        buttonMonto.setPrefWidth(150);
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonPorcentaje.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            porPocentajeSeleccion();
+        });
+        buttonMonto.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            porValorFijoSeleccion();
+        });
+        dialogStage.show();
+        
+        if (filterField.getText().isEmpty()) {
+            tablaPrecausion();
+        }
+    }
+    
+    public void tablaPrecausion() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Información");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("No hay nada escrito en el filtro, entonces han sido "
+                + "seleccionados todos \nlos empleados de la empresa para "
+                + "aumento de adelanto quincenal."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void selecionarForma(Cargo cargo) {
+        String texto = "Aumento a empleados con el cargo " + cargo.getNombre() + ".";
+  
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonPorcentaje = new Button("Por pocentaje");
+        Button buttonMonto = new Button("Por valor fijo");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Ahora elija la forma de aumento."), 
+                buttonPorcentaje, buttonMonto, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        buttonPorcentaje.setPrefWidth(150);
+        buttonMonto.setPrefWidth(150);
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonPorcentaje.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            porPocentaje(cargo);
+        });
+        buttonMonto.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            porValorFijo(cargo);
+        });
+        dialogStage.show();
+    }
+    
+    public void porPocentaje(Cargo cargo) {
+        String texto = "Aumento a empleados con el cargo " + cargo.getNombre() + ".";
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        TextField fieldPorcentaje = new TextField();
+        Button buttonContinuar = new Button("Continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Por favor ingrese el porcentaje del aumento."), 
+                fieldPorcentaje, new Text("Valor valido entre 0.0 y 1000.0"), 
+                buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        fieldPorcentaje.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        fieldPorcentaje.setPrefWidth(60);
+        fieldPorcentaje.setMaxWidth(60);
+        buttonContinuar.setPrefWidth(80); 
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (!fieldPorcentaje.getText().isEmpty())
+                if (Double.valueOf(fieldPorcentaje.getText()) < 1000.0d) {
+                    dialogStage.close();
+                    setEmpleadoNuevoSueldoPorcentaje(cargo, Double
+                            .valueOf(fieldPorcentaje.getText()));
+                }
+        }); 
+        dialogStage.show();
+    }
+    
+    public void porPocentajeSeleccion() {
+        String texto = "Aumento a empleados seleccionados "
+                + "en la tabla de empleados.";
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por selección");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        TextField fieldPorcentaje = new TextField();
+        Button buttonContinuar = new Button("Continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Por favor ingrese el pocentaje del aumento."), 
+                fieldPorcentaje, new Text("Valor valido entre 0.0 y 1000.0"), 
+                buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        fieldPorcentaje.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        fieldPorcentaje.setPrefWidth(60);
+        fieldPorcentaje.setMaxWidth(60);
+        buttonContinuar.setPrefWidth(80); 
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (!fieldPorcentaje.getText().isEmpty())
+                if (Double.valueOf(fieldPorcentaje.getText()) < 1000.0d) {
+                    dialogStage.close();
+                    setEmpleadoNuevoSueldoPorcentajeSeleccion(Double
+                            .valueOf(fieldPorcentaje.getText()));
+                }
+        }); 
+        dialogStage.show();
+    }
+    
+    public void porValorFijo(Cargo cargo) {
+        String texto = "Aumento a empleados con el cargo " + cargo.getNombre() + ".";
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por cargo");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        TextField fieldPorcentaje = new TextField();
+        Button buttonContinuar = new Button("Continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Por favor ingrese el valor fijo para "
+                + "adicionar al \n adelanto quincenal de los empleados."), 
+                fieldPorcentaje, buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        fieldPorcentaje.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        fieldPorcentaje.setPrefWidth(60);
+        fieldPorcentaje.setMaxWidth(60);
+        buttonContinuar.setPrefWidth(80); 
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (!fieldPorcentaje.getText().isEmpty())
+                dialogStage.close();
+                setEmpleadoNuevoSueldoMonto(cargo, Double
+                    .valueOf(fieldPorcentaje.getText()));
+            
+        }); 
+        dialogStage.show();
+    }
+    
+    public void porValorFijoSeleccion() {
+        String texto = "Aumento a empleados seleccionados "
+                + "en la tabla de empleados.";
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por selección");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        TextField fieldPorcentaje = new TextField();
+        Button buttonContinuar = new Button("Continuar");
+        Button buttonCancelar = new Button("Cancelar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text(texto), new Text("Por favor ingrese el valor fijo para "
+                + "adicionar al \n adelanto quincenal de los empleados."), 
+                fieldPorcentaje, buttonContinuar, buttonCancelar).
+        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+        fieldPorcentaje.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        fieldPorcentaje.setPrefWidth(60);
+        fieldPorcentaje.setMaxWidth(60);
+        buttonContinuar.setPrefWidth(80); 
+        buttonCancelar.setPrefWidth(80); 
+        buttonCancelar.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        }); 
+        buttonContinuar.setOnAction((ActionEvent e) -> {
+            if (!fieldPorcentaje.getText().isEmpty()){
+                dialogStage.close();
+                setEmpleadoNuevoSueldoMontoSeleccion(Double
+                    .valueOf(fieldPorcentaje.getText()));
+            }  
+             
+        }); 
+        dialogStage.show();
+    }
+    
+    public void setEmpleadoNuevoSueldoPorcentaje(Cargo cargo, Double porcentaje) {
+        usuarios = new ArrayList<>();
+        usuarios.addAll(new UsuarioDAO()
+                .findAllByEmpresaYCargoActivo(empresa.getId(), cargo.getId()));
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.id.set(user.getId());
+            empleado.nombre.set(user.getNombre());
+            empleado.apellido.set(user.getApellido());
+            empleado.cedula.set(user.getCedula());
+            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+            empleado.telefono.set(user.getTelefono());
+            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena()
+                    + (user.getDetallesEmpleado().getQuincena()/100d) * porcentaje;
+            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+             return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
+        empleadosTableView.getColumns().clear();
+        
+        TableColumn sueldoViejo = new TableColumn("Viejo");
+        sueldoViejo.setMinWidth(75);
+        sueldoViejo.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+
+        TableColumn sueldoNuevo = new TableColumn("Nuevo");
+        sueldoNuevo.setMinWidth(75);
+        sueldoNuevo.setCellValueFactory(new PropertyValueFactory<>("nuevoQuincenal"));
+        
+        quincenalColumna = new TableColumn("Adelanto Quincenal"); 
+        quincenalColumna.getColumns().addAll(sueldoViejo, sueldoNuevo);
+        
+        empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
+                apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
+        
+        editable = false;
+        
+        textoParaUditar = "aumento el adelanto quincenal de todos los empleados con cargo "
+                + cargo.getNombre() + " un " + porcentaje + "%";
+        
+        filtro();
+        aumentoButton.setText("Guardar");
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por cargo");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Adelantos quincenal aumentados, pero no guardados,"), 
+                new Text("En la lista ahora se muestran los adelantos viejos y nuevos"),
+                new Text("Verifiquelos y luego use el boton \"Guardar\""),
+                new Text("Sí no guarda los cambios seran desechados."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(80);
+        
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void setEmpleadoNuevoSueldoPorcentajeSeleccion(Double porcentaje) {
+        ArrayList<Usuario> usuariosLista = new ArrayList<>();
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            for (Usuario user: usuarios) {
+                if (user.getId().equals(empleadoTable.getId())) {
+                    usuariosLista.add(user);
+                }
+            }
+        }
+        usuarios.clear();
+        usuarios.addAll(usuariosLista);
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.id.set(user.getId());
+            empleado.nombre.set(user.getNombre());
+            empleado.apellido.set(user.getApellido());
+            empleado.cedula.set(user.getCedula());
+            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+            empleado.telefono.set(user.getTelefono());
+            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena()
+                    + (user.getDetallesEmpleado().getQuincena()/100d) * porcentaje;
+            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+             return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
+        empleadosTableView.getColumns().clear();
+        
+        TableColumn sueldoViejo = new TableColumn("Viejo");
+        sueldoViejo.setMinWidth(75);
+        sueldoViejo.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+
+        TableColumn sueldoNuevo = new TableColumn("Nuevo");
+        sueldoNuevo.setMinWidth(75);
+        sueldoNuevo.setCellValueFactory(new PropertyValueFactory<>("nuevoQuincenal"));
+        
+        quincenalColumna = new TableColumn("Adelanto Quincenal"); 
+        quincenalColumna.getColumns().addAll(sueldoViejo, sueldoNuevo);
+        
+        empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
+                apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
+        
+        editable = false;
+        
+        textoParaUditar = "aumento el adelanto quincenal de todos los empleados "
+                + "seleccionados por \"" + filterField.getText() + "\" un " + porcentaje + "%";
+        
+        filtro();
+        aumentoButton.setText("Guardar");
+        
+         Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por selección");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Adelantos quincenal aumentados, pero no guardados,"), 
+                new Text("En la lista ahora se muestran los adelantos viejos y nuevos"),
+                new Text("Verifiquelos y luego use el boton \"Guardar\""),
+                new Text("Sí no guarda los cambios seran desechados."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(80);
+        
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void setEmpleadoNuevoSueldoMonto(Cargo cargo, Double monto) {
+        usuarios = new ArrayList<>();
+        usuarios.addAll(new UsuarioDAO()
+                .findAllByEmpresaYCargoActivo(empresa.getId(), cargo.getId()));
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.id.set(user.getId());
+            empleado.nombre.set(user.getNombre());
+            empleado.apellido.set(user.getApellido());
+            empleado.cedula.set(user.getCedula());
+            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+            empleado.telefono.set(user.getTelefono());
+            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena() + monto;
+            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+            return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
+        empleadosTableView.getColumns().clear();
+        
+        TableColumn sueldoViejo = new TableColumn("Viejo");
+        sueldoViejo.setMinWidth(75);
+        sueldoViejo.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+
+        TableColumn sueldoNuevo = new TableColumn("Nuevo");
+        sueldoNuevo.setMinWidth(75);
+        sueldoNuevo.setCellValueFactory(new PropertyValueFactory<>("nuevoQuincenal"));
+        
+        quincenalColumna = new TableColumn("Adelanto Quincenal"); 
+        quincenalColumna.getColumns().addAll(sueldoViejo, sueldoNuevo);
+        
+        empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
+                apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
+        
+        editable = false;
+        
+        textoParaUditar = "aumento $" + monto + " el adelanto quincenal de todos"
+                + " los empleados con cargo " + cargo.getNombre();
+        
+        filtro();
+        aumentoButton.setText("Guardar");
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por cargo");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Adelantos quincenal aumentados, pero no guardados,"), 
+                new Text("En la lista ahora se muestran los adelantos viejos y nuevos"),
+                new Text("Verifiquelos y luego use el boton \"Guardar\""),
+                new Text("Sí no guarda los cambios seran desechados."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(80);
+        
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+     public void setEmpleadoNuevoSueldoMontoSeleccion(Double monto) {
+        ArrayList<Usuario> usuariosLista = new ArrayList<>();
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            for (Usuario user: usuarios) {
+                if (user.getId().equals(empleadoTable.getId())) {
+                    usuariosLista.add(user);
+                }
+            }
+        }
+        usuarios.clear();
+        usuarios.addAll(usuariosLista);
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.id.set(user.getId());
+            empleado.nombre.set(user.getNombre());
+            empleado.apellido.set(user.getApellido());
+            empleado.cedula.set(user.getCedula());
+            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
+            empleado.telefono.set(user.getTelefono());
+            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
+            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena() + monto;
+            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+             return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
+        empleadosTableView.getColumns().clear();
+        
+        TableColumn sueldoViejo = new TableColumn("Viejo");
+        sueldoViejo.setMinWidth(75);
+        sueldoViejo.setCellValueFactory(new PropertyValueFactory<>("quincenal"));
+
+        TableColumn sueldoNuevo = new TableColumn("Nuevo");
+        sueldoNuevo.setMinWidth(75);
+        sueldoNuevo.setCellValueFactory(new PropertyValueFactory<>("nuevoQuincenal"));
+        
+        quincenalColumna = new TableColumn("Adelanto Quincenal"); 
+        quincenalColumna.getColumns().addAll(sueldoViejo, sueldoNuevo);
+        
+        empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
+                apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
+        
+        editable = false;
+        
+        textoParaUditar = "aumento $" + monto + " el adelanto quincenal de todos"
+                + " los empleados seleccionados por \"" + filterField.getText();
+        
+        filtro();
+        aumentoButton.setText("Guardar");
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Aumento de Adelanto Quincenal por selección");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Adelantos quincenal aumentados, pero no guardados,"), 
+                new Text("En la lista ahora se muestran los adelantos viejos y nuevos"),
+                new Text("Verifiquelos y luego use el boton \"Guardar\""),
+                new Text("Sí no guarda los cambios seran desechados."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(80);
+        
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
     }
     
     public void mostrarEditarQuincenal(Usuario empleado) {
@@ -202,8 +853,9 @@ public class QuincenalEmpleadosController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Adelanto quincenal modificado con exito."), buttonOk).
+        children(new Text("Adelanto(s) quincenal modificado con exito."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -374,6 +1026,10 @@ public class QuincenalEmpleadosController implements Initializable {
            empleadosTableView.setItems(data);
         }
         
+        filtro();
+    }
+    
+    public void filtro() {
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empleado -> {

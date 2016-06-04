@@ -37,6 +37,7 @@ public class EmpleadoTable {
     public SimpleDoubleProperty totalIess = new SimpleDoubleProperty();
     public SimpleDoubleProperty sueldo = new SimpleDoubleProperty();
     public SimpleDoubleProperty nuevoSueldo = new SimpleDoubleProperty();
+    public SimpleDoubleProperty nuevoQuincenal = new SimpleDoubleProperty();
 
     public Integer getDias() {
         return dias.get();
@@ -122,4 +123,7 @@ public class EmpleadoTable {
         return nuevoSueldo.get();
     }
     
+    public Double getNuevoQuincenal() {
+        return nuevoQuincenal.get();
+    }
 }

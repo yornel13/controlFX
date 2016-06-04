@@ -354,7 +354,7 @@ public class SueldoEmpleadosController implements Initializable {
         Button buttonContinuar = new Button("Continuar");
         Button buttonCancelar = new Button("Cancelar");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text(texto), new Text("Por favor ingrese el pocentaje del aumento."), 
+        children(new Text(texto), new Text("Por favor ingrese el porcentaje del aumento."), 
                 fieldPorcentaje, new Text("Valor valido entre 0.0 y 1000.0"), 
                 buttonContinuar, buttonCancelar).
         alignment(Pos.CENTER).padding(new Insets(25)).build()));
@@ -556,7 +556,7 @@ public class SueldoEmpleadosController implements Initializable {
             dialogStage.close();
         });
         dialogStage.showAndWait();
-    }
+    } 
     
     public void setEmpleadoNuevoSueldoPorcentajeSeleccion(Double porcentaje) {
         ArrayList<Usuario> usuariosLista = new ArrayList<>();
