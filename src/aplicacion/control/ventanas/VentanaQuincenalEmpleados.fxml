@@ -37,12 +37,13 @@
                </Button>
             </children>
          </Pane>
-      <TextField fx:id="filterField" layoutX="183.0" layoutY="5.0" prefHeight="25.0" prefWidth="437.0" promptText="Cedula, nombre, o apellido" />
+      <TextField fx:id="filterField" layoutX="183.0" layoutY="5.0" prefHeight="25.0" prefWidth="374.0" promptText="Cedula, nombre, o apellido" />
       <Label layoutX="61.0" layoutY="8.0" text="Escriba para filtrar" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
       <Button layoutX="719.0" layoutY="5.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
+      <Button fx:id="aumentoButton" layoutX="590.0" layoutY="5.0" mnemonicParsing="false" onAction="#aumentoAvanzado" prefHeight="25.0" prefWidth="121.0" text="Aumento Avanzado" />
     </children>
 </AnchorPane>

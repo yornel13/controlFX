@@ -97,6 +97,9 @@ public class QuincenalEmpleadosController implements Initializable {
     @FXML 
     private TableColumn quincenalColumna;
     
+    @FXML
+    private Button aumentoButton;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
@@ -117,6 +120,15 @@ public class QuincenalEmpleadosController implements Initializable {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
+    
+    @FXML
+    public void aumentoAvanzado(ActionEvent event) {
+         if (aumentoButton.getText().equals("Guardar")) {
+             //guardarAumento();
+         } else {
+             //empezarAumento();
+         }
+    }
     
     public void mostrarEditarQuincenal(Usuario empleado) {
         if (aplicacionControl.permisos == null) {

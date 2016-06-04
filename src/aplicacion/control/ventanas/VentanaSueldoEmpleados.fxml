@@ -44,6 +44,6 @@
          </font>
       </Label>
       <Button layoutX="719.0" layoutY="5.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
-      <Button layoutX="590.0" layoutY="5.0" mnemonicParsing="false" onAction="#aumentoAvanzado" prefHeight="25.0" prefWidth="121.0" text="Aumento Avanzado" />
+      <Button fx:id="aumentoButton" layoutX="590.0" layoutY="5.0" mnemonicParsing="false" onAction="#aumentoAvanzado" prefHeight="25.0" prefWidth="121.0" text="Aumento Avanzado" />
     </children>
 </AnchorPane>
