@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.EmailValidator;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
@@ -166,9 +167,9 @@ public class RegistrarEmpleadoController implements Initializable {
         } else if (direccionField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar la direccion");
             errorText2.setText("Debe ingresar la direccion");
-        } else if (emailField.getText().isEmpty()) {
-            errorText1.setText("Debe ingresar una direccion");
-            errorText2.setText("Debe ingresar una direccion");
+        } else if (!new EmailValidator().validate(emailField.getText())) {
+            errorText1.setText("Debes introducir un correo valido");
+            errorText2.setText("Debes introducir un correo valido");
         } else if (estadoCivilChoiceBox.getSelectionModel().isEmpty()) {
             errorText1.setText("Debe seleccionar el estado civil");
             errorText2.setText("Debe seleccionar el estado civil");

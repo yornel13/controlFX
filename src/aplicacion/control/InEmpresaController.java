@@ -84,10 +84,15 @@ public class InEmpresaController implements Initializable {
         stagePrincipal.close();
         aplicacionControl.mostrarVentanaPrincipal();
     }
-
+    
     @FXML
     private void controlPagos(ActionEvent event) {
         aplicacionControl.mostrarTotalPagosEmpleados(empresa, stagePrincipal);
+    }
+
+    @FXML
+    private void quincenaPagos(ActionEvent event) {
+        aplicacionControl.mostrarPagoQuincenal(empresa, stagePrincipal);
     }
 
     @FXML

@@ -38,6 +38,8 @@ public class EmpleadoTable {
     public SimpleDoubleProperty sueldo = new SimpleDoubleProperty();
     public SimpleDoubleProperty nuevoSueldo = new SimpleDoubleProperty();
     public SimpleDoubleProperty nuevoQuincenal = new SimpleDoubleProperty();
+    public SimpleBooleanProperty pagar = new SimpleBooleanProperty(); 
+    public SimpleStringProperty pagado = new SimpleStringProperty();
 
     public Integer getDias() {
         return dias.get();
@@ -125,5 +127,13 @@ public class EmpleadoTable {
     
     public Double getNuevoQuincenal() {
         return nuevoQuincenal.get();
+    }
+    
+    public Boolean getPagar() {
+        return pagar.get();
+    }
+    
+    public String getPagado() {
+        return pagado.get();
     }
 }
