@@ -13,6 +13,7 @@ import hibernate.dao.UsuarioDAO;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -136,15 +137,19 @@ public class EmpleadosTodosController implements Initializable {
     
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
-            if(empleadoTable.getId() == user.getId()) {
+            if(Objects.equals(empleadoTable.getId(), user.getId())) {
                 EmpleadoTable empleado = new EmpleadoTable();
-                empleado.id.set(user.getId());
-                empleado.nombre.set(user.getNombre());
-                empleado.apellido.set(user.getApellido());
-                empleado.cedula.set(user.getCedula());
-                empleado.telefono.set(user.getTelefono());
-                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
                 data.set(data.indexOf(empleadoTable), empleado);
                 return;
             }
@@ -158,15 +163,18 @@ public class EmpleadosTodosController implements Initializable {
         if (!usuarios.isEmpty()) {
            data = FXCollections.observableArrayList(); 
            usuarios.stream().map((user) -> {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);

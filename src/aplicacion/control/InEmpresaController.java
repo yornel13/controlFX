@@ -91,8 +91,13 @@ public class InEmpresaController implements Initializable {
     }
 
     @FXML
-    private void quincenaPagos(ActionEvent event) {
+    private void quincenalPagos(ActionEvent event) {
         aplicacionControl.mostrarPagoQuincenal(empresa, stagePrincipal);
+    }
+    
+    @FXML
+    private void mesualPagos(ActionEvent event) {
+        aplicacionControl.mostrarPagoMensual(empresa, stagePrincipal);
     }
 
     @FXML

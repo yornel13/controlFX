@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -496,18 +497,20 @@ public class SueldoEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() 
                     + (user.getDetallesEmpleado().getSueldo()/100d) * porcentaje;
-            empleado.nuevoSueldo.set(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -573,18 +576,20 @@ public class SueldoEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() 
                     + (user.getDetallesEmpleado().getSueldo()/100d) * porcentaje;
-            empleado.nuevoSueldo.set(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -642,17 +647,19 @@ public class SueldoEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() + monto;
-            empleado.nuevoSueldo.set(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -718,17 +725,19 @@ public class SueldoEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() + monto;
-            empleado.nuevoSueldo.set(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -975,23 +984,26 @@ public class SueldoEmpleadosController implements Initializable {
     
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
-            if(empleadoTable.getId() == user.getId()) {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               if (user.getDetallesEmpleado().getSueldo() != null) {
-                    empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
-               } else {
-                    empleado.sueldo.set(0d);
-               }
-               data.set(data.indexOf(empleadoTable), empleado);
-               return;
+            if(Objects.equals(empleadoTable.getId(), user.getId())) {
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
+                if (user.getDetallesEmpleado().getSueldo() != null) {
+                    empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
+                } else {
+                    empleado.setSueldo(0d);
+                }
+                data.set(data.indexOf(empleadoTable), empleado);
+                return;
             }
         }
     }
@@ -1006,18 +1018,20 @@ public class SueldoEmpleadosController implements Initializable {
            data = FXCollections.observableArrayList(); 
            usuarios.stream().map((user) -> {
                EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado() .getCargo().getNombre());
                if (user.getDetallesEmpleado().getSueldo() != null) {
-                    empleado.sueldo.set(user.getDetallesEmpleado().getSueldo());
+                    empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
                } else {
-                    empleado.sueldo.set(0d);
+                    empleado.setSueldo(0d);
                }
                
                 return empleado;
@@ -1104,3 +1118,4 @@ public class SueldoEmpleadosController implements Initializable {
     }
     
 }
+

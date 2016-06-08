@@ -5,10 +5,11 @@
  */
 package aplicacion.control.tableModel;
 
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import hibernate.model.Deuda;
+import hibernate.model.Pago;
+import hibernate.model.PagoMesItem;
+import hibernate.model.RolIndividual;
+import java.util.ArrayList;
 
 /**
  *
@@ -16,124 +17,257 @@ import javafx.beans.property.SimpleStringProperty;
  */
 public class EmpleadoTable {
     
-    public SimpleIntegerProperty id = new SimpleIntegerProperty();
-    public SimpleStringProperty nombre = new SimpleStringProperty();
-    public SimpleStringProperty apellido = new SimpleStringProperty();
-    public SimpleStringProperty cedula = new SimpleStringProperty();
-    public SimpleStringProperty telefono = new SimpleStringProperty();
-    public SimpleStringProperty departamento = new SimpleStringProperty();
-    public SimpleStringProperty cargo = new SimpleStringProperty();
-    public SimpleStringProperty empresa = new SimpleStringProperty();
-    public SimpleIntegerProperty dias = new SimpleIntegerProperty();
-    public SimpleIntegerProperty horas = new SimpleIntegerProperty();
-    public SimpleIntegerProperty suplementarias = new SimpleIntegerProperty();
-    public SimpleIntegerProperty sobreTiempo = new SimpleIntegerProperty();
-    public SimpleDoubleProperty actuarial1 = new SimpleDoubleProperty();
-    public SimpleDoubleProperty actuarial2 = new SimpleDoubleProperty();
-    public SimpleDoubleProperty quincenal = new SimpleDoubleProperty();
-    public SimpleDoubleProperty totalMontoDeudas = new SimpleDoubleProperty();
-    public SimpleIntegerProperty totalDeudas = new SimpleIntegerProperty();
-    public SimpleBooleanProperty acumulaDecimos = new SimpleBooleanProperty();
-    public SimpleDoubleProperty totalIess = new SimpleDoubleProperty();
-    public SimpleDoubleProperty sueldo = new SimpleDoubleProperty();
-    public SimpleDoubleProperty nuevoSueldo = new SimpleDoubleProperty();
-    public SimpleDoubleProperty nuevoQuincenal = new SimpleDoubleProperty();
-    public SimpleBooleanProperty pagar = new SimpleBooleanProperty(); 
-    public SimpleStringProperty pagado = new SimpleStringProperty();
+    public Integer id;
+    public String nombre;
+    public String apellido;
+    public String cedula;
+    public String telefono;
+    public String departamento;
+    public String cargo;
+    public String empresa;
+    public Integer dias;
+    public Integer horas;
+    public Integer suplementarias;
+    public Integer sobreTiempo;
+    public Double actuarial1;
+    public Double actuarial2;
+    public Double quincenal;
+    public Double totalMontoDeudas;
+    public Integer totalDeudas;
+    public Boolean acumulaDecimos;
+    public Double totalIess;
+    public Double sueldo;
+    public Double nuevoSueldo;
+    public Double nuevoQuincenal;
+    public Boolean pagar; 
+    public String pagado;
+    public ArrayList<Deuda> deudas;
+    public ArrayList<PagoMesItem> pagoMesItems;
+    public ArrayList<Pago> pagos;
+    public RolIndividual rolIndividual;
 
-    public Integer getDias() {
-        return dias.get();
-    }
-
-    public Integer getHoras() {
-        return horas.get();
-    }
-
-    public Integer getSuplementarias() {
-        return suplementarias.get();
-    }
-
-    public Integer getSobreTiempo() {
-        return sobreTiempo.get();
-    }
-    
     public Integer getId() {
-        return id.get();
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getNombre() {
-        return nombre.get();
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getApellido() {
-        return apellido.get();
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
     }
 
     public String getCedula() {
-        return cedula.get();
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public String getTelefono() {
-        return telefono.get();
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     public String getDepartamento() {
-        return departamento.get();
+        return departamento;
+    }
+
+    public void setDepartamento(String departamento) {
+        this.departamento = departamento;
     }
 
     public String getCargo() {
-        return cargo.get();
+        return cargo;
     }
-    
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
+
     public String getEmpresa() {
-        return empresa.get();
+        return empresa;
     }
-    
+
+    public void setEmpresa(String empresa) {
+        this.empresa = empresa;
+    }
+
+    public Integer getDias() {
+        return dias;
+    }
+
+    public void setDias(Integer dias) {
+        this.dias = dias;
+    }
+
+    public Integer getHoras() {
+        return horas;
+    }
+
+    public void setHoras(Integer horas) {
+        this.horas = horas;
+    }
+
+    public Integer getSuplementarias() {
+        return suplementarias;
+    }
+
+    public void setSuplementarias(Integer suplementarias) {
+        this.suplementarias = suplementarias;
+    }
+
+    public Integer getSobreTiempo() {
+        return sobreTiempo;
+    }
+
+    public void setSobreTiempo(Integer sobreTiempo) {
+        this.sobreTiempo = sobreTiempo;
+    }
+
     public Double getActuarial1() {
-        return actuarial1.get();
+        return actuarial1;
     }
-    
+
+    public void setActuarial1(Double actuarial1) {
+        this.actuarial1 = actuarial1;
+    }
+
     public Double getActuarial2() {
-        return actuarial2.get();
+        return actuarial2;
     }
-    
+
+    public void setActuarial2(Double actuarial2) {
+        this.actuarial2 = actuarial2;
+    }
+
     public Double getQuincenal() {
-        return quincenal.get();
+        return quincenal;
     }
-    
+
+    public void setQuincenal(Double quincenal) {
+        this.quincenal = quincenal;
+    }
+
     public Double getTotalMontoDeudas() {
-        return totalMontoDeudas.get();
+        return totalMontoDeudas;
     }
-    
-    public Boolean getAcumulaDecimos() {
-        return acumulaDecimos.get();
+
+    public void setTotalMontoDeudas(Double totalMontoDeudas) {
+        this.totalMontoDeudas = totalMontoDeudas;
     }
 
     public Integer getTotalDeudas() {
-        return totalDeudas.get();
+        return totalDeudas;
+    }
+
+    public void setTotalDeudas(Integer totalDeudas) {
+        this.totalDeudas = totalDeudas;
+    }
+
+    public Boolean getAcumulaDecimos() {
+        return acumulaDecimos;
+    }
+
+    public void setAcumulaDecimos(Boolean acumulaDecimos) {
+        this.acumulaDecimos = acumulaDecimos;
     }
 
     public Double getTotalIess() {
-        return totalIess.get();
+        return totalIess;
     }
-    
+
+    public void setTotalIess(Double totalIess) {
+        this.totalIess = totalIess;
+    }
+
     public Double getSueldo() {
-        return sueldo.get();
+        return sueldo;
     }
-    
+
+    public void setSueldo(Double sueldo) {
+        this.sueldo = sueldo;
+    }
+
     public Double getNuevoSueldo() {
-        return nuevoSueldo.get();
+        return nuevoSueldo;
     }
-    
+
+    public void setNuevoSueldo(Double nuevoSueldo) {
+        this.nuevoSueldo = nuevoSueldo;
+    }
+
     public Double getNuevoQuincenal() {
-        return nuevoQuincenal.get();
+        return nuevoQuincenal;
     }
-    
+
+    public void setNuevoQuincenal(Double nuevoQuincenal) {
+        this.nuevoQuincenal = nuevoQuincenal;
+    }
+
     public Boolean getPagar() {
-        return pagar.get();
+        return pagar;
+    }
+
+    public void setPagar(Boolean pagar) {
+        this.pagar = pagar;
+    }
+
+    public String getPagado() {
+        return pagado;
+    }
+
+    public void setPagado(String pagado) {
+        this.pagado = pagado;
+    }
+
+    public ArrayList<Deuda> getDeudas() {
+        return deudas;
+    }
+
+    public void setDeudas(ArrayList<Deuda> deudas) {
+        this.deudas = deudas;
+    }
+
+    public ArrayList<PagoMesItem> getPagoMesItems() {
+        return pagoMesItems;
+    }
+
+    public void setPagoMesItems(ArrayList<PagoMesItem> pagoMesItems) {
+        this.pagoMesItems = pagoMesItems;
+    }
+
+    public ArrayList<Pago> getPagos() {
+        return pagos;
+    }
+
+    public void setPagos(ArrayList<Pago> pagos) {
+        this.pagos = pagos;
+    }
+
+    public RolIndividual getRolIndividual() {
+        return rolIndividual;
+    }
+
+    public void setRolIndividual(RolIndividual rolIndividual) {
+        this.rolIndividual = rolIndividual;
     }
     
-    public String getPagado() {
-        return pagado.get();
-    }
 }

@@ -58,7 +58,7 @@
             <Font name="System Bold" size="12.0" />
          </font></Label>
         <Line endX="100.0" layoutX="670.0" layoutY="206.0" startX="-100.0" />
-        <Button layoutX="601.0" layoutY="526.0" mnemonicParsing="false" onAction="#controlPagos" prefHeight="25.0" prefWidth="150.0" text="Pago Empleados" />
+        <Button layoutX="368.0" layoutY="422.0" mnemonicParsing="false" onAction="#controlPagos" prefHeight="25.0" prefWidth="150.0" text="Pago Empleados" />
         <Button layoutX="600.0" layoutY="228.0" mnemonicParsing="false" onAction="#rolEmpleado" prefHeight="25.0" prefWidth="150.0" text="Por Empleado" />
         <Button layoutX="601.0" layoutY="278.0" mnemonicParsing="false" onAction="#rolCliente" prefHeight="25.0" prefWidth="150.0" text="Por Cliente" />
         <Button layoutX="601.0" layoutY="328.0" mnemonicParsing="false" onAction="#verPagos" prefHeight="25.0" prefWidth="150.0" text="Roles Generados" visible="false" />
@@ -87,6 +87,7 @@
       </GridPane>
         <Button layoutX="600.0" layoutY="64.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="150.0" text="Empleados" />
         <Button layoutX="600.0" layoutY="108.0" mnemonicParsing="false" onAction="#verConfiguracion" prefHeight="25.0" prefWidth="150.0" text="Configración" />
-      <Button layoutX="601.0" layoutY="480.0" mnemonicParsing="false" onAction="#quincenaPagos" prefHeight="25.0" prefWidth="150.0" text="Quincena" />
+      <Button layoutX="601.0" layoutY="480.0" mnemonicParsing="false" onAction="#quincenalPagos" prefHeight="25.0" prefWidth="150.0" text="Quincenal" />
+      <Button layoutX="601.0" layoutY="525.0" mnemonicParsing="false" onAction="#mesualPagos" prefHeight="25.0" prefWidth="150.0" text="Mensual" />
     </children>
 </AnchorPane>

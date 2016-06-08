@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -498,22 +499,25 @@ public class QuincenalEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena()
                     + (user.getDetallesEmpleado().getQuincena()/100d) * porcentaje;
-            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
-             return empleado;
-         }).forEach((empleado) -> {
-             data.add(empleado);
-         });
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
+            return empleado;
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
         empleadosTableView.setItems(data);
         empleadosTableView.getColumns().clear();
         
@@ -575,18 +579,21 @@ public class QuincenalEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena()
                     + (user.getDetallesEmpleado().getQuincena()/100d) * porcentaje;
-            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -644,17 +651,20 @@ public class QuincenalEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena() + monto;
-            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
             return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -720,17 +730,20 @@ public class QuincenalEmpleadosController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-            empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena() + monto;
-            empleado.nuevoQuincenal.set(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -974,20 +987,23 @@ public class QuincenalEmpleadosController implements Initializable {
     
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
-            if(empleadoTable.getId() == user.getId()) {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            if(Objects.equals(empleadoTable.getId(), user.getId())) {
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
                if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+                    empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
                } else {
-                    empleado.quincenal.set(0d);
+                    empleado.setQuincenal(0d);
                }
                data.set(data.indexOf(empleadoTable), empleado);
                return;
@@ -1004,19 +1020,22 @@ public class QuincenalEmpleadosController implements Initializable {
         if (!usuarios.isEmpty()) {
            data = FXCollections.observableArrayList(); 
            usuarios.stream().map((user) -> {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
                if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+                    empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
                } else {
-                    empleado.quincenal.set(0d);
+                    empleado.setQuincenal(0d);
                }
                
                 return empleado;

@@ -5,42 +5,18 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
-import static aplicacion.control.HorasEmpleadosController.getToday;
-import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
-import aplicacion.control.reports.ReporteDeudasVarios;
-import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.EmpleadoTable;
-import aplicacion.control.util.Const;
-import aplicacion.control.util.CorreoUtil;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import aplicacion.control.util.Numeros;
-import static aplicacion.control.util.Numeros.round;
-import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
-import hibernate.dao.CargoDAO;
 import hibernate.dao.PagoQuincenaDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Cargo;
-import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.PagoQuincena;
 import hibernate.model.Usuario;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,7 +30,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -71,14 +46,6 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 
 /**
@@ -164,25 +131,28 @@ public class PagoQuincenalController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
             if (user.getDetallesEmpleado().getQuincena() != null) {
-                 empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+                 empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             } else {
-                 empleado.quincenal.set(0d);
+                 empleado.setQuincenal(0d);
             }
-            empleado.pagado.set("No");
-            empleado.pagar.set(todos);
+            empleado.setPagado("No");
+            empleado.setPagar(todos);
             for (PagoQuincena pagoQuincena: pagosQuincena) {
                 if (pagoQuincena.getUsuario().getId().equals(user.getId())) {
-                    empleado.pagado.set("Si");
-                    empleado.pagar.set(false);
+                    empleado.setPagado("Si");
+                    empleado.setPagar(false);
                     break;
                 }
             }
@@ -336,25 +306,28 @@ public class PagoQuincenalController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
-            empleado.id.set(user.getId());
-            empleado.nombre.set(user.getNombre());
-            empleado.apellido.set(user.getApellido());
-            empleado.cedula.set(user.getCedula());
-            empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.telefono.set(user.getTelefono());
-            empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
             if (user.getDetallesEmpleado().getQuincena() != null) {
-                 empleado.quincenal.set(user.getDetallesEmpleado().getQuincena());
+                 empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             } else {
-                 empleado.quincenal.set(0d);
+                 empleado.setQuincenal(0d);
             }
-            empleado.pagado.set("No");
-            empleado.pagar.set(true);
+            empleado.setPagado("No");
+            empleado.setPagar(true);
             for (PagoQuincena pagoQuincena: pagosQuincena) {
                 if (pagoQuincena.getUsuario().getId().equals(user.getId())) {
-                    empleado.pagado.set("Si");
-                    empleado.pagar.set(false);
+                    empleado.setPagado("Si");
+                    empleado.setPagar(false);
                     break;
                 }
             }
@@ -452,7 +425,7 @@ public class PagoQuincenalController implements Initializable {
                     }
                 }
                 checkBoxpagar.setOnAction(event -> {
-                     empleadoTable.pagar.set(checkBoxpagar.isSelected());
+                     empleadoTable.setPagar(checkBoxpagar.isSelected());
                      //guardar();
                 });
             }

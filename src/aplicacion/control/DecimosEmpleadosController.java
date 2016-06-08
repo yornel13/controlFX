@@ -6,7 +6,6 @@
 package aplicacion.control;
 
 import aplicacion.control.reports.ReporteAcumulacionDecimosVarios;
-import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Permisos;
@@ -23,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -354,19 +354,23 @@ public class DecimosEmpleadosController implements Initializable {
     
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
-            if(empleadoTable.getId() == user.getId()) {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               empleado.acumulaDecimos.set(user.getDetallesEmpleado().getAcumulaDecimos());
-               data.set(data.indexOf(empleadoTable), empleado);
-               return;
+            if(Objects.equals(empleadoTable.getId(), user.getId())) {
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
+                empleado.setAcumulaDecimos(user.getDetallesEmpleado()
+                        .getAcumulaDecimos());
+                data.set(data.indexOf(empleadoTable), empleado);
+                return;
             }
         }
     }
@@ -380,17 +384,20 @@ public class DecimosEmpleadosController implements Initializable {
         if (!usuarios.isEmpty()) {
            data = FXCollections.observableArrayList(); 
            usuarios.stream().map((user) -> {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               empleado.acumulaDecimos.set(user.getDetallesEmpleado().getAcumulaDecimos());
-               
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
+                empleado.setAcumulaDecimos(user.getDetallesEmpleado()
+                        .getAcumulaDecimos());
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);

@@ -6,7 +6,6 @@
 package aplicacion.control;
 
 import aplicacion.control.reports.ReporteActuarialesVarios;
-import aplicacion.control.reports.ReporteAcumulacionDecimosVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Permisos;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -267,27 +267,28 @@ public class ActuarialesEmpleadosController implements Initializable {
     
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
-            if(empleadoTable.getId() == user.getId()) {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               Actuariales actuariales = new Actuariales();
-               actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
-               if (actuariales != null) {
-                   empleado.actuarial1.set(actuariales.getPrimario());
-                   empleado.actuarial2.set(actuariales.getSecundario());
-               } else {
-                   empleado.actuarial1.set(0d);
-                   empleado.actuarial2.set(0d);
-               }
-               data.set(data.indexOf(empleadoTable), empleado);
-               return;
+            if(Objects.equals(empleadoTable.getId(), user.getId())) {
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado().getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+                Actuariales actuariales = new Actuariales();
+                actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
+                if (actuariales != null) {
+                   empleado.setActuarial1(actuariales.getPrimario());
+                   empleado.setActuarial2(actuariales.getSecundario());
+                } else {
+                   empleado.setActuarial1(0d);
+                   empleado.setActuarial2(0d);
+                }
+                data.set(data.indexOf(empleadoTable), empleado);
+                return;
             }
         }
     }
@@ -299,27 +300,27 @@ public class ActuarialesEmpleadosController implements Initializable {
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
         if (!usuarios.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
-           usuarios.stream().map((user) -> {
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-               empleado.telefono.set(user.getTelefono());
-               empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               Actuariales actuariales = new Actuariales();
-               actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
-               if (actuariales != null) {
-                   empleado.actuarial1.set(actuariales.getPrimario());
-                   empleado.actuarial2.set(actuariales.getSecundario());
-               } else {
-                   empleado.actuarial1.set(0d);
-                   empleado.actuarial2.set(0d);
-               }
-               
+            data = FXCollections.observableArrayList(); 
+            usuarios.stream().map((user) -> {
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado().getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+                Actuariales actuariales = new Actuariales();
+                actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
+                if (actuariales != null) {
+                   empleado.setActuarial1(actuariales.getPrimario());
+                   empleado.setActuarial2(actuariales.getSecundario());
+                } else {
+                   empleado.setActuarial1(0d);
+                   empleado.setActuarial2(0d);
+                }
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);

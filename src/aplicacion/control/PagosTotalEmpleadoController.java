@@ -86,6 +86,7 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import java.util.Objects;
 
 /**
  *
@@ -770,9 +771,9 @@ public class PagosTotalEmpleadoController implements Initializable {
             else
                 pagoTable.setCliente(pago.getClienteNombre());
             pagoTable.setDias(pago.getDias());
-            pagoTable.setNormales(pago.getHorasNormales().intValue());
-            pagoTable.setSuplementarias(pago.getHorasSuplementarias().intValue());
-            pagoTable.setSobreTiempo(pago.getHorasSobreTiempo().intValue());
+            pagoTable.setNormales(pago.getHorasNormales());
+            pagoTable.setSuplementarias(pago.getHorasSuplementarias());
+            pagoTable.setSobreTiempo(pago.getHorasSobreTiempo());
             pagoTable.setSueldo(pago.getSalario());
             pagoTable.setExtra(pago.getMontoHorasSuplementarias() + pago.getMontoHorasSobreTiempo());
             pagoTable.setBonos(pago.getTotalBonos());
@@ -1021,7 +1022,8 @@ public class PagosTotalEmpleadoController implements Initializable {
     public Double getDeudas() {
         Double monto = 0d;
         ArrayList<Deuda> deudas = new ArrayList<>();
-        deudas.addAll(new DeudaDAO().findAllByUsuarioIdNoPagadaSinAplazar(empleado.getId()));
+        deudas.addAll(new DeudaDAO().findAllByUsuarioIdNoPagadaSinAplazar(empleado
+                .getId()));
         deudasAPagar.addAll(deudas);
         for (Deuda deuda: deudas) {
             monto += (deuda.getRestante() / deuda.getCuotas());
@@ -1040,7 +1042,7 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     public Pago findPagoById(Integer id) {
         for (Pago pago: pagos) {
-            if (pago.getId() == id) {
+            if (Objects.equals(pago.getId(), id)) {
                 return  pago;
             }
         }

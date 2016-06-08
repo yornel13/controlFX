@@ -262,20 +262,23 @@ public class IessEmpleadosController implements Initializable {
             data = FXCollections.observableArrayList(); 
             usuarios.stream().map((user) -> {
                 EmpleadoTable empleado = new EmpleadoTable();
-                empleado.id.set(user.getId());
-                empleado.nombre.set(user.getNombre());
-                empleado.apellido.set(user.getApellido());
-                empleado.cedula.set(user.getCedula());
-                empleado.empresa.set(user.getDetallesEmpleado().getEmpresa().getNombre());
-                empleado.telefono.set(user.getTelefono());
-                empleado.departamento.set(user.getDetallesEmpleado().getDepartamento().getNombre());
-                empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
                 Double totalIess = 0d; 
                 for (PagoMesItem pagoMesItem: new PagoMesItemDAO()
                         .findByEmpleadoIdAndClave(user.getId(), Const.IP_IESS)){
                     totalIess = pagoMesItem.getDeduccion();
                 }
-                empleado.totalIess.set(totalIess);
+                empleado.setTotalIess(totalIess);
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);

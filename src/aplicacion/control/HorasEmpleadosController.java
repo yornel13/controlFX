@@ -196,16 +196,22 @@ public class HorasEmpleadosController implements Initializable {
                     suplementarias = suplementarias + control.getHorasSuplementarias();
                 }
                
-               EmpleadoTable empleado = new EmpleadoTable();
-               empleado.id.set(user.getId());
-               empleado.nombre.set(user.getNombre());
-               empleado.apellido.set(user.getApellido());
-               empleado.cedula.set(user.getCedula());
-               empleado.cargo.set(user.getDetallesEmpleado().getCargo().getNombre());
-               empleado.dias.set(dias);
-               empleado.horas.set(normales);
-               empleado.sobreTiempo.set(sobreTiempo);
-               empleado.suplementarias.set(suplementarias);
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
+               empleado.setDias(dias);
+               empleado.setHoras(normales);
+               empleado.setSobreTiempo(sobreTiempo);
+               empleado.setSuplementarias(suplementarias);
                
                data.add(empleado);
            }
