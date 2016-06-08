@@ -19,7 +19,7 @@
             <TableColumn fx:id="apellidoColumna" prefWidth="130.0" text="Apellido" />
             <TableColumn fx:id="departamentoColumna" prefWidth="110.0" text="Departamento" />
             <TableColumn fx:id="cargoColumna" prefWidth="120.0" text="Cargo" />
-            <TableColumn fx:id="quincenalColumna" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Adelanto" />
+            <TableColumn fx:id="sueldoColumna" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Sueldo" />
             <TableColumn fx:id="pagadoColumna" prefWidth="60.0" style="-fx-alignment: CENTER;" text="Pagado" />
             <TableColumn fx:id="pagarColumna" prefWidth="50.0" style="-fx-alignment: CENTER;" text="Pagar" />
         </columns>
@@ -45,7 +45,7 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="687.0" layoutY="535.0" mnemonicParsing="false" onAction="#pagarAdelanto" text="Pagar Adelanto" />
+      <Button layoutX="699.0" layoutY="536.0" mnemonicParsing="false" onAction="#pagarAdelanto" text="Pagar Sueldo" />
       <CheckBox fx:id="checkBoxPagarTodos" layoutX="751.0" layoutY="11.0" mnemonicParsing="false" onAction="#pagarATodos" />
       <Label layoutX="658.0" layoutY="10.0" text="Pagar a todos" textFill="#fffbfb">
          <font>

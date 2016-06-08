@@ -45,6 +45,7 @@ public class Const {
     public static final String REPORTE_ROL_CLIENTE = "report/rol_cliente.jrxml";
     public static final String REPORTE_ROL_INDIVIDUAL = "report/rol_individual.jrxml";
     public static final String REPORTE_ROL_UNITARIO = "report/rol_unitario.jrxml";
+    public static final String REPORTE_PAGO_ADELANTO_QUINCENAL = "report/adelanto_quincenal_individual.jrxml";
     
     /************* Correo **************/
     // Asunto

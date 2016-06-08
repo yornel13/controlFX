@@ -187,11 +187,11 @@ public class PagoQuincenalController implements Initializable {
                 }
             }
 
-             return empleado;
-         }).forEach((empleado) -> {
-             data.add(empleado);
-         });
-         empleadosTableView.setItems(data);
+            return empleado;
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
+        empleadosTableView.setItems(data);
 
         filtro(); 
     }
@@ -221,10 +221,101 @@ public class PagoQuincenalController implements Initializable {
         buttonNo.setMinWidth(50);
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            //generarRolIndividual();
+            hacerPago();
 
         });
         buttonNo.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void dialogoOpciones() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Pagar Adelanto Quincenal");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Guardar Documento");
+        Button buttonNoDocumento = new Button("No Guardar");
+        CheckBox enviarCorreo = new CheckBox("Enviar correo a los empleados");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Desea guardar una copia de los adelantos quincenal?."), 
+                buttonSiDocumento, buttonNoDocumento, enviarCorreo).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                //imprimir(file, enviarCorreo.isSelected());
+            }
+        });
+        buttonNoDocumento.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            if (enviarCorreo.isSelected()) {
+                //imprimir(null, enviarCorreo.isSelected());
+            } else {
+                dialogoCompletado();
+            }
+        });
+        enviarCorreo.setSelected(true);
+        dialogStage.showAndWait();
+    }
+    
+    public File seleccionarDirectorio() {
+        DirectoryChooser fileChooser = new DirectoryChooser();
+        fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));    
+        return fileChooser.showDialog(stagePrincipal);
+    }
+    
+    public void dialogWait() {
+        dialogLoading = new Stage();
+        dialogLoading.initModality(Modality.APPLICATION_MODAL);
+        dialogLoading.setResizable(false);
+        dialogLoading.setTitle("Cargando...");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        dialogLoading.getIcons().add(new Image(stageIcon));
+        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Cargando espere...")).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogLoading.show();
+    }
+    
+    public void hacerPago() {
+        dialogWait();
+        for (Usuario user: usuarios) {
+            if (data.get(usuarios.indexOf(user)).getPagar()) {
+                PagoQuincena pagoQuincena = new PagoQuincena();
+                pagoQuincena.setUsuario(user);
+                pagoQuincena.setFecha(new Timestamp(new Date().getTime()));
+                pagoQuincena.setMonto(data.get(usuarios.indexOf(user))
+                        .getQuincenal());
+                new PagoQuincenaDAO().save(pagoQuincena);
+            }
+        }
+        setEmpresa(empresa);
+        dialogLoading.close();
+        dialogoCompletado();
+    }
+    
+    public void dialogoCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Pago de adelanto Quincenal");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Pago de adelanto quincenal hecho con exito."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
             dialogStage.close();
         });
         dialogStage.showAndWait();
