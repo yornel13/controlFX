@@ -49,7 +49,8 @@ public class Const {
     
     /************* Correo **************/
     // Asunto
-    public static final String ASUNTO_ROL_INDIVIDUAL = "Pago mensual";
+    public static final String ASUNTO_ROL_INDIVIDUAL = "Pago Mensual";
+    public static final String ASUNTO_ADELANTO_QUINCENAL = "Adelanto Quincenal";
     public static final String ASUNTO_DEUDAS = "Deudas pendientes";
     // Mensaje
     public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";

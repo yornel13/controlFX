@@ -30,8 +30,8 @@ public class CorreoUtil {
             String mensaje, String file, String filename) {
         
         // El correo gmail de envío
-        String correoEnvia = "tgh.ymarval@gmail.com";
-        String claveCorreo = "lasombra";
+        String correoEnvia = "control.guardias.app@gmail.com";
+        String claveCorreo = "controlGuardiasApp";
 
         // La configuración para enviar correo
         Properties properties = new Properties();

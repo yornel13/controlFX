@@ -57,7 +57,7 @@ public class GestionDeudasController implements Initializable {
     
     private AplicacionControl aplicacionControl;
     
-    private PagosTotalEmpleadoController pagosTotalEmpleadoController;
+    private PagoMensualDetallesController pagoMensualDetallesController;
     
     private Empresa empresa;
     
@@ -105,8 +105,8 @@ public class GestionDeudasController implements Initializable {
         stagePrincipal.close();
     }
     
-    public void setPagoTotalController(PagosTotalEmpleadoController pagosTotalEmpleadoController) {
-        this.pagosTotalEmpleadoController = pagosTotalEmpleadoController;
+    public void setPagoTotalController(PagoMensualDetallesController pagoMensualDetallesController) {
+        this.pagoMensualDetallesController = pagoMensualDetallesController;
     }
     
     @FXML
@@ -125,9 +125,9 @@ public class GestionDeudasController implements Initializable {
     }
     
     private void guardar() {
-        pagosTotalEmpleadoController.setTableInfo(pagosTotalEmpleadoController.inicio, 
-                pagosTotalEmpleadoController.fin, 
-                pagosTotalEmpleadoController.empleado.getId());
+        pagoMensualDetallesController.setInfoEditada(pagoMensualDetallesController.inicio, 
+                pagoMensualDetallesController.fin, 
+                pagoMensualDetallesController.empleado.getId());
     }
     
     public void nuevaDeuda() {

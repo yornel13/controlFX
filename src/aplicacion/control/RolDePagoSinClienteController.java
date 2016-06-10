@@ -617,32 +617,32 @@ public class RolDePagoSinClienteController implements Initializable {
         empleadosTableView.getColumns().clear(); 
         
         TableColumn dia = new TableColumn("Dia");
-        dia.setMinWidth(100);
+        dia.setPrefWidth(185);
         dia.setCellValueFactory(new PropertyValueFactory<>("dia"));
         
         TableColumn fecha = new TableColumn("Fecha");
-        fecha.setMinWidth(120);
+        fecha.setPrefWidth(80);
         fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
         
         TableColumn horasExtras = new TableColumn("ST");
-        horasExtras.setMinWidth(40);
+        horasExtras.setPrefWidth(40);
         horasExtras.setCellValueFactory(new PropertyValueFactory<>("horasExtras"));
         
         TableColumn horasSuplementarias = new TableColumn("RC");
-        horasSuplementarias.setMinWidth(40);
+        horasSuplementarias.setPrefWidth(40);
         horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         
         TableColumn horas = new TableColumn("Horas");
-        horas.setMinWidth(80);
+        horas.setPrefWidth(80);
         horas.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         horas.getColumns().addAll(horasExtras, horasSuplementarias);
         
         TableColumn descanso = new TableColumn("Descanso");
-        descanso.setMinWidth(200);
+        descanso.setPrefWidth(180);
         descanso.setCellValueFactory(new PropertyValueFactory<>("descanso"));
         
         TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(30);
+        delete.setPrefWidth(60);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
             private final Button deleteButton = new Button("Borrar");

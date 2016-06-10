@@ -510,7 +510,7 @@ public class SueldoEmpleadosController implements Initializable {
             empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() 
                     + (user.getDetallesEmpleado().getSueldo()/100d) * porcentaje;
-            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -589,7 +589,7 @@ public class SueldoEmpleadosController implements Initializable {
             empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() 
                     + (user.getDetallesEmpleado().getSueldo()/100d) * porcentaje;
-            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -659,7 +659,7 @@ public class SueldoEmpleadosController implements Initializable {
             empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
             empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() + monto;
-            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -737,7 +737,7 @@ public class SueldoEmpleadosController implements Initializable {
             empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
             empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
             Double nuevoSueldo = user.getDetallesEmpleado().getSueldo() + monto;
-            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo, 2));
+            empleado.setNuevoSueldo(Numeros.round(nuevoSueldo));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);

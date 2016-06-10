@@ -325,7 +325,7 @@ public class DeudasEmpleadosController implements Initializable {
                    }
                 }
                 empleado.setTotalDeudas(cantidad);
-                empleado.setTotalMontoDeudas(Numeros.round(montoDeuda, 2));
+                empleado.setTotalMontoDeudas(Numeros.round(montoDeuda));
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);

@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.HorasExtrasController.getDateFromTimestamp;
 import hibernate.dao.ClienteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.model.Cliente;
@@ -95,7 +96,7 @@ public class HorasExtrasSinClienteController implements Initializable {
           datePickerFecha.setValue(getDateFromTimestamp(new Timestamp(dateTime.plusDays(1).getMillis())));
           
         } else {
-           datePickerFecha.setValue(LocalDate.now());
+           datePickerFecha.setValue(getDateFromTimestamp(rolDePagoController.inicio));
         }
     }
     

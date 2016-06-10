@@ -9,7 +9,6 @@ import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
-import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -58,7 +57,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -83,31 +81,29 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import hibernate.dao.PagoQuincenaDAO;
+import hibernate.model.PagoQuincena;
 import java.util.Objects;
+import javafx.scene.control.TableRow;
 
 /**
  *
  * @author Yornel
  */
-public class PagosTotalEmpleadoController implements Initializable {
+public class PagoMensualDetallesController implements Initializable {
 
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
+    
+    private PagoMensualController pagoMensualController;
     
     @FXML
     private ChoiceBox empleadosChoiceBox;
     
     @FXML
     private TextField cedulaField;
-    
-    @FXML
-    private DatePicker pickerDe;
-    
-    @FXML 
-    private DatePicker pickerHasta;
     
     @FXML
     private TableView controlClienteTableView;
@@ -335,6 +331,10 @@ public class PagosTotalEmpleadoController implements Initializable {
         this.aplicacionControl = aplicacionControl;
     }
     
+    public void setPagoMensualController(PagoMensualController pagoMensualController) {
+        this.pagoMensualController = pagoMensualController;
+    }
+    
     @FXML
     private void selectCedula(ActionEvent event) {
         empleadosChoiceBox.setVisible(false);
@@ -351,28 +351,6 @@ public class PagosTotalEmpleadoController implements Initializable {
     private void returnEmpresa(ActionEvent event) {
         aplicacionControl.mostrarInEmpresa(empresa);
         stagePrincipal.close();
-    } 
-    
-    @FXML
-    public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
-        if (empleado != null) {
-            setTableInfo(inicio, fin, empleado.getId());
-        }
-    }
-    
-    @FXML
-    public void onClickLess(ActionEvent event)  {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-        if (empleado != null) {
-            setTableInfo(inicio, fin, empleado.getId());
-        }
     }
     
     @FXML
@@ -397,7 +375,7 @@ public class PagosTotalEmpleadoController implements Initializable {
                         GestionDeudasController controller = loader.getController();
                         controller.setStagePrincipal(ventana);
                         controller.setProgramaPrincipal(aplicacionControl);
-                        //controller.setPagoTotalController(this);
+                        controller.setPagoTotalController(this);
                         controller.setEmpleado(empleado);
                         ventana.show();
 
@@ -458,7 +436,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             
             
         } catch (JRException | IOException ex) {
-            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             dialogLoading.close();
         }
@@ -679,45 +657,19 @@ public class PagosTotalEmpleadoController implements Initializable {
         }
     }
     
-    public void setEmpresa(Empresa empresa) throws ParseException {
-        this.empresa = empresa;
+    public void setEmpleado(Usuario empleado, 
+            Timestamp inicio, Timestamp fin) throws ParseException {
+        this.empleado = empleado;
+        this.empresa = empleado.getDetallesEmpleado().getEmpresa();
+        this.inicio = inicio;
+        this.fin = fin;
         
-        DateTime dateTime;
-        
-        dateTime = new DateTime(getToday().getTime());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
-
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
-        
+        setTableInfo(inicio, fin, this.empleado.getId());
     }
     
-    @FXML
-    private void mostrarRegistro(ActionEvent event) throws IOException {
-        
-        FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaFiltroEmpleados.fxml"));
-        AnchorPane ventanaFiltro = (AnchorPane) loader.load();
-        Stage ventana = new Stage();
-        ventana.setTitle("Selecciona el empleado");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
-        ventana.getIcons().add(new Image(stageIcon));
-        ventana.setResizable(false);
-        ventana.initOwner(stagePrincipal);
-        Scene scene = new Scene(ventanaFiltro);
-        ventana.setScene(scene);
-        FiltrarEmpleadoController controller = loader.getController();
-        controller.setStagePrincipal(ventana);
-        controller.setProgramaPrincipal(aplicacionControl);
-        controller.setPagosController(this);
-        controller.setEmpresa(empresa);
-        ventana.showAndWait();
-   
-    } 
-    
-    public void setEmpleado(Usuario empleado) {
-        this.empleado = empleado;
-        setTableInfo(inicio, fin, this.empleado.getId());
+    public void setInfoEditada(Timestamp inicio, Timestamp fin, Integer empleadoId) {
+        pagoMensualController.empleadoEditado(empleado);
+        setTableInfo(inicio, fin, empleadoId);
     }
     
     public void setTableInfo(Timestamp inicio, Timestamp fin, Integer empleadoId) {
@@ -890,13 +842,16 @@ public class PagosTotalEmpleadoController implements Initializable {
             rol.setClave(Const.IP_IESS);
             pagoMesItems.add(rol);
         }
-        quincenaValor = empleado.getDetallesEmpleado().getQuincena();
-        {
-            PagoMesItem rol = new PagoMesItem();
-            rol.setDescripcion("Adelanto Quincenal");
-            rol.setDeduccion(quincenaValor);
-            rol.setClave(Const.IP_ADELANTO_QUINCENAL);
-            pagoMesItems.add(rol);
+        PagoQuincena pagoQuincena = new PagoQuincenaDAO().findInDeterminateTimeByUsuarioId(fin, empleado.getId());
+        if (pagoQuincena != null) {
+            quincenaValor = pagoQuincena.getMonto();
+            {
+                PagoMesItem rol = new PagoMesItem();
+                rol.setDescripcion("Adelanto Quincenal");
+                rol.setDeduccion(quincenaValor);
+                rol.setClave(Const.IP_ADELANTO_QUINCENAL);
+                pagoMesItems.add(rol);
+            }
         }
         deudasValor = getDeudas();
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
@@ -989,9 +944,17 @@ public class PagosTotalEmpleadoController implements Initializable {
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
         
-        pickerDe.setEditable(false);
-        pickerHasta.setEditable(false);
-        
+        controlClienteTableView.setRowFactory( (Object tv) -> {
+            TableRow<PagosTable> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    PagosTable rowData = row.getItem();
+                    aplicacionControl.mostrarRolClienteEmpleado(new PagoDAO()
+                            .findById(rowData.getId()));
+                }
+            });
+            return row ;
+        });
     }   
     
     public static Timestamp getToday() throws ParseException {

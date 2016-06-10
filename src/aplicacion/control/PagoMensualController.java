@@ -6,31 +6,46 @@
 package aplicacion.control;
 
 import static aplicacion.control.PagosTotalEmpleadoController.getToday;
+import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.EmpleadoTable;
-import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
+import hibernate.HibernateSessionFactory;
+import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.PagoDAO;
+import hibernate.dao.PagoMesDAO;
+import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.PagoQuincenaDAO;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Pago;
+import hibernate.model.PagoMes;
 import hibernate.model.PagoMesItem;
 import hibernate.model.PagoQuincena;
 import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -42,6 +57,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -58,14 +74,22 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 
 /**
@@ -125,6 +149,9 @@ public class PagoMensualController implements Initializable {
     
     private ObservableList<EmpleadoTable> data;
     
+    private ArrayList<EmpleadoTable> empleadosParaImprimir;
+    private ArrayList<Usuario> usuariosParaImprimir;
+    
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     
@@ -151,127 +178,94 @@ public class PagoMensualController implements Initializable {
     } 
     
     @FXML
-    public void onClickMore(ActionEvent event) {
+    public void onClickMore(ActionEvent event) throws ParseException {
         pickerDe.setValue(pickerDe.getValue().plusMonths(1));
         pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
-        
-        //setTableInfo(inicio, fin, empleado.getId());
-        
+        setTableInfo();
     }
     
     @FXML
-    public void onClickLess(ActionEvent event)  {
+    public void onClickLess(ActionEvent event) throws ParseException  {
         pickerDe.setValue(pickerDe.getValue().minusMonths(1));
         pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-        
-        //setTableInfo(inicio, fin, empleado.getId());
-        
+        setTableInfo();
     }
     
     @FXML
-    private void pagarATodos(ActionEvent event) {
-        changeSelect(checkBoxPagarTodos.isSelected());
-    }
-    
-    public void changeSelect(Boolean todos) {
-        data.clear();
-        empleadosTableView.getItems().clear();
-        ArrayList<PagoQuincena> pagosQuincena = new ArrayList<>();
-        DateTime dateTime = new DateTime();
-        Timestamp inicio = new Timestamp(dateTime.withDayOfMonth(1).getMillis());
-        Timestamp fin = new Timestamp(dateTime.withDayOfMonth(28).getMillis());
-        pagosQuincena.addAll(new PagoQuincenaDAO().findAllInDeterminateTime(inicio, fin));
-        data = FXCollections.observableArrayList(); 
-        usuarios.stream().map((user) -> {
-            EmpleadoTable empleado = new EmpleadoTable();
-            empleado.setId(user.getId());
-            empleado.setNombre(user.getNombre());
-            empleado.setApellido(user.getApellido());
-            empleado.setCedula(user.getCedula());
-            empleado.setEmpresa(user.getDetallesEmpleado().getEmpresa().getNombre());
-            empleado.setTelefono(user.getTelefono());
-            empleado.setDepartamento(user.getDetallesEmpleado().getDepartamento().getNombre());
-            empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
-            calcularPago(empleado, user);
-
-            return empleado;
-        }).forEach((empleado) -> {
-            data.add(empleado);
-        });
-        empleadosTableView.setItems(data);
-
-        filtro(); 
+    private void pagarATodos(ActionEvent event) throws ParseException {
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (checkBoxPagarTodos.isSelected()) {
+                if (empleadoTable.getPagado().equalsIgnoreCase("Si")
+                            || empleadoTable.getSinRoles()) {
+                    empleadoTable.setPagar(false);
+                } else {
+                    empleadoTable.setPagar(true);
+                }
+            } else {
+                empleadoTable.setPagar(false);
+            }
+            data.set(data.indexOf(empleadoTable), empleadoTable);
+        }
     }
     
     @FXML
     public void pagarAdelanto(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pagar Adelanto Quincenal");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("Si");
-        Button buttonNo = new Button("no");
-        HBox hBox = HBoxBuilder.create()
-                .spacing(10.0) //In case you are using HBoxBuilder
-                .padding(new Insets(5, 5, 5, 5))
-                .alignment(Pos.CENTER)
-                .children(buttonOk, buttonNo)
-                .build();
-        hBox.maxWidth(120);
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Seguro que desea pagar el adelanto Quincenal "
-                + "a estos empleado?"), hBox).
-        alignment(Pos.CENTER).padding(new Insets(20)).build()));
-        buttonOk.setMinWidth(50);
-        buttonNo.setMinWidth(50);
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-            hacerPago();
-
-        });
-        buttonNo.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        dialogStage.showAndWait();
-    }
-    
-    public void dialogoOpciones() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pagar Adelanto Quincenal");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonSiDocumento = new Button("Guardar Documento");
-        Button buttonNoDocumento = new Button("No Guardar");
-        CheckBox enviarCorreo = new CheckBox("Enviar correo a los empleados");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Desea guardar una copia de los adelantos quincenal?."), 
-                buttonSiDocumento, buttonNoDocumento, enviarCorreo).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonSiDocumento.setOnAction((ActionEvent e) -> {
-            File file = seleccionarDirectorio();
-            if (file != null) {
+        if (hayParaPagar()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Pagar Rol Individual");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("Si");
+            Button buttonNo = new Button("no");
+            HBox hBox = HBoxBuilder.create()
+                    .spacing(10.0) //In case you are using HBoxBuilder
+                    .padding(new Insets(5, 5, 5, 5))
+                    .alignment(Pos.CENTER)
+                    .children(buttonOk, buttonNo)
+                    .build();
+            hBox.maxWidth(120);
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+            children(new Text("¿Seguro que desea pagar el Rol Individual "
+                    + "a estos empleado?"), hBox).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            buttonOk.setMinWidth(50);
+            buttonNo.setMinWidth(50);
+            buttonOk.setOnAction((ActionEvent e) -> {
                 dialogStage.close();
-                //imprimir(file, enviarCorreo.isSelected());
-            }
-        });
-        buttonNoDocumento.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-            if (enviarCorreo.isSelected()) {
-                //imprimir(null, enviarCorreo.isSelected());
-            } else {
-                dialogoCompletado();
-            }
-        });
-        enviarCorreo.setSelected(true);
-        dialogStage.showAndWait();
+                hacerPago();
+
+            });
+            buttonNo.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.showAndWait();
+        } else {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Roles Individuales");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("No hay empleados seleccionados para hacer el pago."), buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonOk.setPrefWidth(60);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
+            dialogStage.showAndWait();
+        }
     }
     
     public File seleccionarDirectorio() {
@@ -294,37 +288,171 @@ public class PagoMensualController implements Initializable {
         dialogLoading.show();
     }
     
-    public void hacerPago() {
+    public void imprimir(File file, Boolean enviarCorreo) {
+        
         dialogWait();
-        for (Usuario user: usuarios) {
-            if (data.get(usuarios.indexOf(user)).getPagar()) {
-                PagoQuincena pagoQuincena = new PagoQuincena();
-                pagoQuincena.setUsuario(user);
-                pagoQuincena.setFecha(new Timestamp(new Date().getTime()));
-                pagoQuincena.setMonto(data.get(usuarios.indexOf(user))
-                        .getQuincenal());
-                new PagoQuincenaDAO().save(pagoQuincena);
+        
+        for (Usuario user: usuariosParaImprimir) {
+            EmpleadoTable empleadoTable = empleadosParaImprimir
+                    .get(usuariosParaImprimir.indexOf(user));
+            if (empleadoTable.getPagar()) {
+        
+                ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
+                datasource.addAll(empleadoTable.getPagoMesItems());
+
+                try {
+                    InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
+
+                    Map<String, String> parametros = new HashMap();
+                    parametros.put("empleado", user.getNombre() + " " + user.getApellido());
+                    parametros.put("cedula", user.getCedula());
+                    parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
+                    parametros.put("empresa", user.getDetallesEmpleado().getEmpresa().getNombre());
+                    parametros.put("numero", empleadoTable.getRolIndividual().getId().toString()); 
+                    parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+                    parametros.put("total", round(empleadoTable.getSueldo()).toString());
+
+                    JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+                    JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+
+                    String filename = "rol_individual_" + empleadoTable.getRolIndividual().getId();
+
+                    if (file != null) {
+                        JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+                    } 
+                    if (enviarCorreo) {
+                        File pdf = File.createTempFile(filename, ".pdf");
+                        JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
+                        CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
+                                user.getEmail(), Const.ASUNTO_ROL_INDIVIDUAL, 
+                                "Recibo de rol de pago del mes que empieza el " 
+                                        + getFechaConMes(inicio) 
+                                        + " y termina el " 
+                                        + getFechaConMes(fin), 
+                                pdf.getPath(), filename + ".pdf");
+                    }
+
+                } catch (JRException | IOException ex) {
+                    Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
+                } 
             }
         }
-        try {
-            setEmpresa(empresa);
-        } catch (ParseException ex) {
-            Logger.getLogger(PagoMensualController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        empleadosParaImprimir.clear();
+        usuariosParaImprimir.clear();
         dialogLoading.close();
         dialogoCompletado();
+    }
+    
+    public void hacerPago() {
+        dialogWait();
+        
+        empleadosParaImprimir = new ArrayList<>();
+        usuariosParaImprimir = new ArrayList<>();
+        
+        for (Usuario user: usuarios) {
+            EmpleadoTable empleadoTable = data.get(usuarios.indexOf(user));
+            empleadosParaImprimir.add(empleadoTable);
+            usuariosParaImprimir.add(user);
+            if (empleadoTable.getPagar()) {
+                new RolIndividualDAO().save(empleadoTable.getRolIndividual());
+        
+                PagoMes pagoMes = new PagoMes();
+                pagoMes.setFecha(new Timestamp(new Date().getTime()));
+                pagoMes.setInicioMes(inicio);
+                pagoMes.setFinMes(fin);
+                pagoMes.setMonto(round(empleadoTable.getSueldo()));
+                pagoMes.setUsuario(user);
+                pagoMes.setRolIndividual(empleadoTable.getRolIndividual());
+                new PagoMesDAO().save(pagoMes);
+                
+                for (PagoMesItem pago: empleadoTable.getPagoMesItems()) {
+                    pago.setPagoMes(pagoMes);
+                    new PagoMesItemDAO().save(pago);
+                }
+                
+                for (Deuda deuda: empleadoTable.getDeudas()) {
+                    Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas());
+                    Integer newCuotas = deuda.getCuotas() - 1;
+                    if (newCuotas == 0) {
+                        deuda.setPagada(Boolean.TRUE);
+                        deuda.setRestante(0d);  
+                        deuda.setCuotas(newCuotas);
+                    } else {
+                        deuda.setPagada(Boolean.FALSE);
+                        deuda.setRestante(round(deuda.getRestante() - montoAPagar));
+                        deuda.setCuotas(newCuotas);
+                    }
+                    deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
+                    HibernateSessionFactory.getSession().flush();
+
+                    AbonoDeuda abonoDeuda = new AbonoDeuda();
+                    abonoDeuda.setDeuda(deuda);
+                    abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
+                    abonoDeuda.setMonto(montoAPagar);
+                    abonoDeuda.setPagoMes(pagoMes);
+                    new AbonoDeudaDAO().save(abonoDeuda);  
+                }
+                
+                // Registro para auditar
+                String detalles = "genero el rol individual nro: " 
+                        + empleadoTable.getRolIndividual().getId() 
+                        + " del lapso " + getFechaConMes(inicio)+ " a " 
+                        + getFechaConMes(fin) + " para el empleado " 
+                        + empleadoTable.getNombre() + " " + empleadoTable.getApellido();
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            }
+        }
+        setTableInfo();
+        
+        dialogLoading.close();
+        dialogoGenerarRolCompletado();
+    }
+    
+    public void dialogoGenerarRolCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Roles Individuales");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Guardar Documento");
+        Button buttonNoDocumento = new Button("No Guardar");
+        CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se generaron los roles de pago individual con exito, \n"
+                + " ¿Desea guardar los documento de pago?."), 
+                buttonSiDocumento, buttonNoDocumento, enviarCorreo).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                imprimir(file, enviarCorreo.isSelected());
+            }
+        });
+        buttonNoDocumento.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            if (enviarCorreo.isSelected()) {
+                imprimir(null, enviarCorreo.isSelected());
+            } else {
+                dialogoCompletado();
+            }
+        });
+        enviarCorreo.setSelected(true);
+        dialogStage.showAndWait();
     }
     
     public void dialogoCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago de adelanto Quincenal");
+        dialogStage.setTitle("Roles Individuales");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Pago de adelanto quincenal hecho con exito."), buttonOk).
+        children(new Text("Completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -338,13 +466,19 @@ public class PagoMensualController implements Initializable {
     
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
-        
-        DateTime dateTime = new DateTime();
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
-
+        DateTime dateTime = new DateTime(getToday().getTime());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+                .getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+                .minusMonths(1).plusDays(1).getMillis());
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        
+        checkBoxPagarTodos.setSelected(true);
+        setTableInfo();
+    }
+    
+    public void setTableInfo() {
         
         iess = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.IESS);
         if (iess != null) 
@@ -353,13 +487,8 @@ public class PagoMensualController implements Initializable {
         pagosQuincena = new ArrayList<>();
         pagosQuincena.addAll(new PagoQuincenaDAO()
                 .findAllInDeterminateTime(inicio, fin));
-        
         usuarios = new ArrayList<>();
         usuarios.addAll(new UsuarioDAO().findByEmpresaIdActivo(empresa.getId()));
-        
-        pagosQuincena = new ArrayList<>();
-        pagosQuincena.addAll(new PagoQuincenaDAO()
-                .findAllInDeterminateTime(inicio, fin));
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
@@ -374,21 +503,56 @@ public class PagoMensualController implements Initializable {
                     .getDepartamento().getNombre());
             empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
             calcularPago(empleado, user);
+            if (!checkBoxPagarTodos.isSelected()) {
+                empleado.setPagar(false);
+            }
            
             return empleado;
         }).forEach((empleado) -> {
             data.add(empleado);
         });
         empleadosTableView.setItems(data);
-        checkBoxPagarTodos.setSelected(true);
-
+        
         filtro();
+    }
+    
+    public void empleadoEditado(Usuario user) {
+        for (EmpleadoTable empleadoTable: data) {
+            if(Objects.equals(empleadoTable.getId(), user.getId())) {
+                EmpleadoTable empleado = new EmpleadoTable();
+                empleado.setId(user.getId());
+                empleado.setNombre(user.getNombre());
+                empleado.setApellido(user.getApellido());
+                empleado.setCedula(user.getCedula());
+                empleado.setEmpresa(user.getDetallesEmpleado()
+                        .getEmpresa().getNombre());
+                empleado.setTelefono(user.getTelefono());
+                empleado.setDepartamento(user.getDetallesEmpleado()
+                        .getDepartamento().getNombre());
+                empleado.setCargo(user.getDetallesEmpleado()
+                        .getCargo().getNombre());
+                calcularPago(empleado, user);
+                if (!checkBoxPagarTodos.isSelected()) {
+                    empleado.setPagar(false);
+                }
+                data.set(data.indexOf(empleadoTable), empleado);
+                return;
+            }
+        }
+    }
+    
+    public Boolean hayParaPagar() {
+        for (EmpleadoTable empleadoTable: data) {
+            if (empleadoTable.getPagar()) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public void calcularPago(EmpleadoTable empleadoTable, Usuario empleado) {
         PagoDAO pagoDAO = new PagoDAO();
         ArrayList<Pago> pagos = new ArrayList<>();
-        ArrayList<PagosTable> pagosTable = new ArrayList<>();
         ArrayList<PagoMesItem> pagoMesItems = new ArrayList<>();
         ArrayList<Deuda> deudasAPagar = new ArrayList<>();
         pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, 
@@ -396,7 +560,8 @@ public class PagoMensualController implements Initializable {
         if (pagos.isEmpty())
             pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, 
                     empleadoTable.getId()));
-        
+        if (pagos.isEmpty()) 
+            empleadoTable.setSinRoles(Boolean.TRUE);
         Integer diasTextValor = 0;
         Integer normalesTextValor = 0;
         Integer suplementariasTextValor = 0;
@@ -426,54 +591,36 @@ public class PagoMensualController implements Initializable {
         Double aPercibirValor = 0d;
         
         for (Pago pago: pagos) {
-            PagosTable pagoTable = new PagosTable();
-            pagoTable.setId(pago.getId());
-            if (pago.getClienteNombre() == null)
-                pagoTable.setCliente("*Administrativo*");
-            else
-                pagoTable.setCliente(pago.getClienteNombre());
-            pagoTable.setDias(pago.getDias());
-            pagoTable.setNormales(pago.getHorasNormales());
-            pagoTable.setSuplementarias(pago.getHorasSuplementarias());
-            pagoTable.setSobreTiempo(pago.getHorasSobreTiempo());
-            pagoTable.setSueldo(pago.getSalario());
-            pagoTable.setExtra(pago.getMontoHorasSuplementarias() + pago.getMontoHorasSobreTiempo());
-            pagoTable.setBonos(pago.getTotalBonos());
-            pagoTable.setVacaciones(pago.getVacaciones());
-            pagoTable.setSubtotal(pago.getSubtotal());
-            pagoTable.setDecimos(pago.getDecimoCuarto() + pago.getDecimoTercero());
-            pagoTable.setTercero(pago.getDecimoTercero());
-            pagoTable.setCuarto(pago.getDecimoCuarto());
-            pagoTable.setTotal(pago.getTotalIngreso());
-            pagosTable.add(pagoTable);
             
-            diasTextValor += pagoTable.getDias();
-            normalesTextValor += pagoTable.getNormales();
-            suplementariasTextValor += pagoTable.getSuplementarias();
-            sobreTiempoTextValor += pagoTable.getSobreTiempo();
-            sueldoTotalTextValor += pagoTable.getSueldo();
-            extraTextValor += pagoTable.getExtra();
-            bonosTextValor += pagoTable.getBonos();
-            vacacionesTextValor += pagoTable.getVacaciones();
-            subTotalTextValor += pagoTable.getSubtotal();
-            decimosTotalTextValor += pagoTable.getDecimos();
-            decimoTerceroTotalTextValor += pagoTable.getTercero();
-            decimoCuartoTotalTextValor += pagoTable.getCuarto();
-            totalTextValor += pagoTable.getTotal();
+            diasTextValor += pago.getDias();
+            normalesTextValor += pago.getHorasNormales();
+            suplementariasTextValor += pago.getHorasSuplementarias();
+            sobreTiempoTextValor += pago.getHorasSobreTiempo();
+            sueldoTotalTextValor += pago.getSalario();
+            extraTextValor += (pago.getMontoHorasSuplementarias() 
+                    + pago.getMontoHorasSobreTiempo());
+            bonosTextValor += pago.getTotalBonos();
+            vacacionesTextValor += pago.getVacaciones();
+            subTotalTextValor += pago.getSubtotal();
+            decimosTotalTextValor += (pago.getDecimoCuarto() 
+                    + pago.getDecimoTercero());
+            decimoTerceroTotalTextValor += pago.getDecimoTercero();
+            decimoCuartoTotalTextValor += pago.getDecimoCuarto();
+            totalTextValor += pago.getTotalIngreso();
             
-            montoSumplementariasTextValor += pago.getMontoHorasSuplementarias(); // No Visible en ventana
-            montoSobreTiempoTextValor += pago.getMontoHorasSobreTiempo(); // No Visible en ventana
-            montoBonoTextValor += pago.getBono(); // No Visible en ventana
-            montoTransporteTextValor += pago.getTransporte(); // No Visible en ventana
-            montoJubilacionTextValor += pago.getJubilacionPatronal(); // No Visible en ventana
-            montoAportePatronalTextValor += pago.getAportePatronal(); // No Visible en ventana
-            montoSegurosTextValor += pago.getSeguros(); // No Visible en ventana
-            montoUniformasTextValor += pago.getUniformes(); // No Visible en ventana
+            montoSumplementariasTextValor += pago.getMontoHorasSuplementarias();
+            montoSobreTiempoTextValor += pago.getMontoHorasSobreTiempo();
+            montoBonoTextValor += pago.getBono();
+            montoTransporteTextValor += pago.getTransporte();
+            montoJubilacionTextValor += pago.getJubilacionPatronal(); 
+            montoAportePatronalTextValor += pago.getAportePatronal(); 
+            montoSegurosTextValor += pago.getSeguros(); 
+            montoUniformasTextValor += pago.getUniformes(); 
         }
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Sueldo");
-            rol.setIngreso(round(sueldoTotalTextValor, 2));
+            rol.setIngreso(round(sueldoTotalTextValor));
             rol.setDias(diasTextValor);
             rol.setHoras(normalesTextValor);
             rol.setClave(Const.IP_SUELDO);
@@ -502,14 +649,14 @@ public class PagoMensualController implements Initializable {
             {
                 PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Decimo Tercero");
-                rol.setIngreso(round(decimoTerceroTotalTextValor, 2));
+                rol.setIngreso(round(decimoTerceroTotalTextValor));
                 rol.setClave(Const.IP_DECIMO_TERCERO);
                 pagoMesItems.add(rol);
             }
             {
                 PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Decimo Cuarto");
-                rol.setIngreso(round(decimoCuartoTotalTextValor, 2));
+                rol.setIngreso(round(decimoCuartoTotalTextValor));
                 rol.setClave(Const.IP_DECIMO_CUARTO);
                 pagoMesItems.add(rol);
             }
@@ -518,7 +665,7 @@ public class PagoMensualController implements Initializable {
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion(iessText);
-            rol.setDeduccion(round(ieesValor, 2));
+            rol.setDeduccion(round(ieesValor));
             rol.setClave(Const.IP_IESS);
             pagoMesItems.add(rol);
         }
@@ -538,47 +685,55 @@ public class PagoMensualController implements Initializable {
         deudasValor = getDeudas(deudasAPagar, empleadoTable, pagoMesItems);
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
         aPercibirValor = ingresoValor - deduccionesValor;
-        empleadoTable.setSueldo(aPercibirValor);
         
-        RolIndividual pagoRol = new RolIndividual();
-        pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
-        pagoRol.setFecha(new Timestamp(new Date().getTime()));
-        pagoRol.setInicio(inicio);
-        pagoRol.setFinalizo(fin);
-        pagoRol.setDias(diasTextValor);
-        pagoRol.setHorasNormales(Double.valueOf(normalesTextValor));
-        pagoRol.setHorasSuplementarias(Double.valueOf(suplementariasTextValor));  // RC
-        pagoRol.setHorasSobreTiempo(Double.valueOf(sobreTiempoTextValor));         // ST
-        pagoRol.setTotalHorasExtras(Double.valueOf(sobreTiempoTextValor + suplementariasTextValor));
-        pagoRol.setSalario(sueldoTotalTextValor);
-        pagoRol.setMontoHorasSuplementarias(montoSumplementariasTextValor);
-        pagoRol.setMontoHorasSobreTiempo(montoSobreTiempoTextValor);
-        pagoRol.setBono(montoBonoTextValor);
-        pagoRol.setTransporte(montoTransporteTextValor);
-        pagoRol.setTotalBonos(bonosTextValor);
-        pagoRol.setVacaciones(vacacionesTextValor);
-        pagoRol.setSubtotal(subTotalTextValor);
-        pagoRol.setDecimoTercero(decimoTerceroTotalTextValor);
-        pagoRol.setDecimoCuarto(decimoCuartoTotalTextValor);
-        pagoRol.setJubilacionPatronal(montoJubilacionTextValor);
-        pagoRol.setAportePatronal(montoAportePatronalTextValor);
-        pagoRol.setSeguros(montoSegurosTextValor);
-        pagoRol.setUniformes(montoUniformasTextValor);
-        pagoRol.setTotalIngreso(totalTextValor);
-        pagoRol.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
-        pagoRol.setCedula(empleado.getCedula());
-        pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
-        pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
-        pagoRol.setUsuario(empleado);
+        RolIndividual pagoRol;
+        pagoRol = new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, 
+                empleado.getId(), Const.ROL_PAGO_INDIVIDUAL);
         
-        if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
-            empleadoTable.setPagado("Si");
-            empleadoTable.setPagar(false);
-        } else {
+        if (pagoRol == null) {
+            pagoRol = new RolIndividual();
+            pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
+            pagoRol.setFecha(new Timestamp(new Date().getTime()));
+            pagoRol.setInicio(inicio);
+            pagoRol.setFinalizo(fin);
+            pagoRol.setDias(diasTextValor);
+            pagoRol.setHorasNormales(Double.valueOf(normalesTextValor));
+            pagoRol.setHorasSuplementarias(Double.valueOf(suplementariasTextValor));  // RC
+            pagoRol.setHorasSobreTiempo(Double.valueOf(sobreTiempoTextValor));        // ST
+            pagoRol.setTotalHorasExtras(Double.valueOf(sobreTiempoTextValor 
+                    + suplementariasTextValor));
+            pagoRol.setSalario(sueldoTotalTextValor);
+            pagoRol.setMontoHorasSuplementarias(montoSumplementariasTextValor);
+            pagoRol.setMontoHorasSobreTiempo(montoSobreTiempoTextValor);
+            pagoRol.setBono(montoBonoTextValor);
+            pagoRol.setTransporte(montoTransporteTextValor);
+            pagoRol.setTotalBonos(bonosTextValor);
+            pagoRol.setVacaciones(vacacionesTextValor);
+            pagoRol.setSubtotal(subTotalTextValor);
+            pagoRol.setDecimoTercero(decimoTerceroTotalTextValor);
+            pagoRol.setDecimoCuarto(decimoCuartoTotalTextValor);
+            pagoRol.setJubilacionPatronal(montoJubilacionTextValor);
+            pagoRol.setAportePatronal(montoAportePatronalTextValor);
+            pagoRol.setSeguros(montoSegurosTextValor);
+            pagoRol.setUniformes(montoUniformasTextValor);
+            pagoRol.setTotalIngreso(totalTextValor);
+            pagoRol.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
+            pagoRol.setCedula(empleado.getCedula());
+            pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
+            pagoRol.setUsuario(empleado);
+            
             empleadoTable.setPagado("No");
             empleadoTable.setPagar(true);
+        } else {
+           empleadoTable.setPagado("Si");
+           empleadoTable.setPagar(false); 
         }
         
+        empleadoTable.setSueldo(round(aPercibirValor));
+        empleadoTable.setDeudas(deudasAPagar);
+        empleadoTable.setPagoMesItems(pagoMesItems);
+        empleadoTable.setRolIndividual(pagoRol);
     }
     
     public void filtro() {
@@ -613,6 +768,58 @@ public class PagoMensualController implements Initializable {
         empleadosTableView.setItems(sortedData);
     }
     
+    public void mostrarPagoMensualDetalles(Usuario empleado) {
+        try {
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoMensualDetalles.fxml"));
+            AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Pago para el empleado " + empleado.getNombre() + " " 
+                    + empleado.getApellido());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaAuditar);
+            ventana.setScene(scene);
+            PagoMensualDetallesController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(aplicacionControl);
+            controller.setPagoMensualController(this);
+            controller.setEmpleado(empleado, inicio, fin);
+            ventana.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        } 
+    }
+    
+    public void mostrarPagado(RolIndividual rolIndividual) {
+        try {
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoMensualPagado.fxml"));
+            AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Pago para el empleado " + rolIndividual.getUsuario().getNombre() + " " 
+                    + rolIndividual.getUsuario().getApellido());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaAuditar);
+            ventana.setScene(scene);
+            PagoMensualPagadoController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(aplicacionControl);
+            controller.setPagoMensualController(this);
+            controller.setPago(rolIndividual, rolIndividual.getInicio(), rolIndividual.getFinalizo());
+            ventana.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        } 
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.FALSE);
@@ -636,7 +843,12 @@ public class PagoMensualController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    //mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    if (rowData.getPagado().equalsIgnoreCase("Si")) {
+                        mostrarPagado(rowData.getRolIndividual());
+                    } else {
+                        mostrarPagoMensualDetalles(new UsuarioDAO()
+                                .findById(rowData.getId()));
+                    }
                 }
             });
             return row ;
@@ -657,10 +869,14 @@ public class PagoMensualController implements Initializable {
                 
                 setGraphic(checkBoxpagar);
                 if (checkBoxpagar != null) {
-                    checkBoxpagar.setSelected(empleadoTable.getPagar());
-                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")
+                            || empleadoTable.getSinRoles()) {
                         checkBoxpagar.setDisable(true);
+                        empleadoTable.setPagar(false);
+                    } else {
+                        checkBoxpagar.setDisable(false);
                     }
+                    checkBoxpagar.setSelected(empleadoTable.getPagar());
                 }
                 checkBoxpagar.setOnAction(event -> {
                      empleadoTable.setPagar(checkBoxpagar.isSelected());
@@ -683,10 +899,9 @@ public class PagoMensualController implements Initializable {
     public Double getDeudas(ArrayList<Deuda> deudasAPagar, 
             EmpleadoTable empleadoTable, ArrayList<PagoMesItem> pagoMesItems) {
         Double monto = 0d;
-        ArrayList<Deuda> deudas = new ArrayList<>();
         deudasAPagar.addAll(new DeudaDAO()
                 .findAllByUsuarioIdNoPagadaSinAplazar(empleadoTable.getId()));
-        for (Deuda deuda: deudas) {
+        for (Deuda deuda: deudasAPagar) {
             monto += (deuda.getRestante() / deuda.getCuotas());
             {
                 PagoMesItem rol = new PagoMesItem();

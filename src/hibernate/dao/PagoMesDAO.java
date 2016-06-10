@@ -70,6 +70,28 @@ public class PagoMesDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<PagoMes>) result;
         }
+        
+        public PagoMes findByRolIndividual(Integer rolIndividualId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes "
+                            + "where rol_individual_id = :rol_individual_id")
+                    .addEntity(PagoMes.class)
+                    .setParameter("rol_individual_id", rolIndividualId);
+            Object result = query.uniqueResult();
+            return (PagoMes) result;
+        }
+        
+        public PagoMes findInDeterminateTimeByUsuarioId(Timestamp fin, Integer usuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes WHERE "
+                            + "usuario_id = :usuario_id and "
+                            + "fin_mes = :fin")
+                    .addEntity(PagoMes.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("fin", fin);
+                Object result = query.uniqueResult();
+                return (PagoMes) result;
+	}
 
 	public List findByExample(PagoMes instance) {
 		log.debug("finding PagoMes instance by example");

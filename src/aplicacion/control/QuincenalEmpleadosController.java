@@ -513,7 +513,7 @@ public class QuincenalEmpleadosController implements Initializable {
             empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena()
                     + (user.getDetallesEmpleado().getQuincena()/100d) * porcentaje;
-            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal));
             return empleado;
         }).forEach((empleado) -> {
             data.add(empleado);
@@ -593,7 +593,7 @@ public class QuincenalEmpleadosController implements Initializable {
             empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena()
                     + (user.getDetallesEmpleado().getQuincena()/100d) * porcentaje;
-            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -664,7 +664,7 @@ public class QuincenalEmpleadosController implements Initializable {
                     .getCargo().getNombre());
             empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena() + monto;
-            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal));
             return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);
@@ -743,7 +743,7 @@ public class QuincenalEmpleadosController implements Initializable {
                     .getCargo().getNombre());
             empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
             Double nuevoQuincenal = user.getDetallesEmpleado().getQuincena() + monto;
-            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal, 2));
+            empleado.setNuevoQuincenal(Numeros.round(nuevoQuincenal));
              return empleado;
          }).forEach((empleado) -> {
              data.add(empleado);

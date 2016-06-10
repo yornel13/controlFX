@@ -105,6 +105,18 @@ public class PagoQuincenaDAO extends BaseHibernateDAO {
                 Object result = query.list();
                 return (List<PagoQuincena>) result;
 	}
+        
+        public PagoQuincena findInDeterminateTimeByUsuarioId(Timestamp fin, Integer usuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_quincena WHERE "
+                            + "usuario_id = :usuario_id and "
+                            + "fin_mes = :fin")
+                    .addEntity(PagoQuincena.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("fin", fin);
+                Object result = query.uniqueResult();
+                return (PagoQuincena) result;
+	}
 
 	public List findAll() {
 		log.debug("finding all PagoQuincena instances");

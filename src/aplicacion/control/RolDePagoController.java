@@ -426,7 +426,8 @@ public class RolDePagoController implements Initializable {
                 Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
     }
     
-    public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin) throws ParseException {
+    public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin) 
+            throws ParseException {
         this.empleado = empleado;
         this.inicio = inicio;
         this.fin = fin;
@@ -485,36 +486,36 @@ public class RolDePagoController implements Initializable {
         empleadosTableView.setItems(data);
         
         TableColumn dia = new TableColumn("Dia");
-        dia.setMinWidth(50);
+        dia.setPrefWidth(80);
         dia.setCellValueFactory(new PropertyValueFactory<>("dia"));
         
         TableColumn fecha = new TableColumn("Fecha");
-        fecha.setMinWidth(80);
+        fecha.setPrefWidth(80);
         fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
        
         TableColumn cliente = new TableColumn("Cliente");
-        cliente.setMinWidth(200);
+        cliente.setPrefWidth(200);
         cliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
         
         TableColumn horasExtras = new TableColumn("ST");
-        horasExtras.setMinWidth(40);
+        horasExtras.setPrefWidth(40);
         horasExtras.setCellValueFactory(new PropertyValueFactory<>("horasExtras"));
         
         TableColumn horasSuplementarias = new TableColumn("RC");
-        horasSuplementarias.setMinWidth(40);
+        horasSuplementarias.setPrefWidth(40);
         horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         
         TableColumn horas = new TableColumn("Horas");
-        horas.setMinWidth(80);
+        horas.setPrefWidth(80);
         horas.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
         horas.getColumns().addAll(horasExtras, horasSuplementarias);
         
         TableColumn descanso = new TableColumn("Descanso");
-        descanso.setMinWidth(50);
+        descanso.setPrefWidth(100);
         descanso.setCellValueFactory(new PropertyValueFactory<>("descanso"));
         
         TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(30);
+        delete.setPrefWidth(60);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
             private final Button deleteButton = new Button("Borrar");

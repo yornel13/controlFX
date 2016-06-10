@@ -11,7 +11,8 @@ package aplicacion.control.util;
  */
 public class Numeros {
     
-    public static Double round(double value, int places) {
+    public static Double round(double value) {
+        int places = 2;
         if (places < 0) throw new IllegalArgumentException();
 
         long factor = (long) Math.pow(10, places);

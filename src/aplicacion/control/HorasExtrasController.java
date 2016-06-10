@@ -106,7 +106,7 @@ public class HorasExtrasController implements Initializable {
           }
           
         } else {
-           datePickerFecha.setValue(LocalDate.now());
+           datePickerFecha.setValue(getDateFromTimestamp(rolDePagoController.inicio));
         }
     }
     

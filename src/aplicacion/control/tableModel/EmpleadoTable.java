@@ -17,30 +17,31 @@ import java.util.ArrayList;
  */
 public class EmpleadoTable {
     
-    public Integer id;
-    public String nombre;
-    public String apellido;
-    public String cedula;
-    public String telefono;
-    public String departamento;
-    public String cargo;
-    public String empresa;
-    public Integer dias;
-    public Integer horas;
-    public Integer suplementarias;
-    public Integer sobreTiempo;
-    public Double actuarial1;
-    public Double actuarial2;
-    public Double quincenal;
-    public Double totalMontoDeudas;
-    public Integer totalDeudas;
-    public Boolean acumulaDecimos;
-    public Double totalIess;
-    public Double sueldo;
-    public Double nuevoSueldo;
-    public Double nuevoQuincenal;
-    public Boolean pagar; 
-    public String pagado;
+    private Integer id;
+    private String nombre;
+    private String apellido;
+    private String cedula;
+    private String telefono;
+    private String departamento;
+    private String cargo;
+    private String empresa;
+    private Integer dias;
+    private Integer horas;
+    private Integer suplementarias;
+    private Integer sobreTiempo;
+    private Double actuarial1;
+    private Double actuarial2;
+    private Double quincenal;
+    private Double totalMontoDeudas;
+    private Integer totalDeudas;
+    private Boolean acumulaDecimos;
+    private Double totalIess;
+    private Double sueldo;
+    private Double nuevoSueldo;
+    private Double nuevoQuincenal;
+    private Boolean pagar; 
+    private String pagado;
+    private Boolean sinRoles;
     public ArrayList<Deuda> deudas;
     public ArrayList<PagoMesItem> pagoMesItems;
     public ArrayList<Pago> pagos;
@@ -269,5 +270,16 @@ public class EmpleadoTable {
     public void setRolIndividual(RolIndividual rolIndividual) {
         this.rolIndividual = rolIndividual;
     }
+
+    public Boolean getSinRoles() {
+        if (sinRoles == null) 
+            return false;
+        return sinRoles;
+    }
+
+    public void setSinRoles(Boolean sinRoles) {
+        this.sinRoles = sinRoles;
+    }
+    
     
 }
