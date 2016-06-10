@@ -105,7 +105,7 @@ public class EmpresaController implements Initializable {
         nombre.setText(empresa.getNombre());
         tipo.setText(empresa.getTipo());
         siglas.setText(empresa.getSiglas());
-        numeracion.setText(empresa.getNumeracion().toString());
+        numeracion.setText(empresa.getNumeracion());
         direccion.setText(empresa.getDireccion());
         telefono1.setText(empresa.getTelefono1());
         telefono2.setText(empresa.getTelefono2());

@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,9 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -91,7 +88,7 @@ public class EditarEmpresaController implements Initializable {
         this.empresa = empresa;
         nombreField.setText(empresa.getNombre());
         siglasField.setText(empresa.getSiglas());
-        numeracionField.setText(empresa.getNumeracion().toString());
+        numeracionField.setText(empresa.getNumeracion());
         telefono1Field.setText(empresa.getTelefono1());
         telefono2Field.setText(empresa.getTelefono2());
         webField.setText(empresa.getWeb());
@@ -134,7 +131,7 @@ public class EditarEmpresaController implements Initializable {
             
             empresa.setNombre(nombreField.getText());
             empresa.setSiglas(siglasField.getText());
-            empresa.setNumeracion(Integer.parseInt(numeracionField.getText()));
+            empresa.setNumeracion(numeracionField.getText());
             empresa.setTelefono1(telefono1Field.getText());
             empresa.setTelefono2(telefono2Field.getText());
             empresa.setDireccion(direccionField.getText());

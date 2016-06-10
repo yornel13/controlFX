@@ -299,7 +299,7 @@ public class RolClienteController implements Initializable {
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
             parametros.put("cliente", cliente.getNombre());
-            parametros.put("numeracion", cliente.getRuc().toString());
+            parametros.put("numeracion", cliente.getRuc());
             parametros.put("fecha", Fechas.getFechaConMes(inicio) + " a " + Fechas.getFechaConMes(fin));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);

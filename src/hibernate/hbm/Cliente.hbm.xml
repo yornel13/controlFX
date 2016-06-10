@@ -16,7 +16,7 @@
         <property name="detalles" type="java.lang.String">
             <column name="detalles" not-null="true" />
         </property>
-        <property name="ruc" type="java.lang.Integer">
+        <property name="ruc" type="java.lang.String">
             <column name="ruc" not-null="true" />
         </property>
         <property name="direccion" type="java.lang.String">

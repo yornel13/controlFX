@@ -112,7 +112,7 @@ public class RegistrarEmpresaController implements Initializable {
             Empresa empresa = new Empresa();
             empresa.setNombre(nombreField.getText());
             empresa.setSiglas(siglasField.getText());
-            empresa.setNumeracion(Integer.parseInt(numeracionField.getText()));
+            empresa.setNumeracion(numeracionField.getText());
             empresa.setTelefono1(telefono1Field.getText());
             empresa.setTelefono2(telefono2Field.getText());
             empresa.setDireccion(direccionField.getText());

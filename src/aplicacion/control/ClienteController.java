@@ -71,7 +71,7 @@ public class ClienteController implements Initializable {
         nombre.setText(cliente.getNombre());
         telefono.setText(cliente.getTelefono());
         direccion.setText(cliente.getDireccion());
-        numeracion.setText(cliente.getRuc().toString());
+        numeracion.setText(cliente.getRuc());
         detalles.setText(cliente.getDetalles());
     }
   

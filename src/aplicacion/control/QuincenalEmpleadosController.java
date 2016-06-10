@@ -10,6 +10,7 @@ import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
 import aplicacion.control.reports.ReporteDeudasVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -111,9 +112,7 @@ public class QuincenalEmpleadosController implements Initializable {
     private Empresa empresa;
     
     Stage dialogLoading;
-    
-    String textoParaUditar;
-    
+   
     private Boolean editable = true;
     
     public void setStagePrincipal(Stage stagePrincipal) {
@@ -147,10 +146,15 @@ public class QuincenalEmpleadosController implements Initializable {
             if (user.getId().equals(empleado.getId())) {
                 user.getDetallesEmpleado()
                     .setQuincena(empleado.getNuevoQuincenal());
+                // Registro para auditar
+                String detalles = "aumento de $" + empleado.getQuincenal() 
+                        + " a $" + empleado.getNuevoQuincenal() 
+                        + " el adelanto quincenal del empleado " 
+                        + user.getNombre() + " " + user.getApellido();
+                aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
             }
         });
         HibernateSessionFactory.getSession().flush();
-            aplicacionControl.au.saveAgrego(textoParaUditar, aplicacionControl.permisos.getUsuario());
         completado();
         quincenalColumna = new TableColumn("Adelanto Quincenal");
         quincenalColumna.setMinWidth(150);
@@ -537,9 +541,6 @@ public class QuincenalEmpleadosController implements Initializable {
         
         editable = false;
         
-        textoParaUditar = "aumento el adelanto quincenal de todos los empleados con cargo "
-                + cargo.getNombre() + " un " + porcentaje + "%";
-        
         filtro();
         aumentoButton.setText("Guardar");
         
@@ -617,9 +618,6 @@ public class QuincenalEmpleadosController implements Initializable {
         
         editable = false;
         
-        textoParaUditar = "aumento el adelanto quincenal de todos los empleados "
-                + "seleccionados por \"" + filterField.getText() + "\" un " + porcentaje + "%";
-        
         filtro();
         aumentoButton.setText("Guardar");
         
@@ -687,9 +685,6 @@ public class QuincenalEmpleadosController implements Initializable {
                 apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
         
         editable = false;
-        
-        textoParaUditar = "aumento $" + monto + " el adelanto quincenal de todos"
-                + " los empleados con cargo " + cargo.getNombre();
         
         filtro();
         aumentoButton.setText("Guardar");
@@ -766,9 +761,6 @@ public class QuincenalEmpleadosController implements Initializable {
                 apellidoColumna, departamentoColumna, cargoColumna, quincenalColumna);
         
         editable = false;
-        
-        textoParaUditar = "aumento $" + monto + " el adelanto quincenal de todos"
-                + " los empleados seleccionados por \"" + filterField.getText();
         
         filtro();
         aumentoButton.setText("Guardar");

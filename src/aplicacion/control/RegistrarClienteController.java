@@ -93,7 +93,7 @@ public class RegistrarClienteController implements Initializable {
             Cliente cliente = new Cliente();
             cliente.setNombre(nombreField.getText());
             cliente.setDetalles(detallesField.getText());
-            cliente.setRuc(Integer.parseInt(numeracionField.getText()));
+            cliente.setRuc(numeracionField.getText());
             cliente.setTelefono(telefonoField.getText());
             cliente.setDireccion(direccionField.getText());
             cliente.setActivo(Boolean.TRUE);

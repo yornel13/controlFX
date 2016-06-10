@@ -17,7 +17,7 @@ public class Empresa implements java.io.Serializable {
 	private Integer id;
 	private String nombre;
 	private String siglas;
-	private Integer numeracion;
+	private String numeracion;
 	private String telefono1;
 	private String telefono2;
 	private String fax;
@@ -51,7 +51,7 @@ public class Empresa implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Empresa(String nombre, String siglas, Integer numeracion,
+	public Empresa(String nombre, String siglas, String numeracion,
 			String telefono1, String telefono2, String fax, String email,
 			String direccion, String web, String logo, Timestamp creacion,
 			Timestamp ultimaModificacion, String observacion, String tipo,
@@ -101,11 +101,11 @@ public class Empresa implements java.io.Serializable {
 		this.siglas = siglas;
 	}
 
-	public Integer getNumeracion() {
+	public String getNumeracion() {
 		return this.numeracion;
 	}
 
-	public void setNumeracion(Integer numeracion) {
+	public void setNumeracion(String numeracion) {
 		this.numeracion = numeracion;
 	}
 

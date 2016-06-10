@@ -111,8 +111,6 @@ public class SueldoEmpleadosController implements Initializable {
     
     Stage dialogLoading;
     
-    String textoParaUditar;
-    
     private Boolean editable = true;
     
     public void setStagePrincipal(Stage stagePrincipal) {
@@ -146,10 +144,15 @@ public class SueldoEmpleadosController implements Initializable {
             if (user.getId().equals(empleado.getId())) {
                 user.getDetallesEmpleado()
                     .setSueldo(empleado.getNuevoSueldo());
+                // Registro para auditar
+                String detalles = "aumento de $" + empleado.getSueldo()
+                        + " a $" + empleado.getNuevoSueldo()
+                        + " el sueldo del empleado " 
+                        + user.getNombre() + " " + user.getApellido();
+                aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
             }
         });
         HibernateSessionFactory.getSession().flush();
-            aplicacionControl.au.saveAgrego(textoParaUditar, aplicacionControl.permisos.getUsuario());
         completado();
         sueldoColumna = new TableColumn("Sueldo");
         sueldoColumna.setMinWidth(120);
@@ -533,10 +536,6 @@ public class SueldoEmpleadosController implements Initializable {
                 apellidoColumna, departamentoColumna, cargoColumna, sueldoColumna);
         
         editable = false;
-        
-        textoParaUditar = "aumento el sueldo de todos los empleados con cargo "
-                + cargo.getNombre() + " un " + porcentaje + "%";
-        
         filtro();
         aumentoButton.setText("Guardar");
         
@@ -612,10 +611,6 @@ public class SueldoEmpleadosController implements Initializable {
                 apellidoColumna, departamentoColumna, cargoColumna, sueldoColumna);
         
         editable = false;
-        
-        textoParaUditar = "aumento el sueldo de todos los empleados "
-                + "seleccionados por \"" + filterField.getText() + "\" un " + porcentaje + "%";
-        
         filtro();
         aumentoButton.setText("Guardar");
         
@@ -682,10 +677,6 @@ public class SueldoEmpleadosController implements Initializable {
                 apellidoColumna, departamentoColumna, cargoColumna, sueldoColumna);
         
         editable = false;
-        
-        textoParaUditar = "aumento $" + monto + " el sueldo de todos los "
-                + "empleados con cargo " + cargo.getNombre();
-        
         filtro();
         aumentoButton.setText("Guardar");
         
@@ -760,10 +751,6 @@ public class SueldoEmpleadosController implements Initializable {
                 apellidoColumna, departamentoColumna, cargoColumna, sueldoColumna);
         
         editable = false;
-        
-        textoParaUditar = "aumento $" + monto + " el sueldo de todos los empleados "
-                + "seleccionados por \"" + filterField.getText();
-        
         filtro();
         aumentoButton.setText("Guardar");
         

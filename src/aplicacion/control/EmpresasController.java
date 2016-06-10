@@ -13,6 +13,7 @@ import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -140,12 +141,12 @@ public class EmpresasController implements Initializable {
     
     public void empresaEditada(Empresa emp) {
         for (EmpresaTable empresaTable: data) {
-            if(empresaTable.getId() == emp.getId()) {
+            if(Objects.equals(empresaTable.getId(), emp.getId())) {
                 EmpresaTable empresa = new EmpresaTable();
                 empresa.id.set(emp.getId());
                 empresa.nombre.set(emp.getNombre());
                 empresa.siglas.set(emp.getSiglas());
-                empresa.numeracion.set(emp.getNumeracion().toString());
+                empresa.numeracion.set(emp.getNumeracion());
                 empresa.diaCortePago.set(emp.getDiaCortePago());
                 empresa.creacion.set(emp.getCreacion().toString());
                 empresa.tipo.set(emp.getTipo());
@@ -170,7 +171,7 @@ public class EmpresasController implements Initializable {
                empresa.id.set(emp.getId());
                empresa.nombre.set(emp.getNombre());
                empresa.siglas.set(emp.getSiglas());
-               empresa.numeracion.set(emp.getNumeracion().toString());
+               empresa.numeracion.set(emp.getNumeracion());
                empresa.diaCortePago.set(emp.getDiaCortePago());
                empresa.creacion.set(emp.getCreacion().toString());
                empresa.tipo.set(emp.getTipo());

@@ -76,7 +76,7 @@ public class EditarClienteController implements Initializable {
         this.cliente = cliente;
         nombreField.setText(this.cliente.getNombre());
         detallesField.setText(this.cliente.getDetalles());
-        numeracionField.setText(this.cliente.getRuc().toString());
+        numeracionField.setText(this.cliente.getRuc());
         telefonoField.setText(this.cliente.getTelefono());
         direccionField.setText(this.cliente.getDireccion());
     }
@@ -107,7 +107,7 @@ public class EditarClienteController implements Initializable {
             
             cliente.setNombre(nombreField.getText());
             cliente.setDetalles(detallesField.getText());
-            cliente.setRuc(Integer.parseInt(numeracionField.getText()));
+            cliente.setRuc(numeracionField.getText());
             cliente.setTelefono(telefonoField.getText());
             cliente.setDireccion(direccionField.getText());
             cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));

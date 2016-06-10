@@ -17,7 +17,7 @@ public class Cliente implements java.io.Serializable {
 	private Integer id;
 	private String nombre;
 	private String detalles;
-	private Integer ruc;
+	private String ruc;
 	private String direccion;
 	private String telefono;
 	private Boolean activo;
@@ -33,7 +33,7 @@ public class Cliente implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public Cliente(String nombre, String detalles, Integer ruc,
+	public Cliente(String nombre, String detalles, String ruc,
 			String direccion, String telefono, Boolean activo,
 			Timestamp creacion, Timestamp ultimaModificacion) {
 		this.nombre = nombre;
@@ -47,7 +47,7 @@ public class Cliente implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Cliente(String nombre, String detalles, Integer ruc,
+	public Cliente(String nombre, String detalles, String ruc,
 			String direccion, String telefono, Boolean activo,
 			Timestamp creacion, Timestamp ultimaModificacion,
 			Set controlEmpleados) {
@@ -88,11 +88,11 @@ public class Cliente implements java.io.Serializable {
 		this.detalles = detalles;
 	}
 
-	public Integer getRuc() {
+	public String getRuc() {
 		return this.ruc;
 	}
 
-	public void setRuc(Integer ruc) {
+	public void setRuc(String ruc) {
 		this.ruc = ruc;
 	}
 

@@ -286,7 +286,7 @@ public class RolClienteEmpleadoController implements Initializable {
             numeracionText.setVisible(false);
         } else {
             clienteText.setText("Cliente: " + pago.getClienteNombre());
-            numeracionText.setText("Ruc: " + pago.getCliente().getRuc().toString());
+            numeracionText.setText("Ruc: " + pago.getCliente().getRuc());
         }
         lapsoText.setText(Fechas.getFechaConMes(pago.getInicio()) + " a " 
                 + Fechas.getFechaConMes(pago.getFinalizo()));

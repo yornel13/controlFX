@@ -311,6 +311,14 @@ public class PagoQuincenalController implements Initializable {
                 pagoQuincena.setFinMes(fin);
                 new PagoQuincenaDAO().save(pagoQuincena);
                 pagosQuincenal.add(pagoQuincena);
+                
+                // Registro para auditar
+                String detalles = "hizo el adelanto quincenal nro: " 
+                        + pagoQuincena.getId() 
+                        + " del lapso " + getFechaConMes(inicio)+ " a " 
+                        + getFechaConMes(fin) + " para el empleado " 
+                        + user.getNombre() + " " + user.getApellido();
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             }
         }
         setTableInfo();

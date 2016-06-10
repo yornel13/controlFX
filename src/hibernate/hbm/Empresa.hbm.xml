@@ -16,7 +16,7 @@
         <property name="siglas" type="java.lang.String">
             <column name="siglas" not-null="true" />
         </property>
-        <property name="numeracion" type="java.lang.Integer">
+        <property name="numeracion" type="java.lang.String">
             <column name="numeracion" />
         </property>
         <property name="telefono1" type="java.lang.String">

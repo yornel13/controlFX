@@ -388,11 +388,13 @@ public class DepartamentosCargosController implements Initializable {
         departamentosTableView.getColumns().clear();
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(190);
+        nombre.setMinWidth(200);
+        nombre.setMaxWidth(200);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn<Departamento, Departamento> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(45);
+        delete.setMinWidth(55);
+        delete.setMaxWidth(55);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Departamento, Departamento>() {
             private final Button deleteButton = new Button("Borrar");
@@ -431,11 +433,13 @@ public class DepartamentosCargosController implements Initializable {
         cargosTableView.getColumns().clear();
         
         TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(190);
+        nombre.setMinWidth(200);
+        nombre.setMaxWidth(200);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn<Cargo, Cargo> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(45);
+        delete.setMinWidth(55);
+        delete.setMaxWidth(55);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<Cargo, Cargo>() {
             private final Button deleteButton = new Button("Borrar");
@@ -475,14 +479,17 @@ public class DepartamentosCargosController implements Initializable {
         
         TableColumn nombre = new TableColumn("Nombre");
         nombre.setMinWidth(150);
+        nombre.setMaxWidth(150);
         nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
         TableColumn cuotas = new TableColumn("Cuotas");
-        cuotas.setMinWidth(30);
+        cuotas.setMinWidth(50);
+        cuotas.setMaxWidth(50);
         cuotas.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
         
         TableColumn<DeudaTipo, DeudaTipo> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(45);
+        delete.setMinWidth(55);
+        delete.setMaxWidth(55);
         delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         delete.setCellFactory(param -> new TableCell<DeudaTipo, DeudaTipo>() {
             private final Button deleteButton = new Button("Borrar");

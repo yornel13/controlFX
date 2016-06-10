@@ -37,6 +37,10 @@ INSERT INTO control.cargo
 (`id`,`nombre`,`activo`)
 VALUES
 (4, 'BUNKER', true);
+INSERT INTO control.cargo
+(`id`,`nombre`,`activo`)
+VALUES
+(5, 'ANALISTA', true);
 
 
 
@@ -78,7 +82,7 @@ VALUES
 INSERT INTO control.constante
 (`id`,`nombre`,`valor`,`activo`)
 VALUES
-(1, 'decimo_cuarto', '30,5', 1);
+(1, 'decimo_cuarto', '30.5', 1);
 
 
 

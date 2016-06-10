@@ -169,7 +169,7 @@ public class InEmpresaController implements Initializable {
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
         empresaLabel.setText(empresa.getNombre());
-        numeracionLabel.setText("RUC: " + empresa.getNumeracion().toString());
+        numeracionLabel.setText("RUC: " + empresa.getNumeracion());
 
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         empleados = new ArrayList<>();
