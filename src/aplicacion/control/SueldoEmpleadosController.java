@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
 import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
+import aplicacion.control.reports.ReporteSueldoVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Numeros;
@@ -876,11 +877,11 @@ public class SueldoEmpleadosController implements Initializable {
         
         dialogWait();
         
-        ReporteAdelantoQuincenalVarios datasource = new ReporteAdelantoQuincenalVarios();
+        ReporteSueldoVarios datasource = new ReporteSueldoVarios();
         datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
         
         try {
-            InputStream inputStream = new FileInputStream(Const.REPORTE_ADELANTO_QUINCENAL_EMPLEADOS);
+            InputStream inputStream = new FileInputStream(Const.REPORTE_SUELDO_EMPLEADOS);
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
@@ -895,14 +896,14 @@ public class SueldoEmpleadosController implements Initializable {
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
-            String filename = "adelanto_quincenal_" + System.currentTimeMillis();
+            String filename = "sueldos_" + System.currentTimeMillis();
             
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
             } 
             
             // Registro para auditar
-            String detalles = "genero el recibo general de adelantos quincenales de todos los empleado";
+            String detalles = "genero el recibo general de sueldos de todos los empleado";
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();
@@ -919,7 +920,7 @@ public class SueldoEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Adelanto Quincenal");
+        dialogStage.setTitle("Imprimir Sueldos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
@@ -947,7 +948,7 @@ public class SueldoEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Adelanto Quincenal");
+        dialogStage.setTitle("Imprimir Sueldos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Seleccionar ruta");

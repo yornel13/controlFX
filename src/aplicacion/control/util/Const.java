@@ -38,6 +38,7 @@ public class Const {
     public static final String REPORTE_DEUDAS_EMPLEADO = "report/deudas_empleado.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADOS = "report/deudas_varios.jrxml";
     public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "report/adelanto_quincenal_varios.jrxml";
+    public static final String REPORTE_SUELDO_EMPLEADOS = "report/sueldo_varios.jrxml";
     public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "report/acumulacion_decimos_varios.jrxml";
     public static final String REPORTE_ACTUARIALES_EMPLEADOS = "report/actuariales_varios.jrxml";
     public static final String REPORTE_IESS_EMPLEADOS = "report/iess_varios.jrxml";
