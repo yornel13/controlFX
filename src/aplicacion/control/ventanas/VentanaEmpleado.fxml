@@ -34,17 +34,17 @@
       <Label layoutX="26.0" layoutY="390.0" text="Sueldo" textFill="#2382c6" />
       <Label layoutX="29.0" layoutY="240.0" text="Empresa" textFill="#2382c6" />
       <Label layoutX="29.0" layoutY="360.0" text="Extra" textFill="#2382c6" />
-      <Label fx:id="cedula" layoutX="280.0" layoutY="59.0" text="Label" />
-      <Label fx:id="telefono" layoutX="280.0" layoutY="88.0" text="Label" />
-      <Label fx:id="direccion" layoutX="280.0" layoutY="117.0" text="Label" />
-      <Label fx:id="email" layoutX="280.0" layoutY="146.0" text="Label" />
-      <Label fx:id="estadoCivil" layoutX="280.0" layoutY="175.0" text="Label" />
-      <Label fx:id="empresa" layoutX="179.0" layoutY="240.0" text="Label" />
-      <Label fx:id="departamento" layoutX="179.0" layoutY="270.0" text="Label" />
+      <Label fx:id="cedula" layoutX="280.0" layoutY="59.0" maxWidth="300.0" text="Label" />
+      <Label fx:id="telefono" layoutX="280.0" layoutY="88.0" maxWidth="300.0" text="Label" />
+      <Label fx:id="direccion" layoutX="280.0" layoutY="117.0" maxWidth="300.0" prefHeight="17.0" prefWidth="300.0" text="Label" />
+      <Label fx:id="email" layoutX="280.0" layoutY="146.0" maxWidth="300.0" text="Label" />
+      <Label fx:id="estadoCivil" layoutX="280.0" layoutY="175.0" maxWidth="300.0" text="Label" />
+      <Label fx:id="empresa" layoutX="179.0" layoutY="240.0" maxWidth="300.0" text="Label" />
+      <Label fx:id="departamento" layoutX="179.0" layoutY="270.0" maxWidth="300.0" text="Label" />
       <Label fx:id="cargo" layoutX="179.0" layoutY="300.0" text="Label" />
-      <Label fx:id="cuenta" layoutX="179.0" layoutY="330.0" text="Label" />
+      <Label fx:id="cuenta" layoutX="179.0" layoutY="330.0" maxWidth="300.0" text="Label" />
       <Label fx:id="sueldo" layoutX="179.0" layoutY="390.0" text="Label" />
-      <Label fx:id="extra" layoutX="179.0" layoutY="359.0" text="Label" />
+      <Label fx:id="extra" layoutX="179.0" layoutY="359.0" maxWidth="300.0" text="Label" />
       <Button alignment="BASELINE_LEFT" contentDisplay="RIGHT" layoutX="507.0" layoutY="15.0" mnemonicParsing="false" onAction="#editarEmpleado" prefHeight="30.0" prefWidth="79.0" style="-fx-background-position: right; -fx-background-repeat: no-repeat; -fx-background-color: transparent;" text="Editar" textAlignment="RIGHT" textFill="WHITE" />
       <GridPane alignment="CENTER" layoutX="435.0" layoutY="291.0" prefHeight="103.0" prefWidth="134.0">
         <columnConstraints>
@@ -65,7 +65,7 @@
       </GridPane>
       <Button layoutX="554.0" layoutY="15.0" mnemonicParsing="false" onAction="#editarEmpleado" prefHeight="30.0" prefWidth="30.0" style="-fx-background-image: url('aplicacion/control/imagenes/pencil.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2));" />
       <Label layoutX="170.0" layoutY="204.0" text="Cumpleños" textFill="#2382c6" />
-      <Label fx:id="cumpleano" layoutX="280.0" layoutY="204.0" text="Label" />
+      <Label fx:id="cumpleano" layoutX="280.0" layoutY="204.0" maxHeight="300.0" text="Label" />
       <Button layoutX="125.0" layoutY="189.0" mnemonicParsing="false" onAction="#changeImage" prefHeight="30.0" prefWidth="30.0" style="-fx-background-image: url('aplicacion/control/imagenes/pencil.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2));" />
     </children>
 </AnchorPane>

@@ -1434,7 +1434,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
@@ -1472,7 +1472,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoCliente.fxml"));
@@ -1511,7 +1511,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoSinCliente.fxml"));
@@ -1720,51 +1720,6 @@ public class AplicacionControl extends Application {
                         }
                     });
                     ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-              noPermitido();
-           }
-       }
-    }
-    
-    public void mostrarPagos(Empresa empresa, Stage stage) {
-        if (permisos == null) {
-           noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
-               try {
-                    stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagos.fxml"));
-                    AnchorPane ventanaPagos = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empresa.getSiglas());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.setWidth(800);
-                    ventana.setHeight(628);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaPagos);
-                    ventana.setScene(scene);
-                    PagosController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
-                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
-                    Platform.setImplicitExit(false);
-                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent event) {
-                            cerrarWindows();
-                            event.consume();
-                        }
-                    });
-                    ventana.show();
-                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1995,7 +1950,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoQuincenal.fxml"));
@@ -2040,7 +1995,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoMensual.fxml"));

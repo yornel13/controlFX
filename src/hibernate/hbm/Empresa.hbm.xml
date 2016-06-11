@@ -8,7 +8,7 @@
     <class name="hibernate.model.Empresa" table="empresa" catalog="control">
         <id name="id" type="java.lang.Integer">
             <column name="id" />
-            <generator class="identity" />
+            <generator class="identity"/>
         </id>
         <property name="nombre" type="java.lang.String">
             <column name="nombre" not-null="true" />

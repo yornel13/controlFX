@@ -73,6 +73,15 @@ public class EmpresaDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public void changeId(Integer oldId, Integer newId) {
+            Query query = getSession().
+                    createSQLQuery("update empresa set id = :new where id = :old")
+                        .setParameter("old", oldId)
+                        .setParameter("new", newId);
+            query.executeUpdate();
+            getSession().beginTransaction().commit();
+	}
 
 	public List findByExample(Empresa instance) {
 		log.debug("finding Empresa instance by example");

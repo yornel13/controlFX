@@ -161,11 +161,6 @@ public class InEmpresaController implements Initializable {
         aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
     }
 
-    @FXML
-    private void verPagos(ActionEvent event) {
-        aplicacionControl.mostrarPagos(empresa, stagePrincipal);
-    }
-
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
         empresaLabel.setText(empresa.getNombre());

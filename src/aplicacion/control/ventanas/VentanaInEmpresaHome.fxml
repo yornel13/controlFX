@@ -28,7 +28,7 @@
             <Font name="System Bold" size="18.0" />
          </font></Label>
         <Line endX="100.0" layoutX="132.0" layoutY="230.0" startX="-100.0" />
-        <Label layoutX="46.0" layoutY="207.0" text="Consulta y Edición" textFill="WHITE">
+        <Label layoutX="46.0" layoutY="207.0" text="Consulta y Edición para pagos" textFill="WHITE">
          <font>
             <Font name="System Bold" size="12.0" />
          </font></Label>
@@ -53,14 +53,13 @@
             <Font name="System Bold" size="12.0" />
          </font></Label>
         <Line endX="100.0" layoutX="670.0" layoutY="363.0" startX="-100.0" />
-        <Label layoutX="576.0" layoutY="178.0" text="Gestion de Horas y Dias Trabajados" textFill="WHITE">
+        <Label layoutX="576.0" layoutY="178.0" text="Gestion de horas y dias trabajados" textFill="WHITE">
          <font>
             <Font name="System Bold" size="12.0" />
          </font></Label>
         <Line endX="100.0" layoutX="670.0" layoutY="206.0" startX="-100.0" />
         <Button layoutX="600.0" layoutY="228.0" mnemonicParsing="false" onAction="#rolEmpleado" prefHeight="25.0" prefWidth="150.0" text="Por Empleado" />
         <Button layoutX="601.0" layoutY="278.0" mnemonicParsing="false" onAction="#rolCliente" prefHeight="25.0" prefWidth="150.0" text="Por Cliente" />
-        <Button layoutX="601.0" layoutY="328.0" mnemonicParsing="false" onAction="#verPagos" prefHeight="25.0" prefWidth="150.0" text="Roles Generados" visible="false" />
         <Button layoutX="601.0" layoutY="434.0" mnemonicParsing="false" onAction="#mostrarRolIndividual" prefHeight="25.0" prefWidth="150.0" text="Rol Individual" />
         <Button layoutX="601.0" layoutY="387.0" mnemonicParsing="false" onAction="#mostrarRolCliente" prefHeight="25.0" prefWidth="150.0" text="Rol Cliente" />
       <GridPane layoutX="38.0" layoutY="242.0" prefHeight="308.0" prefWidth="188.0">

@@ -67,6 +67,15 @@ public class UsuarioDAO extends BaseHibernateDAO {
 		}
 	}
         
+        public void changeId(Integer oldId, Integer newId) {
+            Query query = getSession().
+                    createSQLQuery("update usuario set id = :new where id = :old")
+                        .setParameter("old", oldId)
+                        .setParameter("new", newId);
+            query.executeUpdate();
+            getSession().beginTransaction().commit();
+	}
+        
         public Usuario findByCedula(String cedula) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario where cedula = :cedula")

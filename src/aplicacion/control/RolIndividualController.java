@@ -338,7 +338,7 @@ public class RolIndividualController implements Initializable {
         buttonOk.setOnKeyPressed((KeyEvent event1) -> {
             dialogStage.close();
         });
-        dialogStage.showAndWait();
+        dialogStage.show();
     }
     
     public File seleccionarDirectorio() {
