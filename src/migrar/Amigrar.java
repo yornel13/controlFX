@@ -8,16 +8,15 @@ package migrar;
 
 
 import hibernate.dao.CargoDAO;
+import hibernate.dao.ClienteDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
 import hibernate.dao.EmpresaDAO;
 import hibernate.dao.EstadoCivilDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Cargo;
-import hibernate.model.Departamento;
+import hibernate.model.Cliente;
 import hibernate.model.DetallesEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.EstadoCivil;
 import hibernate.model.Usuario;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -35,20 +34,22 @@ public class Amigrar {
     
     
     public static void main(String[]args) {
-        /*SessionFactory sf_2 = null;
-        try {
-           sf_2 = new Configuration()
-               .configure("hibernate.cfg_2.xml").buildSessionFactory(); 
-            session_1 = sf_2.openSession(); 
-            
-            EmpTbempresasegu empTbempresasegu = (EmpTbempresasegu) new EmpTbempresaseguDAO().findAll().get(0);
-            System.out.println(empTbempresasegu.getNombEmpresa());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {  
-            sf_2.close();
-        } */
+        
         System.out.println("Migrando data:");
+        
+        /*
+        System.out.println("Migrando cargos...");
+        ArrayList<EmpTbcargoguardia> cargosViejos = new ArrayList<>();
+        cargosViejos.addAll((List<EmpTbcargoguardia>) new EmpTbcargoguardiaDAO().findAll());
+        
+        for (EmpTbcargoguardia cargoViejo: cargosViejos) {
+            Cargo cargo = new Cargo();
+            cargo.setNombre(cargoViejo.getNombCargoguardia());
+            cargo.setActivo(Boolean.TRUE);
+            CargoDAO dao = new CargoDAO();
+            dao.save(cargo);
+            dao.changeId(cargo.getId(), cargoViejo.getCodiCargoguardia());
+        } */
         
         System.out.println("Migrando empresas...");
         ArrayList<EmpTbempresasegu> empresasViejas = new ArrayList<>();
@@ -75,20 +76,6 @@ public class Amigrar {
             empresaDAO.save(empresa);
             empresaDAO.changeId(empresa.getId(), empresaVieja.getCodiEmpresa());
         } 
-        /*
-        System.out.println("Migrando cargos...");
-        ArrayList<EmpTbcargoguardia> cargosViejos = new ArrayList<>();
-        cargosViejos.addAll((List<EmpTbcargoguardia>) new EmpTbcargoguardiaDAO().findAll());
-        
-        for (EmpTbcargoguardia cargoViejo: cargosViejos) {
-            Cargo cargo = new Cargo();
-            cargo.setNombre(cargoViejo.getNombCargoguardia());
-            cargo.setActivo(Boolean.TRUE);
-            CargoDAO dao = new CargoDAO();
-            dao.save(cargo);
-            dao.changeId(cargo.getId(), cargoViejo.getCodiCargoguardia());
-        } */
-        
         
         System.out.println("Migrando empleados guardias...");
         ArrayList<SegTbguardia> empleadosViejos = new ArrayList<>();
@@ -135,6 +122,24 @@ public class Amigrar {
             
             usuariosDAO.changeId(usuario.getId(), empleadoViejo.getCodiGuardia());
         }  
+        
+        System.out.println("Migrando clientes...");
+        ArrayList<WebTblCliente> clientesViejos = new ArrayList<>();
+        clientesViejos.addAll((List<WebTblCliente>) new WebTblClienteDAO().findAll());
+        
+        for (WebTblCliente clienteViejo: clientesViejos) {
+            Cliente cliente = new Cliente();
+            cliente.setNombre(clienteViejo.getRazonSocial());
+            cliente.setDetalles("");
+            cliente.setRuc("Falta Nruc.");
+            cliente.setTelefono("Falta Tlf.");
+            cliente.setDireccion("Falta direccion.");
+            cliente.setActivo(Boolean.TRUE);
+            cliente.setCreacion(new Timestamp(new Date().getTime()));
+            cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
+            ClienteDAO clienteDAO = new ClienteDAO();
+            clienteDAO.save(cliente);
+        }
         
         System.out.println("Migracion completada.");
     }

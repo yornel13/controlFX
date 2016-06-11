@@ -7,9 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.util.FilterMaxValue;
 import hibernate.dao.ClienteDAO;
-import hibernate.dao.EmpresaDAO;
 import hibernate.model.Cliente;
-import hibernate.model.Empresa;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;

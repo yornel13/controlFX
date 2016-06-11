@@ -14,5 +14,6 @@
     <mapping resource="migrar/EmpTbempleado.hbm.xml"/>
     <mapping resource="migrar/EmpTbcargoguardia.hbm.xml"/>
     <mapping resource="migrar/SegTbguardia.hbm.xml"/>
+    <mapping resource="migrar/WebTblCliente.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>
