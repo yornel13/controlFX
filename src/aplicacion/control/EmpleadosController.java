@@ -35,8 +35,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
@@ -60,13 +62,13 @@ public class EmpleadosController implements Initializable {
     private Button administradoresButton;
     
     @FXML
-    private Button agregarButton;
+    private Button buttonAgregar;
     
     @FXML
     private Pane imagenLabel;
     
     @FXML
-    private Button homeButton;
+    private Button buttonAtras;
     
     @FXML 
     private TableColumn cedulaColumna;
@@ -419,6 +421,38 @@ public class EmpleadosController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.FALSE);
+        
+        buttonAgregar.setTooltip(
+            new Tooltip("Agregar nuevo empleado")
+        );
+        buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAgregar.setOnMouseExited((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     } 
     
     // Login items

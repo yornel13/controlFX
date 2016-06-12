@@ -45,9 +45,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -71,9 +73,6 @@ public class DecimosEmpleadosController implements Initializable {
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
     private TableView empleadosTableView;
@@ -99,6 +98,12 @@ public class DecimosEmpleadosController implements Initializable {
     @FXML 
     private TableColumn<EmpleadoTable, EmpleadoTable>  decimosColumna;
     
+    @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonImprimir;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
@@ -114,7 +119,7 @@ public class DecimosEmpleadosController implements Initializable {
     }
     
     @FXML
-    private void returnConfiguracion(ActionEvent event) {
+    private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
@@ -474,8 +479,6 @@ public class DecimosEmpleadosController implements Initializable {
                      }
                 });
             }
-
-            
         });
         
         empleadosTableView.setRowFactory( (Object tv) -> {
@@ -487,6 +490,37 @@ public class DecimosEmpleadosController implements Initializable {
                 }
             });
             return row ;
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

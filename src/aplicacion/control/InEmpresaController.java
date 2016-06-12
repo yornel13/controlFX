@@ -32,6 +32,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -48,19 +49,7 @@ public class InEmpresaController implements Initializable {
     private Stage stagePrincipal;
 
     private AplicacionControl aplicacionControl;
-
-    @FXML
-    private Button administradoresButton;
-
-    @FXML
-    private Button empresaButton;
-
-    @FXML
-    private Pane contentPane;
-
-    @FXML
-    private Button homeButton;
-
+    
     @FXML
     private Label labelEmpresaSeguridad;
 
@@ -313,6 +302,20 @@ public class InEmpresaController implements Initializable {
                 aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
             });
         }
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     }
 
     // obtener dia sin horas

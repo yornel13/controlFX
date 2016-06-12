@@ -48,9 +48,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -103,7 +105,16 @@ public class SueldoEmpleadosController implements Initializable {
     private TableColumn sueldoColumna;
     
     @FXML
-    private Button aumentoButton;
+    private Button buttonAumento;
+    
+    @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonImprimir;
+    
+    @FXML
+    private Button buttonGuardar;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -123,21 +134,18 @@ public class SueldoEmpleadosController implements Initializable {
     }
     
     @FXML
-    private void returnConfiguracion(ActionEvent event) {
+    private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
     
     @FXML
     public void aumentoAvanzado(ActionEvent event) {
-         if (aumentoButton.getText().equals("Guardar")) {
-             guardarAumento();
-         } else {
-             empezarAumento();
-         }
+        empezarAumento(); 
     }
     
-    public void guardarAumento() {
+    @FXML
+    public void guardarAumento(ActionEvent event) {
         ArrayList<EmpleadoTable> empleadosIndex = new ArrayList<>();
         empleadosIndex.addAll((List<EmpleadoTable>) data);
         empleadosIndex.stream().forEach((empleado) -> {
@@ -158,12 +166,14 @@ public class SueldoEmpleadosController implements Initializable {
         sueldoColumna = new TableColumn("Sueldo");
         sueldoColumna.setMinWidth(120);
         sueldoColumna.setCellValueFactory(new PropertyValueFactory<>("sueldo"));
+        sueldoColumna.setStyle("-fx-alignment: center;");
         empleadosTableView.getColumns().clear();
         empleadosTableView.getColumns().addAll(cedulaColumna, nombreColumna, 
                 apellidoColumna, departamentoColumna, cargoColumna, sueldoColumna);
         
         editable = true;
-        aumentoButton.setText("Aumento Avanzado");
+        buttonAumento.setVisible(true);
+        buttonGuardar.setVisible(false);
         filterField.clear();
         setEmpresa(empresa);
     }
@@ -538,7 +548,8 @@ public class SueldoEmpleadosController implements Initializable {
         
         editable = false;
         filtro();
-        aumentoButton.setText("Guardar");
+        buttonAumento.setVisible(false);
+        buttonGuardar.setVisible(true);
         
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -613,7 +624,8 @@ public class SueldoEmpleadosController implements Initializable {
         
         editable = false;
         filtro();
-        aumentoButton.setText("Guardar");
+        buttonAumento.setVisible(false);
+        buttonGuardar.setVisible(true);
         
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -679,7 +691,8 @@ public class SueldoEmpleadosController implements Initializable {
         
         editable = false;
         filtro();
-        aumentoButton.setText("Guardar");
+        buttonAumento.setVisible(false);
+        buttonGuardar.setVisible(true);
         
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -753,7 +766,8 @@ public class SueldoEmpleadosController implements Initializable {
         
         editable = false;
         filtro();
-        aumentoButton.setText("Guardar");
+        buttonAumento.setVisible(false);
+        buttonGuardar.setVisible(true);
         
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -1090,6 +1104,71 @@ public class SueldoEmpleadosController implements Initializable {
                 }
             });
             return row ;
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAumento.setTooltip(
+            new Tooltip("Aumento avanzado")
+        );
+        buttonAumento.setOnMouseEntered((MouseEvent t) -> {
+            buttonAumento.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/aumento.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAumento.setOnMouseExited((MouseEvent t) -> {
+            buttonAumento.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/aumento.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonGuardar.setTooltip(
+            new Tooltip("Guardar")
+        );
+        buttonGuardar.setOnMouseEntered((MouseEvent t) -> {
+            buttonGuardar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/guardar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonGuardar.setOnMouseExited((MouseEvent t) -> {
+            buttonGuardar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/guardar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

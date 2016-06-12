@@ -5,22 +5,13 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
-import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
-import aplicacion.control.reports.ReporteDeudasVarios;
 import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
-import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
-import hibernate.dao.PagoMesDAO;
 import hibernate.dao.PagoMesItemDAO;
-import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
-import hibernate.model.PagoMes;
 import hibernate.model.PagoMesItem;
-import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,9 +41,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -104,6 +97,12 @@ public class IessEmpleadosController implements Initializable {
     @FXML 
     private TableColumn iessColumna;
     
+    @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonImprimir;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
@@ -120,7 +119,7 @@ public class IessEmpleadosController implements Initializable {
     }
     
     @FXML
-    private void returnConfiguracion(ActionEvent event) {
+    private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
@@ -342,6 +341,37 @@ public class IessEmpleadosController implements Initializable {
                 }
             });
             return row ;
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

@@ -6,11 +6,8 @@
 package aplicacion.control;
 
 import aplicacion.control.reports.ReporteDeudas;
-import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
@@ -21,7 +18,6 @@ import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,9 +52,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -72,7 +70,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -109,6 +106,12 @@ public class DeudasController implements Initializable {
     
     @FXML
     private TableColumn<Deuda, Deuda> borrarColumna;
+    
+    @FXML
+    private Button buttonAgregar;
+    
+    @FXML
+    private Button buttonImprimir;
     
     @FXML
     private TableView deudasTableView;
@@ -566,6 +569,40 @@ public class DeudasController implements Initializable {
                 }
             });
             return row ;
+        });
+        buttonAgregar.setTooltip(
+            new Tooltip("Agregar deuda")
+        );
+        buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAgregar.setOnMouseExited((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     
