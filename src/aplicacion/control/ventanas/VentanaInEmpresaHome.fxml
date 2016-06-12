@@ -9,31 +9,70 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.InEmpresaController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.InEmpresaController">
     <children>
-        <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#goHome" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
-        <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
+      <AnchorPane layoutY="150.0" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" />
+      <Pane layoutX="90.0" layoutY="100.0" prefHeight="500.0" prefWidth="620.0" style="-fx-background-color: white;">
+         <children>
+              <Button fx:id="buttonEmpleados" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="160.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="EMPLEADOS" textFill="WHITE" />
+            <MenuButton fx:id="buttonEdicion" layoutX="35.0" layoutY="250.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" GETIÓN" textAlignment="CENTER" textFill="WHITE">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
+              <Button fx:id="buttonConfiguracion" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="340.0" mnemonicParsing="false" onAction="#verConfiguracion" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="CONFIGURAR" textFill="WHITE" />
+            <MenuButton fx:id="buttonHoras" layoutX="405.0" layoutY="160.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   HORAS" textAlignment="CENTER" textFill="WHITE">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </MenuButton>
+            <MenuButton fx:id="buttonRoles" layoutX="405.0" layoutY="250.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   ROLES" textAlignment="CENTER" textFill="WHITE">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
+            <MenuButton fx:id="buttonPagos" layoutX="405.0" layoutY="340.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   PAGOS" textAlignment="CENTER" textFill="WHITE">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
+              <Label fx:id="totalLabel" layoutX="35.0" layoutY="65.0" text="Total de empleados: 0">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <GridPane layoutX="403.0" layoutY="8.0" prefHeight="30.0" prefWidth="200.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                    <Label fx:id="numeracionLabel" alignment="CENTER_RIGHT" text="Nruc: 0000000000" GridPane.halignment="RIGHT">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </GridPane>
+            <Label fx:id="labelEmpresaSeguridad" layoutX="35.0" layoutY="35.0" text="Empresa de Seguridad">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+        <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <Line endX="660.0" layoutX="117.0" layoutY="40.0" startX="-100.0">
-         <stroke>
-            <LinearGradient endX="1.0" endY="1.0" startX="0.5523809523809524">
-               <stops>
-                  <Stop color="BLACK" />
-                  <Stop color="WHITE" offset="1.0" />
-               </stops>
-            </LinearGradient>
-         </stroke></Line>
-      <Label fx:id="empresaLabel" layoutX="61.0" layoutY="7.0" prefHeight="27.0" prefWidth="724.0" text="Nombre de la empresa seleccionada" textFill="WHITE" wrapText="true">
+      <Label fx:id="empresaLabel" layoutX="90.0" layoutY="50.0" prefHeight="27.0" prefWidth="620.0" text="Nombre de la empresa seleccionada" textFill="WHITE" wrapText="true">
          <font>
-            <Font name="System Bold" size="18.0" />
+            <Font name="Arial Rounded MT Bold" size="18.0" />
          </font></Label>
-        <Line endX="100.0" layoutX="132.0" layoutY="230.0" startX="-100.0" />
-        <Label layoutX="46.0" layoutY="207.0" text="Consulta y Edición para pagos" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font></Label>
-        <Label fx:id="totalLabel" layoutX="26.0" layoutY="95.0" style="-fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); -fx-label-padding: 5;" text="Total de empleados: 0" textFill="WHITE" />
-        <Label fx:id="numeracionLabel" layoutX="26.0" layoutY="147.0" style="-fx-background-color: linear-gradient(rgba(255, 255, 255, 0.3), rgba(0, 0, 0, 0.2)); -fx-label-padding: 5;" text="RUC: 000000000" textFill="WHITE" />
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
             <children>
                <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
@@ -48,44 +87,5 @@
                </Button>
             </children>
         </Pane>
-        <Label layoutX="587.0" layoutY="339.0" text="Rol de pago" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font></Label>
-        <Line endX="100.0" layoutX="670.0" layoutY="363.0" startX="-100.0" />
-        <Label layoutX="576.0" layoutY="178.0" text="Gestion de horas y dias trabajados" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="12.0" />
-         </font></Label>
-        <Line endX="100.0" layoutX="670.0" layoutY="206.0" startX="-100.0" />
-        <Button layoutX="600.0" layoutY="228.0" mnemonicParsing="false" onAction="#rolEmpleado" prefHeight="25.0" prefWidth="150.0" text="Por Empleado" />
-        <Button layoutX="601.0" layoutY="278.0" mnemonicParsing="false" onAction="#rolCliente" prefHeight="25.0" prefWidth="150.0" text="Por Cliente" />
-        <Button layoutX="601.0" layoutY="434.0" mnemonicParsing="false" onAction="#mostrarRolIndividual" prefHeight="25.0" prefWidth="150.0" text="Rol Individual" />
-        <Button layoutX="601.0" layoutY="387.0" mnemonicParsing="false" onAction="#mostrarRolCliente" prefHeight="25.0" prefWidth="150.0" text="Rol Cliente" />
-      <GridPane layoutX="38.0" layoutY="242.0" prefHeight="308.0" prefWidth="188.0">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-              <Button mnemonicParsing="false" onAction="#verSueldoEmpleados" prefHeight="25.0" prefWidth="150.0" text="Sueldos" GridPane.halignment="CENTER" />
-              <Button mnemonicParsing="false" onAction="#verQuincenalEmpleados" prefHeight="25.0" prefWidth="150.0" text="Adelantos Quincenal" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-              <Button mnemonicParsing="false" onAction="#verIessEmpleados" prefHeight="25.0" prefWidth="150.0" text="IESS" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
-              <Button mnemonicParsing="false" onAction="#verActuarialesEmpleados" prefHeight="25.0" prefWidth="150.0" text="Actuariales" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-              <Button mnemonicParsing="false" onAction="#verDeudasEmpleados" prefHeight="25.0" prefWidth="150.0" text="Deudas" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
-              <Button mnemonicParsing="false" onAction="#verDecimosEmpleados" prefHeight="25.0" prefWidth="150.0" text="Decimos" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-         </children>
-      </GridPane>
-        <Button layoutX="600.0" layoutY="64.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="150.0" text="Empleados" />
-        <Button layoutX="600.0" layoutY="108.0" mnemonicParsing="false" onAction="#verConfiguracion" prefHeight="25.0" prefWidth="150.0" text="Configración" />
-      <Button layoutX="601.0" layoutY="480.0" mnemonicParsing="false" onAction="#quincenalPagos" prefHeight="25.0" prefWidth="150.0" text="Quincenal" />
-      <Button layoutX="601.0" layoutY="525.0" mnemonicParsing="false" onAction="#mesualPagos" prefHeight="25.0" prefWidth="150.0" text="Mensual" />
     </children>
 </AnchorPane>

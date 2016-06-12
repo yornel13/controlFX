@@ -68,6 +68,27 @@ public class EmpleadosController implements Initializable {
     @FXML
     private Button homeButton;
     
+    @FXML 
+    private TableColumn cedulaColumna;
+    
+    @FXML 
+    private TableColumn nombreColumna;
+    
+    @FXML 
+    private TableColumn apellidoColumna;
+    
+    @FXML 
+    private TableColumn telefonoColumna;
+    
+    @FXML 
+    private TableColumn departamentoColumna;
+    
+    @FXML 
+    private TableColumn cargoColumna;
+    
+    @FXML
+    private TableColumn<EmpleadoTable, EmpleadoTable>  borrarColumna;
+    
     @FXML
     private TableView empleadosTableView;
     
@@ -319,34 +340,20 @@ public class EmpleadosController implements Initializable {
            empleadosTableView.setItems(data);
         }
           
-        TableColumn cedula = new TableColumn("Cedula");
-        cedula.setMinWidth(80);
-        cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
-        TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(140);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
        
-        TableColumn apellido = new TableColumn("Apellido");
-        apellido.setMinWidth(140);
-        apellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
+        apellidoColumna.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         
-        TableColumn telefono = new TableColumn("Telefono");
-        telefono.setMinWidth(100);
-        telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        telefonoColumna.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
-        TableColumn departamento = new TableColumn("Departamento");
-        departamento.setMinWidth(140);
-        departamento.setCellValueFactory(new PropertyValueFactory<>("departamento"));
+        departamentoColumna.setCellValueFactory(new PropertyValueFactory<>("departamento"));
         
-        TableColumn cargo = new TableColumn("Cargo");
-        cargo.setMinWidth(120);
-        cargo.setCellValueFactory(new PropertyValueFactory<>("cargo"));
+        cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
-        TableColumn<EmpleadoTable, EmpleadoTable> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
-        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        delete.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
+        borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        borrarColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
             private final Button deleteButton = new Button("Borrar");
 
             @Override
@@ -364,9 +371,6 @@ public class EmpleadosController implements Initializable {
                 });
             }
         });
-        
-        empleadosTableView.getColumns().addAll(cedula, nombre, apellido, 
-                telefono, departamento, cargo, delete);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
@@ -415,7 +419,6 @@ public class EmpleadosController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.FALSE);
-        empleadosTableView.getColumns().clear(); 
     } 
     
     // Login items

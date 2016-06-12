@@ -9,11 +9,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RegistrarEmpleadoController">
+<TabPane style="-fx-background-color: #039BE5;" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RegistrarEmpleadoController">
    <tabs>
       <Tab text="Detalles Personales">
          <content>
-            <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2196F3;">
+            <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #039BE5;">
                <children>
                   <Label layoutX="25.0" layoutY="38.0" text="Nombres" textFill="WHITE" />
                   <Label layoutX="25.0" layoutY="78.0" text="Apellidos" textFill="WHITE" />
@@ -47,7 +47,7 @@
       </Tab>
       <Tab text="Detalles Empresariales">
          <content>
-            <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #2196F3;">
+            <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #039BE5;">
                <children>
                   <Label layoutX="25.0" layoutY="38.0" text="Departamento" textFill="WHITE" />
                   <Label layoutX="25.0" layoutY="78.0" text="Cargo" textFill="WHITE" />

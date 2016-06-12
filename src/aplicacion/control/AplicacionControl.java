@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Auditar;
+import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.model.Cliente;
@@ -123,11 +124,12 @@ public class AplicacionControl extends Application {
         dialogStage.setTitle("No hay usuario");
         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
         children(new Text("Debes ingresar tu usuario primero."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
+        buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
@@ -316,11 +318,11 @@ public class AplicacionControl extends Application {
     }
    
     public void mostrarInEmpresa(Empresa empresa) {
-        if (permisos == null) {
-           noLogeado();
-       } else {
-           if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
-               try {
+        if (permisos == null && false) { // TODO. quitar false
+            noLogeado();
+        } else {
+            if (true || permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) { // TODO. quitar true
+                try {
                     stagePrincipal.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaInEmpresaHome.fxml"));
                     AnchorPane ventanaInEmpresa = (AnchorPane) loader.load();
@@ -332,8 +334,8 @@ public class AplicacionControl extends Application {
                     ventana.setWidth(800);
                     ventana.setHeight(628);
                     ventana.initOwner(stagePrincipal);
-                    String image = AplicacionControl.class.getResource("imagenes/fondo_in_empresa.jpg").toExternalForm();
-                    ventanaInEmpresa.setStyle("-fx-background-image: url('" + image + "'); " + "-fx-background-position: center center; " + "-fx-background-repeat: stretch;");
+                    //String image = AplicacionControl.class.getResource("imagenes/fondo_1.jpg").toExternalForm();
+                    //ventanaInEmpresa.setStyle("-fx-background-image: url('" + image + "'); " + "-fx-background-position: center center; " + "-fx-background-repeat: stretch;");
                     Scene scene = new Scene(ventanaInEmpresa);
                     ventana.setScene(scene);
                     InEmpresaController controller = loader.getController();
@@ -357,7 +359,7 @@ public class AplicacionControl extends Application {
                     //tratar la excepción
                 }
            } else {
-              noPermitido();
+               noPermitido();
            }
        }
     }

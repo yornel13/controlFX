@@ -5,6 +5,8 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.MaterialDesignButton;
+import aplicacion.control.util.Roboto;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
@@ -25,7 +27,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -35,7 +40,7 @@ import javafx.stage.Stage;
  * @author Yornel
  */
 public class InEmpresaController implements Initializable {
-
+    
     Empresa empresa;
 
     private ArrayList<Usuario> empleados;
@@ -57,7 +62,7 @@ public class InEmpresaController implements Initializable {
     private Button homeButton;
 
     @FXML
-    private Label labelTest;
+    private Label labelEmpresaSeguridad;
 
     @FXML
     private Label numeracionLabel;
@@ -69,8 +74,26 @@ public class InEmpresaController implements Initializable {
     private Label totalLabel;
 
     @FXML
-    private TextField cedulaField;
-
+    private Button buttonEmpleados;
+    
+    @FXML
+    private Button buttonConfiguracion;
+    
+    @FXML
+    private MenuButton buttonHoras;
+    
+    @FXML
+    private MenuButton buttonPagos;
+    
+    @FXML
+    private MenuButton buttonRoles;
+    
+    @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private MenuButton buttonEdicion;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -164,31 +187,132 @@ public class InEmpresaController implements Initializable {
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
         empresaLabel.setText(empresa.getNombre());
-        numeracionLabel.setText("RUC: " + empresa.getNumeracion());
+        empresaLabel.setFont(Roboto.MEDIUM(18));
+        numeracionLabel.setText("Nruc: " + empresa.getNumeracion());
+        numeracionLabel.setFont(Roboto.REGULAR(14));
+        labelEmpresaSeguridad.setFont(Roboto.REGULAR(14));
 
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         empleados = new ArrayList<>();
         empleados.addAll(usuariosDAO.findByEmpresaIdActivo(empresa.getId()));
+        totalLabel.setFont(Roboto.REGULAR(14));
         totalLabel.setText("Total de empleados: " + empleados.size());
     }
-
-    public void guardarRegistro(Usuario empleado, Integer suplementarias, Integer sobreTiempo, Cliente cliente) throws ParseException {
-        ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
-        ControlEmpleado controlEmpleado = new ControlEmpleado();
-        controlEmpleado = new ControlEmpleado();
-        controlEmpleado.setFecha(getToday());
-        controlEmpleado.setUsuario(empleado);
-        controlEmpleado.setHorasExtras(sobreTiempo);
-        controlEmpleado.setHorasSuplementarias(suplementarias);
-        controlEmpleado.setCliente(cliente);
-        controlEmpleadoDAO.save(controlEmpleado);
-        labelTest.setText("Registro Completado!!!");
-        cedulaField.setText("");
-    }
-
+ 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // nada aqui por ahora
+    public void initialize(URL url, ResourceBundle rb) { 
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_guardia.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonEmpleados.setGraphic(imageView);
+            buttonEmpleados.setFont(Roboto.MEDIUM(15));
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_configuracion.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonConfiguracion.setGraphic(imageView);
+            buttonConfiguracion.setFont(Roboto.MEDIUM(15));
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_horas.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonHoras.setGraphic(imageView);
+            buttonHoras.setFont(Roboto.MEDIUM(15));
+            buttonHoras.getItems().clear();
+            MenuItem menuItemEmpleado = new MenuItem("Por Empleado");
+            buttonHoras.getItems().add(menuItemEmpleado);
+            MenuItem menuItemCliente = new MenuItem("Por Cliente");
+            buttonHoras.getItems().add(menuItemCliente);
+            menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
+            });
+             menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
+            });
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_pagos.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonPagos.setGraphic(imageView);
+            buttonPagos.setFont(Roboto.MEDIUM(15));
+            buttonPagos.getItems().clear();
+            MenuItem menuItemQuincenal = new MenuItem("Quincenal");
+            buttonPagos.getItems().add(menuItemQuincenal);
+            MenuItem menuItemMensual = new MenuItem("Mensual");
+            buttonPagos.getItems().add(menuItemMensual);
+            menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarPagoQuincenal(empresa, stagePrincipal);
+            });
+             menuItemMensual.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarPagoMensual(empresa, stagePrincipal);
+            });
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_roles.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonRoles.setGraphic(imageView);
+            buttonRoles.setFont(Roboto.MEDIUM(15));
+            buttonRoles.getItems().clear();
+            MenuItem menuItemCliente = new MenuItem("Cliente");
+            buttonRoles.getItems().add(menuItemCliente);
+            MenuItem menuItemEmpleado = new MenuItem("Individual");
+            buttonRoles.getItems().add(menuItemEmpleado);
+            menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
+            });
+             menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarEmpleadosParaRol(empresa, stagePrincipal);
+            });
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_edicion.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonEdicion.setGraphic(imageView);
+            buttonEdicion.setFont(Roboto.MEDIUM(15));
+            buttonEdicion.getItems().clear();
+            MenuItem menuItemQuincenal = new MenuItem("Adelanto Quincenal");
+            buttonEdicion.getItems().add(menuItemQuincenal);
+            MenuItem menuItemSueldo = new MenuItem("Sueldo");
+            buttonEdicion.getItems().add(menuItemSueldo);
+            MenuItem menuItemDecimos = new MenuItem("Acumulacion Decimos");
+            buttonEdicion.getItems().add(menuItemDecimos);
+            MenuItem menuItemActuariales = new MenuItem("Actuariales");
+            buttonEdicion.getItems().add(menuItemActuariales);
+            MenuItem menuItemDeudas = new MenuItem("Deudas");
+            buttonEdicion.getItems().add(menuItemDeudas);
+            MenuItem menuItemIess = new MenuItem("IESS Acumulado");
+            buttonEdicion.getItems().add(menuItemIess);
+            menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
+            });
+            menuItemSueldo.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarSueldoEmpleados(empresa, stagePrincipal);
+            });
+            menuItemDecimos.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarDecimosEmpleados(empresa, stagePrincipal);
+            });
+            menuItemActuariales.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarActuarialesEmpleados(empresa, stagePrincipal);
+            });
+            menuItemDeudas.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarDeudasEmpleados(empresa, stagePrincipal);
+            });
+            menuItemIess.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
+            });
+        }
     }
 
     // obtener dia sin horas
