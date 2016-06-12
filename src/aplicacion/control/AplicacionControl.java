@@ -36,8 +36,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.WindowEvent;
 import static javafx.application.Application.launch;
 import javafx.application.Platform;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.paint.Color;
 
 /**
  *
@@ -145,11 +148,12 @@ public class AplicacionControl extends Application {
         dialogStage.setTitle("Lo siento!");
         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
         children(new Text("Ya no se puede realizar esta acción."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
+        buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
@@ -165,11 +169,12 @@ public class AplicacionControl extends Application {
         dialogStage.setTitle("No permitido");
         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
         children(new Text("No tienes permiso para ingresar aqui."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
+        buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
@@ -185,11 +190,12 @@ public class AplicacionControl extends Application {
         dialogStage.setTitle("Error de Base de Datos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
         children(new Text("No se pudo conectar al base de datos."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
+        buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
@@ -205,8 +211,8 @@ public class AplicacionControl extends Application {
         dialogStage.setTitle("Precaución");
         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("Si");
-        Button buttonNo = new Button("no");
+        MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
         HBox hBox = HBoxBuilder.create()
                 .spacing(10.0) //In case you are using HBoxBuilder
                 .padding(new Insets(5, 5, 5, 5))
@@ -232,8 +238,17 @@ public class AplicacionControl extends Application {
     }
     
     private void insertarDatosDeUsuarios(Button login, Label usuarioLogin) {
-       this.login = login;
-       this.usuarioLogin = usuarioLogin;
+        this.login = login;
+        this.usuarioLogin = usuarioLogin;
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(3.0f);
+        ds.setColor(Color.valueOf("#039BE5"));
+        this.login.setOnMouseEntered((MouseEvent t) -> {
+            this.login.setEffect(ds);
+        });
+        this.login.setOnMouseExited((MouseEvent t) -> {
+            this.login.setEffect(null);
+        });
        if (permisos != null) {
            login.setText("Salir");
            usuarioLogin.setText(permisos.getUsuario().getNombre() + 
@@ -321,7 +336,7 @@ public class AplicacionControl extends Application {
         if (permisos == null && false) { // TODO. quitar false
             noLogeado();
         } else {
-            if (true || permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) { // TODO. quitar true
+            if (true || permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.VER)) { // TODO. quitar true
                 try {
                     stagePrincipal.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaInEmpresaHome.fxml"));
@@ -368,7 +383,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.CREAR)) {
+            if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.CREAR)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpresa.fxml"));
                     AnchorPane ventanaRegistrarEmpresa = (AnchorPane) loader.load();
@@ -399,7 +414,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleados.fxml"));
@@ -445,7 +460,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaActuarialesEmpleados.fxml"));
@@ -491,7 +506,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaQuincenalEmpleados.fxml"));
@@ -536,7 +551,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDecimosEmpleados.fxml"));
@@ -581,7 +596,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudasEmpleados.fxml"));
@@ -626,7 +641,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaIessEmpleados.fxml"));
@@ -671,7 +686,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaSueldoEmpleados.fxml"));
@@ -716,7 +731,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleadosTodos.fxml"));
@@ -761,7 +776,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.CREAR)) {
+            if (permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.CREAR)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
                     TabPane ventanaRegistrarEmpleado = (TabPane) loader.load();
@@ -793,7 +808,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleado.fxml"));
                     AnchorPane ventanaEmpleado = (AnchorPane) loader.load();
@@ -825,7 +840,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+            if (permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.EDITAR)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpleado()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpleado.fxml"));
@@ -858,7 +873,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresas.fxml"));
@@ -903,7 +918,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
@@ -949,7 +964,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
@@ -994,7 +1009,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesParaRol.fxml"));
@@ -1038,7 +1053,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpleadosParaRol.fxml"));
@@ -1159,7 +1174,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEmpresa.fxml"));
                     AnchorPane ventanaEmpresa = (AnchorPane) loader.load();
@@ -1192,7 +1207,7 @@ public class AplicacionControl extends Application {
          if (permisos == null) {
            noLogeado();
          } else {
-            if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+            if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.EDITAR)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostarEditarEmpresa()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarEmpresa.fxml"));
@@ -1225,7 +1240,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.CREAR)) {
+            if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.CREAR)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarCliente.fxml"));
                     AnchorPane ventanaRegistrarCliente = (AnchorPane) loader.load();
@@ -1256,7 +1271,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.VER)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarCliente()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaCliente.fxml"));
@@ -1290,7 +1305,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.EDITAR)) {
+            if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.EDITAR)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarEditarCliente()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarCliente.fxml"));
@@ -1323,7 +1338,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
+           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleados.fxml"));
@@ -1368,7 +1383,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
+           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosCliente.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
@@ -1402,7 +1417,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_HORAS_EMPLEADO, Permisos.Nivel.VER)) {
+           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosSinCliente.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
@@ -1436,7 +1451,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
+            if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
                 try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
@@ -1474,7 +1489,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
+           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoCliente.fxml"));
@@ -1513,7 +1528,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-           if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
+           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
                try {
                     System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoSinCliente.fxml"));
@@ -1649,7 +1664,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
        } else {
-           if (permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.VER)) {
+           if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.EDITAR)) {
                try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracionEmpresa.fxml"));
@@ -1781,7 +1796,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.PAGOS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagosTotalEmpleado.fxml"));
@@ -1826,7 +1841,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolCliente.fxml"));
@@ -1872,7 +1887,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolIndividual.fxml"));
@@ -1919,7 +1934,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolClienteEmpleado.fxml"));
                     AnchorPane ventanaAuditar = (AnchorPane) loader.load();
@@ -1952,7 +1967,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.PAGOS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoQuincenal.fxml"));
@@ -1997,7 +2012,7 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.PAGOS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoMensual.fxml"));

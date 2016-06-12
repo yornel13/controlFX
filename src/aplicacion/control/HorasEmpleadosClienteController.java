@@ -184,7 +184,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.VER)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
               
                aplicacionControl.mostrarRolDePagoCliente(empleado, cliente, inicio, fin);
                   

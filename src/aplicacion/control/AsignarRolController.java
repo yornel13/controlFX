@@ -46,7 +46,10 @@ public class AsignarRolController implements Initializable {
     private ToggleGroup grupoEmpresas; 
     
     @FXML
-    private ToggleGroup grupoClientes; 
+    private ToggleGroup grupoClientes;
+    
+    @FXML
+    private ToggleGroup grupoGestion;
     
     @FXML
     private ToggleGroup grupoHoras; 
@@ -100,7 +103,7 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoEmpleados.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_EMPLEADOS);
+                rol.setNombre(Permisos.EMPLEADOS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -114,7 +117,7 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoEmpresas.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_EMPRESAS);
+                rol.setNombre(Permisos.EMPRESAS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -128,7 +131,21 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoClientes.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_CLIENTES);
+                rol.setNombre(Permisos.CLIENTES);
+                rol.setPermiso(radioButton.getText().toLowerCase());
+                rol.setActivo(Boolean.TRUE);
+                rol.setUsuario(usuario);
+                rolesDAO.save(rol);
+                
+                permisos ++;
+
+            } 
+            if (grupoGestion.getSelectedToggle() != null) {
+
+                RadioButton radioButton = (RadioButton) grupoGestion.getSelectedToggle();
+
+                Roles rol = new Roles();
+                rol.setNombre(Permisos.GESTION);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -142,7 +159,7 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoHoras.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_HORAS_EMPLEADO);
+                rol.setNombre(Permisos.HORAS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -156,7 +173,7 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoRol.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_ROL_DE_PAGO);
+                rol.setNombre(Permisos.ROLES);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -171,7 +188,7 @@ public class AsignarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoPagos.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_PAGOS);
+                rol.setNombre(Permisos.PAGOS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -241,6 +258,9 @@ public class AsignarRolController implements Initializable {
             }
             if (grupoEmpresas.getSelectedToggle() != null){
                 ((RadioButton) grupoEmpresas.getSelectedToggle()).setSelected(false);
+            }
+            if (grupoGestion.getSelectedToggle() != null){
+                ((RadioButton) grupoGestion.getSelectedToggle()).setSelected(false);
             }
             if (grupoHoras.getSelectedToggle() != null){
                 ((RadioButton) grupoHoras.getSelectedToggle()).setSelected(false);

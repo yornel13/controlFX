@@ -133,7 +133,7 @@ public class DeudasEmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudas.fxml"));
                     AnchorPane ventanaDeudas = (AnchorPane) loader.load();

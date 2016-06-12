@@ -129,7 +129,7 @@ public class ConfiguracionEmpresaController implements Initializable {
         if (aplicacionControl.permisos == null) {
             aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.EDITAR)) {
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
@@ -182,7 +182,7 @@ public class ConfiguracionEmpresaController implements Initializable {
         if (aplicacionControl.permisos == null) {
             aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.EDITAR)) {
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
@@ -235,7 +235,7 @@ public class ConfiguracionEmpresaController implements Initializable {
         if (aplicacionControl.permisos == null) {
             aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.EDITAR)) {
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
@@ -285,7 +285,7 @@ public class ConfiguracionEmpresaController implements Initializable {
         if (aplicacionControl.permisos == null) {
             aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.EDITAR)) {
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);

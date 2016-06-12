@@ -178,7 +178,7 @@ public class QuincenalEmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                 try {
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -799,7 +799,7 @@ public class QuincenalEmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                 try {
                     
                     Stage dialogStage = new Stage();

@@ -381,7 +381,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             if (aplicacionControl.permisos == null) {
                 aplicacionControl.noLogeado();
             } else {
-                if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
+                if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                     try {
                         FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaGestionDeudas.fxml"));
                         AnchorPane ventanaDeudas = (AnchorPane) loader.load();

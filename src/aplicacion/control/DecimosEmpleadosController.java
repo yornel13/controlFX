@@ -128,7 +128,7 @@ public class DecimosEmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                 try {
                     
                     Stage dialogStage = new Stage();
@@ -181,7 +181,7 @@ public class DecimosEmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_PAGOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                 try {
                     
                     Stage dialogStage = new Stage();

@@ -95,7 +95,7 @@ public class ClientesController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_CLIENTES, Permisos.Nivel.ELIMINAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.ELIMINAR)) {
                 
                 if (new ControlEmpleadoDAO().findAllByClienteId(cliente.getId()).isEmpty()) { 
                     

@@ -114,7 +114,7 @@ public class GestionDeudasController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.CREAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.CREAR)) {
                
                nuevaDeuda();
                   
@@ -134,7 +134,7 @@ public class GestionDeudasController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
                
                 ArrayList<DeudaTipo> deudaTipos = new ArrayList<>();
                 deudaTipos.addAll(new DeudaTipoDAO().findAll());

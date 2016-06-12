@@ -48,13 +48,13 @@ public class Permisos {
         return false;
     }
     
-    public static final String A_EMPLEADOS = "empleados";
-    public static final String A_EMPRESAS = "empresas";
-    public static final String A_CLIENTES = "clientes";
-    public static final String A_HORAS_EMPLEADO = "horas_empleado";
-    public static final String A_ROL_DE_PAGO = "rol_de_pago";
-    public static final String A_ROL_DE_USUARIO = "rol_de_usuario";
-    public static final String A_PAGOS = "pagos";
+    public static final String EMPLEADOS = "empleados";
+    public static final String EMPRESAS = "empresas";
+    public static final String CLIENTES = "clientes";
+    public static final String GESTION = "gestion";
+    public static final String HORAS = "horas";
+    public static final String ROLES = "rolES";
+    public static final String PAGOS = "pagos";
     public static final String TOTAL = "total";
     
     public static class Nivel {

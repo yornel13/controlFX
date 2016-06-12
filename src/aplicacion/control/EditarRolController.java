@@ -55,6 +55,9 @@ public class EditarRolController implements Initializable {
     private ToggleGroup grupoClientes; 
     
     @FXML
+    private ToggleGroup grupoGestion; 
+    
+    @FXML
     private ToggleGroup grupoHoras; 
     
     @FXML
@@ -100,7 +103,7 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoEmpleados.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_EMPLEADOS);
+                rol.setNombre(Permisos.EMPLEADOS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -114,7 +117,7 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoEmpresas.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_EMPRESAS);
+                rol.setNombre(Permisos.EMPRESAS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -128,7 +131,21 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoClientes.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_CLIENTES);
+                rol.setNombre(Permisos.CLIENTES);
+                rol.setPermiso(radioButton.getText().toLowerCase());
+                rol.setActivo(Boolean.TRUE);
+                rol.setUsuario(usuario);
+                rolesDAO.save(rol);
+                
+                permisos ++;
+
+            } 
+            if (grupoGestion.getSelectedToggle() != null) {
+
+                RadioButton radioButton = (RadioButton) grupoGestion.getSelectedToggle();
+
+                Roles rol = new Roles();
+                rol.setNombre(Permisos.GESTION);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -142,7 +159,7 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoHoras.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_HORAS_EMPLEADO);
+                rol.setNombre(Permisos.HORAS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -156,7 +173,7 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoRol.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_ROL_DE_PAGO);
+                rol.setNombre(Permisos.ROLES);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -170,7 +187,7 @@ public class EditarRolController implements Initializable {
                 RadioButton radioButton = (RadioButton) grupoPagos.getSelectedToggle();
 
                 Roles rol = new Roles();
-                rol.setNombre(Permisos.A_PAGOS);
+                rol.setNombre(Permisos.PAGOS);
                 rol.setPermiso(radioButton.getText().toLowerCase());
                 rol.setActivo(Boolean.TRUE);
                 rol.setUsuario(usuario);
@@ -245,6 +262,9 @@ public class EditarRolController implements Initializable {
             if (grupoEmpresas.getSelectedToggle() != null){
                 ((RadioButton) grupoEmpresas.getSelectedToggle()).setSelected(false);
             }
+            if (grupoGestion.getSelectedToggle() != null){
+                ((RadioButton) grupoGestion.getSelectedToggle()).setSelected(false);
+            }
             if (grupoHoras.getSelectedToggle() != null){
                 ((RadioButton) grupoHoras.getSelectedToggle()).setSelected(false);
             }
@@ -274,7 +294,7 @@ public class EditarRolController implements Initializable {
                 controlTotal.setSelected(true);
                 onSetControlTotal(null);
                 break;
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_EMPLEADOS)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.EMPLEADOS)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoEmpleados.getToggles().get(0).setSelected(true);
@@ -289,7 +309,7 @@ public class EditarRolController implements Initializable {
                         grupoEmpleados.getToggles().get(3).setSelected(true);
                         break;
                 }
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_CLIENTES)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.CLIENTES)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoClientes.getToggles().get(0).setSelected(true);
@@ -304,7 +324,7 @@ public class EditarRolController implements Initializable {
                         grupoClientes.getToggles().get(3).setSelected(true);
                         break;
                 }
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_EMPRESAS)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.EMPRESAS)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoEmpresas.getToggles().get(0).setSelected(true);
@@ -319,7 +339,22 @@ public class EditarRolController implements Initializable {
                         grupoEmpresas.getToggles().get(3).setSelected(true);
                         break;
                 }
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_ROL_DE_PAGO)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.GESTION)) {
+                switch (Permisos.getNivel(rol.getPermiso())) {
+                    case 1:
+                        grupoGestion.getToggles().get(0).setSelected(true);
+                        break;
+                    case 2:
+                        grupoGestion.getToggles().get(1).setSelected(true);
+                        break;
+                    case 3:
+                        grupoGestion.getToggles().get(2).setSelected(true);
+                        break;
+                    case 4:
+                        grupoGestion.getToggles().get(3).setSelected(true);
+                        break;
+                }
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.ROLES)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoRol.getToggles().get(0).setSelected(true);
@@ -334,7 +369,7 @@ public class EditarRolController implements Initializable {
                         grupoRol.getToggles().get(3).setSelected(true);
                         break;
                 }
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_HORAS_EMPLEADO)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.HORAS)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoHoras.getToggles().get(0).setSelected(true);
@@ -349,7 +384,7 @@ public class EditarRolController implements Initializable {
                         grupoHoras.getToggles().get(3).setSelected(true);
                         break;
                 }
-            } else if (rol.getNombre().equalsIgnoreCase(Permisos.A_PAGOS)) {
+            } else if (rol.getNombre().equalsIgnoreCase(Permisos.PAGOS)) {
                 switch (Permisos.getNivel(rol.getPermiso())) {
                     case 1:
                         grupoPagos.getToggles().get(0).setSelected(true);

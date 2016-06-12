@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Roboto;
 import hibernate.dao.EmpresaDAO;
 import hibernate.model.Empresa;
 import java.io.IOException;
@@ -19,9 +20,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.Font;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 /**
@@ -39,7 +41,13 @@ public class PrincipalController implements Initializable {
     private ChoiceBox selector;
     
     @FXML
-    private Button configuracion;
+    private Button buttonGlobal;
+    
+    @FXML
+    private Button buttonEntrar;
+    
+    @FXML
+    private Label labelEmpresa;
     
     ArrayList<Empresa> empresas;
     
@@ -91,11 +99,35 @@ public class PrincipalController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        String image = AplicacionControl.class.getResource("imagenes/config_admin.png").toExternalForm();
+        buttonGlobal.setTooltip(
+            new Tooltip("Configuración Global")
+        );
+        buttonGlobal.setOnMouseEntered((MouseEvent t) -> {
+            buttonGlobal.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/global.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonGlobal.setOnMouseExited((MouseEvent t) -> {
+            buttonGlobal.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/global.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         
-        Image adminImage = new Image(image);
-        configuracion.setGraphic(new ImageView(adminImage));
-        configuracion.setStyle(Const.BACKGROUND_COLOR_SEMI_TRANSPARENT);
+        buttonEntrar.setFont(Roboto.MEDIUM(12));
+        buttonEntrar.setOnMouseEntered((MouseEvent t) -> {
+            buttonEntrar.setStyle("-fx-background-color: #E0E0E0;");
+        });
+        buttonEntrar.setOnMouseExited((MouseEvent t) -> {
+            buttonEntrar.setStyle("-fx-background-color: #039BE5;");
+        });
+        
+        labelEmpresa.setFont(Roboto.MEDIUM(14));
+        label.setFont(Roboto.MEDIUM(14));
+        
         
     }
     

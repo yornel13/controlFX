@@ -156,7 +156,7 @@ public class EmpleadoController implements Initializable {
         if (aplicacionControl.permisos == null) {
             aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.EDITAR)) {
                
                 aplicacionControl.mostrarEditarEmpleado(empleado);
                 stagePrincipal.close();

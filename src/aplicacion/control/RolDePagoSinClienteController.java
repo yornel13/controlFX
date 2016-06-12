@@ -340,7 +340,7 @@ public class RolDePagoSinClienteController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.CREAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasSinCliente.fxml"));
                     AnchorPane ventanaHoras = (AnchorPane) loader.load();
@@ -373,7 +373,7 @@ public class RolDePagoSinClienteController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.EDITAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.EDITAR)) {
                 try {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtrasSinCliente.fxml"));
                     AnchorPane ventanaHoras = (AnchorPane) loader.load();
@@ -415,7 +415,7 @@ public class RolDePagoSinClienteController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_ROL_DE_PAGO, Permisos.Nivel.ELIMINAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.ELIMINAR)) {
                
                 new ControlEmpleadoDAO().delete(controlEmpleado);
                 HibernateSessionFactory.getSession().flush();

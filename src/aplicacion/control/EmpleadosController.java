@@ -109,102 +109,6 @@ public class EmpleadosController implements Initializable {
         this.aplicacionControl = aplicacionControl;
     }
     
-    public void pagos(Usuario empleado) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Agregar Datos");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonActuariales = new Button("Actuariales");
-        Button buttonDeudas = new Button("Deudas");
-        Button buttonPermisos = new Button("Permisos");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Que desea editar?"), buttonActuariales, buttonDeudas).
-        alignment(Pos.CENTER).padding(new Insets(25)).build()));
-        buttonPermisos.setPrefWidth(150);
-        buttonDeudas.setPrefWidth(150);
-        buttonActuariales.setPrefWidth(150);
-        dialogStage.show();
-        buttonActuariales.setOnAction((ActionEvent e) -> {
-            mostrarEditarActuariales(empleado);
-            dialogStage.close();
-        });
-        buttonDeudas.setOnAction((ActionEvent e) -> {
-            mostrarDeudas(empleado);
-            dialogStage.close();
-        });
-        buttonPermisos.setOnAction((ActionEvent e) -> {
-            //aplicacionControl.mostrarEditarRol(identidad);
-            dialogStage.close();
-        });
-    }
-    
-    public void mostrarDeudas(Usuario empleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudas.fxml"));
-                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.setMaxWidth(608);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaDeudas);
-                    ventana.setScene(scene);
-                    DeudasController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(aplicacionControl);
-                    controller.setEmpleado(empleado);
-                    ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
-    }
-    
-    public void mostrarEditarActuariales(Usuario empleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.EDITAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarActuariales.fxml"));
-                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaHoras);
-                    ventana.setScene(scene);
-                    ActuarialesController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(aplicacionControl);
-                    controller.setEmpleado(empleado);
-                    ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
-    }
-    
     @FXML
     private void goHome(ActionEvent event) {
         aplicacionControl.mostrarVentanaPrincipal();
@@ -216,7 +120,7 @@ public class EmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.CREAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.CREAR)) {
                
                aplicacionControl.mostrarRegistrarEmpleado(empresa);
                   
@@ -230,7 +134,7 @@ public class EmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.VER)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.VER)) {
                
                aplicacionControl.mostrarEmpleado(empleado);
                   
@@ -271,7 +175,7 @@ public class EmpleadosController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPLEADOS, Permisos.Nivel.ELIMINAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.ELIMINAR)) {
                
                 if (new PagoDAO().findByUsuarioId(empleadoTable.getId()).isEmpty()) { 
                     

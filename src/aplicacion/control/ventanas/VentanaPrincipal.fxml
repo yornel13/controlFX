@@ -9,21 +9,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" fx:id="mainAppPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" snapToPixel="false" style="-fx-background-color: #2196F3;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PrincipalController">
+<AnchorPane id="AnchorPane" fx:id="mainAppPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" snapToPixel="false" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PrincipalController">
     <children>
         <Label fx:id="label" layoutX="55.0" layoutY="73.0" minHeight="16" minWidth="69" textFill="RED">
          <font>
             <Font size="14.0" />
          </font></Label>
-      <Label layoutX="557.0" layoutY="271.0" text="Empresa:" textFill="WHITE" textOverrun="CLIP">
+      <Label fx:id="labelEmpresa" layoutX="530.0" layoutY="276.0" text="Empresa" textFill="WHITE" textOverrun="CLIP">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="614.0" layoutY="359.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="91.0" text="Entrar" />
-      <Button fx:id="configuracion" layoutX="730.0" layoutY="5.0" mnemonicParsing="false" onAction="#onCLickConfiguration" prefHeight="32.0" prefWidth="32.0" />
-      <ChoiceBox fx:id="selector" layoutX="557.0" layoutY="310.0" onDragDetected="#onSelectMenuButtonItem" prefHeight="25.0" prefWidth="205.0" />
-      <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
+      <Button fx:id="buttonEntrar" layoutX="595.0" layoutY="359.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="25.0" prefWidth="91.0" style="-fx-background-color: #039BE5;" text="ENTRAR" textFill="WHITE" />
+      <ChoiceBox fx:id="selector" layoutX="520.0" layoutY="310.0" onDragDetected="#onSelectMenuButtonItem" prefHeight="25.0" prefWidth="240.0" />
+      <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;">
         <children>
            <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
               <font>
@@ -37,5 +36,6 @@
            </Button>
         </children>
      </Pane>
+      <Button fx:id="buttonGlobal" layoutX="735.0" layoutY="10.0" mnemonicParsing="false" onAction="#onCLickConfiguration" prefHeight="50.0" prefWidth="50.0" style="-fx-background-image: url('aplicacion/control/imagenes/global.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

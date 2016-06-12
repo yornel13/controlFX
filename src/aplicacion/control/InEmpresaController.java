@@ -197,6 +197,12 @@ public class InEmpresaController implements Initializable {
             imageView.setFitWidth(50);
             buttonEmpleados.setGraphic(imageView);
             buttonEmpleados.setFont(Roboto.MEDIUM(15));
+            buttonEmpleados.setOnMouseEntered((MouseEvent t) -> {
+                buttonEmpleados.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonEmpleados.setOnMouseExited((MouseEvent t) -> {
+                buttonEmpleados.setStyle("-fx-background-color: #039BE5;");
+            });
         }
         {
             Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_configuracion.png"));
@@ -205,6 +211,12 @@ public class InEmpresaController implements Initializable {
             imageView.setFitWidth(50);
             buttonConfiguracion.setGraphic(imageView);
             buttonConfiguracion.setFont(Roboto.MEDIUM(15));
+            buttonConfiguracion.setOnMouseEntered((MouseEvent t) -> {
+                buttonConfiguracion.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonConfiguracion.setOnMouseExited((MouseEvent t) -> {
+                buttonConfiguracion.setStyle("-fx-background-color: #039BE5;");
+            });
         }
         {
             Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_horas.png"));
@@ -223,6 +235,12 @@ public class InEmpresaController implements Initializable {
             });
              menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
+            });
+            buttonHoras.setOnMouseEntered((MouseEvent t) -> {
+                buttonHoras.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonHoras.setOnMouseExited((MouseEvent t) -> {
+                buttonHoras.setStyle("-fx-background-color: #039BE5;");
             });
         }
         {
@@ -243,6 +261,12 @@ public class InEmpresaController implements Initializable {
              menuItemMensual.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarPagoMensual(empresa, stagePrincipal);
             });
+            buttonPagos.setOnMouseEntered((MouseEvent t) -> {
+                buttonPagos.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonPagos.setOnMouseExited((MouseEvent t) -> {
+                buttonPagos.setStyle("-fx-background-color: #039BE5;");
+            });
         }
         {
             Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_roles.png"));
@@ -261,6 +285,12 @@ public class InEmpresaController implements Initializable {
             });
              menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarEmpleadosParaRol(empresa, stagePrincipal);
+            });
+            buttonRoles.setOnMouseEntered((MouseEvent t) -> {
+                buttonRoles.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonRoles.setOnMouseExited((MouseEvent t) -> {
+                buttonRoles.setStyle("-fx-background-color: #039BE5;");
             });
         }
         {
@@ -300,6 +330,12 @@ public class InEmpresaController implements Initializable {
             });
             menuItemIess.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
+            });
+            buttonEdicion.setOnMouseEntered((MouseEvent t) -> {
+                buttonEdicion.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonEdicion.setOnMouseExited((MouseEvent t) -> {
+                buttonEdicion.setStyle("-fx-background-color: #039BE5;");
             });
         }
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {

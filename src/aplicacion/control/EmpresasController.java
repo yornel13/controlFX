@@ -95,7 +95,7 @@ public class EmpresasController implements Initializable {
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.A_EMPRESAS, Permisos.Nivel.ELIMINAR)) {
+            if (aplicacionControl.permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.ELIMINAR)) {
                
                 if (new UsuarioDAO().findByEmpresaId(empresaTable.getId()).isEmpty()) { 
                 
