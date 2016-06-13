@@ -16,7 +16,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
-import hibernate.dao.PagoDAO;
+import hibernate.dao.RolClienteDAO;
 import hibernate.dao.PagoMesDAO;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.RolIndividualDAO;
@@ -24,7 +24,7 @@ import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import hibernate.model.PagoMes;
 import hibernate.model.PagoMesItem;
 import hibernate.model.RolIndividual;
@@ -86,6 +86,9 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import java.util.Objects;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -249,11 +252,11 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     private Integer diasTextValor;
 
-    private Integer normalesTextValor;
+    private Double normalesTextValor;
 
-    private Integer suplementariasTextValor;
+    private Double suplementariasTextValor;
 
-    private Integer sobreTiempoTextValor;
+    private Double sobreTiempoTextValor;
 
     private Double sueldoTotalTextValor;
 
@@ -311,7 +314,7 @@ public class PagosTotalEmpleadoController implements Initializable {
     public Usuario empleado;
     
     ArrayList<Usuario> usuarios;
-    ArrayList<Pago> pagos;
+    ArrayList<RolCliente> pagos;
     ArrayList<PagosTable> pagosTable;
     
     private ObservableList<PagosTable> data;
@@ -723,7 +726,7 @@ public class PagosTotalEmpleadoController implements Initializable {
     public void setTableInfo(Timestamp inicio, Timestamp fin, Integer empleadoId) {
         this.inicio = inicio;
         this.fin = fin;
-        PagoDAO pagoDAO = new PagoDAO();
+        RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
         pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, empleadoId));
@@ -734,9 +737,9 @@ public class PagosTotalEmpleadoController implements Initializable {
         deudasAPagar = new ArrayList<>();
         
         diasTextValor = 0;
-        normalesTextValor = 0;
-        suplementariasTextValor = 0;
-        sobreTiempoTextValor = 0;
+        normalesTextValor = 0d;
+        suplementariasTextValor = 0d;
+        sobreTiempoTextValor = 0d;
         sueldoTotalTextValor = 0d;
         extraTextValor = 0d;
         bonosTextValor = 0d;
@@ -836,7 +839,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             rol.setDescripcion("Sueldo");
             rol.setIngreso(round(sueldoTotalTextValor));
             rol.setDias(diasTextValor);
-            rol.setHoras(normalesTextValor);
+            rol.setHoras(normalesTextValor.intValue() );
             rol.setClave(Const.IP_SUELDO);
             pagoMesItems.add(rol);
         }
@@ -845,7 +848,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
             rol.setIngreso(extraTextValor);
-            rol.setHoras(suplementariasTextValor + sobreTiempoTextValor);
+            rol.setHoras((suplementariasTextValor.intValue()  + sobreTiempoTextValor.intValue() ));
             rol.setClave(Const.IP_HORAS_EXTRAS);
             pagoMesItems.add(rol);
         }
@@ -1039,8 +1042,8 @@ public class PagosTotalEmpleadoController implements Initializable {
         return monto;
     }
     
-    public Pago findPagoById(Integer id) {
-        for (Pago pago: pagos) {
+    public RolCliente findPagoById(Integer id) {
+        for (RolCliente pago: pagos) {
             if (Objects.equals(pago.getId(), id)) {
                 return  pago;
             }

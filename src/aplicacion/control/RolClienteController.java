@@ -9,10 +9,10 @@ import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
-import hibernate.dao.PagoDAO;
+import hibernate.dao.RolClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -224,9 +224,9 @@ public class RolClienteController implements Initializable {
     @FXML
     private TextField filterField;
     
-    private ObservableList<Pago> data;
+    private ObservableList<RolCliente> data;
     
-    ArrayList<Pago> pagos;
+    ArrayList<RolCliente> pagos;
     
     private Empresa empresa;
     
@@ -285,7 +285,7 @@ public class RolClienteController implements Initializable {
         dialogWait();
         
         ReporteRolCliente datasource = new ReporteRolCliente();
-        datasource.addAll((List<Pago>) controlClienteTableView.getItems());
+        datasource.addAll((List<RolCliente>) controlClienteTableView.getItems());
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_CLIENTE);
@@ -399,7 +399,7 @@ public class RolClienteController implements Initializable {
         this.inicio = inicio;
         this.fin = fin;
         
-        PagoDAO pagoDAO = new PagoDAO();
+        RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagos.addAll(pagoDAO.findAllByFechaAndClienteId(fin, cliente.getId()));
         
@@ -421,7 +421,7 @@ public class RolClienteController implements Initializable {
         montoSegurosTextValor = 0d; 
         montoUniformesTextValor = 0d;
         
-        for (Pago pago: pagos){
+        for (RolCliente pago: pagos){
             sueldoTotalTextValor += pago.getSueldo();
             extraTextValor += pago.getMontoHorasSobreTiempo() + pago.getMontoHorasSuplementarias();
             pago.setMontoHorasExtras(extraTextValor);
@@ -447,7 +447,7 @@ public class RolClienteController implements Initializable {
         data.addAll(pagos);
         controlClienteTableView.setItems(data);
       
-        FilteredList<Pago> filteredData = new FilteredList<>(data, p -> true);
+        FilteredList<RolCliente> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(pago -> {
                 // If filter text is empty, display all persons.
@@ -476,7 +476,7 @@ public class RolClienteController implements Initializable {
             }
         });
         
-        SortedList<Pago> sortedData = new SortedList<>(filteredData);
+        SortedList<RolCliente> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(controlClienteTableView.comparatorProperty());
         controlClienteTableView.setItems(sortedData);
         
@@ -513,7 +513,7 @@ public class RolClienteController implements Initializable {
         montoSegurosTextValor = 0d; 
         montoUniformesTextValor = 0d;
         
-        for (Pago pago: (List<Pago>) controlClienteTableView.getItems()) {
+        for (RolCliente pago: (List<RolCliente>) controlClienteTableView.getItems()) {
             sueldoTotalTextValor += pago.getSueldo();
             extraTextValor += pago.getMontoHorasSobreTiempo() + pago.getMontoHorasSuplementarias();
             pago.setMontoHorasExtras(extraTextValor);
@@ -592,11 +592,11 @@ public class RolClienteController implements Initializable {
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
         
-        controlClienteTableView.setRowFactory( (Object tv) -> {
-            TableRow<Pago> row = new TableRow<>();
+        controlClienteTableView.setRowFactory((Object tv) -> {
+            TableRow<RolCliente> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    Pago rowData = row.getItem();
+                    RolCliente rowData = row.getItem();
                     aplicacionControl.mostrarRolClienteEmpleado(rowData);
                 }
             });

@@ -5,10 +5,8 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.HorasExtrasController.getDateFromTimestamp;
-import hibernate.dao.ClienteDAO;
+import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Usuario;
 import java.io.UnsupportedEncodingException;
@@ -19,10 +17,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -35,6 +31,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -73,7 +70,13 @@ public class HorasExtrasSinClienteController implements Initializable {
     private DatePicker datePickerFecha;
     
     @FXML 
-    private CheckBox checkBoxLibre;
+    private RadioButton marcarTrabajo;
+    
+    @FXML 
+    private RadioButton marcarLibre;
+    
+    @FXML 
+    private RadioButton marcarFalta;
     
     @FXML 
     private GridPane panelHoras;
@@ -106,15 +109,21 @@ public class HorasExtrasSinClienteController implements Initializable {
     }
     
     @FXML
+    private void checkTrabajo(ActionEvent event) {
+        panelHoras.setVisible(true);
+        textEmpleadoLibre.setText("");
+    }
+    
+    @FXML
     private void checkLibre(ActionEvent event) {
-        System.out.println("aplicacion.control.HorasExtrasController.checkLibre()");
-        if (checkBoxLibre.isSelected()) {
-            panelHoras.setVisible(false); 
-            textEmpleadoLibre.setVisible(true);
-        } else {
-            panelHoras.setVisible(true);
-            textEmpleadoLibre.setVisible(false);
-        }
+        panelHoras.setVisible(false);
+        textEmpleadoLibre.setText("Libre");
+    }
+    
+    @FXML
+    private void checkFalta(ActionEvent event) {
+        panelHoras.setVisible(false);
+        textEmpleadoLibre.setText("Falta");
     }
     
     @FXML
@@ -143,21 +152,23 @@ public class HorasExtrasSinClienteController implements Initializable {
             
                 stagePrincipal.close();
 
-                if (checkBoxLibre.isSelected()) {
-                    rolDePagoController.guardarRegistro(empleado, 0, 0, null, timestamp, true);
+                if (marcarLibre.isSelected()) {
+                    rolDePagoController.guardarRegistro(empleado, 0d, 0d, null, timestamp, true, false);
+                } else if (marcarFalta.isSelected()) {
+                    rolDePagoController.guardarRegistro(empleado, 0d, 0d, null, timestamp, false, true);
                 } else {
                     if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
-                       rolDePagoController.guardarRegistro(empleado, 0, 0, null, timestamp, false); 
+                       rolDePagoController.guardarRegistro(empleado, 0d, 0d, null, timestamp, false, false); 
                     } else if (suplementarias.getText().isEmpty()) {
-                        rolDePagoController.guardarRegistro(empleado, 0, 
-                            Integer.parseInt(sobreTiempo.getText()), null, timestamp, false);
+                        rolDePagoController.guardarRegistro(empleado, 0d, 
+                                round(Double.valueOf(sobreTiempo.getText())), null, timestamp, false, false);
                     } else if (sobreTiempo.getText().isEmpty()) {
                         rolDePagoController.guardarRegistro(empleado, 
-                            Integer.parseInt(suplementarias.getText()), 0, null, timestamp, false);
+                            round(Double.valueOf(suplementarias.getText())), 0d, null, timestamp, false, false);
                     } else {
                         rolDePagoController.guardarRegistro(empleado, 
-                                Integer.parseInt(suplementarias.getText()), 
-                                Integer.parseInt(sobreTiempo.getText()), null, timestamp, false);
+                                round(Double.valueOf(suplementarias.getText())), 
+                                round(Double.valueOf(sobreTiempo.getText())), null, timestamp, false, false);
                     }
                 }
             } else {

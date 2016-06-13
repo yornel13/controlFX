@@ -96,21 +96,6 @@ public class InEmpresaController implements Initializable {
         stagePrincipal.close();
         aplicacionControl.mostrarVentanaPrincipal();
     }
-    
-    @FXML
-    private void controlPagos(ActionEvent event) {
-        aplicacionControl.mostrarTotalPagosEmpleados(empresa, stagePrincipal);
-    }
-
-    @FXML
-    private void quincenalPagos(ActionEvent event) {
-        aplicacionControl.mostrarPagoQuincenal(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void mesualPagos(ActionEvent event) {
-        aplicacionControl.mostrarPagoMensual(empresa, stagePrincipal);
-    }
 
     @FXML
     private void verEmpleados(ActionEvent event) {
@@ -122,57 +107,6 @@ public class InEmpresaController implements Initializable {
         aplicacionControl.mostrarConfiguracionEmpresa(empresa, stagePrincipal);
     }
     
-    @FXML
-    private void verActuarialesEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarActuarialesEmpleados(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void verDecimosEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarDecimosEmpleados(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void verQuincenalEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void verDeudasEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarDeudasEmpleados(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void verIessEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
-        
-    }
-    
-    @FXML
-    private void verSueldoEmpleados(ActionEvent event) {
-        aplicacionControl.mostrarSueldoEmpleados(empresa, stagePrincipal);
-    }
-
-    @FXML
-    private void rolCliente(ActionEvent event) {
-        aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void mostrarRolCliente(ActionEvent event) {
-        aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
-    }
-    
-    @FXML
-    private void mostrarRolIndividual(ActionEvent event) {
-        aplicacionControl.mostrarEmpleadosParaRol(empresa, stagePrincipal);
-    }
-
-    @FXML
-    public void rolEmpleado(ActionEvent event) {
-        aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
-    }
-
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
         empresaLabel.setText(empresa.getNombre());
@@ -231,7 +165,7 @@ public class InEmpresaController implements Initializable {
             MenuItem menuItemCliente = new MenuItem("Por Cliente");
             buttonHoras.getItems().add(menuItemCliente);
             menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
+                aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
             });
              menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);

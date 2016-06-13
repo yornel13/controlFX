@@ -104,6 +104,24 @@ public class HorasEmpleadosController implements Initializable {
     }
     
     @FXML
+    public void onClickMore(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        mostrarRegistro(null);
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        mostrarRegistro(null);
+    }
+    
+    @FXML
     private void verRol(ActionEvent event) {
         if (cedulaField != null) {
             Usuario emp = new UsuarioDAO().findByCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
@@ -185,15 +203,18 @@ public class HorasEmpleadosController implements Initializable {
            for (Usuario user: usuarios) {
             
                 Integer dias = 0;
-                Integer normales = 0;
-                Integer sobreTiempo = 0;
-                Integer suplementarias = 0;
+                Double normales = 0d;
+                Double sobreTiempo = 0d;
+                Double suplementarias = 0d;
                 
-                for (ControlEmpleado control: controlDAO.findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio, fin)) {
-                    dias = dias + 1;
-                    normales = normales + 8;
-                    sobreTiempo = sobreTiempo + control.getHorasExtras();
-                    suplementarias = suplementarias + control.getHorasSuplementarias();
+                for (ControlEmpleado control: controlDAO
+                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio, fin)) {
+                    if (!control.getFalta()) {
+                        dias = dias + 1;
+                        normales = normales + 8d;
+                        sobreTiempo = sobreTiempo + control.getHorasExtras();
+                        suplementarias = suplementarias + control.getHorasSuplementarias();
+                    }
                 }
                
                 EmpleadoTable empleado = new EmpleadoTable();

@@ -13,7 +13,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.dao.PagoDAO;
+import hibernate.dao.RolClienteDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.model.Actuariales;
@@ -21,7 +21,7 @@ import hibernate.model.Cliente;
 import hibernate.model.Constante;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import hibernate.model.Seguro;
 import hibernate.model.Uniforme;
 import hibernate.model.Usuario;
@@ -192,7 +192,7 @@ public class RolDePagoClienteController implements Initializable {
     
     ArrayList<Usuario> usuarios;
     
-    private Pago pago;
+    private RolCliente pago;
     
     Timestamp fin;
     Timestamp inicio;
@@ -285,11 +285,11 @@ public class RolDePagoClienteController implements Initializable {
     
     public void generarPago() {
         
-        if (new PagoDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
+        if (new RolClienteDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
                 empleado.getId(), cliente.getId()) == null) {
         
             pago.setDetalles("");
-            new PagoDAO().save(pago);
+            new RolClienteDAO().save(pago);
 
             // Registro para auditar
             String detalles = "genero un pago al empleado " 
@@ -452,13 +452,15 @@ public class RolDePagoClienteController implements Initializable {
         } 
     }
     
-    public void guardarRegistro(Usuario empleado, Integer suplementarias, 
-            Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
+    public void guardarRegistro(Usuario empleado, Double suplementarias, 
+            Double sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre,
+            Boolean falta) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
         ControlEmpleado controlEmpleado = new ControlEmpleado();
         controlEmpleado = new ControlEmpleado();
         controlEmpleado.setFecha(fecha);
         controlEmpleado.setLibre(libre);
+        controlEmpleado.setFalta(falta);
         controlEmpleado.setUsuario(empleado);
         controlEmpleado.setHorasExtras(sobreTiempo);
         controlEmpleado.setHorasSuplementarias(suplementarias);
@@ -475,15 +477,17 @@ public class RolDePagoClienteController implements Initializable {
         aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
     }
     
-    public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Integer suplementarias, 
-            Integer sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre) throws ParseException {
+    public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Double suplementarias, 
+            Double sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre,
+            Boolean falta) throws ParseException {
         
         controlEmpleado.setFecha(fecha);
         controlEmpleado.setCliente(cliente);
         controlEmpleado.setLibre(libre);
-        if (libre) {
-            controlEmpleado.setHorasExtras(0);
-            controlEmpleado.setHorasSuplementarias(0);
+        controlEmpleado.setFalta(falta);
+        if (libre || falta) {
+            controlEmpleado.setHorasExtras(0d);
+            controlEmpleado.setHorasSuplementarias(0d);
         } else {
             controlEmpleado.setHorasExtras(sobreTiempo);
             controlEmpleado.setHorasSuplementarias(suplementarias);
@@ -520,9 +524,9 @@ public class RolDePagoClienteController implements Initializable {
         ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
         
         Integer dias = 0;
-        Integer normales = 0;
-        Integer sobreTiempo = 0;
-        Integer suplementarias = 0;
+        Double normales = 0d;
+        Double sobreTiempo = 0d;
+        Double suplementarias = 0d;
         
         controlEmpleado = new ArrayList<>();
         controlEmpleadoTable = new ArrayList<>();
@@ -548,8 +552,10 @@ public class RolDePagoClienteController implements Initializable {
             controlTable.setHorasExtras(control.getHorasExtras());
             controlTable.setHorasSuplementarias(control.getHorasSuplementarias());
             controlTable.setUsuarios(empleado);
-            if (control.getLibre() != null && control.getLibre()) {
+            if (control.getLibre()) {
                controlTable.setDescanso("Libre"); 
+            } else if (control.getFalta()) {
+               controlTable.setDescanso("Falta"); 
             } 
             controlEmpleadoTable.add(controlTable);
         }
@@ -669,7 +675,7 @@ public class RolDePagoClienteController implements Initializable {
                 + jubilacionPatronal + aportePatronal + segurosDecimal + uniformeDecimal;
         totalIngresos.setText(String.format( "%.2f", ingresoTotal));
         
-        pago = new Pago();
+        pago = new RolCliente();
         pago.setFecha(new Timestamp(new Date().getTime()));
         pago.setInicio(inicio);
         pago.setFinalizo(fin);

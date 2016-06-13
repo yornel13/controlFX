@@ -6,7 +6,6 @@
 package aplicacion.control;
 
 import static aplicacion.control.PagosTotalEmpleadoController.getToday;
-import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.reports.ReporteRolDePagoQuincenal;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
@@ -56,9 +55,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
@@ -123,6 +124,18 @@ public class PagoQuincenalController implements Initializable {
     private TableColumn<EmpleadoTable, EmpleadoTable> pagarColumna;
     
     @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonPagar;
+    
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
     private DatePicker pickerDe;
     
     @FXML 
@@ -148,7 +161,7 @@ public class PagoQuincenalController implements Initializable {
     }
     
     @FXML
-    private void returnConfiguracion(ActionEvent event) {
+    private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
@@ -521,20 +534,69 @@ public class PagoQuincenalController implements Initializable {
                 
                 setGraphic(checkBoxpagar);
                 if (checkBoxpagar != null) {
-                    checkBoxpagar.setSelected(empleadoTable.getPagar());
                     if (empleadoTable.getPagado().equalsIgnoreCase("Si") 
                             || empleadoTable.getQuincenal().equals(0d)) {
                         checkBoxpagar.setDisable(true);
+                        empleadoTable.setPagar(false);
                     } else {
                         checkBoxpagar.setDisable(false);
                     }
+                    checkBoxpagar.setSelected(empleadoTable.getPagar());
                 }
                 checkBoxpagar.setOnAction(event -> {
                      empleadoTable.setPagar(checkBoxpagar.isSelected());
                 });
             }
-
-            
+        });
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonPagar.setTooltip(
+            new Tooltip("Pagar a seleccionados")
+        );
+        buttonPagar.setOnMouseEntered((MouseEvent t) -> {
+            buttonPagar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/pagar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonPagar.setOnMouseExited((MouseEvent t) -> {
+            buttonPagar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/pagar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

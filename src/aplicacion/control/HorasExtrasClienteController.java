@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import static aplicacion.control.HorasExtrasController.getDateFromTimestamp;
+import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
@@ -31,6 +32,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -66,7 +68,13 @@ public class HorasExtrasClienteController implements Initializable {
     private DatePicker datePickerFecha;
     
     @FXML 
-    private CheckBox checkBoxLibre;
+    private RadioButton marcarTrabajo;
+    
+    @FXML 
+    private RadioButton marcarLibre;
+    
+    @FXML 
+    private RadioButton marcarFalta;
     
     @FXML 
     private GridPane panelHoras;
@@ -104,15 +112,21 @@ public class HorasExtrasClienteController implements Initializable {
     }
     
     @FXML
+    private void checkTrabajo(ActionEvent event) {
+        panelHoras.setVisible(true);
+        textEmpleadoLibre.setText("");
+    }
+    
+    @FXML
     private void checkLibre(ActionEvent event) {
-        System.out.println("aplicacion.control.HorasExtrasController.checkLibre()");
-        if (checkBoxLibre.isSelected()) {
-            panelHoras.setVisible(false); 
-            textEmpleadoLibre.setVisible(true);
-        } else {
-            panelHoras.setVisible(true);
-            textEmpleadoLibre.setVisible(false);
-        }
+        panelHoras.setVisible(false);
+        textEmpleadoLibre.setText("Libre");
+    }
+    
+    @FXML
+    private void checkFalta(ActionEvent event) {
+        panelHoras.setVisible(false);
+        textEmpleadoLibre.setText("Falta");
     }
     
     @FXML
@@ -140,21 +154,23 @@ public class HorasExtrasClienteController implements Initializable {
             if (controlEmpleadoDAO.findByFecha(timestamp, empleado.getId()) == null) {
                 stagePrincipal.close();
 
-                if (checkBoxLibre.isSelected()) {
-                    rolDePagoClienteController.guardarRegistro(empleado, 0, 0, cliente, timestamp, true);
+                if (marcarLibre.isSelected()) {
+                    rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, timestamp, true, false);
+                } else if (marcarFalta.isSelected()) {
+                    rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, timestamp, false, true);
                 } else {
                     if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
-                       rolDePagoClienteController.guardarRegistro(empleado, 0, 0, cliente, timestamp, false); 
+                       rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, timestamp, false, false); 
                     } else if (suplementarias.getText().isEmpty()) {
-                        rolDePagoClienteController.guardarRegistro(empleado, 0, 
-                            Integer.parseInt(sobreTiempo.getText()), cliente, timestamp, false);
+                        rolDePagoClienteController.guardarRegistro(empleado, 0d, 
+                            round(Double.valueOf(sobreTiempo.getText())), cliente, timestamp, false, false);
                     } else if (sobreTiempo.getText().isEmpty()) {
                         rolDePagoClienteController.guardarRegistro(empleado, 
-                            Integer.parseInt(suplementarias.getText()), 0, cliente, timestamp, false);
+                            round(Double.valueOf(suplementarias.getText())), 0d, cliente, timestamp, false, false);
                     } else {
                         rolDePagoClienteController.guardarRegistro(empleado, 
-                                Integer.parseInt(suplementarias.getText()), 
-                                Integer.parseInt(sobreTiempo.getText()), cliente, timestamp, false);
+                                round(Double.valueOf(suplementarias.getText())), 
+                                round(Double.valueOf(sobreTiempo.getText())), cliente, timestamp, false, false);
                     }
                 }
             } else {
@@ -184,14 +200,14 @@ public class HorasExtrasClienteController implements Initializable {
   
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
     }    
     
-    public static EventHandler<KeyEvent> numFilter() {
+    public static EventHandler<KeyEvent> numDecimalFilter() {
 
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
-            if (!"0123456789".contains(keyEvent.getCharacter())) {
+            if (!"0123456789.".contains(keyEvent.getCharacter())) {
                 keyEvent.consume();
             }
         };

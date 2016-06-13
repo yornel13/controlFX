@@ -5,12 +5,13 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.Const;
 import aplicacion.control.util.Roboto;
 import hibernate.dao.EmpresaDAO;
 import hibernate.model.Empresa;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -20,9 +21,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.effect.BoxBlur;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
@@ -49,6 +50,9 @@ public class PrincipalController implements Initializable {
     @FXML
     private Label labelEmpresa;
     
+    @FXML
+    private ProgressBar progressBar;
+    
     ArrayList<Empresa> empresas;
     
     private Stage stagePrincipal;
@@ -69,7 +73,6 @@ public class PrincipalController implements Initializable {
     @FXML
     private void onSelectMenuButtonItem(ActionEvent event) {
         System.out.println("You clicked me menu!");
-        //label.setText(menuButton.getCursor().toString());
     }
     
     @FXML
@@ -79,21 +82,12 @@ public class PrincipalController implements Initializable {
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
         this.aplicacionControl = aplicacionControl;
-        try {
-            EmpresaDAO empresaDao = new EmpresaDAO();
-            empresas = new ArrayList<>();
-            empresas.addAll(empresaDao.findAll());
+        
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new DataBaseThread("primer");
+        executor.execute(worker);
+        executor.shutdown();
 
-            String[] items = new String[empresas.size()];
-
-            empresas.stream().forEach((emp) -> {
-                items[empresas.indexOf(emp)] = emp.getNombre();
-            });
-
-            selector.setItems(FXCollections.observableArrayList(items)); 
-        } catch (Exception e) {
-            label.setText("ERROR DE CONEXION A BASE DE DATOS.");
-        }
     }
     
     @Override
@@ -128,6 +122,14 @@ public class PrincipalController implements Initializable {
         labelEmpresa.setFont(Roboto.MEDIUM(14));
         label.setFont(Roboto.MEDIUM(14));
         
+        selector.setVisible(false);
+        label.setVisible(false);
+        labelEmpresa.setVisible(false);
+        buttonEntrar.setVisible(false);
+        buttonGlobal.setVisible(false);
+        login.setVisible(false);
+        usuarioLogin.setVisible(false);
+        
         
     }
     
@@ -143,5 +145,56 @@ public class PrincipalController implements Initializable {
     public void onClickLoginButton(ActionEvent event) {
         aplicacionControl.login(login, usuarioLogin);
     }
-  
+    
+    public class DataBaseThread implements Runnable {
+
+        private String command;
+
+        public DataBaseThread(String s){
+            this.command = s;
+        }
+
+        @Override
+        public void run() {
+            System.out.println(Thread.currentThread().getName()+ " Start. Command = "+command);
+
+            try {
+                EmpresaDAO empresaDao = new EmpresaDAO();
+                empresas = new ArrayList<>();
+                empresas.addAll(empresaDao.findAll());
+
+                String[] items = new String[empresas.size()];
+
+                empresas.stream().forEach((emp) -> {
+                    items[empresas.indexOf(emp)] = emp.getNombre();
+                });
+
+                selector.setItems(FXCollections.observableArrayList(items)); 
+            } catch (Exception e) {
+                label.setText("ERROR DE CONEXION A BASE DE DATOS.");
+            }
+            selector.setVisible(true);
+            label.setVisible(true);
+            labelEmpresa.setVisible(true);
+            buttonEntrar.setVisible(true);
+            buttonGlobal.setVisible(true);
+            login.setVisible(true);
+            usuarioLogin.setVisible(true);
+            progressBar.setVisible(false);
+            System.out.println(Thread.currentThread().getName()+" End.");
+        }
+
+        private void processCommand() {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public String toString(){
+            return this.command;
+        }
+    }
 }

@@ -209,9 +209,9 @@ public class HorasEmpleadosSinClienteController implements Initializable {
            
            usuarios.stream().map((user) -> {
                Integer dias = 0;
-               Integer normales = 0;
-               Integer sobreTiempo = 0;
-               Integer suplementarias = 0;
+               Double normales = 0d;
+               Double sobreTiempo = 0d;
+               Double suplementarias = 0d;
                for (ControlEmpleado control: controlDAO
                        .findAllByEmpleadoIdSinClienteInDeterminateTime(user.getId(),
                                inicio, fin)) {

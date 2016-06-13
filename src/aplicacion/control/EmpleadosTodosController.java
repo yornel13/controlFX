@@ -8,7 +8,7 @@ package aplicacion.control;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.PagoDAO;
+import hibernate.dao.RolClienteDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Usuario;
 import java.net.URL;
@@ -93,7 +93,7 @@ public class EmpleadosTodosController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.ELIMINAR)) {
                
-                if (new PagoDAO().findByUsuarioId(empleadoTable.getId()).isEmpty()) { 
+                if (new RolClienteDAO().findByUsuarioId(empleadoTable.getId()).isEmpty()) { 
                     
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(Modality.APPLICATION_MODAL);

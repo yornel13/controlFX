@@ -12,7 +12,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import hibernate.model.Identidad;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -41,6 +41,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.paint.Color;
+import static javafx.application.Application.launch;
 
 /**
  *
@@ -1930,7 +1931,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarRolClienteEmpleado(Pago pago) {
+    public void mostrarRolClienteEmpleado(RolCliente pago) {
         if (permisos == null) {
            noLogeado();
         } else {

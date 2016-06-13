@@ -210,14 +210,14 @@ public class HorasEmpleadosClienteController implements Initializable {
            
            usuarios.stream().map((user) -> {
                Integer dias = 0;
-               Integer normales = 0;
-               Integer sobreTiempo = 0;
-               Integer suplementarias = 0;
+               Double normales = 0d;
+               Double sobreTiempo = 0d;
+               Double suplementarias = 0d;
                 for (ControlEmpleado control: controlDAO
                         .findAllByEmpleadoIdClienteIdInDeterminateTime(
                                user.getId(), cliente.getId(), inicio, fin)) {
                     dias = dias + 1;
-                    normales = normales + 8;
+                    normales = normales + 8d;
                     sobreTiempo = sobreTiempo + control.getHorasExtras();
                     suplementarias = suplementarias + control.getHorasSuplementarias();
                 }

@@ -17,8 +17,8 @@ public class ControlTable {
     private Usuario usuario;
     private String cliente;
     private String fecha;
-    private Integer horasSuplementarias;
-    private Integer horasExtras;
+    private Double horasSuplementarias;
+    private Double horasExtras;
     private String descanso;
     private String dia;
 
@@ -78,19 +78,19 @@ public class ControlTable {
         this.fecha = fecha;
     }
 
-    public Integer getHorasSuplementarias() {
+    public Double getHorasSuplementarias() {
         return horasSuplementarias;
     }
 
-    public void setHorasSuplementarias(Integer horasSuplementarias) {
+    public void setHorasSuplementarias(Double horasSuplementarias) {
         this.horasSuplementarias = horasSuplementarias;
     }
 
-    public Integer getHorasExtras() {
+    public Double getHorasExtras() {
         return horasExtras;
     }
 
-    public void setHorasExtras(Integer horasExtras) {
+    public void setHorasExtras(Double horasExtras) {
         this.horasExtras = horasExtras;
     }
     

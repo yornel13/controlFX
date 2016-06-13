@@ -17,7 +17,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
-import hibernate.dao.PagoDAO;
+import hibernate.dao.RolClienteDAO;
 import hibernate.dao.PagoMesDAO;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.PagoQuincenaDAO;
@@ -27,7 +27,7 @@ import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import hibernate.model.PagoMes;
 import hibernate.model.PagoMesItem;
 import hibernate.model.PagoQuincena;
@@ -71,9 +71,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
@@ -91,6 +93,9 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -139,6 +144,18 @@ public class PagoMensualController implements Initializable {
     private TableColumn<EmpleadoTable, EmpleadoTable> pagarColumna;
     
     @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonPagar;
+    
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
     private DatePicker pickerDe;
     
     @FXML 
@@ -172,7 +189,7 @@ public class PagoMensualController implements Initializable {
     }
     
     @FXML
-    private void returnConfiguracion(ActionEvent event) {
+    private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
@@ -201,7 +218,8 @@ public class PagoMensualController implements Initializable {
                 (List<EmpleadoTable>) empleadosTableView.getItems()) {
             if (checkBoxPagarTodos.isSelected()) {
                 if (empleadoTable.getPagado().equalsIgnoreCase("Si")
-                            || empleadoTable.getSinRoles()) {
+                            || empleadoTable.getSinRoles()
+                        || empleadoTable.getSueldo() < 0d) {
                     empleadoTable.setPagar(false);
                 } else {
                     empleadoTable.setPagar(true);
@@ -551,8 +569,8 @@ public class PagoMensualController implements Initializable {
     }
     
     public void calcularPago(EmpleadoTable empleadoTable, Usuario empleado) {
-        PagoDAO pagoDAO = new PagoDAO();
-        ArrayList<Pago> pagos = new ArrayList<>();
+        RolClienteDAO pagoDAO = new RolClienteDAO();
+        ArrayList<RolCliente> pagos = new ArrayList<>();
         ArrayList<PagoMesItem> pagoMesItems = new ArrayList<>();
         ArrayList<Deuda> deudasAPagar = new ArrayList<>();
         pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, 
@@ -563,9 +581,9 @@ public class PagoMensualController implements Initializable {
         if (pagos.isEmpty()) 
             empleadoTable.setSinRoles(Boolean.TRUE);
         Integer diasTextValor = 0;
-        Integer normalesTextValor = 0;
-        Integer suplementariasTextValor = 0;
-        Integer sobreTiempoTextValor = 0;
+        Double normalesTextValor = 0d;
+        Double suplementariasTextValor = 0d;
+        Double sobreTiempoTextValor = 0d;
         Double sueldoTotalTextValor = 0d;
         Double extraTextValor = 0d;
         Double bonosTextValor = 0d;
@@ -590,7 +608,7 @@ public class PagoMensualController implements Initializable {
         Double deduccionesValor = 0d;
         Double aPercibirValor = 0d;
         
-        for (Pago pago: pagos) {
+        for (RolCliente pago: pagos) {
             
             diasTextValor += pago.getDias();
             normalesTextValor += pago.getHorasNormales();
@@ -622,7 +640,7 @@ public class PagoMensualController implements Initializable {
             rol.setDescripcion("Sueldo");
             rol.setIngreso(round(sueldoTotalTextValor));
             rol.setDias(diasTextValor);
-            rol.setHoras(normalesTextValor);
+            rol.setHoras(normalesTextValor.intValue());
             rol.setClave(Const.IP_SUELDO);
             pagoMesItems.add(rol);
         }
@@ -630,7 +648,7 @@ public class PagoMensualController implements Initializable {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
             rol.setIngreso(extraTextValor);
-            rol.setHoras(suplementariasTextValor + sobreTiempoTextValor);
+            rol.setHoras(suplementariasTextValor.intValue() + sobreTiempoTextValor.intValue());
             rol.setClave(Const.IP_HORAS_EXTRAS);
             pagoMesItems.add(rol);
         }
@@ -870,7 +888,8 @@ public class PagoMensualController implements Initializable {
                 setGraphic(checkBoxpagar);
                 if (checkBoxpagar != null) {
                     if (empleadoTable.getPagado().equalsIgnoreCase("Si")
-                            || empleadoTable.getSinRoles()) {
+                            || empleadoTable.getSinRoles() 
+                            || empleadoTable.getSueldo() < 0d) {
                         checkBoxpagar.setDisable(true);
                         empleadoTable.setPagar(false);
                     } else {
@@ -882,9 +901,57 @@ public class PagoMensualController implements Initializable {
                      empleadoTable.setPagar(checkBoxpagar.isSelected());
                      //guardar();
                 });
-            }
-
-            
+            } 
+        });
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonPagar.setTooltip(
+            new Tooltip("Pagar a seleccionados")
+        );
+        buttonPagar.setOnMouseEntered((MouseEvent t) -> {
+            buttonPagar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/pagar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonPagar.setOnMouseExited((MouseEvent t) -> {
+            buttonPagar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/pagar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

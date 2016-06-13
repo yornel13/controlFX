@@ -10,7 +10,7 @@ import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -146,7 +146,7 @@ public class RolClienteEmpleadoController implements Initializable {
     private Cliente cliente;
     private Empresa empresa;
     
-    private Pago pago;
+    private RolCliente pago;
     private Stage dialogLoading;
     
     public void setStagePrincipal(Stage stagePrincipal) {
@@ -273,7 +273,7 @@ public class RolClienteEmpleadoController implements Initializable {
         dialogStage.showAndWait();
     }
     
-    public void setRolInfo(Pago pago) {
+    public void setRolInfo(RolCliente pago) {
         this.pago = pago;
         
         empleadoText.setText(pago.getUsuario().getNombre() + " " 

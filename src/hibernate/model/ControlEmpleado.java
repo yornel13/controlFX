@@ -16,10 +16,11 @@ public class ControlEmpleado implements java.io.Serializable {
 	private Usuario usuario;
 	private Cliente cliente;
 	private Timestamp fecha;
-	private Integer horasSuplementarias;
-	private Integer horasExtras;
+	private Double horasSuplementarias;
+	private Double horasExtras;
 	private Boolean libre;
         private Boolean vacaciones;
+        private Boolean falta;
 
 	// Constructors
 
@@ -38,7 +39,7 @@ public class ControlEmpleado implements java.io.Serializable {
 
 	/** full constructor */
 	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha,
-			Integer horasSuplementarias, Integer horasExtras,
+			Double horasSuplementarias, Double horasExtras,
 			Boolean libre, Boolean vacaciones) {
 		this.usuario = usuario;
 		this.cliente = cliente;
@@ -83,19 +84,19 @@ public class ControlEmpleado implements java.io.Serializable {
 		this.fecha = fecha;
 	}
 
-	public Integer getHorasSuplementarias() {
+	public Double getHorasSuplementarias() {
 		return this.horasSuplementarias;
 	}
 
-	public void setHorasSuplementarias(Integer horasSuplementarias) {
+	public void setHorasSuplementarias(Double horasSuplementarias) {
 		this.horasSuplementarias = horasSuplementarias;
 	}
 
-	public Integer getHorasExtras() {
+	public Double getHorasExtras() {
 		return this.horasExtras;
 	}
 
-	public void setHorasExtras(Integer horasExtras) {
+	public void setHorasExtras(Double horasExtras) {
 		this.horasExtras = horasExtras;
         }
 
@@ -113,6 +114,14 @@ public class ControlEmpleado implements java.io.Serializable {
 
         public void setVacaciones(Boolean vacaciones) {
             this.vacaciones = vacaciones;
+        }
+        
+        public Boolean getFalta() {
+            return falta;
+        }
+
+        public void setFalta(Boolean falta) {
+            this.falta = falta;
         }
 
 }

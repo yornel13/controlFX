@@ -2,7 +2,7 @@ package hibernate.dao;
 
 // default package
 
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
  * @see .Pago
  * @author MyEclipse Persistence Tools
  */
-public class PagoDAO extends BaseHibernateDAO {
-	private static final Logger log = LoggerFactory.getLogger(PagoDAO.class);
+public class RolClienteDAO extends BaseHibernateDAO {
+	private static final Logger log = LoggerFactory.getLogger(RolClienteDAO.class);
 	// property constants
 	public static final String SUELDO = "sueldo";
 	public static final String DIAS = "dias";
@@ -51,7 +51,7 @@ public class PagoDAO extends BaseHibernateDAO {
 	public static final String EMPRESA = "empresa";
 	public static final String CLIENTE_NOMBRE = "clienteNombre";
 
-	public void save(Pago transientInstance) {
+	public void save(RolCliente transientInstance) {
 		log.debug("saving Pago instance");
 		try {
 			getSession().save(transientInstance);
@@ -62,7 +62,7 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void delete(Pago persistentInstance) {
+	public void delete(RolCliente persistentInstance) {
 		log.debug("deleting Pago instance");
 		try {
 			getSession().delete(persistentInstance);
@@ -73,10 +73,10 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public Pago findById(java.lang.Integer id) {
+	public RolCliente findById(java.lang.Integer id) {
 		log.debug("getting Pago instance with id: " + id);
 		try {
-			Pago instance = (Pago) getSession().get("hibernate.model.Pago", id);
+			RolCliente instance = (RolCliente) getSession().get("hibernate.model.RolCliente", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
@@ -84,10 +84,10 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public List findByExample(Pago instance) {
+	public List findByExample(RolCliente instance) {
 		log.debug("finding Pago instance by example");
 		try {
-			List results = getSession().createCriteria("hibernate.model.Pago")
+			List results = getSession().createCriteria("hibernate.model.RolCliente")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());
@@ -98,95 +98,95 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List<Pago> findAllByFechaAndEmpleadoId(Timestamp fecha, Integer empleadoId) {
+        public List<RolCliente> findAllByFechaAndEmpleadoId(Timestamp fecha, Integer empleadoId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and usuario_id = :usuario_id")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
         
-        public List<Pago> findAllByFechaAndEmpleadoIdConCliente(Timestamp fecha, Integer empleadoId) {
+        public List<RolCliente> findAllByFechaAndEmpleadoIdConCliente(Timestamp fecha, Integer empleadoId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and usuario_id = :usuario_id "
                             + "and cliente_id IS NOT NULL")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
         
-        public List<Pago> findAllByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
+        public List<RolCliente> findAllByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and usuario_id = :usuario_id "
                             + "and cliente_id IS NULL")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
         
-        public Pago findByFechaAndEmpleadoIdAndClienteId(Timestamp fecha, Integer empleadoId, Integer clienteId) {
+        public RolCliente findByFechaAndEmpleadoIdAndClienteId(Timestamp fecha, Integer empleadoId, Integer clienteId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and usuario_id = :usuario_id "
                             + "and cliente_id = :cliente_id")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("usuario_id", empleadoId)
                     .setParameter("cliente_id", clienteId);
             Object result = query.uniqueResult();
-            return (Pago) result;
+            return (RolCliente) result;
         }
         
-        public Pago findByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
+        public RolCliente findByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and usuario_id = :usuario_id "
                             + "and cliente_id IS NULL")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.uniqueResult();
-            return (Pago) result;
+            return (RolCliente) result;
         }
         
-        public Pago findByFechaAndEmpleadoIdAndDetalles(Timestamp fecha, Integer empleadoId, String detalles) {
+        public RolCliente findByFechaAndEmpleadoIdAndDetalles(Timestamp fecha, Integer empleadoId, String detalles) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and usuario_id = :usuario_id and detalles = :detalles "
                             + "and cliente_id IS NULL")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("detalles", detalles)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.uniqueResult();
-            return (Pago) result;
+            return (RolCliente) result;
         }
         
-        public List<Pago> findAllByFechaAndClienteId(Timestamp fecha, Integer clienteId) {
+        public List<RolCliente> findAllByFechaAndClienteId(Timestamp fecha, Integer clienteId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where finalizo = :fecha "
+                    createSQLQuery("SELECT * FROM rol_cliente where finalizo = :fecha "
                             + "and cliente_id = :cliente_id")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("fecha", fecha)
                     .setParameter("cliente_id", clienteId);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Pago instance with property: " + propertyName
 				+ ", value: " + value);
 		try {
-			String queryString = "from Pago as model where model."
+			String queryString = "from RolCliente as model where model."
 					+ propertyName + "= ?";
 			Query queryObject = getSession().createQuery(queryString);
 			queryObject.setParameter(0, value);
@@ -310,36 +310,36 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List<Pago> findByClienteId(Integer clienteId) {
+        public List<RolCliente> findByClienteId(Integer clienteId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago where cliente_id = :cliente_id")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("cliente_id", clienteId);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
         
-        public List<Pago> findAllSinCliente() {
+        public List<RolCliente> findAllSinCliente() {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago where cliente_id IS NULL")
-                    .addEntity(Pago.class);
+                    .addEntity(RolCliente.class);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
         
-        public List<Pago> findByUsuarioId(Integer usuarioId) {
+        public List<RolCliente> findByUsuarioId(Integer usuarioId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago where usuario_id = :usuario_id")
-                    .addEntity(Pago.class)
+                    .addEntity(RolCliente.class)
                     .setParameter("usuario_id", usuarioId);
             Object result = query.list();
-            return (List<Pago>) result;
+            return (List<RolCliente>) result;
         }
 
-	public Pago merge(Pago detachedInstance) {
+	public RolCliente merge(RolCliente detachedInstance) {
 		log.debug("merging Pago instance");
 		try {
-			Pago result = (Pago) getSession().merge(detachedInstance);
+			RolCliente result = (RolCliente) getSession().merge(detachedInstance);
 			log.debug("merge successful");
 			return result;
 		} catch (RuntimeException re) {
@@ -348,7 +348,7 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachDirty(Pago instance) {
+	public void attachDirty(RolCliente instance) {
 		log.debug("attaching dirty Pago instance");
 		try {
 			getSession().saveOrUpdate(instance);
@@ -359,7 +359,7 @@ public class PagoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachClean(Pago instance) {
+	public void attachClean(RolCliente instance) {
 		log.debug("attaching clean Pago instance");
 		try {
 			getSession().buildLockRequest(LockOptions.NONE).lock(instance);

@@ -5,7 +5,7 @@
  */
 package aplicacion.control.reports;
 
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -18,7 +18,7 @@ import net.sf.jasperreports.engine.JRField;
  */
 public class ReporteRolCliente implements JRDataSource {
     
-    private final List<Pago> lista = new ArrayList<>();
+    private final List<RolCliente> lista = new ArrayList<>();
     private int indiceActual = -1;
     
     @Override
@@ -116,11 +116,11 @@ public class ReporteRolCliente implements JRDataSource {
         return ++indiceActual < lista.size(); 
     }
     
-    public void add(Pago pago) {
+    public void add(RolCliente pago) {
         this.lista.add(pago);
     }
 
-    public void addAll(List<Pago> pagos) {
+    public void addAll(List<RolCliente> pagos) {
         this.lista.addAll(pagos);
     }
 }

@@ -6,7 +6,7 @@
 package aplicacion.control.tableModel;
 
 import hibernate.model.Deuda;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
 import hibernate.model.RolIndividual;
 import java.util.ArrayList;
@@ -26,9 +26,9 @@ public class EmpleadoTable {
     private String cargo;
     private String empresa;
     private Integer dias;
-    private Integer horas;
-    private Integer suplementarias;
-    private Integer sobreTiempo;
+    private Double horas;
+    private Double suplementarias;
+    private Double sobreTiempo;
     private Double actuarial1;
     private Double actuarial2;
     private Double quincenal;
@@ -44,7 +44,7 @@ public class EmpleadoTable {
     private Boolean sinRoles;
     public ArrayList<Deuda> deudas;
     public ArrayList<PagoMesItem> pagoMesItems;
-    public ArrayList<Pago> pagos;
+    public ArrayList<RolCliente> pagos;
     public RolIndividual rolIndividual;
 
     public Integer getId() {
@@ -119,27 +119,27 @@ public class EmpleadoTable {
         this.dias = dias;
     }
 
-    public Integer getHoras() {
+    public Double getHoras() {
         return horas;
     }
 
-    public void setHoras(Integer horas) {
+    public void setHoras(Double horas) {
         this.horas = horas;
     }
 
-    public Integer getSuplementarias() {
+    public Double getSuplementarias() {
         return suplementarias;
     }
 
-    public void setSuplementarias(Integer suplementarias) {
+    public void setSuplementarias(Double suplementarias) {
         this.suplementarias = suplementarias;
     }
 
-    public Integer getSobreTiempo() {
+    public Double getSobreTiempo() {
         return sobreTiempo;
     }
 
-    public void setSobreTiempo(Integer sobreTiempo) {
+    public void setSobreTiempo(Double sobreTiempo) {
         this.sobreTiempo = sobreTiempo;
     }
 
@@ -255,11 +255,11 @@ public class EmpleadoTable {
         this.pagoMesItems = pagoMesItems;
     }
 
-    public ArrayList<Pago> getPagos() {
+    public ArrayList<RolCliente> getPagos() {
         return pagos;
     }
 
-    public void setPagos(ArrayList<Pago> pagos) {
+    public void setPagos(ArrayList<RolCliente> pagos) {
         this.pagos = pagos;
     }
 

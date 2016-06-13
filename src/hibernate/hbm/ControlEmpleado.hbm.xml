@@ -19,10 +19,10 @@
         <property name="fecha" type="java.sql.Timestamp">
             <column name="fecha" length="19" not-null="true" />
         </property>
-        <property name="horasSuplementarias" type="java.lang.Integer">
+        <property name="horasSuplementarias" type="java.lang.Double">
             <column name="horas_suplementarias" />
         </property>
-        <property name="horasExtras" type="java.lang.Integer">
+        <property name="horasExtras" type="java.lang.Double">
             <column name="horas_extras" />
         </property>
         <property name="libre" type="java.lang.Boolean">
@@ -30,6 +30,9 @@
         </property>
         <property name="vacaciones" type="java.lang.Boolean">
             <column name="vacaciones" />
+        </property>
+        <property name="falta" type="java.lang.Boolean">
+            <column name="falta" />
         </property>
     </class>
 </hibernate-mapping>

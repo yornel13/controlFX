@@ -8,7 +8,7 @@ import java.sql.Timestamp;
  * Pago entity. @author MyEclipse Persistence Tools
  */
 
-public class Pago implements java.io.Serializable {
+public class RolCliente implements java.io.Serializable {
 
 	// Fields
 
@@ -19,10 +19,10 @@ public class Pago implements java.io.Serializable {
 	private Timestamp fecha;
 	private Double sueldo;
 	private Integer dias;
-	private Integer horasNormales;
-	private Integer horasSuplementarias;
-	private Integer horasSobreTiempo;
-	private Integer totalHorasExtras;
+	private Double horasNormales;
+	private Double horasSuplementarias;
+	private Double horasSobreTiempo;
+	private Double totalHorasExtras;
 	private Double salario;
 	private Double montoHorasSuplementarias;
 	private Double montoHorasSobreTiempo;
@@ -49,14 +49,14 @@ public class Pago implements java.io.Serializable {
 	// Constructors
 
 	/** default constructor */
-	public Pago() {
+	public RolCliente() {
 	}
 
 	/** minimal constructor */
-	public Pago(Timestamp inicio, Timestamp finalizo, Timestamp fecha,
-			Double sueldo, Integer dias, Integer horasNormales,
-			Integer horasSuplementarias, Integer horasSobreTiempo,
-			Integer totalHorasExtras, Double salario,
+	public RolCliente(Timestamp inicio, Timestamp finalizo, Timestamp fecha,
+			Double sueldo, Integer dias, Double horasNormales,
+			Double horasSuplementarias, Double horasSobreTiempo,
+			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
 			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
 			Double decimoTercero, Double decimoCuarto,
@@ -93,10 +93,10 @@ public class Pago implements java.io.Serializable {
 	}
 
 	/** full constructor */
-	public Pago(String detalles, Timestamp inicio, Timestamp finalizo,
-			Timestamp fecha, Double sueldo, Integer dias, Integer horasNormales,
-			Integer horasSuplementarias, Integer horasSobreTiempo,
-			Integer totalHorasExtras, Double salario,
+	public RolCliente(String detalles, Timestamp inicio, Timestamp finalizo,
+			Timestamp fecha, Double sueldo, Integer dias, Double horasNormales,
+			Double horasSuplementarias, Double horasSobreTiempo,
+			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
 			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
 			Double decimoTercero, Double decimoCuarto,
@@ -192,35 +192,35 @@ public class Pago implements java.io.Serializable {
 		this.dias = dias;
 	}
 
-	public Integer getHorasNormales() {
+	public Double getHorasNormales() {
 		return this.horasNormales;
 	}
 
-	public void setHorasNormales(Integer horasNormales) {
+	public void setHorasNormales(Double horasNormales) {
 		this.horasNormales = horasNormales;
 	}
 
-	public Integer getHorasSuplementarias() {
+	public Double getHorasSuplementarias() {
 		return this.horasSuplementarias;
 	}
 
-	public void setHorasSuplementarias(Integer horasSuplementarias) {
+	public void setHorasSuplementarias(Double horasSuplementarias) {
 		this.horasSuplementarias = horasSuplementarias;
 	}
 
-	public Integer getHorasSobreTiempo() {
+	public Double getHorasSobreTiempo() {
 		return this.horasSobreTiempo;
 	}
 
-	public void setHorasSobreTiempo(Integer horasSobreTiempo) {
+	public void setHorasSobreTiempo(Double horasSobreTiempo) {
 		this.horasSobreTiempo = horasSobreTiempo;
 	}
 
-	public Integer getTotalHorasExtras() {
+	public Double getTotalHorasExtras() {
 		return this.totalHorasExtras;
 	}
 
-	public void setTotalHorasExtras(Integer totalHorasExtras) {
+	public void setTotalHorasExtras(Double totalHorasExtras) {
 		this.totalHorasExtras = totalHorasExtras;
 	}
 

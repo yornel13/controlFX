@@ -9,22 +9,58 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PagoQuincenalController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PagoQuincenalController">
     <children>
-      <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="75.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="485.0" prefWidth="780.0">
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Button fx:id="buttonPagar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#pagarAdelanto" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="600.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Button layoutX="591.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
+            <Button layoutX="361.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
+            <Accordion layoutX="216.0" layoutY="24.0" />
+            <DatePicker fx:id="pickerHasta" layoutX="441.0" layoutY="15.0" promptText="fin" />
+            <DatePicker fx:id="pickerDe" layoutX="211.0" layoutY="15.0" promptText="inicio" />
+            <Label layoutX="186.0" layoutY="20.0" text="De" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="395.0" layoutY="20.0" text="Hasta" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="692.0" layoutY="62.0" text="Todos" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="checkBoxPagarTodos" layoutX="740.0" layoutY="62.0" mnemonicParsing="false" onAction="#pagarATodos" />
+            <Button fx:id="buttonSiguiente" layoutX="591.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonAnterior" layoutX="359.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </Pane>
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
           <TableColumn fx:id="nombreColumna" prefWidth="130.0" text="Nombre" />
             <TableColumn fx:id="apellidoColumna" prefWidth="130.0" text="Apellido" />
             <TableColumn fx:id="departamentoColumna" prefWidth="110.0" text="Departamento" />
-            <TableColumn fx:id="cargoColumna" prefWidth="125.0" text="Cargo" />
+            <TableColumn fx:id="cargoColumna" prefWidth="100.0" text="Cargo" />
             <TableColumn fx:id="quincenalColumna" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Adelanto" />
             <TableColumn fx:id="pagadoColumna" prefWidth="60.0" style="-fx-alignment: CENTER;" text="Pagado" />
             <TableColumn fx:id="pagarColumna" prefWidth="50.0" style="-fx-alignment: CENTER;" text="Pagar" />
         </columns>
       </TableView>
-      <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#returnConfiguracion" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
             <children>
                <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
@@ -39,35 +75,5 @@
                </Button>
             </children>
          </Pane>
-      <TextField fx:id="filterField" layoutX="183.0" layoutY="41.0" prefHeight="25.0" prefWidth="374.0" promptText="Cedula, nombre, apellido, departamento o cargo..." />
-      <Label layoutX="61.0" layoutY="36.0" text="Escriba para filtrar" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Button layoutX="687.0" layoutY="5.0" mnemonicParsing="false" onAction="#pagarAdelanto" text="Pagar Adelanto" />
-      <CheckBox fx:id="checkBoxPagarTodos" layoutX="751.0" layoutY="47.0" mnemonicParsing="false" onAction="#pagarATodos" />
-      <Label layoutX="699.0" layoutY="46.0" text="Marcar" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Button layoutX="340.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
-      <Button layoutX="570.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
-      <Label layoutX="374.0" layoutY="10.0" text="Hasta" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="165.0" layoutY="10.0" text="De" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <DatePicker fx:id="pickerDe" layoutX="190.0" layoutY="5.0" promptText="inicio" />
-      <DatePicker fx:id="pickerHasta" layoutX="420.0" layoutY="5.0" promptText="fin" />
-      <Accordion layoutX="195.0" layoutY="14.0" />
-      <Button layoutX="340.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
-      <Button layoutX="570.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
     </children>
 </AnchorPane>

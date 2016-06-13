@@ -9,9 +9,9 @@ import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
-import hibernate.dao.PagoDAO;
+import hibernate.dao.RolClienteDAO;
 import hibernate.model.Empresa;
-import hibernate.model.Pago;
+import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
@@ -217,9 +217,9 @@ public class RolIndividualController implements Initializable {
     public Timestamp inicio;
     public Timestamp fin;
     
-    private ObservableList<Pago> data;
+    private ObservableList<RolCliente> data;
     
-    ArrayList<Pago> pagos;
+    ArrayList<RolCliente> pagos;
     
     private Empresa empresa;
     
@@ -278,7 +278,7 @@ public class RolIndividualController implements Initializable {
         dialogWait();
         
         ReporteRolCliente datasource = new ReporteRolCliente();
-        datasource.addAll((List<Pago>) controlIndividualTableView.getItems());
+        datasource.addAll((List<RolCliente>) controlIndividualTableView.getItems());
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
@@ -394,7 +394,7 @@ public class RolIndividualController implements Initializable {
         this.inicio = inicio;
         this.fin = fin;
         
-        PagoDAO pagoDAO = new PagoDAO();
+        RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoId(fin, empleado.getId()));
         
@@ -416,7 +416,7 @@ public class RolIndividualController implements Initializable {
         montoSegurosTextValor = 0d; 
         montoUniformesTextValor = 0d;
         
-        for (Pago pago: pagos){
+        for (RolCliente pago: pagos){
             sueldoTotalTextValor += pago.getSueldo();
             extraTextValor += pago.getMontoHorasSobreTiempo() + pago.getMontoHorasSuplementarias();
             pago.setMontoHorasExtras(extraTextValor);
@@ -500,11 +500,11 @@ public class RolIndividualController implements Initializable {
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
         
-        controlIndividualTableView.setRowFactory( (Object tv) -> {
-            TableRow<Pago> row = new TableRow<>();
+        controlIndividualTableView.setRowFactory((Object tv) -> {
+            TableRow<RolCliente> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    Pago rowData = row.getItem();
+                    RolCliente rowData = row.getItem();
                     aplicacionControl.mostrarRolClienteEmpleado(rowData);
                 }
             });

@@ -55,5 +55,7 @@
       <TextField fx:id="cedulaField" layoutX="89.0" layoutY="535.0" onAction="#verRol" />
       <Button layoutX="256.0" layoutY="535.0" mnemonicParsing="false" onAction="#verRol" text="ver rol" />
       <Label fx:id="errorText" layoutX="339.0" layoutY="539.0" prefHeight="17.0" prefWidth="444.0" textFill="#d00b0b" />
+      <Button layoutX="558.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
+      <Button layoutX="328.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
     </children>
 </AnchorPane>

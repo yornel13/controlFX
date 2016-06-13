@@ -14,9 +14,9 @@ public class PagosTable {
     private Integer id;
     private String cliente;
     private Integer dias;
-    private Integer normales;
-    private Integer suplementarias;
-    private Integer sobreTiempo;
+    private Double normales;
+    private Double suplementarias;
+    private Double sobreTiempo;
     private Double sueldo;
     private Double extra;
     private Double bonos;
@@ -51,27 +51,27 @@ public class PagosTable {
         this.dias = dias;
     }
 
-    public Integer getNormales() {
+    public Double getNormales() {
         return normales;
     }
 
-    public void setNormales(Integer normales) {
+    public void setNormales(Double normales) {
         this.normales = normales;
     }
 
-    public Integer getSuplementarias() {
+    public Double getSuplementarias() {
         return suplementarias;
     }
 
-    public void setSuplementarias(Integer suplementarias) {
+    public void setSuplementarias(Double suplementarias) {
         this.suplementarias = suplementarias;
     }
 
-    public Integer getSobreTiempo() {
+    public Double getSobreTiempo() {
         return sobreTiempo;
     }
 
-    public void setSobreTiempo(Integer sobreTiempo) {
+    public void setSobreTiempo(Double sobreTiempo) {
         this.sobreTiempo = sobreTiempo;
     }
 
