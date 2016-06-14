@@ -8,15 +8,12 @@ package migrar;
 
 
 import hibernate.dao.CargoDAO;
-import hibernate.dao.ClienteDAO;
 import hibernate.dao.DepartamentoDAO;
 import hibernate.dao.DetallesEmpleadoDAO;
 import hibernate.dao.EmpresaDAO;
 import hibernate.dao.EstadoCivilDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Cliente;
 import hibernate.model.DetallesEmpleado;
-import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -49,7 +46,7 @@ public class Amigrar {
             CargoDAO dao = new CargoDAO();
             dao.save(cargo);
             dao.changeId(cargo.getId(), cargoViejo.getCodiCargoguardia());
-        } */
+        } 
         
         System.out.println("Migrando empresas...");
         ArrayList<EmpTbempresasegu> empresasViejas = new ArrayList<>();
@@ -75,7 +72,25 @@ public class Amigrar {
             EmpresaDAO empresaDAO = new EmpresaDAO();
             empresaDAO.save(empresa);
             empresaDAO.changeId(empresa.getId(), empresaVieja.getCodiEmpresa());
-        } 
+        }  
+        
+        System.out.println("Migrando clientes...");
+        ArrayList<WebTblCliente> clientesViejos = new ArrayList<>();
+        clientesViejos.addAll((List<WebTblCliente>) new WebTblClienteDAO().findAll());
+        
+        for (WebTblCliente clienteViejo: clientesViejos) {
+            Cliente cliente = new Cliente();
+            cliente.setNombre(clienteViejo.getRazonSocial());
+            cliente.setDetalles("");
+            cliente.setRuc("Falta Nruc.");
+            cliente.setTelefono("Falta Tlf.");
+            cliente.setDireccion("Falta direccion.");
+            cliente.setActivo(Boolean.TRUE);
+            cliente.setCreacion(new Timestamp(new Date().getTime()));
+            cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
+            ClienteDAO clienteDAO = new ClienteDAO();
+            clienteDAO.save(cliente);
+        } */ 
         
         System.out.println("Migrando empleados guardias...");
         ArrayList<SegTbguardia> empleadosViejos = new ArrayList<>();
@@ -123,26 +138,11 @@ public class Amigrar {
             usuariosDAO.changeId(usuario.getId(), empleadoViejo.getCodiGuardia());
         }  
         
-        System.out.println("Migrando clientes...");
-        ArrayList<WebTblCliente> clientesViejos = new ArrayList<>();
-        clientesViejos.addAll((List<WebTblCliente>) new WebTblClienteDAO().findAll());
         
-        for (WebTblCliente clienteViejo: clientesViejos) {
-            Cliente cliente = new Cliente();
-            cliente.setNombre(clienteViejo.getRazonSocial());
-            cliente.setDetalles("");
-            cliente.setRuc("Falta Nruc.");
-            cliente.setTelefono("Falta Tlf.");
-            cliente.setDireccion("Falta direccion.");
-            cliente.setActivo(Boolean.TRUE);
-            cliente.setCreacion(new Timestamp(new Date().getTime()));
-            cliente.setUltimaModificacion(new Timestamp(new Date().getTime()));
-            ClienteDAO clienteDAO = new ClienteDAO();
-            clienteDAO.save(cliente);
-        }
+        
         
         System.out.println("Migracion completada.");
-    }
+    } 
 
     
 }

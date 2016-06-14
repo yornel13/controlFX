@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
@@ -25,6 +26,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -81,6 +84,9 @@ public class HorasEmpleadosController implements Initializable {
     
     @FXML
     private Label errorText;
+    
+    @FXML
+    private TextField filterField;
     
     private Timestamp inicio;
     private Timestamp fin;
@@ -231,8 +237,8 @@ public class HorasEmpleadosController implements Initializable {
                         .getCargo().getNombre());
                empleado.setDias(dias);
                empleado.setHoras(normales);
-               empleado.setSobreTiempo(sobreTiempo);
-               empleado.setSuplementarias(suplementarias);
+               empleado.setSobreTiempo(round(sobreTiempo));
+               empleado.setSuplementarias(round(suplementarias));
                
                data.add(empleado);
            }
@@ -287,7 +293,39 @@ public class HorasEmpleadosController implements Initializable {
         });
         
         
-        errorText.setText("");
+        filtro();
+    }
+    
+    public void filtro() {
+        FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(empleado -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                }
+                return false; // Does not match.
+            });
+        });
+        
+        SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
+        empleadosTableView.setItems(sortedData);
     }
     
     @Override

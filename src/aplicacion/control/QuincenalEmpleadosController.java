@@ -1018,33 +1018,31 @@ public class QuincenalEmpleadosController implements Initializable {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
-        if (!usuarios.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
-           usuarios.stream().map((user) -> {
-                EmpleadoTable empleado = new EmpleadoTable();
-                empleado.setId(user.getId());
-                empleado.setNombre(user.getNombre());
-                empleado.setApellido(user.getApellido());
-                empleado.setCedula(user.getCedula());
-                empleado.setEmpresa(user.getDetallesEmpleado()
-                        .getEmpresa().getNombre());
-                empleado.setTelefono(user.getTelefono());
-                empleado.setDepartamento(user.getDetallesEmpleado()
-                        .getDepartamento().getNombre());
-                empleado.setCargo(user.getDetallesEmpleado()
-                        .getCargo().getNombre());
-               if (user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
-               } else {
-                    empleado.setQuincenal(0d);
-               }
-               
-                return empleado;
-            }).forEach((empleado) -> {
-                data.add(empleado);
-            });
-           empleadosTableView.setItems(data);
-        }
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+             EmpleadoTable empleado = new EmpleadoTable();
+             empleado.setId(user.getId());
+             empleado.setNombre(user.getNombre());
+             empleado.setApellido(user.getApellido());
+             empleado.setCedula(user.getCedula());
+             empleado.setEmpresa(user.getDetallesEmpleado()
+                     .getEmpresa().getNombre());
+             empleado.setTelefono(user.getTelefono());
+             empleado.setDepartamento(user.getDetallesEmpleado()
+                     .getDepartamento().getNombre());
+             empleado.setCargo(user.getDetallesEmpleado()
+                     .getCargo().getNombre());
+            if (user.getDetallesEmpleado().getQuincena() != null) {
+                 empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
+            } else {
+                 empleado.setQuincenal(0d);
+            }
+
+             return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
         
         filtro();
     }

@@ -12,7 +12,7 @@
 <AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="780.0" minHeight="-Infinity" minWidth="780.0" prefHeight="486.0" prefWidth="780.0">
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="75.0" maxHeight="-Infinity" maxWidth="780.0" minHeight="-Infinity" minWidth="780.0" prefHeight="486.0" prefWidth="780.0">
         <columns>
           <TableColumn prefWidth="75.0" text="C1" />
           <TableColumn prefWidth="75.0" text="C2" />
@@ -47,15 +47,8 @@
       <DatePicker fx:id="pickerDe" layoutX="179.0" layoutY="5.0" promptText="inicio" />
       <DatePicker fx:id="pickerHasta" layoutX="409.0" layoutY="5.0" promptText="fin" />
       <Accordion layoutX="184.0" layoutY="14.0" />
-      <Label layoutX="28.0" layoutY="537.0" text="Cedula" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <TextField fx:id="cedulaField" layoutX="89.0" layoutY="535.0" onAction="#verRol" />
-      <Button layoutX="256.0" layoutY="535.0" mnemonicParsing="false" onAction="#verRol" text="ver rol" />
-      <Label fx:id="errorText" layoutX="339.0" layoutY="539.0" prefHeight="17.0" prefWidth="444.0" textFill="#d00b0b" />
       <Button layoutX="558.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
       <Button layoutX="328.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
+      <TextField fx:id="filterField" layoutX="81.0" layoutY="41.0" prefHeight="25.0" prefWidth="654.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
     </children>
 </AnchorPane>

@@ -307,35 +307,34 @@ public class ActuarialesEmpleadosController implements Initializable {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
-        if (!usuarios.isEmpty()) {
-            data = FXCollections.observableArrayList(); 
-            usuarios.stream().map((user) -> {
-                EmpleadoTable empleado = new EmpleadoTable();
-                empleado.setId(user.getId());
-                empleado.setNombre(user.getNombre());
-                empleado.setApellido(user.getApellido());
-                empleado.setCedula(user.getCedula());
-                empleado.setEmpresa(user.getDetallesEmpleado().getEmpresa().getNombre());
-                empleado.setTelefono(user.getTelefono());
-                empleado.setDepartamento(user.getDetallesEmpleado()
-                        .getDepartamento().getNombre());
-                empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
-                Actuariales actuariales = new Actuariales();
-                actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
-                if (actuariales != null) {
-                   empleado.setActuarial1(actuariales.getPrimario());
-                   empleado.setActuarial2(actuariales.getSecundario());
-                } else {
-                   empleado.setActuarial1(0d);
-                   empleado.setActuarial2(0d);
-                }
-                return empleado;
-            }).forEach((empleado) -> {
-                data.add(empleado);
-            });
-           empleadosTableView.setItems(data);
-        }
         
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado().getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+            Actuariales actuariales = new Actuariales();
+            actuariales = new ActuarialesDAO().findByEmpleadoId(user.getId());
+            if (actuariales != null) {
+               empleado.setActuarial1(actuariales.getPrimario());
+               empleado.setActuarial2(actuariales.getSecundario());
+            } else {
+               empleado.setActuarial1(0d);
+               empleado.setActuarial2(0d);
+            }
+            return empleado;
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
+       empleadosTableView.setItems(data);
+
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empleado -> {

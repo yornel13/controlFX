@@ -224,8 +224,8 @@ public class EmpleadosController implements Initializable {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
+        data = FXCollections.observableArrayList(); 
         if (!usuarios.isEmpty()) {
-            data = FXCollections.observableArrayList(); 
             usuarios.stream().map((user) -> {
                 EmpleadoTable empleado = new EmpleadoTable();
                 empleado.setId(user.getId());
@@ -243,8 +243,8 @@ public class EmpleadosController implements Initializable {
             }).forEach((empleado) -> {
                 data.add(empleado);
             });
-           empleadosTableView.setItems(data);
         }
+        empleadosTableView.setItems(data);
           
         cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
@@ -316,7 +316,7 @@ public class EmpleadosController implements Initializable {
                 return false; // Does not match.
             });
         });
-        
+
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);

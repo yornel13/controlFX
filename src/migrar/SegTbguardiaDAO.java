@@ -289,6 +289,14 @@ public class SegTbguardiaDAO extends BaseHibernateDAO {
 	public List findByApel2Guardia(Object apel2Guardia) {
 		return findByProperty(APEL2_GUARDIA, apel2Guardia);
 	}
+        
+        public List findAllLimited() {
+           Query query = getSession().
+                    createSQLQuery("SELECT * FROM seg_tbguardia limit 51,500")
+                    .addEntity(SegTbguardia.class);
+            Object result = query.list();
+            return (List) result; 
+        }
 
 	public List findAll() {
 		log.debug("finding all SegTbguardia instances");

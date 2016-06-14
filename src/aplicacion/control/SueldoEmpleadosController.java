@@ -526,9 +526,9 @@ public class SueldoEmpleadosController implements Initializable {
                     + (user.getDetallesEmpleado().getSueldo()/100d) * porcentaje;
             empleado.setNuevoSueldo(Numeros.round(nuevoSueldo));
              return empleado;
-         }).forEach((empleado) -> {
-             data.add(empleado);
-         });
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
         empleadosTableView.setItems(data);
         empleadosTableView.getColumns().clear();
         
@@ -1016,32 +1016,31 @@ public class SueldoEmpleadosController implements Initializable {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
-        if (!usuarios.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
-           usuarios.stream().map((user) -> {
-               EmpleadoTable empleado = new EmpleadoTable();
-                empleado.setId(user.getId());
-                empleado.setNombre(user.getNombre());
-                empleado.setApellido(user.getApellido());
-                empleado.setCedula(user.getCedula());
-                empleado.setEmpresa(user.getDetallesEmpleado()
-                        .getEmpresa().getNombre());
-                empleado.setTelefono(user.getTelefono());
-                empleado.setDepartamento(user.getDetallesEmpleado()
-                        .getDepartamento().getNombre());
-                empleado.setCargo(user.getDetallesEmpleado() .getCargo().getNombre());
-               if (user.getDetallesEmpleado().getSueldo() != null) {
-                    empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
-               } else {
-                    empleado.setSueldo(0d);
-               }
-               
-                return empleado;
-            }).forEach((empleado) -> {
-                data.add(empleado);
-            });
-           empleadosTableView.setItems(data);
-        }
+        
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+             empleado.setId(user.getId());
+             empleado.setNombre(user.getNombre());
+             empleado.setApellido(user.getApellido());
+             empleado.setCedula(user.getCedula());
+             empleado.setEmpresa(user.getDetallesEmpleado()
+                     .getEmpresa().getNombre());
+             empleado.setTelefono(user.getTelefono());
+             empleado.setDepartamento(user.getDetallesEmpleado()
+                     .getDepartamento().getNombre());
+             empleado.setCargo(user.getDetallesEmpleado() .getCargo().getNombre());
+            if (user.getDetallesEmpleado().getSueldo() != null) {
+                 empleado.setSueldo(user.getDetallesEmpleado().getSueldo());
+            } else {
+                 empleado.setSueldo(0d);
+            }
+
+             return empleado;
+         }).forEach((empleado) -> {
+             data.add(empleado);
+         });
+        empleadosTableView.setItems(data);
         
         filtro();
     }

@@ -209,7 +209,7 @@ public class EditarHorasExtrasController implements Initializable {
     public static EventHandler<KeyEvent> numFilter() {
 
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
-            if (!"0123456789".contains(keyEvent.getCharacter())) {
+            if (!"0123456789.".contains(keyEvent.getCharacter())) {
                 keyEvent.consume();
             }
         };

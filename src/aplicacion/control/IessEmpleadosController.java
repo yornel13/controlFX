@@ -257,34 +257,33 @@ public class IessEmpleadosController implements Initializable {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
-        if (!usuarios.isEmpty()) {
-            data = FXCollections.observableArrayList(); 
-            usuarios.stream().map((user) -> {
-                EmpleadoTable empleado = new EmpleadoTable();
-                empleado.setId(user.getId());
-                empleado.setNombre(user.getNombre());
-                empleado.setApellido(user.getApellido());
-                empleado.setCedula(user.getCedula());
-                empleado.setEmpresa(user.getDetallesEmpleado()
-                        .getEmpresa().getNombre());
-                empleado.setTelefono(user.getTelefono());
-                empleado.setDepartamento(user.getDetallesEmpleado()
-                        .getDepartamento().getNombre());
-                empleado.setCargo(user.getDetallesEmpleado()
-                        .getCargo().getNombre());
-                Double totalIess = 0d; 
-                for (PagoMesItem pagoMesItem: new PagoMesItemDAO()
-                        .findByEmpleadoIdAndClave(user.getId(), Const.IP_IESS)){
-                    totalIess = pagoMesItem.getDeduccion();
-                }
-                empleado.setTotalIess(totalIess);
-                return empleado;
-            }).forEach((empleado) -> {
-                data.add(empleado);
-            });
-           empleadosTableView.setItems(data);
-        }
         
+        data = FXCollections.observableArrayList(); 
+        usuarios.stream().map((user) -> {
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            Double totalIess = 0d; 
+            for (PagoMesItem pagoMesItem: new PagoMesItemDAO()
+                    .findByEmpleadoIdAndClave(user.getId(), Const.IP_IESS)){
+                totalIess = pagoMesItem.getDeduccion();
+            }
+            empleado.setTotalIess(totalIess);
+            return empleado;
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
+        empleadosTableView.setItems(data);
+
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empleado -> {
