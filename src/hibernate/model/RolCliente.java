@@ -2,6 +2,7 @@ package hibernate.model;
 
 // default package
 
+import static aplicacion.control.util.Numeros.round;
 import java.sql.Timestamp;
 
 /**
@@ -193,7 +194,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getHorasNormales() {
-		return this.horasNormales;
+		return round(this.horasNormales);
 	}
 
 	public void setHorasNormales(Double horasNormales) {
@@ -201,7 +202,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getHorasSuplementarias() {
-		return this.horasSuplementarias;
+		return round(this.horasSuplementarias);
 	}
 
 	public void setHorasSuplementarias(Double horasSuplementarias) {
@@ -209,7 +210,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getHorasSobreTiempo() {
-		return this.horasSobreTiempo;
+		return round(this.horasSobreTiempo);
 	}
 
 	public void setHorasSobreTiempo(Double horasSobreTiempo) {
@@ -217,7 +218,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getTotalHorasExtras() {
-		return this.totalHorasExtras;
+		return round(this.totalHorasExtras);
 	}
 
 	public void setTotalHorasExtras(Double totalHorasExtras) {
@@ -225,7 +226,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getSalario() {
-		return this.salario;
+		return round(this.salario);
 	}
 
 	public void setSalario(Double salario) {
@@ -233,7 +234,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getMontoHorasSuplementarias() {
-		return this.montoHorasSuplementarias;
+		return round(this.montoHorasSuplementarias);
 	}
 
 	public void setMontoHorasSuplementarias(Double montoHorasSuplementarias) {
@@ -241,7 +242,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getMontoHorasSobreTiempo() {
-		return this.montoHorasSobreTiempo;
+		return round(this.montoHorasSobreTiempo);
 	}
 
 	public void setMontoHorasSobreTiempo(Double montoHorasSobreTiempo) {
@@ -249,7 +250,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getBono() {
-		return this.bono;
+		return round(this.bono);
 	}
 
 	public void setBono(Double bono) {
@@ -257,7 +258,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getTransporte() {
-		return this.transporte;
+		return round(this.transporte);
 	}
 
 	public void setTransporte(Double transporte) {
@@ -265,7 +266,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getTotalBonos() {
-		return this.totalBonos;
+		return round(this.totalBonos);
 	}
 
 	public void setTotalBonos(Double totalBonos) {
@@ -273,7 +274,7 @@ public class RolCliente implements java.io.Serializable {
 	}
         
         public Double getVacaciones() {
-            return vacaciones;
+            return round(vacaciones);
         }
 
         public void setVacaciones(Double vacaciones) {
@@ -281,7 +282,7 @@ public class RolCliente implements java.io.Serializable {
         }
 
 	public Double getSubtotal() {
-		return this.subtotal;
+		return round(this.subtotal);
 	}
 
 	public void setSubtotal(Double subtotal) {
@@ -289,7 +290,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getDecimoTercero() {
-		return this.decimoTercero;
+		return round(this.decimoTercero);
 	}
 
 	public void setDecimoTercero(Double decimoTercero) {
@@ -297,7 +298,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getDecimoCuarto() {
-		return this.decimoCuarto;
+		return round(this.decimoCuarto);
 	}
 
 	public void setDecimoCuarto(Double decimoCuarto) {
@@ -305,7 +306,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getJubilacionPatronal() {
-		return this.jubilacionPatronal;
+		return round(this.jubilacionPatronal);
 	}
 
 	public void setJubilacionPatronal(Double jubilacionPatronal) {
@@ -313,7 +314,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getAportePatronal() {
-		return this.aportePatronal;
+		return round(this.aportePatronal);
 	}
 
 	public void setAportePatronal(Double aportePatronal) {
@@ -321,7 +322,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getSeguros() {
-		return this.seguros;
+		return round(this.seguros);
 	}
 
 	public void setSeguros(Double seguros) {
@@ -329,7 +330,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getUniformes() {
-		return this.uniformes;
+		return round(this.uniformes);
 	}
 
 	public void setUniformes(Double uniformes) {
@@ -337,7 +338,7 @@ public class RolCliente implements java.io.Serializable {
 	}
 
 	public Double getTotalIngreso() {
-		return this.totalIngreso;
+		return round(this.totalIngreso);
 	}
 
 	public void setTotalIngreso(Double totalIngreso) {

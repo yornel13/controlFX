@@ -21,7 +21,6 @@
                   <MenuItem mnemonicParsing="false" text="Action 2" />
                </items>
             </MenuButton>
-              <Button fx:id="buttonConfiguracion" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="340.0" mnemonicParsing="false" onAction="#verConfiguracion" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="CONFIGURAR" textFill="WHITE" />
             <MenuButton fx:id="buttonHoras" layoutX="405.0" layoutY="160.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   HORAS" textAlignment="CENTER" textFill="WHITE">
               <items>
                 <MenuItem mnemonicParsing="false" text="Action 1" />

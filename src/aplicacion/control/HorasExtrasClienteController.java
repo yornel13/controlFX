@@ -5,7 +5,6 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.HorasExtrasController.getDateFromTimestamp;
 import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.model.Cliente;
@@ -29,7 +28,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -202,6 +200,9 @@ public class HorasExtrasClienteController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        
+        marcarTrabajo.setSelected(true);
+        textEmpleadoLibre.setText("");
     }    
     
     public static EventHandler<KeyEvent> numDecimalFilter() {

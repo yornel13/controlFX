@@ -70,6 +70,15 @@ public class UniformeDAO extends BaseHibernateDAO {
             Object result = query.uniqueResult();
             return (Uniforme) result;
         }
+        
+        public Uniforme findByClienteId(Integer clienteId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM uniforme where cliente_id = :cliente_id and activo = true")
+                    .addEntity(Uniforme.class)
+                    .setParameter("cliente_id", clienteId);
+            Object result = query.uniqueResult();
+            return (Uniforme) result;
+        }
 
 	public List findByExample(Uniforme instance) {
 		log.debug("finding Uniforme instance by example");

@@ -7,17 +7,12 @@ package aplicacion.control;
 
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Permisos;
+import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ConstanteDAO;
-import hibernate.dao.SeguroDAO;
-import hibernate.dao.UniformeDAO;
 import hibernate.model.Constante;
 import hibernate.model.Empresa;
-import hibernate.model.Seguro;
-import hibernate.model.Uniforme;
 import java.net.URL;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -41,17 +36,11 @@ import javafx.stage.Stage;
  *
  * @author Yornel
  */
-public class ConfiguracionEmpresaController implements Initializable {
+public class ConstantesController implements Initializable {
     
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-    
-    @FXML
-    private Label valorSeguro;
-    
-    @FXML
-    private Label valorUniforme;
     
     @FXML
     private Label valorDecimoCuarto;
@@ -62,10 +51,11 @@ public class ConfiguracionEmpresaController implements Initializable {
     @FXML
     private Button buttonAtras;
     
+    @FXML
+    private Label tituloLabel;
+    
     private Empresa empresa;
     
-    Seguro seguro;
-    Uniforme uniforme;
     Constante decimoCuarto;
     Constante iess;
     
@@ -76,32 +66,6 @@ public class ConfiguracionEmpresaController implements Initializable {
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
         this.aplicacionControl = aplicacionControl;
-    }
-    
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
-        setSeguro(new SeguroDAO().findByEmpresaId(empresa.getId()));
-        setUniforme(new UniformeDAO().findByEmpresaId(empresa.getId()));
-        setDecimoCuarto(new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO));
-        setIess(new ConstanteDAO().findUniqueResultByNombre(Const.IESS)); 
-    }
-    
-    public void setSeguro(Seguro seguro) {
-        this.seguro = seguro;
-        if (seguro != null) {
-            valorSeguro.setText("$" + this.seguro.getValor().toString());
-        } else {
-            valorSeguro.setText("$0.0");
-        }
-    }
-    
-    public void setUniforme(Uniforme uniforme) {
-        this.uniforme = uniforme;
-        if (uniforme != null) {
-            valorUniforme.setText("$" + this.uniforme.getValor().toString());
-        } else {
-            valorUniforme.setText("$0.0");
-        }
     }
     
     public void setDecimoCuarto(Constante decimoCuarto) {
@@ -123,117 +87,11 @@ public class ConfiguracionEmpresaController implements Initializable {
     }
     
     @FXML
-    private void returnEmpresa(ActionEvent event) {
+    private void returnConfiguracion(ActionEvent event) {
         stagePrincipal.close();
-        aplicacionControl.mostrarInEmpresa(empresa);
+        aplicacionControl.mostrarConfiguracion();
     }
-     
-    @FXML
-    private void cambiarSeguro(ActionEvent event) {
-        if (aplicacionControl.permisos == null) {
-            aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.EDITAR)) {
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Seguro");
-                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));
-                Button cambiarValorSeguro = new Button("Cambiar");
-                TextField fieldSeguro = new TextField();
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Escriba el nuevo valor?"), fieldSeguro, cambiarValorSeguro).
-                alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                fieldSeguro.setPrefWidth(150);
-                cambiarValorSeguro.setPrefWidth(100);
-                fieldSeguro.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-                dialogStage.show();
-                cambiarValorSeguro.setOnAction((ActionEvent e) -> {
-                    Double newSeguroValue;
-                    if (fieldSeguro.getText().isEmpty()) {
-                        newSeguroValue = 0d;
-                    } else {
-                        newSeguroValue = Double.parseDouble(fieldSeguro.getText());
-                    }
-                    if (seguro != null) {
-                        seguro.setActivo(false);
-                        HibernateSessionFactory.getSession().flush();
-                    }
-                    Seguro newSeguro = new Seguro();
-                    newSeguro.setActivo(Boolean.TRUE);
-                    newSeguro.setEmpresa(empresa);
-                    newSeguro.setNombre("Seguro");
-                    newSeguro.setValor(newSeguroValue);
-                    newSeguro.setFecha(new Timestamp(new Date().getTime()));
-                    new SeguroDAO().save(newSeguro);
-                    setEmpresa(empresa);
-                    dialogStage.close();
-                    
-                    // Registro para auditar
-                    String detalles = "edito el valor del seguro de la empresa " 
-                            + empresa.getNombre();
-                    aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-                }); 
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        } 
-    }
-    
-    @FXML
-    private void cambiarUniforme(ActionEvent event) {
-        if (aplicacionControl.permisos == null) {
-            aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.EDITAR)) {
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Uniforme");
-                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));
-                Button cambiarValorUniforme = new Button("Cambiar");
-                TextField fieldSeguro = new TextField();
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Escriba el nuevo valor?"), fieldSeguro, cambiarValorUniforme).
-                alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                fieldSeguro.setPrefWidth(150);
-                cambiarValorUniforme.setPrefWidth(100);
-                fieldSeguro.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-                dialogStage.show();
-                cambiarValorUniforme.setOnAction((ActionEvent e) -> {
-                    Double newUniformeValue;
-                    if (fieldSeguro.getText().isEmpty()) {
-                        newUniformeValue = 0d;
-                    } else {
-                        newUniformeValue = Double.parseDouble(fieldSeguro.getText());
-                    }
-                    if (uniforme != null) {
-                        uniforme.setActivo(false);
-                        HibernateSessionFactory.getSession().flush();
-                    }
-                    Uniforme newUniforme = new Uniforme();
-                    newUniforme.setActivo(Boolean.TRUE);
-                    newUniforme.setEmpresa(empresa);
-                    newUniforme.setNombre("Uniforme");
-                    newUniforme.setValor(newUniformeValue);
-                    newUniforme.setFecha(new Timestamp(new Date().getTime()));
-                    new UniformeDAO().save(newUniforme);
-                    setEmpresa(empresa);
-                    dialogStage.close();
-                    
-                    // Registro para auditar
-                    String detalles = "edito el valor del uniforme de la empresa " 
-                            + empresa.getNombre();
-                    aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-                }); 
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        } 
-    }   
-    
+   
     @FXML
     private void cambiarDecimoCuarto(ActionEvent event) {
         if (aplicacionControl.permisos == null) {
@@ -271,7 +129,7 @@ public class ConfiguracionEmpresaController implements Initializable {
                     newContante.setNombre(Const.DECIMO_CUARTO);
                     newContante.setValor(newValorDecimoCuarto.toString());
                     new ConstanteDAO().save(newContante);
-                    setEmpresa(empresa);
+                    setInfo();
                     dialogStage.close();
                     
                     // Registro para auditar
@@ -321,7 +179,7 @@ public class ConfiguracionEmpresaController implements Initializable {
                     newContante.setNombre(Const.IESS);
                     newContante.setValor(newValorIess.toString());
                     new ConstanteDAO().save(newContante);
-                    setEmpresa(empresa);
+                    setInfo();
                     dialogStage.close();
                     
                     // Registro para auditar
@@ -334,8 +192,18 @@ public class ConfiguracionEmpresaController implements Initializable {
         } 
     }
     
+    public void setInfo() {
+       setDecimoCuarto(new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO));
+        setIess(new ConstanteDAO().findUniqueResultByNombre(Const.IESS));  
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        setInfo();
+        
+        tituloLabel.setFont(Roboto.MEDIUM(22));
+        
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {
             buttonAtras.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/atras.png'); "

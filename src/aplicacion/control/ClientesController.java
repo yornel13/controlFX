@@ -10,9 +10,9 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.model.Cliente;
-import hibernate.model.Empresa;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -29,9 +29,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -47,16 +48,32 @@ public class ClientesController implements Initializable {
     
     private AplicacionControl aplicacionControl;
     
-    private Empresa empresa;
-   
     @FXML
-    private Button agregarButton;
+    private Button buttonAgregar;
     
     @FXML
-    private Pane imagenLabel;
+    private Button buttonAtras;
     
     @FXML
-    private Button homeButton;
+    private TableColumn numeracionColumna;
+    
+    @FXML
+    private TableColumn nombreColumna;
+    
+    @FXML
+    private TableColumn direccionColumna;
+    
+    @FXML
+    private TableColumn telefonoColumna;
+    
+    @FXML
+    private TableColumn detallesColumna;
+    
+    @FXML
+    private TableColumn<Cliente, Cliente> pagosColumna;
+    
+    @FXML
+    private TableColumn<Cliente, Cliente> borrarColumna;
     
     @FXML
     private TableView clientesTableView;
@@ -85,7 +102,7 @@ public class ClientesController implements Initializable {
     }
     
     @FXML
-    private void returnEmpresa(ActionEvent event) {
+    private void returnConfiguracion(ActionEvent event) {
         aplicacionControl.mostrarConfiguracion();
         stagePrincipal.close();
     } 
@@ -140,7 +157,7 @@ public class ClientesController implements Initializable {
     public void clienteEditado(Cliente cliente) {
         int posicion = 0;
         for (Cliente cli: data) {
-            if (cli.getId() == cliente.getId()) {
+            if (Objects.equals(cli.getId(), cliente.getId())) {
                posicion = data.indexOf(cli);
                break;
             }
@@ -151,42 +168,46 @@ public class ClientesController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         clientesTableView.setEditable(Boolean.FALSE);
-        clientesTableView.getColumns().clear(); 
         
         ClienteDAO clientesDAO = new ClienteDAO();
         clientes = new ArrayList<>();
         clientes.addAll(clientesDAO.findAllActivo());
         
-        if (!clientes.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
-           data.addAll(clientes);
-           clientesTableView.setItems(data);
-        }
+        data = FXCollections.observableArrayList(); 
+        data.addAll(clientes);
+        clientesTableView.setItems(data);
         
-        TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(200);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        numeracionColumna.setCellValueFactory(new PropertyValueFactory<>("ruc"));
         
-        TableColumn detalles = new TableColumn("Detalles");
-        detalles.setMinWidth(100);
-        detalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
-     
-        TableColumn numeracion = new TableColumn("Numeracion");
-        numeracion.setMinWidth(100);
-        numeracion.setCellValueFactory(new PropertyValueFactory<>("ruc"));
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
-        TableColumn telefono = new TableColumn("Telefono");
-        telefono.setMinWidth(100);
-        telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        telefonoColumna.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
-        TableColumn direccion = new TableColumn("Direccion");
-        direccion.setMinWidth(220);
-        direccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
+        direccionColumna.setCellValueFactory(new PropertyValueFactory<>("direccion"));
         
-        TableColumn<Cliente, Cliente> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
-        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        delete.setCellFactory(param -> new TableCell<Cliente, Cliente>() {
+        detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+        
+        pagosColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        pagosColumna.setCellFactory(param -> new TableCell<Cliente, Cliente>() {
+            private final Button pagarButton = new Button("Editar");
+
+            @Override
+            protected void updateItem(Cliente cliente, boolean empty) {
+                super.updateItem(cliente, empty);
+
+                if (cliente == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                setGraphic(pagarButton);
+                pagarButton.setOnAction(event -> {
+                    aplicacionControl.mostrarClienteVariables(cliente, stagePrincipal);
+                });
+            }
+        });
+        borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        borrarColumna.setCellFactory(param -> new TableCell<Cliente, Cliente>() {
             private final Button deleteButton = new Button("Borrar");
 
             @Override
@@ -205,17 +226,48 @@ public class ClientesController implements Initializable {
             }
         });
        
-        clientesTableView.getColumns().addAll(nombre, detalles, numeracion, telefono, direccion, delete);
-        
         clientesTableView.setRowFactory( (Object tv) -> {
             TableRow<Cliente> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     Cliente rowData = row.getItem();
-                    aplicacionControl.mostrarCliente(clientesDAO.findById(rowData.getId()));
+                    aplicacionControl.mostrarCliente(clientesDAO
+                            .findById(rowData.getId()));
                 }
             });
             return row ;
+        });
+        
+        buttonAgregar.setTooltip(
+            new Tooltip("Agregar nuevo cliente")
+        );
+        buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAgregar.setOnMouseExited((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

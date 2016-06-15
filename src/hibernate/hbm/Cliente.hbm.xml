@@ -39,11 +39,23 @@
       </key>
       <one-to-many class="hibernate.model.ControlEmpleado"/>
     </set>
-    <set inverse="true" name="pagos">
+    <set inverse="true" name="rolClientes">
       <key>
         <column name="cliente_id"/>
       </key>
       <one-to-many class="hibernate.model.RolCliente"/>
+    </set>
+    <set inverse="true" name="seguros">
+      <key>
+        <column name="cliente_id"/>
+      </key>
+      <one-to-many class="hibernate.model.Seguro"/>
+    </set>
+    <set inverse="true" name="uniformes">
+      <key>
+        <column name="cliente_id"/>
+      </key>
+      <one-to-many class="hibernate.model.Uniforme"/>
     </set>
   </class>
 </hibernate-mapping>

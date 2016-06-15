@@ -69,6 +69,15 @@ public class SeguroDAO extends BaseHibernateDAO {
             Object result = query.uniqueResult();
             return (Seguro) result;
         }
+        
+        public Seguro findByClienteId(Integer clienteId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM seguro where cliente_id = :cliente_id and activo = true")
+                    .addEntity(Seguro.class)
+                    .setParameter("cliente_id", clienteId);
+            Object result = query.uniqueResult();
+            return (Seguro) result;
+        }
 
 	public List findByExample(Seguro instance) {
 		log.debug("finding Seguro instance by example");

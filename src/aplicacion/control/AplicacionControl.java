@@ -965,14 +965,14 @@ public class AplicacionControl extends Application {
         if (permisos == null) {
            noLogeado();
         } else {
-            if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.VER)) {
+            if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
                     System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesEmpresa.fxml"));
                     AnchorPane ventanaClientesEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Rol de pago por cliente");
+                    ventana.setTitle(empresa.getNombre() + " - Rol de pago por cliente");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setWidth(800);
@@ -1661,17 +1661,17 @@ public class AplicacionControl extends Application {
        }
     }
     
-    public void mostrarConfiguracionEmpresa(Empresa empresa, Stage stage) {
+    public void mostrarConstantes(Stage stage) {
         if (permisos == null) {
            noLogeado();
        } else {
            if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.EDITAR)) {
                try {
                     stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConfiguracionEmpresa.fxml"));
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaConstantes.fxml"));
                     AnchorPane ventanaConfiguracionEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle(empresa.getSiglas() + " - configuracion");
+                    ventana.setTitle("Constantes Globales");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -1680,10 +1680,54 @@ public class AplicacionControl extends Application {
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaConfiguracionEmpresa);
                     ventana.setScene(scene);
-                    ConfiguracionEmpresaController controller = loader.getController();
+                    ConstantesController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.CONFIGURACION, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+              noPermitido();
+           }
+       }
+    }
+    
+    public void mostrarClienteVariables(Cliente cliente, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+       } else {
+           if (permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.EDITAR)) {
+               try {
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClienteVariables.fxml"));
+                    AnchorPane ventanaConfiguracionEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Cliente " + cliente.getNombre() + " - Constantes.");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaConfiguracionEmpresa);
+                    ventana.setScene(scene);
+                    ClienteVariablesController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setCliente(cliente);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     Platform.setImplicitExit(false);
                     ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {

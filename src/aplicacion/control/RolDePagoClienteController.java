@@ -252,14 +252,14 @@ public class RolDePagoClienteController implements Initializable {
     public void onClickPago(ActionEvent event) {
         
         String faltantes = "";
-        if (pago.getVacaciones() == 0) {
-            faltantes += " Sin transporte.";
+        if (pago.getVacaciones().equals(0d)) {
+            faltantes += " Sin vacaciones.";
         } 
-        if (pago.getBono() == 0) {
+        if (pago.getBono().equals(0d)) {
             faltantes += " Sin bono.";
         }
-        if (pago.getTransporte()== 0) {
-            faltantes += " Sin vacaciones.";
+        if (pago.getTransporte().equals(0d)) {
+            faltantes += " Sin transporte.";
         }
         
         Stage dialogStage = new Stage();
@@ -636,45 +636,50 @@ public class RolDePagoClienteController implements Initializable {
         
         totalDias.setText(dias.toString());
         totalHorasN.setText(normales.toString());
-        totalHorasRC.setText(suplementarias.toString());
-        totalHorasST.setText(sobreTiempo.toString());
-        totalHorasExtras.setText(String.valueOf(sobreTiempo + suplementarias));
+        totalHorasRC.setText(round(suplementarias).toString());
+        totalHorasST.setText(round(sobreTiempo).toString());
+        totalHorasExtras.setText((round(sobreTiempo + suplementarias)).toString());
         
         // Salario
-        Double totalSalarioDouble = sueldoDia * Double.valueOf(dias);
-        totalSalario.setText(String.format( "%.2f", totalSalarioDouble));
-        Double totalSobreTiempoDouble = sueldoHoras * Double.valueOf(sobreTiempo);
-        totalSobreTiempo.setText(String.format( "%.2f", totalSobreTiempoDouble));
-        Double totalRecargoDouble = sueldoHoras * Double.valueOf(suplementarias);
-        totalRecargo.setText(String.format( "%.2f", totalRecargoDouble));
-        Double totalBonoDouble = getBono();
-        totalBono.setText(String.format( "%.2f", totalBonoDouble));
-        Double totalTransporteDouble = getTransporte();
-        totalTransporte.setText(String.format( "%.2f", totalTransporteDouble));
-        Double totalBonosDouble = totalBonoDouble + totalTransporteDouble;
-        totalBonos.setText(String.format( "%.2f", totalBonosDouble));
-        Double totalVacacionesDouble = getVacaciones();
-        totalVacaciones.setText(String.format( "%.2f", totalVacacionesDouble));
-        Double subTotalDouble = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonosDouble + totalVacacionesDouble;
-        subTotal.setText(String.format( "%.2f", subTotalDouble));
+        Double totalSalarioDouble = round(sueldoDia * Double.valueOf(dias));
+        totalSalario.setText(String.format("%.2f", totalSalarioDouble));
+        Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
+        totalSobreTiempo.setText(String.format("%.2f", totalSobreTiempoDouble));
+        Double totalRecargoDouble = round(sueldoHoras * suplementarias);
+        totalRecargo.setText(String.format("%.2f", totalRecargoDouble));
+        Double totalBonoDouble = round(getBono());
+        totalBono.setText(String.format("%.2f", totalBonoDouble));
+        Double totalTransporteDouble = round(getTransporte());
+        totalTransporte.setText(String.format("%.2f", totalTransporteDouble));
+        Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
+        totalBonos.setText(String.format("%.2f", totalBonosDouble));
+        Double totalVacacionesDouble = round(getVacaciones());
+        totalVacaciones.setText(String.format("%.2f", totalVacacionesDouble));
+        Double subTotalDouble = round(totalSalarioDouble 
+                + totalSobreTiempoDouble + totalRecargoDouble 
+                + totalBonosDouble + totalVacacionesDouble);
+        subTotal.setText(String.format("%.2f", subTotalDouble));
         ////////////////////////////////////////////////////
-        Double decimoTercero = subTotalDouble / 12d;
-        totalDecimo3.setText(String.format( "%.2f", decimoTercero));
-        Double decimoCuarto = (getDecimoCuarto()/30d) * Double.valueOf(dias);
-        totalDecimo4.setText(String.format( "%.2f", decimoCuarto));
-        totalReserva.setText(String.format( "%.2f", decimoTercero));
+        Double decimoTercero = round(subTotalDouble / 12d);
+        totalDecimo3.setText(String.format("%.2f", decimoTercero));
+        Double decimoCuarto = round(getDecimoCuarto()/30d * Double.valueOf(dias));
+        totalDecimo4.setText(String.format("%.2f", decimoCuarto));
+        totalReserva.setText(String.format("%.2f", decimoTercero));
         Double jubilacionPatronal = round(getActuariales(empleado.getId()))/ 360d * Double.valueOf(dias);
-        totalJubilacion.setText(String.format( "%.2f", jubilacionPatronal));
-        Double aportePatronal = subTotalDouble * 12.15d / 100d;
-        totalAporte.setText(String.format( "%.2f", aportePatronal));
-        Double segurosDecimal = getSeguro(empleado.getDetallesEmpleado().getEmpresa().getId()) * Double.valueOf(dias);
-        totalSeguros.setText(String.format( "%.2f", segurosDecimal));
-        Double uniformeDecimal = getUniforme(empleado.getDetallesEmpleado().getEmpresa().getId()) * Double.valueOf(dias);
-        totalUniformes.setText(String.format( "%.2f", uniformeDecimal));
+        totalJubilacion.setText(String.format("%.2f", jubilacionPatronal));
+        Double aportePatronal = round(subTotalDouble * 12.15d / 100d);
+        totalAporte.setText(String.format("%.2f", aportePatronal));
+        Double segurosDecimal = round(getSeguro(empleado.getDetallesEmpleado()
+                .getEmpresa().getId()) * Double.valueOf(dias));
+        totalSeguros.setText(String.format("%.2f", segurosDecimal));
+        Double uniformeDecimal = round(getUniforme(empleado.getDetallesEmpleado()
+                .getEmpresa().getId()) * Double.valueOf(dias));
+        totalUniformes.setText(String.format("%.2f", uniformeDecimal));
         
-        Double ingresoTotal = subTotalDouble + decimoTercero + decimoCuarto + decimoTercero 
-                + jubilacionPatronal + aportePatronal + segurosDecimal + uniformeDecimal;
-        totalIngresos.setText(String.format( "%.2f", ingresoTotal));
+        Double ingresoTotal = round(subTotalDouble + decimoTercero 
+                + decimoCuarto + decimoTercero + jubilacionPatronal 
+                + aportePatronal + segurosDecimal + uniformeDecimal);
+        totalIngresos.setText(String.format("%.2f", ingresoTotal));
         
         pago = new RolCliente();
         pago.setFecha(new Timestamp(new Date().getTime()));
@@ -729,65 +734,65 @@ public class RolDePagoClienteController implements Initializable {
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
     }
     
-    public double getDecimoCuarto() {
+    public Double getDecimoCuarto() {
         ConstanteDAO constanteDao = new ConstanteDAO();
         Constante constante;
         constante = (Constante) constanteDao.findUniqueResultByNombre(Const.DECIMO_CUARTO);
         if (constante == null) {
-            return 30.5;
+            return 30.5d;
         } else {
             return Double.valueOf(constante.getValor());
         }
     }
     
-    public double getActuariales(Integer empleadoId) {
+    public Double getActuariales(Integer empleadoId) {
         ActuarialesDAO actuarialesDAO = new ActuarialesDAO();
         Actuariales actuariales;
         actuariales = actuarialesDAO.findByEmpleadoId(empleadoId);
         if (actuariales == null) {
-            return 0;
+            return 0d;
         } else {
             return actuariales.getPrimario() + actuariales.getSecundario();
         }
     }
     
-    public double getSeguro(Integer empresaId) {
+    public Double getSeguro(Integer empresaId) {
         Seguro seguro = new SeguroDAO().findByEmpresaId(empresaId);
         if (seguro == null) {
-          return 0;  
+          return 0d;  
         } else {
             return seguro.getValor();
         }  
     }
     
-    public double getUniforme(Integer empresaId) {
+    public Double getUniforme(Integer empresaId) {
         Uniforme uniforme = new UniformeDAO().findByEmpresaId(empresaId);
         if (uniforme == null) {
-          return 0;  
+          return 0d;  
         } else {
             return uniforme.getValor();
         }  
     }
     
-    public double getBono() {
+    public Double getBono() {
         if (bonoField.getText().isEmpty()) {
-            return 0;
+            return 0d;
         } else {
             return Double.valueOf(bonoField.getText());
         }
     }
     
-    public double getTransporte() {
+    public Double getTransporte() {
         if (transporteField.getText().isEmpty()) {
-            return 0;
+            return 0d;
         } else {
             return Double.valueOf(transporteField.getText());
         }
     }
     
-    public double getVacaciones() {
+    public Double getVacaciones() {
         if (vacacionesField.getText().isEmpty()) {
-            return 0;
+            return 0d;
         } else {
             return Double.valueOf(vacacionesField.getText());
         }

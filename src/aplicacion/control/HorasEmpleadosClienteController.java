@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
@@ -103,11 +104,6 @@ public class HorasEmpleadosClienteController implements Initializable {
     private void goHome(ActionEvent event) {
         aplicacionControl.mostrarVentanaPrincipal();
         stagePrincipal.close();
-    }
-    
-    @FXML
-    private void agregarEmpleado(ActionEvent event) {
-        //aplicacionControl.mostrarRegistrarEmpleado(empresa);
     }
     
     @FXML
@@ -234,9 +230,9 @@ public class HorasEmpleadosClienteController implements Initializable {
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
                empleado.setDias(dias);
-               empleado.setHoras(normales);
-               empleado.setSobreTiempo(sobreTiempo);
-               empleado.setSuplementarias(suplementarias);
+               empleado.setHoras(round(normales));
+               empleado.setSobreTiempo(round(sobreTiempo));
+               empleado.setSuplementarias(round(suplementarias));
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);

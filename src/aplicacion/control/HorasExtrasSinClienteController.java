@@ -199,6 +199,9 @@ public class HorasExtrasSinClienteController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
         sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        
+        marcarTrabajo.setSelected(true);
+        textEmpleadoLibre.setText("");
     }    
     
     public static EventHandler<KeyEvent> numFilter() {

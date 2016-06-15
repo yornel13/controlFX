@@ -5,7 +5,7 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.ConfiguracionEmpresaController.numDecimalFilter;
+import static aplicacion.control.ConstantesController.numDecimalFilter;
 import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;

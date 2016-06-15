@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Roboto;
 import hibernate.dao.ClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
@@ -22,6 +23,9 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -36,15 +40,27 @@ public class ClientesEmpresaController implements Initializable {
     private AplicacionControl aplicacionControl;
     
     private Empresa empresa;
-   
-    @FXML
-    private Button agregarButton;
     
     @FXML
-    private Pane imagenLabel;
+    private TableColumn numeracionColumna;
     
     @FXML
-    private Button homeButton;
+    private TableColumn nombreColumna;
+    
+    @FXML
+    private TableColumn direccionColumna;
+    
+    @FXML
+    private TableColumn telefonoColumna;
+    
+    @FXML
+    private TableColumn detallesColumna;
+    
+    @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonAdministrativo;
     
     @FXML
     private TableView clientesTableView;
@@ -78,52 +94,68 @@ public class ClientesEmpresaController implements Initializable {
     } 
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {   
+    public void initialize(URL url, ResourceBundle rb) {
         clientesTableView.setEditable(Boolean.FALSE);
-        clientesTableView.getColumns().clear(); 
         
         ClienteDAO clientesDAO = new ClienteDAO();
         clientes = new ArrayList<>();
         clientes.addAll(clientesDAO.findAllActivo());
         
-        if (!clientes.isEmpty()) {
-           data = FXCollections.observableArrayList(); 
-           data.addAll(clientes);
-           clientesTableView.setItems(data);
-        }
+        data = FXCollections.observableArrayList(); 
+        data.addAll(clientes);
+        clientesTableView.setItems(data);
+
+        numeracionColumna.setCellValueFactory(new PropertyValueFactory<>("ruc"));
         
-        TableColumn nombre = new TableColumn("Cliente");
-        nombre.setMinWidth(120);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
-        TableColumn detalles = new TableColumn("Detalles");
-        detalles.setMinWidth(100);
-        detalles.setCellValueFactory(new PropertyValueFactory<>("detalles"));
-     
-        TableColumn numeracion = new TableColumn("Numeracion");
-        numeracion.setMinWidth(80);
-        numeracion.setCellValueFactory(new PropertyValueFactory<>("ruc"));
+        telefonoColumna.setCellValueFactory(new PropertyValueFactory<>("telefono"));
         
-        TableColumn telefono = new TableColumn("Telefono");
-        telefono.setMinWidth(100);
-        telefono.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        direccionColumna.setCellValueFactory(new PropertyValueFactory<>("direccion"));
         
-        TableColumn direccion = new TableColumn("Direccion");
-        direccion.setMinWidth(100);
-        direccion.setCellValueFactory(new PropertyValueFactory<>("direccion"));
-       
-        clientesTableView.getColumns().addAll(numeracion, nombre, detalles, telefono, direccion);
+        detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
         
         clientesTableView.setRowFactory( (Object tv) -> {
             TableRow<Cliente> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     Cliente rowData = row.getItem();
-                    aplicacionControl.mostrarHorasEmpleadosCliente(empresa, clientesDAO.findById(rowData.getId()));
+                    aplicacionControl.mostrarHorasEmpleadosCliente(empresa, 
+                            clientesDAO.findById(rowData.getId()));
                 }
             });
             return row ;
         });
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        {
+            Image imageGuardia = new Image(getClass()
+                    .getResourceAsStream("imagenes/bt_administrativo.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonAdministrativo.setGraphic(imageView);
+            buttonAdministrativo.setFont(Roboto.MEDIUM(15));
+            buttonAdministrativo.setOnMouseEntered((MouseEvent t) -> {
+                buttonAdministrativo.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonAdministrativo.setOnMouseExited((MouseEvent t) -> {
+                buttonAdministrativo.setStyle("-fx-background-color: #039BE5;");
+            });
+        }
     } 
     
     // Login items

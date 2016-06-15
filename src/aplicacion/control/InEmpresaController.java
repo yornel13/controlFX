@@ -5,12 +5,8 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Roboto;
-import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.Cliente;
-import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.net.URL;
@@ -33,7 +29,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 /**
@@ -64,9 +59,6 @@ public class InEmpresaController implements Initializable {
 
     @FXML
     private Button buttonEmpleados;
-    
-    @FXML
-    private Button buttonConfiguracion;
     
     @FXML
     private MenuButton buttonHoras;
@@ -101,11 +93,6 @@ public class InEmpresaController implements Initializable {
     private void verEmpleados(ActionEvent event) {
         aplicacionControl.mostrarEmpleados(empresa, stagePrincipal);
     }
-
-    @FXML
-    private void verConfiguracion(ActionEvent event) {
-        aplicacionControl.mostrarConfiguracionEmpresa(empresa, stagePrincipal);
-    }
     
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
@@ -136,20 +123,6 @@ public class InEmpresaController implements Initializable {
             });
             buttonEmpleados.setOnMouseExited((MouseEvent t) -> {
                 buttonEmpleados.setStyle("-fx-background-color: #039BE5;");
-            });
-        }
-        {
-            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_configuracion.png"));
-            ImageView imageView = new ImageView(imageGuardia);
-            imageView.setFitHeight(50);
-            imageView.setFitWidth(50);
-            buttonConfiguracion.setGraphic(imageView);
-            buttonConfiguracion.setFont(Roboto.MEDIUM(15));
-            buttonConfiguracion.setOnMouseEntered((MouseEvent t) -> {
-                buttonConfiguracion.setStyle("-fx-background-color: #E0E0E0;");
-            });
-            buttonConfiguracion.setOnMouseExited((MouseEvent t) -> {
-                buttonConfiguracion.setStyle("-fx-background-color: #039BE5;");
             });
         }
         {
@@ -272,6 +245,7 @@ public class InEmpresaController implements Initializable {
                 buttonEdicion.setStyle("-fx-background-color: #039BE5;");
             });
         }
+        
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {
             buttonAtras.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/atras.png'); "

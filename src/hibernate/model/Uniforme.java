@@ -15,6 +15,7 @@ public class Uniforme implements java.io.Serializable {
 
 	private Integer id;
 	private Empresa empresa;
+        private Cliente cliente;
 	private String nombre;
 	private Double valor;
 	private Boolean activo;
@@ -52,6 +53,14 @@ public class Uniforme implements java.io.Serializable {
 		this.empresa = empresa;
 	}
 
+        public Cliente getCliente() {
+            return cliente;
+        }
+
+        public void setCliente(Cliente cliente) {
+            this.cliente = cliente;
+        }
+        
 	public String getNombre() {
 		return this.nombre;
 	}

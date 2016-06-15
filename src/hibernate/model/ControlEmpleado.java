@@ -2,6 +2,7 @@ package hibernate.model;
 
 // default package
 
+import static aplicacion.control.util.Numeros.round;
 import java.sql.Timestamp;
 
 /**
@@ -85,7 +86,7 @@ public class ControlEmpleado implements java.io.Serializable {
 	}
 
 	public Double getHorasSuplementarias() {
-		return this.horasSuplementarias;
+		return round(this.horasSuplementarias);
 	}
 
 	public void setHorasSuplementarias(Double horasSuplementarias) {
@@ -93,7 +94,7 @@ public class ControlEmpleado implements java.io.Serializable {
 	}
 
 	public Double getHorasExtras() {
-		return this.horasExtras;
+		return round(this.horasExtras);
 	}
 
 	public void setHorasExtras(Double horasExtras) {

@@ -23,7 +23,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -39,8 +38,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -57,15 +54,9 @@ public class EmpleadosController implements Initializable {
     private AplicacionControl aplicacionControl;
     
     private Empresa empresa;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
     private Button buttonAgregar;
-    
-    @FXML
-    private Pane imagenLabel;
     
     @FXML
     private Button buttonAtras;

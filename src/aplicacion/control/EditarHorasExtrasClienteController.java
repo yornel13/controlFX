@@ -187,6 +187,9 @@ public class EditarHorasExtrasClienteController implements Initializable {
         suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         datePickerFecha.setDisable(true);
+        
+        marcarTrabajo.setSelected(true);
+        textEmpleadoLibre.setText("");
     }    
     
     public static EventHandler<KeyEvent> numDecimalFilter() {

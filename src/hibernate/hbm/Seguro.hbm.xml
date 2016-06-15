@@ -11,7 +11,10 @@
             <generator class="identity" />
         </id>
         <many-to-one name="empresa" class="hibernate.model.Empresa" fetch="select">
-            <column name="empresa_id" not-null="true" />
+            <column name="empresa_id" />
+        </many-to-one>
+        <many-to-one name="cliente" class="hibernate.model.Cliente" fetch="select">
+            <column name="cliente_id" />
         </many-to-one>
         <property name="nombre" type="java.lang.String">
             <column name="nombre" not-null="true" />

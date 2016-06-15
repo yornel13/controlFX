@@ -9,25 +9,19 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.ConfiguracionController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.ConfiguracionController">
     <children>
         <Label fx:id="label" layoutX="126" layoutY="120" minHeight="16" minWidth="69" />
-      <Button layoutX="78.0" layoutY="387.0" mnemonicParsing="false" onAction="#verAdministradores" prefHeight="25.0" prefWidth="151.0" text="Ver adminitradores" />
-      <Button fx:id="buttonConfiguracion" layoutX="78.0" layoutY="340.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="25.0" prefWidth="151.0" text="Ver empleados" />
-      <Button layoutX="574.0" layoutY="340.0" mnemonicParsing="false" onAction="#registrarEmpresa" prefHeight="25.0" prefWidth="151.0" text="Crear" />
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <Pane fx:id="imagenLabel" prefHeight="216.0" prefWidth="800.0" />
-      <Line endX="70.0" layoutX="168.0" layoutY="310.0" startX="-100.0" />
-      <Label layoutX="78.0" layoutY="285.0" text="Usuarios" />
-      <Line endX="70.0" layoutX="664.0" layoutY="310.0" startX="-100.0" />
-      <Label layoutX="572.0" layoutY="285.0" text="Empresas" />
-      <Button layoutX="574.0" layoutY="387.0" mnemonicParsing="false" onAction="#mostrarEmpresas" prefHeight="25.0" prefWidth="151.0" text="Ver todas" />
-      <Button layoutX="78.0" layoutY="435.0" mnemonicParsing="false" onAction="#registrarAdministrador" prefHeight="25.0" prefWidth="151.0" text="Registrar adminitradores" />
-      <Button fx:id="homeButton" layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#goHome" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
-      <Label layoutX="324.0" layoutY="285.0" text="Clientes" />
-      <Line endX="70.0" layoutX="415.0" layoutY="310.0" startX="-100.0" />
-      <Button layoutX="330.0" layoutY="340.0" mnemonicParsing="false" onAction="#registrarCliente" prefHeight="25.0" prefWidth="151.0" text="Crear" />
-      <Button layoutX="330.0" layoutY="387.0" mnemonicParsing="false" onAction="#mostrarClientes" prefHeight="25.0" prefWidth="151.0" text="Ver todos" />
+      <Pane fx:id="imagenLabel" prefHeight="200.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Label alignment="CENTER" layoutX="177.0" layoutY="62.0" prefHeight="77.0" prefWidth="447.0" text="ADMINISTRACIÓN" textFill="WHITE">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Label>
+         </children></Pane>
       <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
         <children>
            <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
@@ -42,7 +36,12 @@
            </Button>
         </children>
      </Pane>
-      <Button layoutX="78.0" layoutY="485.0" mnemonicParsing="false" onAction="#mostarAuditorias" prefWidth="151.0" text="Auditoria" />
-      <Button layoutX="574.0" layoutY="435.0" mnemonicParsing="false" onAction="#mostrarDepartamentosCargos" prefHeight="25.0" prefWidth="151.0" text="Deudas/Cargos/Departamentos" />
+      <Button fx:id="buttonClientes" alignment="BASELINE_LEFT" layoutX="315.0" layoutY="269.0" mnemonicParsing="false" onAction="#mostrarClientes" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="  Clientes" textFill="WHITE" />
+      <Button fx:id="buttonConstantes" alignment="BASELINE_LEFT" layoutX="61.0" layoutY="378.0" mnemonicParsing="false" onAction="#verConstantes" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="Constantes" textFill="WHITE" />
+      <Button fx:id="buttonEmpleados" alignment="BASELINE_LEFT" layoutX="61.0" layoutY="273.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="Empleados" textFill="WHITE" />
+      <Button fx:id="buttonVariables" alignment="BASELINE_LEFT" layoutX="61.0" layoutY="479.0" mnemonicParsing="false" onAction="#mostrarDepartamentosCargos" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="Variables" textFill="WHITE" />
+      <Button fx:id="buttonAdministradores" alignment="BASELINE_LEFT" layoutX="564.0" layoutY="269.0" mnemonicParsing="false" onAction="#verAdministradores" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="Usuarios" textFill="WHITE" />
+      <Button fx:id="buttonEmpresas" alignment="BASELINE_LEFT" layoutX="315.0" layoutY="378.0" mnemonicParsing="false" onAction="#mostrarEmpresas" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" Empresas" textFill="WHITE" />
+      <Button fx:id="buttonAuditoria" alignment="BASELINE_LEFT" layoutX="564.0" layoutY="378.0" mnemonicParsing="false" onAction="#mostarAuditorias" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" Auditoria" textFill="WHITE" />
     </children>
 </AnchorPane>
