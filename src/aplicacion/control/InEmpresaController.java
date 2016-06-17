@@ -39,8 +39,6 @@ public class InEmpresaController implements Initializable {
     
     Empresa empresa;
 
-    private ArrayList<Usuario> empleados;
-
     private Stage stagePrincipal;
 
     private AplicacionControl aplicacionControl;
@@ -101,12 +99,9 @@ public class InEmpresaController implements Initializable {
         numeracionLabel.setText("Nruc: " + empresa.getNumeracion());
         numeracionLabel.setFont(Roboto.REGULAR(14));
         labelEmpresaSeguridad.setFont(Roboto.REGULAR(14));
-
-        UsuarioDAO usuariosDAO = new UsuarioDAO();
-        empleados = new ArrayList<>();
-        empleados.addAll(usuariosDAO.findByEmpresaIdActivo(empresa.getId()));
         totalLabel.setFont(Roboto.REGULAR(14));
-        totalLabel.setText("Total de empleados: " + empleados.size());
+        totalLabel.setText("Total de empleados: " 
+                + new UsuarioDAO().countEmpleados(empresa.getId()));
     }
  
     @Override

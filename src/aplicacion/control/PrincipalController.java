@@ -156,7 +156,6 @@ public class PrincipalController implements Initializable {
 
         @Override
         public void run() {
-            System.out.println(Thread.currentThread().getName()+ " Start. Command = "+command);
 
             try {
                 EmpresaDAO empresaDao = new EmpresaDAO();
@@ -181,7 +180,6 @@ public class PrincipalController implements Initializable {
             login.setVisible(true);
             usuarioLogin.setVisible(true);
             progressBar.setVisible(false);
-            System.out.println(Thread.currentThread().getName()+" End.");
         }
 
         private void processCommand() {

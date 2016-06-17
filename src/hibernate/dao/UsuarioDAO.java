@@ -128,6 +128,19 @@ public class UsuarioDAO extends BaseHibernateDAO {
             return (List<Usuario>) result;
         }
         
+        public Integer countEmpleados(Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT COUNT(empresa_id) "
+                            + "FROM usuario "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "WHERE empresa_id = :empresa_id "
+                            + "and activo = true")
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.uniqueResult();
+            return Integer.valueOf(result.toString());
+        }
+        
         public List<Usuario> findAllByEmpresaYCargoActivo(Integer empresaId, Integer cargoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario JOIN detalles_empleado "
