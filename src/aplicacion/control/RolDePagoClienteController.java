@@ -54,9 +54,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -186,14 +188,21 @@ public class RolDePagoClienteController implements Initializable {
     @FXML
     private GridPane gridPaneTotal;
     
+     @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
     private Cliente cliente;
-    private Empresa empresa;
     
     private ObservableList<ControlTable> data;
     
     ArrayList<Usuario> usuarios;
     
     private RolCliente pago;
+    
+    private Boolean editable = true;
     
     Timestamp fin;
     Timestamp inicio;
@@ -214,13 +223,16 @@ public class RolDePagoClienteController implements Initializable {
     
     @FXML
     private void onClickCalcular(ActionEvent event) {
-        setControlEmpleadoInfo(empleado, inicio, fin);
+        if (editable)
+            setControlEmpleadoInfo(empleado, inicio, fin);
+        else 
+            dialogError();
     }
     
     @FXML
     private void expandir(ActionEvent event) {
         if (expandirButton.getText().equalsIgnoreCase("Expandir")) {
-            empleadosTableView.setPrefHeight(525);
+            empleadosTableView.setPrefHeight(495);
             expandirButton.setText("Contraer");
             gridPaneTotal.setVisible(false);
         } else {
@@ -336,7 +348,6 @@ public class RolDePagoClienteController implements Initializable {
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            stagePrincipal.close();
         });
     }
     
@@ -357,34 +368,38 @@ public class RolDePagoClienteController implements Initializable {
     
     @FXML
     public void mostrarHoras(ActionEvent event) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasCliente.fxml"));
-                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaHoras);
-                    ventana.setScene(scene);
-                    HorasExtrasClienteController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpleado(empleado, cliente);
-                    ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
+        if (editable)
+            if (aplicacionControl.permisos == null) {
+               aplicacionControl.noLogeado();
             } else {
-                aplicacionControl.noPermitido();
-            }
+                if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
+                    try {
+                        FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasExtrasCliente.fxml"));
+                        AnchorPane ventanaHoras = (AnchorPane) loader.load();
+                        Stage ventana = new Stage();
+                        ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                        ventana.getIcons().add(new Image(stageIcon));
+                        ventana.setResizable(false);
+                        ventana.initOwner(stagePrincipal);
+                        Scene scene = new Scene(ventanaHoras);
+                        ventana.setScene(scene);
+                        HorasExtrasClienteController controller = loader.getController();
+                        controller.setStagePrincipal(ventana);
+                        controller.setProgramaPrincipal(this);
+                        controller.setEmpleado(empleado, cliente);
+                        ventana.show();
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        //tratar la excepción
+                    }
+                } else {
+                    aplicacionControl.noPermitido();
+                }
+            } 
+        else {
+            dialogError();
         }
     }
     
@@ -432,25 +447,29 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     private void borrarHoras(ControlEmpleado controlEmpleado, ControlTable controlTable) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.ELIMINAR)) {
-               
-                new ControlEmpleadoDAO().delete(controlEmpleado);
-                HibernateSessionFactory.getSession().flush();
-                // Registro para auditar
-                String detalles = "elimino un registro diario del empleado " 
-                    + empleado.getNombre() + " " + empleado.getApellido() 
-                    + " con fecha " + new DateTime(controlEmpleado.getFecha()
-                            .getTime()).toString("dd-MM-yyyy");
-                aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-                data.remove(controlTable);
-                  
+        if (editable)
+            if (aplicacionControl.permisos == null) {
+               aplicacionControl.noLogeado();
             } else {
-               aplicacionControl.noPermitido();
-            }
-        } 
+                if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.ELIMINAR)) {
+
+                    new ControlEmpleadoDAO().delete(controlEmpleado);
+                    HibernateSessionFactory.getSession().flush();
+                    // Registro para auditar
+                    String detalles = "elimino un registro diario del empleado " 
+                        + empleado.getNombre() + " " + empleado.getApellido() 
+                        + " con fecha " + new DateTime(controlEmpleado.getFecha()
+                                .getTime()).toString("dd-MM-yyyy");
+                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                    data.remove(controlTable);
+
+                } else {
+                   aplicacionControl.noPermitido();
+                }
+            } 
+        else {
+            dialogError();
+        }
     }
     
     public void guardarRegistro(Usuario empleado, Double suplementarias, 
@@ -613,7 +632,8 @@ public class RolDePagoClienteController implements Initializable {
 
                 setGraphic(deleteButton);
                 deleteButton.setOnAction(event -> {
-                    borrarHoras(controlDAO.findById(controlTable.getId()), controlTable);
+                    borrarHoras(controlDAO
+                            .findById(controlTable.getId()), controlTable);
                 });
             }
         });
@@ -634,84 +654,112 @@ public class RolDePagoClienteController implements Initializable {
         Double sueldoDia = empleado.getDetallesEmpleado().getSueldo() / 30d;
         Double sueldoHoras = empleado.getDetallesEmpleado().getSueldo() / 240d;
         
+        normales = round(normales);
+        sobreTiempo = round(sobreTiempo);
+        suplementarias = round(suplementarias);
+        
         totalDias.setText(dias.toString());
         totalHorasN.setText(normales.toString());
-        totalHorasRC.setText(round(suplementarias).toString());
-        totalHorasST.setText(round(sobreTiempo).toString());
-        totalHorasExtras.setText((round(sobreTiempo + suplementarias)).toString());
+        totalHorasRC.setText(suplementarias.toString());
+        totalHorasST.setText(sobreTiempo.toString());
+        totalHorasExtras.setText(round(sobreTiempo + suplementarias).toString());
         
         // Salario
         Double totalSalarioDouble = round(sueldoDia * Double.valueOf(dias));
-        totalSalario.setText(String.format("%.2f", totalSalarioDouble));
+        totalSalario.setText(totalSalarioDouble.toString());
         Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
-        totalSobreTiempo.setText(String.format("%.2f", totalSobreTiempoDouble));
+        totalSobreTiempo.setText(totalSobreTiempoDouble.toString());
         Double totalRecargoDouble = round(sueldoHoras * suplementarias);
-        totalRecargo.setText(String.format("%.2f", totalRecargoDouble));
+        totalRecargo.setText(totalRecargoDouble.toString());
         Double totalBonoDouble = round(getBono());
-        totalBono.setText(String.format("%.2f", totalBonoDouble));
+        totalBono.setText(totalBonoDouble.toString());
         Double totalTransporteDouble = round(getTransporte());
-        totalTransporte.setText(String.format("%.2f", totalTransporteDouble));
+        totalTransporte.setText(totalTransporteDouble.toString());
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
-        totalBonos.setText(String.format("%.2f", totalBonosDouble));
+        totalBonos.setText(totalBonosDouble.toString());
         Double totalVacacionesDouble = round(getVacaciones());
-        totalVacaciones.setText(String.format("%.2f", totalVacacionesDouble));
+        totalVacaciones.setText(totalVacacionesDouble.toString());
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
                 + totalBonosDouble + totalVacacionesDouble);
-        subTotal.setText(String.format("%.2f", subTotalDouble));
+        subTotal.setText(subTotalDouble.toString());
         ////////////////////////////////////////////////////
         Double decimoTercero = round(subTotalDouble / 12d);
-        totalDecimo3.setText(String.format("%.2f", decimoTercero));
+        totalDecimo3.setText(decimoTercero.toString());
         Double decimoCuarto = round(getDecimoCuarto()/30d * Double.valueOf(dias));
-        totalDecimo4.setText(String.format("%.2f", decimoCuarto));
-        totalReserva.setText(String.format("%.2f", decimoTercero));
-        Double jubilacionPatronal = round(getActuariales(empleado.getId()))/ 360d * Double.valueOf(dias);
-        totalJubilacion.setText(String.format("%.2f", jubilacionPatronal));
+        totalDecimo4.setText(decimoCuarto.toString());
+        totalReserva.setText(decimoTercero.toString());
+        Double jubilacionPatronal = round((getActuariales(empleado.getId())/ 360d) * Double.valueOf(dias));
+        totalJubilacion.setText(jubilacionPatronal.toString());
         Double aportePatronal = round(subTotalDouble * 12.15d / 100d);
-        totalAporte.setText(String.format("%.2f", aportePatronal));
+        totalAporte.setText(aportePatronal.toString());
         Double segurosDecimal = round(getSeguro(empleado.getDetallesEmpleado()
                 .getEmpresa().getId()) * Double.valueOf(dias));
-        totalSeguros.setText(String.format("%.2f", segurosDecimal));
+        totalSeguros.setText(segurosDecimal.toString());
         Double uniformeDecimal = round(getUniforme(empleado.getDetallesEmpleado()
                 .getEmpresa().getId()) * Double.valueOf(dias));
-        totalUniformes.setText(String.format("%.2f", uniformeDecimal));
+        totalUniformes.setText(uniformeDecimal.toString());
         
         Double ingresoTotal = round(subTotalDouble + decimoTercero 
                 + decimoCuarto + decimoTercero + jubilacionPatronal 
                 + aportePatronal + segurosDecimal + uniformeDecimal);
-        totalIngresos.setText(String.format("%.2f", ingresoTotal));
+        totalIngresos.setText(ingresoTotal.toString());
         
-        pago = new RolCliente();
-        pago.setFecha(new Timestamp(new Date().getTime()));
-        pago.setInicio(inicio);
-        pago.setFinalizo(fin);
-        pago.setDias(dias);
-        pago.setHorasNormales(normales);
-        pago.setHorasSuplementarias(suplementarias);  // RC
-        pago.setHorasSobreTiempo(sobreTiempo);         // ST
-        pago.setTotalHorasExtras(sobreTiempo + suplementarias);
-        pago.setSalario(totalSalarioDouble);
-        pago.setMontoHorasSuplementarias(totalRecargoDouble);
-        pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);
-        pago.setBono(totalBonoDouble);
-        pago.setTransporte(totalTransporteDouble);
-        pago.setTotalBonos(totalBonosDouble);
-        pago.setVacaciones(totalVacacionesDouble);
-        pago.setSubtotal(subTotalDouble);
-        pago.setDecimoTercero(decimoTercero);
-        pago.setDecimoCuarto(decimoCuarto);
-        pago.setJubilacionPatronal(jubilacionPatronal);
-        pago.setAportePatronal(aportePatronal);
-        pago.setSeguros(segurosDecimal);
-        pago.setUniformes(uniformeDecimal);
-        pago.setTotalIngreso(ingresoTotal);
-        pago.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
-        pago.setCedula(empleado.getCedula());
-        pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
-        pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
-        pago.setUsuario(empleado);
-        pago.setCliente(this.cliente);
-        pago.setClienteNombre(this.cliente.getNombre());
+        pago = new RolClienteDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
+                this.empleado.getId(), this.cliente.getId());
+        if (pago == null) {
+            pago = new RolCliente();
+            pago.setFecha(new Timestamp(new Date().getTime()));
+            pago.setInicio(inicio);
+            pago.setFinalizo(fin);
+            pago.setDias(dias);
+            pago.setHorasNormales(normales);
+            pago.setHorasSuplementarias(suplementarias);  // RC
+            pago.setHorasSobreTiempo(sobreTiempo);         // ST
+            pago.setTotalHorasExtras(sobreTiempo + suplementarias);
+            pago.setSalario(totalSalarioDouble);
+            pago.setMontoHorasSuplementarias(totalRecargoDouble);
+            pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);
+            pago.setBono(totalBonoDouble);
+            pago.setTransporte(totalTransporteDouble);
+            pago.setTotalBonos(totalBonosDouble);
+            pago.setVacaciones(totalVacacionesDouble);
+            pago.setSubtotal(subTotalDouble);
+            pago.setDecimoTercero(decimoTercero);
+            pago.setDecimoCuarto(decimoCuarto);
+            pago.setJubilacionPatronal(jubilacionPatronal);
+            pago.setAportePatronal(aportePatronal);
+            pago.setSeguros(segurosDecimal);
+            pago.setUniformes(uniformeDecimal);
+            pago.setTotalIngreso(ingresoTotal);
+            pago.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
+            pago.setCedula(empleado.getCedula());
+            pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
+            pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
+            pago.setUsuario(empleado);
+            pago.setCliente(this.cliente);
+            pago.setClienteNombre(this.cliente.getNombre());
+            
+            editable = true;
+        } else {
+            editable = false;
+            vacacionesField.setText(pago.getVacaciones().toString());
+            totalVacaciones.setText(pago.getVacaciones().toString());
+            bonoField.setText(pago.getBono().toString());
+            totalBono.setText(pago.getBono().toString());
+            transporteField.setText(pago.getTransporte().toString());
+            totalTransporte.setText(pago.getTransporte().toString());
+            totalBonos.setText(pago.getTotalBonos().toString());
+            subTotal.setText(pago.getSubtotal().toString());
+            totalDecimo3.setText(pago.getDecimoTercero().toString());
+            totalDecimo4.setText(pago.getDecimoCuarto().toString());
+            totalReserva.setText(pago.getDecimoTercero().toString());
+            totalJubilacion.setText(pago.getJubilacionPatronal().toString());
+            totalJubilacion.setText(pago.getJubilacionPatronal().toString());
+            totalSeguros.setText(pago.getSeguros().toString());
+            totalUniformes.setText(pago.getUniformes().toString());
+            totalIngresos.setText(pago.getTotalIngreso().toString());
+        }
     }
     
     @Override
@@ -725,6 +773,25 @@ public class RolDePagoClienteController implements Initializable {
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);
+        
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
     }  
     
     public static String getMonthName(int month){

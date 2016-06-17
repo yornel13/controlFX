@@ -11,7 +11,6 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.AbonoDeudaDAO;
@@ -93,8 +92,6 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**

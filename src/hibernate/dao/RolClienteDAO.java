@@ -181,6 +181,25 @@ public class RolClienteDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<RolCliente>) result;
         }
+        
+        public List<RolCliente> findAllByFechaAndClienteIdAndEmpresaId(Timestamp fecha, 
+                Integer clienteId, Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_cliente "
+                            + "JOIN usuario "
+                            + "ON usuario.id = rol_cliente.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where finalizo = :fecha "
+                            + "and cliente_id = :cliente_id "
+                            + "and empresa_id = :empresa_id")
+                    .addEntity(RolCliente.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("cliente_id", clienteId)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<RolCliente>) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Pago instance with property: " + propertyName

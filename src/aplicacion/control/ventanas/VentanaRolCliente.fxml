@@ -9,55 +9,40 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolClienteController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolClienteController">
     <children>
-      <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="controlClienteTableView" layoutX="5.0" layoutY="80.0" maxHeight="-Infinity" maxWidth="780.0" minHeight="-Infinity" minWidth="780.0" prefHeight="420.0" prefWidth="780.0">
-        <columns>
-          <TableColumn fx:id="columnaCedula" prefWidth="60.0" resizable="false" text="Cedula" />
-            <TableColumn fx:id="columnaHoras" maxWidth="120.0" minWidth="2.0" prefWidth="75.0" resizable="false" text="Horas">
-               <columns>
-                  <TableColumn fx:id="columnaNormales" minWidth="0.0" prefWidth="35.0" resizable="false" text="N" />
-                  <TableColumn fx:id="columnaSumplementarias" minWidth="0.0" prefWidth="35.0" resizable="false" text="RC" />
-                  <TableColumn fx:id="columnaSobreTiempo" minWidth="0.0" prefWidth="35.0" resizable="false" text="ST" />
-               </columns></TableColumn>
-            <TableColumn fx:id="columnaIngresos" maxWidth="210.0" minWidth="0.0" prefWidth="150.0" resizable="false" text="Ingresos">
-               <columns>
-                  <TableColumn fx:id="columnaSueldo" minWidth="0.0" prefWidth="50.0" resizable="false" text="Sueldo" />
-                  <TableColumn fx:id="columnaExtra" minWidth="0.0" prefWidth="45.0" resizable="false" text="Extra" />
-                  <TableColumn fx:id="columnaBonos" minWidth="0.0" prefWidth="45.0" resizable="false" text="Bonos" />
-               </columns></TableColumn>
-            <TableColumn fx:id="columnaVacaciones" minWidth="0.0" prefWidth="55.0" resizable="false" text="Vacacion" />
-            <TableColumn fx:id="columnaSubTotal" minWidth="0.0" prefWidth="55.0" resizable="false" text="SubTotal" />
-            <TableColumn fx:id="columnaDecimos" minWidth="0.0" resizable="false" text="Decimos">
-               <columns>
-                  <TableColumn fx:id="columnaTercero" prefWidth="45.0" text="3ro" />
-                  <TableColumn fx:id="columnaCuarto" prefWidth="45.0" text="4to" />
-               </columns></TableColumn>
-            <TableColumn fx:id="columnaTotal11" minWidth="0.0" prefWidth="60.0" resizable="false" text="Jubilacion">
-               <columns>
-                  <TableColumn fx:id="columnaJubilacion" minWidth="0.0" prefWidth="55.0" resizable="false" text="Patronal" />
-               </columns>
-            </TableColumn>
-            <TableColumn fx:id="columnaTotal112" minWidth="0.0" prefWidth="60.0" resizable="false" text="Aporte">
-               <columns>
-                  <TableColumn fx:id="columnaAporte" minWidth="0.0" prefWidth="55.0" resizable="false" text="Patronal" />
-               </columns>
-            </TableColumn>
-            <TableColumn fx:id="columnaTotal111" minWidth="0.0" prefWidth="60.0" resizable="false" text="Seguros">
-               <columns>
-                  <TableColumn fx:id="columnaSeguros" minWidth="0.0" prefWidth="55.0" resizable="false" text="AP/VC/RC" />
-               </columns>
-            </TableColumn>
-            <TableColumn fx:id="columnaTotal1111" minWidth="0.0" prefWidth="60.0" resizable="false" text="Uniforme">
-               <columns>
-                  <TableColumn fx:id="columnaUniforme" minWidth="0.0" prefWidth="55.0" resizable="false" text="Guardias" />
-               </columns>
-            </TableColumn>
-            <TableColumn fx:id="columnaTotal" minWidth="0.0" prefWidth="55.0" resizable="false" text="Total" />
-        </columns>
-      </TableView>
-      <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnClientes" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="643.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Button layoutX="591.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
+            <Button layoutX="361.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
+            <Accordion layoutX="216.0" layoutY="24.0" />
+            <DatePicker fx:id="pickerHasta" layoutX="441.0" layoutY="15.0" promptText="fin" />
+            <DatePicker fx:id="pickerDe" layoutX="211.0" layoutY="15.0" promptText="inicio" />
+            <Label layoutX="186.0" layoutY="20.0" text="De" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="395.0" layoutY="20.0" text="Hasta" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Button fx:id="buttonSiguiente" layoutX="591.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonAnterior" layoutX="359.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </Pane>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
             <children>
                <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
@@ -72,79 +57,64 @@
                </Button>
             </children>
          </Pane>
-      <Label layoutX="382.0" layoutY="10.0" text="Hasta" textFill="#fffbfb">
+      <Label layoutX="18.0" layoutY="535.0" text="Totales">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="173.0" layoutY="10.0" text="De" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <DatePicker fx:id="pickerDe" layoutX="198.0" layoutY="5.0" promptText="inicio" />
-      <DatePicker fx:id="pickerHasta" layoutX="428.0" layoutY="5.0" promptText="fin" />
-      <Accordion layoutX="200.0" layoutY="14.0" />
-      <Button layoutX="348.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
-      <Button layoutX="578.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
-      <Label layoutX="27.0" layoutY="525.0" text="Totales:" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <GridPane layoutX="110.0" layoutY="505.0" prefHeight="30.0" prefWidth="90.0">
+      <GridPane layoutX="70.0" layoutY="505.0" prefHeight="30.0" prefWidth="715.0">
          <children>
-            <Label fx:id="sueldoText1" text="Sueldo" textFill="#fffbfb" GridPane.halignment="CENTER">
+            <Label fx:id="sueldoText1" text="Salario" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="extraText1" text="Extra" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Label fx:id="extraText1" text="Extra" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="bonosText1" text="Bonos" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+            <Label fx:id="bonosText1" text="Bonos" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="vacacionesText1" text="Vacacion" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+            <Label fx:id="vacacionesText1" text="Vacacion" GridPane.columnIndex="3" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="subTotalText1" text="SubTotal" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+            <Label fx:id="subTotalText1" text="SubTotal" GridPane.columnIndex="4" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="decimosText1" text="Decimos" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.halignment="CENTER">
+            <Label fx:id="decimosText1" text="Decimos" GridPane.columnIndex="5" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="totalText1" text="Jubilacion" textFill="#fffbfb" GridPane.columnIndex="6" GridPane.halignment="CENTER">
+            <Label fx:id="totalText1" text="Jubilacion" GridPane.columnIndex="6" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="totalText11" text="Seguros" textFill="#fffbfb" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="totalText11" text="Seguros" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="totalText112" text="Uniforme" textFill="#fffbfb" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="totalText112" text="Uniforme" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="totalText111" text="Total" textFill="#fffbfb" GridPane.columnIndex="10" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="totalText111" text="Total" GridPane.columnIndex="10" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="totalText13" text="Aporte" textFill="#fffbfb" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="totalText13" text="Aporte" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
@@ -156,31 +126,25 @@
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="50.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="70.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="60.0" prefWidth="55.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="90.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="60.0" minWidth="60.0" prefWidth="60.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="50.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="50.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="65.0" prefWidth="100.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <TextField fx:id="filterField" layoutX="193.0" layoutY="41.0" prefHeight="25.0" prefWidth="437.0" promptText="Cedula, nombre, o apellido" />
-      <Label layoutX="71.0" layoutY="44.0" text="Escriba para filtrar" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <GridPane gridLinesVisible="true" layoutX="110.0" layoutY="530.0" prefHeight="30.0" prefWidth="90.0">
+      <GridPane gridLinesVisible="true" layoutX="70.0" layoutY="530.0" prefHeight="30.0" prefWidth="715.0">
          <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="70.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="50.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="50.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="70.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="60.0" prefWidth="55.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="90.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="60.0" prefWidth="60.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="70.0" minWidth="60.0" prefWidth="100.0" />
@@ -191,63 +155,78 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label fx:id="sueldoTotalText" textFill="#fffbfb" GridPane.halignment="CENTER">
+            <Label fx:id="sueldoTotalText" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="extraText" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Label fx:id="extraText" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="bonosText" textFill="#fffbfb" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+            <Label fx:id="bonosText" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="vacacionesText" textFill="#fffbfb" GridPane.columnIndex="3" GridPane.halignment="CENTER">
+            <Label fx:id="vacacionesText" GridPane.columnIndex="3" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="decimosTotalText" textFill="#fffbfb" GridPane.columnIndex="5" GridPane.halignment="CENTER">
+            <Label fx:id="decimosTotalText" GridPane.columnIndex="5" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="totalText" textFill="#fffbfb" GridPane.columnIndex="10" GridPane.halignment="CENTER">
+            <Label fx:id="totalText" GridPane.columnIndex="10" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="subTotalText" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+            <Label fx:id="subTotalText" GridPane.columnIndex="4" GridPane.halignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label fx:id="jubilacionText" textFill="#fffbfb" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="jubilacionText" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="segurosText" textFill="#fffbfb" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="segurosText" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="uniformeText" textFill="#fffbfb" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label fx:id="uniformeText" GridPane.columnIndex="9" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="aporteText" textFill="#fffbfb" GridPane.columnIndex="7" GridPane.halignment="CENTER">
+            <Label fx:id="aporteText" GridPane.columnIndex="7" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
             </Label>
          </children>
       </GridPane>
-      <Button layoutX="719.0" layoutY="5.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="25.0" prefWidth="66.0" text="Imprimir" />
+      <TableView fx:id="controlClienteTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="77.0" minHeight="-Infinity" minWidth="770.0" prefHeight="420.0" prefWidth="770.0" style="-fx-background-color: white;">
+         <columns>
+            <TableColumn fx:id="columnaCedula" minWidth="0.0" resizable="false" text="Cedula" />
+            <TableColumn fx:id="columnaDias" minWidth="0.0" prefWidth="40.0" resizable="false" text="Dias" />
+            <TableColumn fx:id="columnaSalario" minWidth="0.0" prefWidth="65.0" resizable="false" text="Salario" />
+            <TableColumn fx:id="columnaExtras" minWidth="0.0" prefWidth="65.0" resizable="false" text="Horas Ex." />
+            <TableColumn fx:id="columnaBonos" minWidth="0.0" prefWidth="50.0" resizable="false" text="Bonos" />
+            <TableColumn fx:id="columnaVacaciones" minWidth="0.0" prefWidth="50.0" resizable="false" text="Vacaciones" />
+            <TableColumn fx:id="columnaSubTotal" minWidth="0.0" prefWidth="70.0" resizable="false" text="Subtotal" />
+            <TableColumn fx:id="columnaTercero" minWidth="0.0" prefWidth="70.0" resizable="false" text="Dec. 3ro" />
+            <TableColumn fx:id="columnaCuarto" minWidth="0.0" prefWidth="70.0" resizable="false" text="Dec. 4to" />
+            <TableColumn fx:id="columnaJubilacion" minWidth="0.0" prefWidth="70.0" resizable="false" text="Jubilacion" />
+            <TableColumn fx:id="columnaAporte" minWidth="0.0" prefWidth="75.0" resizable="false" text="Aporte" />
+            <TableColumn fx:id="columnaTotal" minWidth="0.0" prefWidth="55.0" resizable="false" text="Total" />
+         </columns>
+      </TableView>
     </children>
 </AnchorPane>

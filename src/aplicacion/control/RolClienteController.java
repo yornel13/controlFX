@@ -9,6 +9,7 @@ import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.RolClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
@@ -45,9 +46,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -81,25 +84,13 @@ public class RolClienteController implements Initializable {
     private TableColumn columnaCedula;
     
     @FXML
-    private TableColumn columnaHoras;
+    private TableColumn columnaDias;
     
     @FXML
-    private TableColumn columnaNormales;
+    private TableColumn columnaSalario;
     
     @FXML
-    private TableColumn columnaSumplementarias;
-    
-    @FXML
-    private TableColumn columnaSobreTiempo;
-    
-    @FXML
-    private TableColumn columnaIngresos;
-    
-    @FXML
-    private TableColumn columnaSueldo;
-    
-    @FXML
-    private TableColumn columnaExtra;
+    private TableColumn columnaExtras;
     
     @FXML
     private TableColumn columnaBonos;
@@ -109,9 +100,6 @@ public class RolClienteController implements Initializable {
     
     @FXML
     private TableColumn columnaSubTotal;
-    
-    @FXML
-    private TableColumn columnaDecimos;
     
     @FXML
     private TableColumn columnaTercero;
@@ -124,12 +112,6 @@ public class RolClienteController implements Initializable {
     
     @FXML 
     private TableColumn columnaAporte;
-    
-    @FXML 
-    private TableColumn columnaSeguros;
-    
-    @FXML 
-    private TableColumn columnaUniforme;
     
     @FXML
     private TableColumn columnaTotal;
@@ -213,6 +195,18 @@ public class RolClienteController implements Initializable {
     ///////////////////////////////
     
     @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonImprimir;
+    
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
     private DatePicker pickerDe;
     
     @FXML 
@@ -243,7 +237,7 @@ public class RolClienteController implements Initializable {
     }
     
     @FXML
-    private void returnEmpresa(ActionEvent event) {
+    private void returnClientes(ActionEvent event) {
         aplicacionControl.mostrarClientesParaRol(empresa, stagePrincipal);
     } 
     
@@ -401,8 +395,8 @@ public class RolClienteController implements Initializable {
         
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndClienteId(fin, cliente.getId()));
-        
+        pagos.addAll(pagoDAO.findAllByFechaAndClienteIdAndEmpresaId(fin, 
+                cliente.getId(), empresa.getId()));
         sueldoTotalTextValor = 0d;
         extraTextValor = 0d;
         bonosTextValor = 0d;
@@ -424,7 +418,7 @@ public class RolClienteController implements Initializable {
         for (RolCliente pago: pagos){
             sueldoTotalTextValor += pago.getSueldo();
             extraTextValor += pago.getMontoHorasSobreTiempo() + pago.getMontoHorasSuplementarias();
-            pago.setMontoHorasExtras(extraTextValor);
+            pago.setMontoHorasExtras(round(extraTextValor));
             bonosTextValor += pago.getTotalBonos();
             vacacionesTextValor += pago.getVacaciones();
             subTotalTextValor += pago.getSubtotal();
@@ -442,6 +436,24 @@ public class RolClienteController implements Initializable {
             montoSegurosTextValor += pago.getSeguros(); 
             montoUniformesTextValor += pago.getUniformes(); 
         }
+        
+        sueldoTotalTextValor = round(sueldoTotalTextValor);
+        extraTextValor = round(extraTextValor);
+        bonosTextValor = round(bonosTextValor);
+        vacacionesTextValor = round(vacacionesTextValor);
+        subTotalTextValor = round(subTotalTextValor);
+        decimosTotalTextValor = round(decimosTotalTextValor);
+        decimoTerceroTotalTextValor = round(decimoTerceroTotalTextValor);
+        decimoCuartoTotalTextValor = round(decimoCuartoTotalTextValor);
+        totalTextValor = round(totalTextValor);
+        montoSumplementariasTextValor = round(montoSumplementariasTextValor); 
+        montoSobreTiempoTextValor = round(montoSobreTiempoTextValor);
+        montoBonoTextValor = round(montoBonoTextValor);
+        montoTransporteTextValor = round(montoTransporteTextValor);
+        montoJubilacionTextValor = round(montoJubilacionTextValor);
+        montoAportePatronalTextValor = round(montoAportePatronalTextValor); 
+        montoSegurosTextValor = round(montoSegurosTextValor);
+        montoUniformesTextValor = round(montoUniformesTextValor);
         
         data = FXCollections.observableArrayList(); 
         data.addAll(pagos);
@@ -480,17 +492,17 @@ public class RolClienteController implements Initializable {
         sortedData.comparatorProperty().bind(controlClienteTableView.comparatorProperty());
         controlClienteTableView.setItems(sortedData);
         
-        sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
-        extraText.setText(String.format( "%.2f", extraTextValor));
-        bonosText.setText(String.format( "%.2f", bonosTextValor));
-        vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
-        subTotalText.setText(String.format( "%.2f", subTotalTextValor));
-        decimosTotalText.setText(String.format( "%.2f", decimoTerceroTotalTextValor) + "|" + String.format( "%.2f", decimoCuartoTotalTextValor));
-        totalText.setText(String.format( "%.2f", totalTextValor));
-        jubilacionText.setText(String.format( "%.2f", montoJubilacionTextValor));
-        aporteText.setText(String.format( "%.2f", montoAportePatronalTextValor));
-        segurosText.setText(String.format( "%.2f", montoSegurosTextValor));
-        uniformeText.setText(String.format( "%.2f", montoUniformesTextValor));
+        sueldoTotalText.setText(sueldoTotalTextValor.toString());
+        extraText.setText(extraTextValor.toString());
+        bonosText.setText(bonosTextValor.toString());
+        vacacionesText.setText(vacacionesTextValor.toString());
+        subTotalText.setText(subTotalTextValor.toString());
+        decimosTotalText.setText(round(decimoTerceroTotalTextValor + decimoCuartoTotalTextValor).toString());
+        totalText.setText(totalTextValor.toString());
+        jubilacionText.setText(montoJubilacionTextValor.toString());
+        aporteText.setText(montoAportePatronalTextValor.toString());
+        segurosText.setText(montoSegurosTextValor.toString());
+        uniformeText.setText(montoUniformesTextValor.toString());
     }
     
     void calcular() {
@@ -516,7 +528,7 @@ public class RolClienteController implements Initializable {
         for (RolCliente pago: (List<RolCliente>) controlClienteTableView.getItems()) {
             sueldoTotalTextValor += pago.getSueldo();
             extraTextValor += pago.getMontoHorasSobreTiempo() + pago.getMontoHorasSuplementarias();
-            pago.setMontoHorasExtras(extraTextValor);
+            pago.setMontoHorasExtras(round(extraTextValor));
             bonosTextValor += pago.getTotalBonos();
             vacacionesTextValor += pago.getVacaciones();
             subTotalTextValor += pago.getSubtotal();
@@ -534,17 +546,35 @@ public class RolClienteController implements Initializable {
             montoSegurosTextValor += pago.getSeguros(); 
             montoUniformesTextValor += pago.getUniformes();
         }
-        sueldoTotalText.setText(String.format( "%.2f", sueldoTotalTextValor));
-        extraText.setText(String.format( "%.2f", extraTextValor));
-        bonosText.setText(String.format( "%.2f", bonosTextValor));
-        vacacionesText.setText(String.format( "%.2f", vacacionesTextValor));
-        subTotalText.setText(String.format( "%.2f", subTotalTextValor));
-        decimosTotalText.setText(String.format( "%.2f", decimoTerceroTotalTextValor) + "|" + String.format( "%.2f", decimoCuartoTotalTextValor));
-        totalText.setText(String.format( "%.2f", totalTextValor));
-        jubilacionText.setText(String.format( "%.2f", montoJubilacionTextValor));
-        aporteText.setText(String.format( "%.2f", montoAportePatronalTextValor));
-        segurosText.setText(String.format( "%.2f", montoSegurosTextValor));
-        uniformeText.setText(String.format( "%.2f", montoUniformesTextValor));
+        sueldoTotalTextValor = round(sueldoTotalTextValor);
+        extraTextValor = round(extraTextValor);
+        bonosTextValor = round(bonosTextValor);
+        vacacionesTextValor = round(vacacionesTextValor);
+        subTotalTextValor = round(subTotalTextValor);
+        decimosTotalTextValor = round(decimosTotalTextValor);
+        decimoTerceroTotalTextValor = round(decimoTerceroTotalTextValor);
+        decimoCuartoTotalTextValor = round(decimoCuartoTotalTextValor);
+        totalTextValor = round(totalTextValor);
+        montoSumplementariasTextValor = round(montoSumplementariasTextValor); 
+        montoSobreTiempoTextValor = round(montoSobreTiempoTextValor);
+        montoBonoTextValor = round(montoBonoTextValor);
+        montoTransporteTextValor = round(montoTransporteTextValor);
+        montoJubilacionTextValor = round(montoJubilacionTextValor);
+        montoAportePatronalTextValor = round(montoAportePatronalTextValor); 
+        montoSegurosTextValor = round(montoSegurosTextValor);
+        montoUniformesTextValor = round(montoUniformesTextValor);
+        
+        sueldoTotalText.setText(sueldoTotalTextValor.toString());
+        extraText.setText(extraTextValor.toString());
+        bonosText.setText(bonosTextValor.toString());
+        vacacionesText.setText(vacacionesTextValor.toString());
+        subTotalText.setText(subTotalTextValor.toString());
+        decimosTotalText.setText(round(decimoTerceroTotalTextValor + decimoCuartoTotalTextValor).toString());
+        totalText.setText(totalTextValor.toString());
+        jubilacionText.setText(montoJubilacionTextValor.toString());
+        aporteText.setText(montoAportePatronalTextValor.toString());
+        segurosText.setText(montoSegurosTextValor.toString());
+        uniformeText.setText(montoUniformesTextValor.toString());
     }
     
     @Override
@@ -554,41 +584,25 @@ public class RolClienteController implements Initializable {
         
         columnaCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
-        columnaNormales.setCellValueFactory(new PropertyValueFactory<>("horasNormales"));
+        columnaDias.setCellValueFactory(new PropertyValueFactory<>("dias"));
         
-        columnaSumplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
+        columnaSalario.setCellValueFactory(new PropertyValueFactory<>("salario"));
         
-        columnaSobreTiempo.setCellValueFactory(new PropertyValueFactory<>("horasSobreTiempo"));
-        
-        columnaHoras.getColumns().clear();
-        columnaHoras.getColumns().addAll(columnaNormales, columnaSumplementarias, columnaSobreTiempo);
-        
-        columnaSueldo.setCellValueFactory(new PropertyValueFactory<>("salario"));
-        
-        columnaExtra.setCellValueFactory(new PropertyValueFactory<>("montoHorasExtras"));
+        columnaExtras.setCellValueFactory(new PropertyValueFactory<>("montoHorasExtras"));
         
         columnaBonos.setCellValueFactory(new PropertyValueFactory<>("totalBonos"));
-        
-        columnaIngresos.getColumns().clear();
-        columnaIngresos.getColumns().addAll(columnaSueldo, columnaExtra, columnaBonos);
         
         columnaVacaciones.setCellValueFactory(new PropertyValueFactory<>("vacaciones"));
         
         columnaSubTotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
         
         columnaTercero.setCellValueFactory(new PropertyValueFactory<>("decimoTercero"));
-        columnaCuarto.setCellValueFactory(new PropertyValueFactory<>("decimoCuarto"));
         
-        columnaDecimos.getColumns().clear();
-        columnaDecimos.getColumns().addAll(columnaTercero, columnaCuarto);
+        columnaCuarto.setCellValueFactory(new PropertyValueFactory<>("decimoCuarto"));
         
         columnaJubilacion.setCellValueFactory(new PropertyValueFactory<>("jubilacionPatronal"));
         
         columnaAporte.setCellValueFactory(new PropertyValueFactory<>("aportePatronal"));
-        
-        columnaSeguros.setCellValueFactory(new PropertyValueFactory<>("seguros"));
-        
-        columnaUniforme.setCellValueFactory(new PropertyValueFactory<>("uniformes"));
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
         
@@ -605,6 +619,56 @@ public class RolClienteController implements Initializable {
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Pagar a seleccionados")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     } 
     
     // Login items

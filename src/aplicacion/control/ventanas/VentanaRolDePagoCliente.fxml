@@ -11,32 +11,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="590.0" maxWidth="600.0" minHeight="590.0" minWidth="600.0" prefHeight="590.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
+<AnchorPane id="AnchorPane" maxHeight="570.0" maxWidth="600.0" minHeight="570.0" minWidth="600.0" prefHeight="570.0" prefWidth="600.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.RolDePagoClienteController">
     <children>
-      <Pane layoutX="6.0" layoutY="502.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
-      <Pane layoutX="6.0" layoutY="418.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
-      <Pane layoutX="6.0" layoutY="336.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #bbddff;" />
-      <Button layoutX="467.0" layoutY="569.0" mnemonicParsing="false" onAction="#onClickPago" text="Guardar Rol De Pago" />
-      <Button layoutX="447.0" layoutY="300.0" mnemonicParsing="false" onAction="#onClickCalcular" text="Calcular" />
-      <TextField fx:id="transporteField" layoutX="104.0" layoutY="265.0" promptText="Monto" />
-      <TextField fx:id="bonoField" layoutX="104.0" layoutY="300.0" promptText="Monto" />
-      <Label layoutX="19.0" layoutY="302.0" text="Transporte" textFill="#fffbfb">
+      <Pane layoutX="7.0" layoutY="472.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #E0E0E0;" />
+      <Pane layoutX="7.0" layoutY="388.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #E0E0E0;" />
+      <Pane layoutX="7.0" layoutY="306.0" prefHeight="30.0" prefWidth="588.0" style="-fx-background-color: #E0E0E0;" />
+      <Button layoutX="468.0" layoutY="539.0" mnemonicParsing="false" onAction="#onClickPago" text="Guardar Rol De Pago" />
+      <Button layoutX="511.0" layoutY="266.0" mnemonicParsing="false" onAction="#onClickCalcular" text="Calcular" />
+      <TextField fx:id="transporteField" layoutX="233.0" layoutY="266.0" prefHeight="25.0" prefWidth="64.0" promptText="Monto" />
+      <TextField fx:id="bonoField" layoutX="61.0" layoutY="266.0" prefHeight="25.0" prefWidth="67.0" promptText="Monto" />
+      <Label layoutX="152.0" layoutY="268.0" text="Transporte" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <TextField fx:id="vacacionesField" layoutX="401.0" layoutY="265.0" promptText="Monto" />
-      <CheckBox fx:id="checkVacaciones" disable="true" layoutX="283.0" layoutY="267.0" mnemonicParsing="false" onAction="#onClickVacaciones" selected="true" text="Vacaciones" textFill="WHITE">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </CheckBox>
+      <TextField fx:id="vacacionesField" layoutX="401.0" layoutY="265.0" prefHeight="25.0" prefWidth="67.0" promptText="Monto" />
       <Label layoutX="19.0" layoutY="267.0" text="Bono" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="502.0" prefHeight="60.0" prefWidth="588.0">
+      <GridPane gridLinesVisible="true" layoutX="7.0" layoutY="472.0" prefHeight="60.0" prefWidth="588.0">
          <children>
             <Label text="Decimo 3ro">
                <font>
@@ -53,7 +48,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label text="Ap, Patronal" GridPane.columnIndex="4">
+            <Label text="Ap. Patronal" GridPane.columnIndex="4">
                <font>
                   <Font size="14.0" />
                </font>
@@ -123,7 +118,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="418.0" prefHeight="60.0" prefWidth="588.0">
+      <GridPane gridLinesVisible="true" layoutX="7.0" layoutY="388.0" prefHeight="60.0" prefWidth="588.0">
          <children>
             <Label text="Salario">
                <font>
@@ -221,7 +216,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
       </GridPane>
-      <GridPane gridLinesVisible="true" layoutX="6.0" layoutY="336.0" prefHeight="60.0" prefWidth="588.0">
+      <GridPane gridLinesVisible="true" layoutX="7.0" layoutY="306.0" prefHeight="60.0" prefWidth="588.0">
         <columnConstraints>
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="84.0" minWidth="10.0" prefWidth="72.0" />
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="134.0" minWidth="10.0" prefWidth="121.0" />
@@ -286,10 +281,15 @@
             </Label>
          </children>
       </GridPane>
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="590.0">
+      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="220.0" prefWidth="590.0" style="-fx-background-color: white;">
         <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
+          <TableColumn prefWidth="75.0" text="Fecha" />
+          <TableColumn prefWidth="75.0" text="Dia" />
+            <TableColumn prefWidth="170.0" text="Cliente" />
+            <TableColumn prefWidth="60.0" text="Horas ST" />
+            <TableColumn prefWidth="60.0" text="Horas RC" />
+            <TableColumn text="Observación" />
+            <TableColumn prefWidth="60.0" text="Borrar" />
         </columns>
       </TableView>
       <Accordion layoutX="40.0" layoutY="14.0" />
@@ -306,10 +306,8 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button fx:id="expandirButton" layoutX="5.0" layoutY="569.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" />
-      <Button layoutX="415.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
-      <Button layoutX="185.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
-      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="255.0" layoutY="570.0" prefHeight="25.0" prefWidth="194.0">
+      <Button fx:id="expandirButton" layoutX="6.0" layoutY="539.0" mnemonicParsing="false" onAction="#expandir" text="Expandir" />
+      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="256.0" layoutY="540.0" prefHeight="25.0" prefWidth="194.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="104.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="90.0" />
@@ -334,5 +332,20 @@
             </Label>
          </children>
       </GridPane>
+      <Label layoutX="324.0" layoutY="267.0" text="Vacaciones" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="buttonAnterior" layoutX="183.0" layoutY="2.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="buttonSiguiente" layoutX="413.0" layoutY="3.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
     </children>
 </AnchorPane>

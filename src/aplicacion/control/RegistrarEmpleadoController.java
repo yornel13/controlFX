@@ -206,7 +206,7 @@ public class RegistrarEmpleadoController implements Initializable {
                 detallesEmpleado.setExtra(extraField.getText());
                 detallesEmpleado.setNroCuenta(cuentaField.getText());
                 detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
-                detallesEmpleado.setQuincena(Double.NaN);
+                detallesEmpleado.setQuincena(0d);
                 detallesEmpleado.setAcumulaDecimos(checkBoxDecimos.isSelected());
                 
                 detallesEmpleadoDAO.save(detallesEmpleado);

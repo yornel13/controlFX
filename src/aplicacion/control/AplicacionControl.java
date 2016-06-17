@@ -334,10 +334,10 @@ public class AplicacionControl extends Application {
     }
    
     public void mostrarInEmpresa(Empresa empresa) {
-        if (permisos == null && false) { // TODO. quitar false
+        if (permisos == null) { 
             noLogeado();
         } else {
-            if (true || permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.VER)) { // TODO. quitar true
+            if (permisos.getPermiso(Permisos.EMPRESAS, Permisos.Nivel.VER)) { 
                 try {
                     stagePrincipal.close();
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaInEmpresaHome.fxml"));
