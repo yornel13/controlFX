@@ -103,9 +103,6 @@ public class PagoMensualController implements Initializable {
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
     private TableView empleadosTableView;
@@ -455,7 +452,7 @@ public class PagoMensualController implements Initializable {
             }
         });
         enviarCorreo.setSelected(true);
-        dialogStage.showAndWait();
+        dialogStage.show();
     }
     
     public void dialogoCompletado() {
@@ -637,7 +634,7 @@ public class PagoMensualController implements Initializable {
             rol.setDescripcion("Sueldo");
             rol.setIngreso(round(sueldoTotalTextValor));
             rol.setDias(diasTextValor);
-            rol.setHoras(normalesTextValor.intValue());
+            rol.setHoras(normalesTextValor);
             rol.setClave(Const.IP_SUELDO);
             pagoMesItems.add(rol);
         }
@@ -645,7 +642,7 @@ public class PagoMensualController implements Initializable {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
             rol.setIngreso(extraTextValor);
-            rol.setHoras(suplementariasTextValor.intValue() + sobreTiempoTextValor.intValue());
+            rol.setHoras(suplementariasTextValor + sobreTiempoTextValor);
             rol.setClave(Const.IP_HORAS_EXTRAS);
             pagoMesItems.add(rol);
         }

@@ -648,7 +648,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaIessEmpleados.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("IESS Abonado");
+                    ventana.setTitle("IESS");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);

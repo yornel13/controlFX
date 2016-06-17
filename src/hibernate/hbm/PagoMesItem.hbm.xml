@@ -18,8 +18,8 @@
     <property name="dias" type="java.lang.Integer">
       <column name="dias"/>
     </property>
-    <property name="horas" type="java.lang.Integer">
-      <column name="horas"/>
+    <property name="horas" type="java.lang.Double">
+      <column name="horas" precision="8"/>
     </property>
     <property name="ingreso" type="java.lang.Double">
       <column name="ingreso" precision="8"/>

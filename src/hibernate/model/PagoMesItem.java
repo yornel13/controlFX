@@ -14,7 +14,7 @@ public class PagoMesItem implements java.io.Serializable {
 	private PagoMes pagoMes;
 	private String descripcion;
 	private Integer dias;
-	private Integer horas;
+	private Double horas;
 	private Double ingreso;
 	private Double deduccion;
         private String clave;
@@ -33,7 +33,7 @@ public class PagoMesItem implements java.io.Serializable {
 
 	/** full constructor */
 	public PagoMesItem(PagoMes pagoMes, String descripcion, Integer dias,
-			Integer horas, Double ingreso, Double deduccion) {
+			Double horas, Double ingreso, Double deduccion) {
 		this.pagoMes = pagoMes;
 		this.descripcion = descripcion;
 		this.dias = dias;
@@ -76,11 +76,11 @@ public class PagoMesItem implements java.io.Serializable {
 		this.dias = dias;
 	}
 
-	public Integer getHoras() {
+	public Double getHoras() {
 		return this.horas;
 	}
 
-	public void setHoras(Integer horas) {
+	public void setHoras(Double horas) {
 		this.horas = horas;
 	}
 

@@ -5,9 +5,11 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fechas;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
@@ -18,6 +20,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +40,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -59,6 +64,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -103,10 +109,25 @@ public class IessEmpleadosController implements Initializable {
     @FXML
     private Button buttonImprimir;
     
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
+    
+    @FXML
+    private DatePicker pickerDe;
+    
+    @FXML 
+    private DatePicker pickerHasta;
+    
+    public Timestamp inicio;
+    public Timestamp fin;
     
     Stage dialogLoading;
     
@@ -123,6 +144,24 @@ public class IessEmpleadosController implements Initializable {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
+    
+    @FXML
+    public void onClickMore(ActionEvent event) throws ParseException {
+        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        setTableInfo();
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) throws ParseException  {
+        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        setTableInfo();
+    }
     
     public void completado() {
         Stage dialogStage = new Stage();
@@ -251,8 +290,21 @@ public class IessEmpleadosController implements Initializable {
         dialogStage.showAndWait();
     }
     
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
+    public void setEmpresa(Empresa empresa) throws ParseException {
+        this.empresa = empresa; 
+        
+        DateTime dateTime = new DateTime(getToday().getTime());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+                .getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+                .minusMonths(1).plusDays(1).getMillis());
+        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+       
+        setTableInfo();
+    }
+    
+    public void setTableInfo() {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
@@ -274,7 +326,7 @@ public class IessEmpleadosController implements Initializable {
                     .getCargo().getNombre());
             Double totalIess = 0d; 
             for (PagoMesItem pagoMesItem: new PagoMesItemDAO()
-                    .findByEmpleadoIdAndClave(user.getId(), Const.IP_IESS)){
+                    .findByEmpleadoIdAndClaveAndFecha(user.getId(), Const.IP_IESS, fin)){
                 totalIess = pagoMesItem.getDeduccion();
             }
             empleado.setTotalIess(totalIess);
@@ -371,6 +423,24 @@ public class IessEmpleadosController implements Initializable {
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
+        });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
     } 
     

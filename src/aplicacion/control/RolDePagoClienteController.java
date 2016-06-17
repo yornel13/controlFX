@@ -755,7 +755,7 @@ public class RolDePagoClienteController implements Initializable {
             totalDecimo4.setText(pago.getDecimoCuarto().toString());
             totalReserva.setText(pago.getDecimoTercero().toString());
             totalJubilacion.setText(pago.getJubilacionPatronal().toString());
-            totalJubilacion.setText(pago.getJubilacionPatronal().toString());
+            totalAporte.setText(pago.getAportePatronal().toString());
             totalSeguros.setText(pago.getSeguros().toString());
             totalUniformes.setText(pago.getUniformes().toString());
             totalIngresos.setText(pago.getTotalIngreso().toString());

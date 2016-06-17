@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.PagoMesItem;
+import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -81,6 +82,22 @@ public class PagoMesItemDAO extends BaseHibernateDAO {
                             + "where usuario_id = :usuario_id  and clave = :clave")
                     .addEntity(PagoMesItem.class)
                     .setParameter("usuario_id", empleadoId)
+                    .setParameter("clave", clave);
+            Object result = query.list();
+            return (List<PagoMesItem>) result;
+        }
+        
+        public List<PagoMesItem> findByEmpleadoIdAndClaveAndFecha(Integer empleadoId, String clave, Timestamp fin) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes_item "
+                            + "JOIN pago_mes "
+                            + "ON pago_mes.id = pago_mes_item.pago_mes_id "
+                            + "where usuario_id = :usuario_id "
+                            + "and fin_mes = :fin_mes "
+                            + "and clave = :clave")
+                    .addEntity(PagoMesItem.class)
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("fin_mes", fin)
                     .setParameter("clave", clave);
             Object result = query.list();
             return (List<PagoMesItem>) result;
