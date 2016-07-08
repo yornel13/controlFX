@@ -89,6 +89,8 @@ import javafx.scene.control.TableRow;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -326,6 +328,13 @@ public class PagoMensualDetallesController implements Initializable {
     
     Stage dialogLoading;
     
+    @FXML
+    private Button buttonDeudas;
+    
+    @FXML
+    private Button buttonPagar;
+    
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -534,7 +543,8 @@ public class PagoMensualDetallesController implements Initializable {
             }
         });
         enviarCorreo.setSelected(true);
-        dialogStage.showAndWait();
+        pagoMensualController.setTableInfo();
+        dialogStage.show();
     }
     
     public File seleccionarDirectorio() {
@@ -562,6 +572,7 @@ public class PagoMensualDetallesController implements Initializable {
             dialogStage.close();
         });
         dialogStage.showAndWait();
+        stagePrincipal.close();
     }
     
     public void dialogWait() {
@@ -957,6 +968,42 @@ public class PagoMensualDetallesController implements Initializable {
                 }
             });
             return row ;
+        });
+        
+        buttonDeudas.setTooltip(
+            new Tooltip("Gestionar Deudas")
+        );
+        buttonDeudas.setOnMouseEntered((MouseEvent t) -> {
+            buttonDeudas.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/deudas.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonDeudas.setOnMouseExited((MouseEvent t) -> {
+            buttonDeudas.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/deudas.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        
+        buttonPagar.setTooltip(
+            new Tooltip("Hacer Pago")
+        );
+        buttonPagar.setOnMouseEntered((MouseEvent t) -> {
+            buttonPagar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/pagar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonPagar.setOnMouseExited((MouseEvent t) -> {
+            buttonPagar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/pagar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     }   
     

@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -84,7 +85,7 @@ public class PrincipalController implements Initializable {
         this.aplicacionControl = aplicacionControl;
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
-        Runnable worker = new DataBaseThread("primer");
+        Runnable worker = new DataBaseThread();
         executor.execute(worker);
         executor.shutdown();
 
@@ -148,10 +149,7 @@ public class PrincipalController implements Initializable {
     
     public class DataBaseThread implements Runnable {
 
-        private String command;
-
-        public DataBaseThread(String s){
-            this.command = s;
+        public DataBaseThread(){
         }
 
         @Override
@@ -170,7 +168,11 @@ public class PrincipalController implements Initializable {
 
                 selector.setItems(FXCollections.observableArrayList(items)); 
             } catch (Exception e) {
-                label.setText("ERROR DE CONEXION A BASE DE DATOS.");
+                Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    label.setText("ERROR DE CONEXION A BASE DE DATOS.");
+                    }
+                });
             }
             selector.setVisible(true);
             label.setVisible(true);
@@ -180,19 +182,6 @@ public class PrincipalController implements Initializable {
             login.setVisible(true);
             usuarioLogin.setVisible(true);
             progressBar.setVisible(false);
-        }
-
-        private void processCommand() {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public String toString(){
-            return this.command;
         }
     }
 }

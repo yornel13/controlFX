@@ -10,15 +10,11 @@ import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import static aplicacion.control.util.Numeros.round;
-import hibernate.HibernateSessionFactory;
-import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.dao.PagoMesDAO;
 import hibernate.dao.PagoMesItemDAO;
-import hibernate.dao.RolIndividualDAO;
-import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
@@ -62,10 +58,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
@@ -78,12 +71,26 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import java.util.Objects;
 import javafx.scene.control.TableRow;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.MaterialDesignButton;
+import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
+import hibernate.dao.AbonoDeudaDAO;
+import hibernate.dao.RolIndividualDAO;
+import hibernate.model.AbonoDeuda;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
+import javafx.stage.StageStyle;
 
 /**
  *
@@ -321,6 +328,12 @@ public class PagoMensualPagadoController implements Initializable {
     
     Stage dialogLoading;
     
+    @FXML
+    private Button buttonImprimir;
+    
+    @FXML
+    private Button buttonBorrar;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -398,8 +411,65 @@ public class PagoMensualPagadoController implements Initializable {
             Logger.getLogger(PagoMensualPagadoController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             dialogLoading.close();
-        }
+        }  
+    }
+    
+    @FXML
+    public void borrarPago(ActionEvent event) {
         
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Precaución");
+                String stageIcon = AplicacionControl.class
+                        .getResource("imagenes/icon_error.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+                MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                HBox hBox = HBoxBuilder.create()
+                        .spacing(10.0) //In case you are using HBoxBuilder
+                        .padding(new Insets(5, 5, 5, 5))
+                        .alignment(Pos.CENTER)
+                        .children(buttonOk, buttonNo)
+                        .build();
+                hBox.maxWidth(120);
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Seguro que desea Borrar este Pago?"),
+                         new Text("No podra recuperarlo!"), hBox).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                buttonOk.setMinWidth(50);
+                buttonNo.setMinWidth(50);
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogWait();
+                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                    Runnable worker = new DataBaseThread();
+                    executor.execute(worker);
+                    executor.shutdown();
+                    dialogStage.close();
+                });
+                buttonNo.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+                dialogStage.showAndWait();
+     
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }
+    }
+    
+    public void borradoTerminado() {
+        for (Deuda deuda: new DeudaDAO()
+                .findAllByUsuarioId(pagoMes.getUsuario().getId())) {
+            new DeudaDAO().getSession().refresh(deuda);
+        }
+        stagePrincipal.close();
+        dialogLoading.close();
+        dialogoBorradoCompletado();
     }
     
     @FXML
@@ -444,6 +514,30 @@ public class PagoMensualPagadoController implements Initializable {
         return fileChooser.showDialog(stagePrincipal);
     }
     
+    public void dialogoBorradoCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Pago Mensual");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se borro este pago con exito."), 
+                new Text("(se reintegraron los abonos de deudas sí los habia)"),
+                new Text("Verifique las deudas antes de volver a hacer el pago."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        buttonOk.prefWidth(80);
+        dialogStage.showAndWait();
+    }
+    
     public void dialogoCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -469,10 +563,11 @@ public class PagoMensualPagadoController implements Initializable {
         dialogLoading.initModality(Modality.APPLICATION_MODAL);
         dialogLoading.setResizable(false);
         dialogLoading.setTitle("Cargando...");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_loading.png").toExternalForm();
         dialogLoading.getIcons().add(new Image(stageIcon));
         dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Cargando espere...")).
+        children(new ProgressBar()).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogLoading.show();
     }
@@ -683,6 +778,42 @@ public class PagoMensualPagadoController implements Initializable {
             });
             return row ;
         });
+        
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        
+        buttonBorrar.setTooltip(
+            new Tooltip("Borrar Pago")
+        );
+        buttonBorrar.setOnMouseEntered((MouseEvent t) -> {
+            buttonBorrar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/borrar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBorrar.setOnMouseExited((MouseEvent t) -> {
+            buttonBorrar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/borrar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     }   
     
     public static Timestamp getToday() throws ParseException {
@@ -749,5 +880,52 @@ public class PagoMensualPagadoController implements Initializable {
     @FXML
     public void onClickLoginButton(ActionEvent event) {
         aplicacionControl.login(login, usuarioLogin);
+    }
+    
+    public class DataBaseThread implements Runnable {
+
+        public DataBaseThread(){
+        }
+
+        @Override
+        public void run() {
+
+            try {
+                int pagoId = pagoMes.getId();
+        
+                for (AbonoDeuda abonoDeuda: new AbonoDeudaDAO().findByPagoId(pagoId)) {
+                    Deuda deuda = abonoDeuda.getDeuda();
+                    deuda.setRestante(deuda.getRestante() + abonoDeuda.getMonto());
+                    deuda.setCuotas(deuda.getCuotas() + 1);
+                    deuda.setPagada(Boolean.FALSE);
+                    new AbonoDeudaDAO().delete(abonoDeuda);
+                }
+                for (PagoMesItem pagoMesItem: pagoMesItems) {
+                    new PagoMesItemDAO().delete(pagoMesItem);
+                }
+                new PagoMesDAO().delete(new PagoMesDAO().findById(pagoId));
+                new RolIndividualDAO().delete(new RolIndividualDAO()
+                        .findById(rolIndividual.getId()));
+                HibernateSessionFactory.getSession().flush();
+                String detalles = "elemino el pago mensual numero " + pagoId 
+                        + ", del empleado " + pagoMes.getUsuario().getNombre() 
+                        + " " + pagoMes.getUsuario().getApellido();
+                aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+              
+            } catch (Exception e) {
+                System.out.println("error");
+            }
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    pagoMensualController.setTableInfo(); 
+                }
+            });
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    borradoTerminado();  
+                }
+            });
+        }
+
     }
 }

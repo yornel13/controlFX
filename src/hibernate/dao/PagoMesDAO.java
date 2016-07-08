@@ -4,9 +4,7 @@ package hibernate.dao;
 
 import hibernate.model.PagoMes;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;

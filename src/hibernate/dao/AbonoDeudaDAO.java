@@ -61,6 +61,15 @@ public class AbonoDeudaDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<AbonoDeuda> findByPagoId(int pagoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM abono_deuda where pago_id = :pago_id")
+                    .addEntity(AbonoDeuda.class)
+                    .setParameter("pago_id", pagoId);
+            Object result = query.list();
+            return (List<AbonoDeuda>) result;
+        }
 
 	public List findByExample(AbonoDeuda instance) {
 		log.debug("finding AbonoDeuda instance by example");

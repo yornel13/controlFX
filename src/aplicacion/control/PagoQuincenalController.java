@@ -12,7 +12,10 @@ import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.MaterialDesignButton;
 import static aplicacion.control.util.Numeros.round;
+import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.PagoMesDAO;
 import hibernate.dao.PagoQuincenaDAO;
 import hibernate.dao.UsuarioDAO;
@@ -152,6 +155,8 @@ public class PagoQuincenalController implements Initializable {
     
     Stage dialogLoading;
     
+    Integer count;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -233,7 +238,7 @@ public class PagoQuincenalController implements Initializable {
         buttonNo.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
-        dialogStage.showAndWait();
+        dialogStage.show();
     }
     
     public void imprimir(File file, Boolean enviarCorreo) {
@@ -371,7 +376,7 @@ public class PagoQuincenalController implements Initializable {
             }
         });
         enviarCorreo.setSelected(true);
-        dialogStage.showAndWait();
+        dialogStage.show();
     }
     
     public void dialogoCompletado() {
@@ -410,7 +415,7 @@ public class PagoQuincenalController implements Initializable {
     }
     
     public void setTableInfo() {
-        
+        count = 0;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
@@ -439,10 +444,15 @@ public class PagoQuincenalController implements Initializable {
                 empleado.setPagado("Si");
                 empleado.setPagar(false);
             } else {
-                if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(fin, 
-                        empleado.getId()) == null 
-                        && user.getDetallesEmpleado().getQuincena() != null) {
-                    empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
+                if (user.getDetallesEmpleado().getQuincena() != null) { 
+                    if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(fin, 
+                        empleado.getId()) == null) {
+                        empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
+                    } else {
+                        count ++;
+                        empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
+                        empleado.setPagar(false);
+                    }
                 } else {
                     empleado.setQuincenal(0d);
                     empleado.setPagar(false);
@@ -454,9 +464,41 @@ public class PagoQuincenalController implements Initializable {
             data.add(empleado);
         });
         empleadosTableView.setItems(data);
+        
+        if (count > 0) {
+            dialogAdvertencia();
+        }
          
         filtro();
     }
+    
+     public void dialogAdvertencia() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Precaución");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonOk)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Hay empleados con pago mensual ya generado y sin adelanto quincenal,"),
+                 new Text("Si desea hacer el pago quincenal a estos empleados"), 
+                 new Text("por favor borre el pago mensual primero."), hBox).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonOk.setMinWidth(50);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+     }
     
     public void filtro() {
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
@@ -490,6 +532,116 @@ public class PagoQuincenalController implements Initializable {
         empleadosTableView.setItems(sortedData);
     }
     
+    public void dialogoBorrarPago(int usuarioId) {
+        
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Precaución");
+                String stageIcon = AplicacionControl.class
+                        .getResource("imagenes/icon_error.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+                MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                HBox hBox = HBoxBuilder.create()
+                        .spacing(10.0) //In case you are using HBoxBuilder
+                        .padding(new Insets(5, 5, 5, 5))
+                        .alignment(Pos.CENTER)
+                        .children(buttonOk, buttonNo)
+                        .build();
+                hBox.maxWidth(120);
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Seguro que desea Borrar este Adelanto quincenal?"),
+                         new Text("No podra recuperarlo!"), hBox).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                buttonOk.setMinWidth(50);
+                buttonNo.setMinWidth(50);
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                    dialogWait();
+                    borrarPago(usuarioId);
+                });
+                buttonNo.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+                dialogStage.showAndWait();
+                
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }
+    }
+    
+    void borrarPago(int usuarioId) {
+        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(fin, 
+                        usuarioId) == null) {
+           PagoQuincena pagoQuincena = new PagoQuincenaDAO()
+                    .findInDeterminateTimeByUsuarioId(fin, usuarioId);
+            new PagoQuincenaDAO().delete(pagoQuincena);
+            HibernateSessionFactory.getSession().flush();
+            String detalles = "elemino el pago quincenal numero " + pagoQuincena.getId()
+                    + ", del empleado " + pagoQuincena.getUsuario().getNombre() 
+                    + " " + pagoQuincena.getUsuario().getApellido();
+            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+            setTableInfo();
+            dialogLoading.close();
+            dialogoBorradoCompletado();    
+        } else {
+            dialogLoading.close();
+            dialogoBorradoError();  
+        }
+        
+    }
+    
+    public void dialogoBorradoCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Pago Quincenal");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se borro el adelanto quincenal con exito."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        buttonOk.prefWidth(80);
+        dialogStage.showAndWait();
+    }
+    
+    public void dialogoBorradoError() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Pago Quincenal");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("No se puede borrar este adelanto,"), 
+                new Text("borre primero el pago mensual."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        buttonOk.prefWidth(80);
+        dialogStage.showAndWait();
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.FALSE);
@@ -513,7 +665,8 @@ public class PagoQuincenalController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    //mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    if (rowData.getPagado().equalsIgnoreCase("Si"))
+                        dialogoBorrarPago(rowData.getId());
                 }
             });
             return row ;

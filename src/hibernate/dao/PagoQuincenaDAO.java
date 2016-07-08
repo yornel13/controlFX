@@ -95,12 +95,22 @@ public class PagoQuincenaDAO extends BaseHibernateDAO {
 	public List findByMonto(Object monto) {
 		return findByProperty(MONTO, monto);
 	}
-        
+        /*
         public List<PagoQuincena> findAllInDeterminateTime(Timestamp inicio, Timestamp fin) {
 		Query query = getSession().
                     createSQLQuery("SELECT * FROM pago_quincena WHERE fecha >= :inicio and fecha <= :fin")
                     .addEntity(PagoQuincena.class)
                     .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+                Object result = query.list();
+                return (List<PagoQuincena>) result;
+	}*/
+        
+        public List<PagoQuincena> findAllInDeterminateTime(Timestamp fin) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_quincena WHERE "
+                            + "fin_mes = :fin")
+                    .addEntity(PagoQuincena.class)
                     .setParameter("fin", fin);
                 Object result = query.list();
                 return (List<PagoQuincena>) result;

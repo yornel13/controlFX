@@ -498,7 +498,7 @@ public class PagoMensualController implements Initializable {
         
         pagosQuincena = new ArrayList<>();
         pagosQuincena.addAll(new PagoQuincenaDAO()
-                .findAllInDeterminateTime(inicio, fin));
+                .findAllInDeterminateTime(fin));
         usuarios = new ArrayList<>();
         usuarios.addAll(new UsuarioDAO().findByEmpresaIdActivo(empresa.getId()));
         data = FXCollections.observableArrayList(); 
