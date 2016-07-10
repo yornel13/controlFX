@@ -12,6 +12,7 @@ import hibernate.HibernateSessionFactory;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import hibernate.model.Identidad;
+import hibernate.model.PagoQuincena;
 import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.IOException;

@@ -709,11 +709,11 @@ public class PagoMensualController implements Initializable {
             pagoRol.setInicio(inicio);
             pagoRol.setFinalizo(fin);
             pagoRol.setDias(diasTextValor);
-            pagoRol.setHorasNormales(Double.valueOf(normalesTextValor));
-            pagoRol.setHorasSuplementarias(Double.valueOf(suplementariasTextValor));  // RC
-            pagoRol.setHorasSobreTiempo(Double.valueOf(sobreTiempoTextValor));        // ST
-            pagoRol.setTotalHorasExtras(Double.valueOf(sobreTiempoTextValor 
-                    + suplementariasTextValor));
+            pagoRol.setHorasNormales(normalesTextValor);
+            pagoRol.setHorasSuplementarias(suplementariasTextValor);  // RC
+            pagoRol.setHorasSobreTiempo(sobreTiempoTextValor);        // ST
+            pagoRol.setTotalHorasExtras(sobreTiempoTextValor 
+                    + suplementariasTextValor);
             pagoRol.setSalario(sueldoTotalTextValor);
             pagoRol.setMontoHorasSuplementarias(montoSumplementariasTextValor);
             pagoRol.setMontoHorasSobreTiempo(montoSobreTiempoTextValor);
@@ -739,7 +739,10 @@ public class PagoMensualController implements Initializable {
             empleadoTable.setPagar(true);
         } else {
            empleadoTable.setPagado("Si");
-           empleadoTable.setPagar(false); 
+           empleadoTable.setPagar(false);
+           PagoMes pagoMes = new PagoMesDAO()
+                   .findInDeterminateTimeByUsuarioId(fin, empleado.getId());
+           aPercibirValor = pagoMes.getMonto();
         }
         
         empleadoTable.setSueldo(round(aPercibirValor));

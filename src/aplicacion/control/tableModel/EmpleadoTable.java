@@ -8,6 +8,7 @@ package aplicacion.control.tableModel;
 import hibernate.model.Deuda;
 import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
+import hibernate.model.PagoQuincena;
 import hibernate.model.RolIndividual;
 import java.util.ArrayList;
 
@@ -46,7 +47,13 @@ public class EmpleadoTable {
     public ArrayList<PagoMesItem> pagoMesItems;
     public ArrayList<RolCliente> pagos;
     public RolIndividual rolIndividual;
+    public Boolean problem;
+    public PagoQuincena pagoQuincena;
 
+    public EmpleadoTable() {
+        problem = false;
+    }
+    
     public Integer getId() {
         return id;
     }
@@ -280,6 +287,21 @@ public class EmpleadoTable {
     public void setSinRoles(Boolean sinRoles) {
         this.sinRoles = sinRoles;
     }
-    
-    
+
+    public Boolean getProblem() {
+        return problem;
+    }
+
+    public void setProblem(Boolean problem) {
+        this.problem = problem;
+    }
+
+    public PagoQuincena getPagoQuincena() {
+        return pagoQuincena;
+    }
+
+    public void setPagoQuincena(PagoQuincena pagoQuincena) {
+        this.pagoQuincena = pagoQuincena;
+    }
+ 
 }

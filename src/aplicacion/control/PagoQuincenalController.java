@@ -45,6 +45,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -63,6 +64,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
@@ -443,14 +445,16 @@ public class PagoQuincenalController implements Initializable {
                 empleado.setQuincenal(pagoQuincena.getMonto());
                 empleado.setPagado("Si");
                 empleado.setPagar(false);
+                empleado.setPagoQuincena(pagoQuincena);
             } else {
                 if (user.getDetallesEmpleado().getQuincena() != null) { 
                     if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(fin, 
                         empleado.getId()) == null) {
                         empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
                     } else {
+                        empleado.setProblem(Boolean.TRUE);
                         count ++;
-                        empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
+                        empleado.setQuincenal(0d);
                         empleado.setPagar(false);
                     }
                 } else {
@@ -666,10 +670,11 @@ public class PagoQuincenalController implements Initializable {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
                     if (rowData.getPagado().equalsIgnoreCase("Si"))
-                        dialogoBorrarPago(rowData.getId());
+                        mostrarPagoQuincenalPagado(rowData
+                                .getPagoQuincena());
                 }
             });
-            return row ;
+            return row;
         });
         
         pagarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
@@ -699,6 +704,12 @@ public class PagoQuincenalController implements Initializable {
                 checkBoxpagar.setOnAction(event -> {
                      empleadoTable.setPagar(checkBoxpagar.isSelected());
                 });
+                
+                if (empleadoTable.getProblem()) {
+                    getTableRow().setStyle("-fx-background-color:lightcoral");
+                } else {
+                    getTableRow().setStyle(null);
+                }
             }
         });
         
@@ -752,6 +763,39 @@ public class PagoQuincenalController implements Initializable {
                     + "-fx-background-color: transparent;");
         });
     } 
+    
+    public void mostrarPagoQuincenalPagado(PagoQuincena pagoQuincena) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagoQuincenalPagado.fxml"));
+                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Pago Quincenal");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaAuditar);
+                    ventana.setScene(scene);
+                    PagoQuincenalPagadoController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setPagoQuincenalController(this);
+                    controller.setPago(pagoQuincena);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              aplicacionControl.noPermitido();
+            }
+        }
+    }
     
     // Login items
     @FXML
