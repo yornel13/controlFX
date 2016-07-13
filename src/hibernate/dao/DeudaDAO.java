@@ -79,7 +79,7 @@ public class DeudaDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List<Deuda> findAllByUsuarioId(Integer UsuarioId) {
+        public List<Deuda> findAllByEmpleadoId(Integer UsuarioId) {
 		Query query = getSession().
                     createSQLQuery("SELECT * FROM deuda WHERE usuario_id = :usuario_id order by creacion DESC")
                     .addEntity(Deuda.class)

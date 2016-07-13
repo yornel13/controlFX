@@ -106,6 +106,9 @@ public class DeudasEmpleadosController implements Initializable {
     private Button buttonAtras;
     
     @FXML
+    private Button buttonDeudas;
+    
+    @FXML
     private Button buttonImprimir;
     
     private ObservableList<EmpleadoTable> data;
@@ -128,6 +131,11 @@ public class DeudasEmpleadosController implements Initializable {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
+    
+    @FXML
+    public void onClickGestionarDeudas(ActionEvent event) {
+        
+    }
     
     public void mostrarDeudas(Usuario empleado) {
         if (aplicacionControl.permisos == null) {
@@ -179,7 +187,7 @@ public class DeudasEmpleadosController implements Initializable {
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
                ArrayList<Deuda> deudas = new ArrayList<>();
-               deudas.addAll(new DeudaDAO().findAllByUsuarioId(user.getId()));
+               deudas.addAll(new DeudaDAO().findAllByEmpleadoId(user.getId()));
                Double montoDeuda = 0d;
                for (Deuda deuda: deudas) {
                    montoDeuda += deuda.getRestante();
@@ -323,7 +331,7 @@ public class DeudasEmpleadosController implements Initializable {
              empleado.setCargo(user.getDetallesEmpleado()
                      .getCargo().getNombre());
              ArrayList<Deuda> deudas = new ArrayList<>();
-             deudas.addAll(new DeudaDAO().findAllByUsuarioId(user.getId()));
+             deudas.addAll(new DeudaDAO().findAllByEmpleadoId(user.getId()));
              Double montoDeuda = 0d;
              Integer cantidad = 0;
              for (Deuda deuda: deudas) {
@@ -407,6 +415,23 @@ public class DeudasEmpleadosController implements Initializable {
         buttonAtras.setOnMouseExited((MouseEvent t) -> {
             buttonAtras.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonDeudas.setTooltip(
+            new Tooltip("Agregar Deudas")
+        );
+        buttonDeudas.setOnMouseEntered((MouseEvent t) -> {
+            buttonDeudas.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/deudas.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonDeudas.setOnMouseExited((MouseEvent t) -> {
+            buttonDeudas.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/deudas.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");

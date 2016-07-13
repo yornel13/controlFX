@@ -162,6 +162,14 @@ public class UsuarioDAO extends BaseHibernateDAO {
             return (List<Usuario>) result;
         }
         
+        public List<Usuario> findAllEmpleados() {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario where detalles_empleado_id is not null")
+                    .addEntity(Usuario.class);
+            Object result = query.list();
+            return (List<Usuario>) result;
+        }
+        
         public List<Usuario> findAllEmpleadosActivosOrderByCedula() {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM usuario where activo = true and detalles_empleado_id is not null order by cedula")

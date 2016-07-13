@@ -46,8 +46,8 @@
       <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
-          <TableColumn fx:id="nombreColumna" prefWidth="150.0" text="Nombre" />
-            <TableColumn fx:id="apellidoColumna" prefWidth="150.0" text="Apellido" />
+          <TableColumn fx:id="apellidoColumna" prefWidth="150.0" text="Apellido" />
+            <TableColumn fx:id="nombreColumna" prefWidth="150.0" text="Nombre" />
             <TableColumn fx:id="departamentoColumna" prefWidth="120.0" text="Departamento" />
             <TableColumn fx:id="cargoColumna" prefWidth="140.0" text="Cargo" />
             <TableColumn fx:id="iessColumna" prefWidth="120.0" style="-fx-alignment: CENTER;" text="IESS" />

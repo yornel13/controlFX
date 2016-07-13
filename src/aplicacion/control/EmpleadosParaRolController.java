@@ -103,7 +103,7 @@ public class EmpleadosParaRolController implements Initializable {
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
                ArrayList<Deuda> deudas = new ArrayList<>();
-               deudas.addAll(new DeudaDAO().findAllByUsuarioId(user.getId()));
+               deudas.addAll(new DeudaDAO().findAllByEmpleadoId(user.getId()));
                Double montoDeuda = 0d;
                for (Deuda deuda: deudas) {
                    montoDeuda += deuda.getRestante();
@@ -137,7 +137,7 @@ public class EmpleadosParaRolController implements Initializable {
             empleado.setCargo(user.getDetallesEmpleado()
                     .getCargo().getNombre());
             ArrayList<Deuda> deudas = new ArrayList<>();
-            deudas.addAll(new DeudaDAO().findAllByUsuarioId(user.getId()));
+            deudas.addAll(new DeudaDAO().findAllByEmpleadoId(user.getId()));
             Double montoDeuda = 0d;
             Integer cantidad = 0;
             for (Deuda deuda: deudas) {

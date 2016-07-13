@@ -21,12 +21,12 @@
       <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="489.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
-          <TableColumn fx:id="nombreColumna" prefWidth="155.0" text="Nombre" />
-            <TableColumn fx:id="apellidoColumna" prefWidth="155.0" text="Apellido" />
-            <TableColumn fx:id="telefonoColumna" prefWidth="110.0" text="Telefono" />
+          <TableColumn fx:id="apellidoColumna" prefWidth="155.0" text="Apellido" />
+            <TableColumn fx:id="nombreColumna" prefWidth="155.0" text="Nombre" />
+            <TableColumn fx:id="telefonoColumna" prefWidth="105.0" text="Telefono" />
             <TableColumn fx:id="departamentoColumna" prefWidth="100.0" text="Departamento" />
             <TableColumn fx:id="cargoColumna" prefWidth="100.0" text="Cargo" />
-            <TableColumn fx:id="borrarColumna" prefWidth="60.0" text="Borrar" />
+            <TableColumn fx:id="borrarColumna" prefWidth="65.0" text="Borrar" />
         </columns>
       </TableView>
       <Accordion layoutX="40.0" layoutY="14.0" />

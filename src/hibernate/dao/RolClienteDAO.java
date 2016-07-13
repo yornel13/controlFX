@@ -346,9 +346,9 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findByUsuarioId(Integer usuarioId) {
+        public List<RolCliente> findAllByUsuarioId(Integer usuarioId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago where usuario_id = :usuario_id")
+                    createSQLQuery("SELECT * FROM rol_cliente where usuario_id = :usuario_id")
                     .addEntity(RolCliente.class)
                     .setParameter("usuario_id", usuarioId);
             Object result = query.list();

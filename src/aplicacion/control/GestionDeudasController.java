@@ -370,7 +370,7 @@ public class GestionDeudasController implements Initializable {
         this.empleado = empleado;
         DeudaDAO deudaDao = new DeudaDAO();
         deudas = new ArrayList<>();
-        deudas.addAll(deudaDao.findAllByUsuarioId(empleado.getId()));
+        deudas.addAll(deudaDao.findAllByEmpleadoId(empleado.getId()));
         data = FXCollections.observableArrayList(); 
         data.addAll(deudas);
         deudasTableView.setItems(data);

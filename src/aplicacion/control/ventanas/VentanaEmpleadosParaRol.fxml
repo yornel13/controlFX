@@ -15,8 +15,8 @@
       <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="780.0">
         <columns>
           <TableColumn fx:id="cedulaColumna" prefWidth="100.0" text="Cedula" />
-          <TableColumn fx:id="nombreColumna" prefWidth="200.0" text="Nombre" />
-            <TableColumn fx:id="apellidoColumna" prefWidth="180.0" text="Apellido" />
+          <TableColumn fx:id="apellidoColumna" prefWidth="200.0" text="Apellido" />
+            <TableColumn fx:id="nombreColumna" prefWidth="180.0" text="Nombre" />
             <TableColumn fx:id="departamentoColumna" prefWidth="150.0" text="Departamento" />
             <TableColumn fx:id="cargoColumna" prefWidth="150.0" text="Cargo" />
         </columns>

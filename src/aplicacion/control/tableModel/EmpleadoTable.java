@@ -49,6 +49,7 @@ public class EmpleadoTable {
     public RolIndividual rolIndividual;
     public Boolean problem;
     public PagoQuincena pagoQuincena;
+    private Boolean activo;
 
     public EmpleadoTable() {
         problem = false;
@@ -302,6 +303,14 @@ public class EmpleadoTable {
 
     public void setPagoQuincena(PagoQuincena pagoQuincena) {
         this.pagoQuincena = pagoQuincena;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
  
 }

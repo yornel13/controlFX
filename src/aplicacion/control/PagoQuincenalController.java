@@ -687,6 +687,7 @@ public class PagoQuincenalController implements Initializable {
 
                 if (empleadoTable == null) {
                     setGraphic(null);
+                    getTableRow().setStyle("");
                     return;
                 }
                 
@@ -708,7 +709,7 @@ public class PagoQuincenalController implements Initializable {
                 if (empleadoTable.getProblem()) {
                     getTableRow().setStyle("-fx-background-color:lightcoral");
                 } else {
-                    getTableRow().setStyle(null);
+                    getTableRow().setStyle("");
                 }
             }
         });

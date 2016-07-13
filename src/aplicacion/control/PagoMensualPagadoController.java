@@ -91,6 +91,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.stage.StageStyle;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -464,7 +471,7 @@ public class PagoMensualPagadoController implements Initializable {
     
     public void borradoTerminado() {
         for (Deuda deuda: new DeudaDAO()
-                .findAllByUsuarioId(pagoMes.getUsuario().getId())) {
+                .findAllByEmpleadoId(pagoMes.getUsuario().getId())) {
             new DeudaDAO().getSession().refresh(deuda);
         }
         stagePrincipal.close();

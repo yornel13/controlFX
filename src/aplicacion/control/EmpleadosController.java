@@ -6,9 +6,14 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.DeudaDAO;
+import hibernate.dao.PagoQuincenaDAO;
 import hibernate.dao.RolClienteDAO;
+import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
@@ -38,6 +43,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -150,6 +157,7 @@ public class EmpleadosController implements Initializable {
                         .getDepartamento().getNombre());
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
+                empleado.setActivo(user.getActivo());
                 data.set(data.indexOf(empleadoTable), empleado);
                 return; 
             }
@@ -167,41 +175,154 @@ public class EmpleadosController implements Initializable {
            aplicacionControl.noLogeado();
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.ELIMINAR)) {
-               
-                if (new RolClienteDAO().findByUsuarioId(empleadoTable.getId()).isEmpty()) { 
-                    
-                    Stage dialogStage = new Stage();
-                    dialogStage.initModality(Modality.APPLICATION_MODAL);
-                    dialogStage.setResizable(false);
-                    dialogStage.setTitle("Confirmación de borrado");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                    dialogStage.getIcons().add(new Image(stageIcon));;
-                    Button buttonConfirmar = new Button("Si Borrar");
-                    Button buttonCancelar = new Button("No, no estoy seguro");
-                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("¿Borrar el empleado " + empleadoTable.getNombre()+ "?"), 
-                            buttonConfirmar, buttonCancelar).
-                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                    buttonConfirmar.setOnAction((ActionEvent e) -> {
+                
+                if (empleadoTable.getActivo()) {
+                
+                    Boolean borrar = true;
 
-                        new UsuarioDAO().findById(empleadoTable.getId()).setActivo(Boolean.FALSE);
-                        HibernateSessionFactory.getSession().flush();
-                        data.remove(empleadoTable);
-                        dialogStage.close();
+                    if (!new RolClienteDAO()  // Si no tiene roles cliente
+                            .findAllByUsuarioId(empleadoTable.getId()).isEmpty()) {
+                        borrar = false;
+                    }
+                    if (!new RolIndividualDAO()  // Si no tiene roles individuales
+                            .findAllByEmpleadoId(empleadoTable.getId()).isEmpty()) {
+                        borrar = false;
+                    }
+                    if (!new ControlEmpleadoDAO()  // Si no tiene horas trabajadas
+                            .findAllByEmpleadoId(empleadoTable.getId()).isEmpty()) {
+                        borrar = false;
+                    }
+                    if (!new DeudaDAO()   // Si no tiene Deudas
+                            .findAllByEmpleadoId(empleadoTable.getId()).isEmpty()) {
+                        borrar = false;
+                    }
+                    if (!new PagoQuincenaDAO()   // Si no tiene Deudas
+                            .findAllByUsuarioId(empleadoTable.getId()).isEmpty()) {
+                        borrar = false;
+                    }
 
-                        // Registro para auditar
-                        String detalles = "elimino el empleado " 
-                                + empleadoTable.getNombre() + " " 
-                                + empleadoTable.getApellido();
-                        aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-                    });
-                    buttonCancelar.setOnAction((ActionEvent e) -> {
-                       dialogStage.close();
-                    });
-                    dialogStage.showAndWait();
-                    
+                    if (borrar) { 
+
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.setResizable(false);
+                        dialogStage.setTitle("Confirmación de borrado");
+                        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                        dialogStage.getIcons().add(new Image(stageIcon));;
+                        Button buttonConfirmar = new Button("Si Borrar");
+                        Button buttonCancelar = new Button("No, no estoy seguro");
+                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                        children(new Text("¿Borrar el empleado " + empleadoTable.getApellido()+ "?"), 
+                                buttonConfirmar, buttonCancelar).
+                        alignment(Pos.CENTER).padding(new Insets(25)).build()));
+                        buttonConfirmar.setOnAction((ActionEvent e) -> {
+
+                            new UsuarioDAO().delete(new UsuarioDAO()
+                                    .findById(empleadoTable.getId()));
+                            HibernateSessionFactory.getSession().flush();
+                            data.remove(empleadoTable);
+                            dialogStage.close();
+
+                            // Registro para auditar
+                            String detalles = "elimino el empleado " 
+                                    + empleadoTable.getApellido() + " " 
+                                    + empleadoTable.getNombre();
+                            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                        });
+                        buttonCancelar.setOnAction((ActionEvent e) -> {
+                           dialogStage.close();
+                        });
+                        dialogStage.showAndWait();
+
+                    } else {
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.setResizable(false);
+                        dialogStage.setTitle("Confirmación de borrado");
+                        String stageIcon = AplicacionControl.class
+                                .getResource("imagenes/icon_error.png").toExternalForm();
+                        dialogStage.getIcons().add(new Image(stageIcon));
+                        MaterialDesignButton buttonOk = new MaterialDesignButton("Si, desactivar");
+                        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                        HBox hBox = HBoxBuilder.create()
+                                .spacing(10.0) //In case you are using HBoxBuilder
+                                .padding(new Insets(5, 5, 5, 5))
+                                .alignment(Pos.CENTER)
+                                .children(buttonOk, buttonNo)
+                                .build();
+                        hBox.maxWidth(120);
+                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                        children(new Text("No se puede borrar el empleado porque tiene roles generados."),
+                                 new Text("¿Desea desactivar el empleado?"),
+                                 new Text("Los empleados desactivados no aparecen en gestiones, horas, pagos, etc."), hBox).
+                        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                        buttonOk.setMinWidth(50);
+                        buttonNo.setMinWidth(50);
+                        buttonOk.setOnAction((ActionEvent e) -> {
+
+                            new UsuarioDAO().findById(empleadoTable.getId())
+                                    .setActivo(Boolean.FALSE);
+                            HibernateSessionFactory.getSession().flush();
+                            empleadoTable.setActivo(false);
+                            data.set(data.indexOf(empleadoTable), empleadoTable);
+                            dialogStage.close();
+
+                            // Registro para auditar
+                            String detalles = "desactivo el empleado " 
+                                    + empleadoTable.getApellido() + " " 
+                                    + empleadoTable.getNombre();
+                            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+
+                            dialogStage.close();
+                        });
+                        buttonNo.setOnAction((ActionEvent e) -> {
+                            dialogStage.close();
+                        });
+                        dialogStage.showAndWait();
+                    }
                 } else {
-                    aplicacionControl.noSePuede();
+                    Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.setResizable(false);
+                        dialogStage.setTitle("Confirmación de Activación");
+                        String stageIcon = AplicacionControl.class
+                                .getResource("imagenes/icon_error.png").toExternalForm();
+                        dialogStage.getIcons().add(new Image(stageIcon));
+                        MaterialDesignButton buttonOk = new MaterialDesignButton("Si, activar");
+                        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                        HBox hBox = HBoxBuilder.create()
+                                .spacing(10.0) //In case you are using HBoxBuilder
+                                .padding(new Insets(5, 5, 5, 5))
+                                .alignment(Pos.CENTER)
+                                .children(buttonOk, buttonNo)
+                                .build();
+                        hBox.maxWidth(120);
+                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                        children(new Text("¿Seguro que desea activar este empleado?"), hBox).
+                        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                        buttonOk.setMinWidth(50);
+                        buttonNo.setMinWidth(50);
+                        buttonOk.setOnAction((ActionEvent e) -> {
+
+                            new UsuarioDAO().findById(empleadoTable.getId())
+                                    .setActivo(Boolean.TRUE);
+                            HibernateSessionFactory.getSession().flush();
+                            empleadoTable.setActivo(true);
+                            data.set(data.indexOf(empleadoTable), empleadoTable);
+                            dialogStage.close();
+
+                            // Registro para auditar
+                            String detalles = "activo el empleado " 
+                                    + empleadoTable.getApellido() + " " 
+                                    + empleadoTable.getNombre();
+                            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+
+                            dialogStage.close();
+                        });
+                        buttonNo.setOnAction((ActionEvent e) -> {
+                            dialogStage.close();
+                        });
+                        dialogStage.showAndWait();
                 }
                   
             } else {
@@ -214,7 +335,7 @@ public class EmpleadosController implements Initializable {
         this.empresa = empresa;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findByEmpresaId(empresa.getId()));
         data = FXCollections.observableArrayList(); 
         if (!usuarios.isEmpty()) {
             usuarios.stream().map((user) -> {
@@ -230,6 +351,7 @@ public class EmpleadosController implements Initializable {
                         .getDepartamento().getNombre());
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
+                empleado.setActivo(user.getActivo());
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);
@@ -259,6 +381,7 @@ public class EmpleadosController implements Initializable {
 
                 if (empleadoTable == null) {
                     setGraphic(null);
+                    getTableRow().setStyle("");
                     return;
                 }
 
@@ -266,6 +389,15 @@ public class EmpleadosController implements Initializable {
                 deleteButton.setOnAction(event -> {
                     deleteEmpleado(empleadoTable);
                 });
+                
+                if (empleadoTable.getActivo()) {
+                    deleteButton.setText("Borrar");
+                    getTableRow().setStyle("");
+                } else {
+                    deleteButton.setText("Activar");
+                    getTableRow().setStyle("-fx-background-color: lightcoral");
+                    
+                }
             }
         });
         
@@ -287,7 +419,7 @@ public class EmpleadosController implements Initializable {
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
-
+                empleadosTableView.setStyle("-fx-background-color: white");
                 // Compare first name and last name of every person with filter text.
                 String lowerCaseFilter = newValue.toLowerCase();
 
