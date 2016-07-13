@@ -282,47 +282,47 @@ public class EmpleadosController implements Initializable {
                     }
                 } else {
                     Stage dialogStage = new Stage();
-                        dialogStage.initModality(Modality.APPLICATION_MODAL);
-                        dialogStage.setResizable(false);
-                        dialogStage.setTitle("Confirmación de Activación");
-                        String stageIcon = AplicacionControl.class
-                                .getResource("imagenes/icon_error.png").toExternalForm();
-                        dialogStage.getIcons().add(new Image(stageIcon));
-                        MaterialDesignButton buttonOk = new MaterialDesignButton("Si, activar");
-                        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
-                        HBox hBox = HBoxBuilder.create()
-                                .spacing(10.0) //In case you are using HBoxBuilder
-                                .padding(new Insets(5, 5, 5, 5))
-                                .alignment(Pos.CENTER)
-                                .children(buttonOk, buttonNo)
-                                .build();
-                        hBox.maxWidth(120);
-                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                        children(new Text("¿Seguro que desea activar este empleado?"), hBox).
-                        alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                        buttonOk.setMinWidth(50);
-                        buttonNo.setMinWidth(50);
-                        buttonOk.setOnAction((ActionEvent e) -> {
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Confirmación de Activación");
+                    String stageIcon = AplicacionControl.class
+                            .getResource("imagenes/icon_error.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    MaterialDesignButton buttonOk = new MaterialDesignButton("Si, activar");
+                    MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                    HBox hBox = HBoxBuilder.create()
+                            .spacing(10.0) //In case you are using HBoxBuilder
+                            .padding(new Insets(5, 5, 5, 5))
+                            .alignment(Pos.CENTER)
+                            .children(buttonOk, buttonNo)
+                            .build();
+                    hBox.maxWidth(120);
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("¿Seguro que desea activar este empleado?"), hBox).
+                    alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                    buttonOk.setMinWidth(50);
+                    buttonNo.setMinWidth(50);
+                    buttonOk.setOnAction((ActionEvent e) -> {
 
-                            new UsuarioDAO().findById(empleadoTable.getId())
-                                    .setActivo(Boolean.TRUE);
-                            HibernateSessionFactory.getSession().flush();
-                            empleadoTable.setActivo(true);
-                            data.set(data.indexOf(empleadoTable), empleadoTable);
-                            dialogStage.close();
+                        new UsuarioDAO().findById(empleadoTable.getId())
+                                .setActivo(Boolean.TRUE);
+                        HibernateSessionFactory.getSession().flush();
+                        empleadoTable.setActivo(true);
+                        data.set(data.indexOf(empleadoTable), empleadoTable);
+                        dialogStage.close();
 
-                            // Registro para auditar
-                            String detalles = "activo el empleado " 
-                                    + empleadoTable.getApellido() + " " 
-                                    + empleadoTable.getNombre();
-                            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                        // Registro para auditar
+                        String detalles = "activo el empleado " 
+                                + empleadoTable.getApellido() + " " 
+                                + empleadoTable.getNombre();
+                        aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
 
-                            dialogStage.close();
-                        });
-                        buttonNo.setOnAction((ActionEvent e) -> {
-                            dialogStage.close();
-                        });
-                        dialogStage.showAndWait();
+                        dialogStage.close();
+                    });
+                    buttonNo.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                    });
+                    dialogStage.showAndWait();
                 }
                   
             } else {

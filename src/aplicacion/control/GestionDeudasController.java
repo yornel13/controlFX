@@ -206,9 +206,11 @@ public class GestionDeudasController implements Initializable {
                         dialogStage.close();
                         
                         String detalle = "agrego una deudo al empleado " 
-                            + empleado.getNombre() + " " + empleado.getApellido() 
+                            + empleado.getApellido()+ " " 
+                                + empleado.getNombre()
                                 + " por " + monto + "$";
-                        aplicacionControl.au.saveElimino(detalle, aplicacionControl.permisos.getUsuario());
+                        aplicacionControl.au.saveAgrego(detalle, 
+                                aplicacionControl.permisos.getUsuario());
                         
                         setEmpleado(empleado);
                         
@@ -261,9 +263,10 @@ public class GestionDeudasController implements Initializable {
                 dialogStage.close();
                 
                 // Registro para auditar
-                String detalles = "elimino la deuda '" + deuda.getDetalles() + "' del empleado " 
-                        + deuda.getUsuario().getNombre() + " " 
-                        + deuda.getUsuario().getApellido();
+                String detalles = "elimino la deuda '" + deuda.getDetalles() 
+                        + "' del empleado " 
+                        + deuda.getUsuario().getApellido()+ " " 
+                        + deuda.getUsuario().getNombre();
                 aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                     
                 borradoCompleto();
@@ -303,8 +306,8 @@ public class GestionDeudasController implements Initializable {
                         
                     // Registro para auditar
                     String detalles = "edito las cuotas de la deuda '" + deuda.getDetalles() + "' del empleado " 
-                            + deuda.getUsuario().getNombre() + " " 
-                            + deuda.getUsuario().getApellido();
+                            + deuda.getUsuario().getApellido()+ " " 
+                            + deuda.getUsuario().getNombre();
                     aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                     
                     guardar();

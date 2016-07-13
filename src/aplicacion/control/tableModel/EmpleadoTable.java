@@ -50,9 +50,14 @@ public class EmpleadoTable {
     public Boolean problem;
     public PagoQuincena pagoQuincena;
     private Boolean activo;
+    private Boolean agregar;
+    private Double monto;
+    private Integer cuotas;
 
     public EmpleadoTable() {
         problem = false;
+        agregar = false;
+        monto = 0.0;
     }
     
     public Integer getId() {
@@ -312,5 +317,30 @@ public class EmpleadoTable {
     public void setActivo(Boolean activo) {
         this.activo = activo;
     }
+
+    public Boolean getAgregar() {
+        return agregar;
+    }
+
+    public void setAgregar(Boolean agregar) {
+        this.agregar = agregar;
+    }
+
+    public Double getMonto() {
+        return monto;
+    }
+
+    public void setMonto(Double monto) {
+        this.monto = monto;
+    }
+
+    public Integer getCuotas() {
+        return cuotas;
+    }
+
+    public void setCuotas(Integer cuotas) {
+        this.cuotas = cuotas;
+    }
  
+    
 }

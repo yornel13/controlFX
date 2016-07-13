@@ -16,6 +16,23 @@
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <TextField fx:id="filterField" layoutX="70.0" layoutY="18.0" prefHeight="25.0" prefWidth="590.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <GridPane fx:id="marcarTodos" layoutX="730.0" layoutY="15.0" prefHeight="30.0" prefWidth="59.0" visible="false">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="43.0" minWidth="10.0" prefWidth="42.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="17.0" minWidth="10.0" prefWidth="17.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="Todos" textFill="#fffbfb">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <CheckBox fx:id="checkBoxDeudaTodos" mnemonicParsing="false" onAction="#marcarATodos" GridPane.columnIndex="1" />
+               </children>
+            </GridPane>
          </children>
       </Pane>
       <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="489.0" prefWidth="770.0" style="-fx-background-color: white;">
@@ -43,5 +60,6 @@
             </children>
          </Pane>
       <Button fx:id="buttonDeudas" layoutX="684.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickGestionarDeudas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/deudas.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Button fx:id="buttonGuardar" layoutX="684.0" layoutY="10.0" mnemonicParsing="false" onAction="#guardarDeudas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" visible="false" />
     </children>
 </AnchorPane>

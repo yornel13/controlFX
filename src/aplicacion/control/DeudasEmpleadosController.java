@@ -5,22 +5,31 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.DeudasController.numDecimalFilter;
+import static aplicacion.control.DeudasController.numFilter;
 import aplicacion.control.reports.ReporteDeudasVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
+import hibernate.dao.DeudaTipoDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Deuda;
+import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +37,9 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -40,7 +52,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -51,6 +66,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -109,7 +127,20 @@ public class DeudasEmpleadosController implements Initializable {
     private Button buttonDeudas;
     
     @FXML
+    private Button buttonGuardar;
+    
+    @FXML
     private Button buttonImprimir;
+    
+    @FXML
+    private GridPane marcarTodos;
+    
+    @FXML
+    private CheckBox checkBoxDeudaTodos;
+    
+    TableColumn cuotasColumna;
+    
+    TableColumn<EmpleadoTable, EmpleadoTable> agregarColumna;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -117,6 +148,10 @@ public class DeudasEmpleadosController implements Initializable {
     private Empresa empresa;
     
     Stage dialogLoading;
+    
+    Boolean enDeudaMultiple = false;
+    
+    private Deuda deuda;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -132,9 +167,394 @@ public class DeudasEmpleadosController implements Initializable {
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
     
+    public void dialogWait() {
+        dialogLoading = new Stage();
+        dialogLoading.initModality(Modality.APPLICATION_MODAL);
+        dialogLoading.setResizable(false);
+        dialogLoading.setTitle("Cargando...");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        dialogLoading.getIcons().add(new Image(stageIcon));
+        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Cargando espere...")).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogLoading.show();
+    }
+    
+    public void generarDeudas() {
+        dialogWait();
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) data) {
+            if (empleadoTable.getAgregar()) {
+                
+                Deuda newDeuda;
+                newDeuda = cloneDeuda(deuda);
+                newDeuda.setMonto(empleadoTable.getMonto());
+                 newDeuda.setRestante(empleadoTable.getMonto());
+                newDeuda.setCuotas(empleadoTable.getCuotas());
+                newDeuda.setUsuario(findUsuarioById(empleadoTable.getId()));
+                new DeudaDAO().save(newDeuda);
+               
+                String detalle = "agrego una deudo al empleado " 
+                        + empleadoTable.getApellido()+ " " 
+                        + empleadoTable.getNombre()
+                        + " por $" + newDeuda.getMonto();
+                aplicacionControl.au.saveAgrego(detalle, 
+                        aplicacionControl.permisos.getUsuario());
+            } 
+        }
+        filterField.clear();
+        checkBoxDeudaTodos.setSelected(false);
+        
+        marcarTodos.setVisible(false);
+        buttonImprimir.setVisible(true);
+        buttonDeudas.setVisible(true);
+        buttonGuardar.setVisible(false);
+        
+        empleadosTableView.getColumns().remove(agregarColumna);
+        empleadosTableView.getColumns().remove(cuotasColumna);
+        empleadosTableView.getColumns().remove(deudasColumna);
+        empleadosTableView.getColumns().remove(cargoColumna);
+        
+        deudasColumna.setText("Total Deudas");
+        deudasColumna.setCellValueFactory(
+                new PropertyValueFactory<>("totalMontoDeudas"));
+        
+        empleadosTableView.getColumns().addAll(departamentoColumna, 
+                cargoColumna, deudasColumna);
+        
+        enDeudaMultiple = false;
+        
+        setEmpresa(empresa);
+        
+        dialogLoading.close();
+        
+        dialogoDeudasMultiplesCompletado();
+    }
+    
+    @FXML
+    public void guardarDeudas(ActionEvent event) {
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Deudas Multiples");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonOk, buttonNo)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Seguro que desea generar la deuda(s) "
+                + "a este(os) empleado(s)?"), hBox).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonOk.setMinWidth(50);
+        buttonNo.setMinWidth(50);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            generarDeudas();
+            dialogStage.close();
+        });
+        buttonNo.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+        
+        
+    }
+    
+    public void dialogoDeudasMultiplesCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Deudas Multiples");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Deudas creadas con exito."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+    }
+    
+    public Usuario findUsuarioById(Integer id) {
+        for (Usuario usuario: usuarios) {
+            if (usuario.getId().equals(id)) {
+                return usuario;
+            }
+        }
+        return  null;
+    }
+    
+    @FXML
+    public void marcarATodos(ActionEvent event) {
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (checkBoxDeudaTodos.isSelected()) {
+                empleadoTable.setAgregar(true);
+            } else {
+                empleadoTable.setAgregar(false);
+            }
+            data.set(data.indexOf(empleadoTable), empleadoTable);
+        }
+    }
+    
     @FXML
     public void onClickGestionarDeudas(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Deudas Multiples");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonOk, buttonNo)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Desea usar el modo deuda a multiples empleados?"), hBox).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonOk.setMinWidth(50);
+        buttonNo.setMinWidth(50);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            nuevaDeuda();
+            dialogStage.close();
+        });
+        buttonNo.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void nuevaDeuda() {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.CREAR)) {
+               
+                ArrayList<DeudaTipo> deudaTipos = new ArrayList<>();
+                deudaTipos.addAll(new DeudaTipoDAO().findAll());
+                
+                String[] itemsTipos = new String[deudaTipos.size()];
+                deudaTipos.stream().forEach((deudaTipo) -> {
+                    itemsTipos[deudaTipos.indexOf(deudaTipo)] = deudaTipo.getNombre();
+                });
+                
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Nueva Deuda");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button buttonConfirmar = new Button("Crear");
+                ChoiceBox choiceBoxTipos = new ChoiceBox();
+                TextField fieldDetalles = new TextField();
+                TextField fieldMonto = new TextField();
+                TextField fieldCuotas = new TextField();
+                Text textTipo = new Text("Tipo");
+                Text textDetalles = new Text("Detalles");
+                Text textMonto = new Text("Monto");
+                Text textCuotas = new Text("Cuotas");
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(textTipo, choiceBoxTipos, textDetalles, fieldDetalles, textMonto, 
+                        fieldMonto, textCuotas, fieldCuotas, buttonConfirmar).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                choiceBoxTipos.setItems(FXCollections.observableArrayList(itemsTipos));
+                fieldMonto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+                fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+                choiceBoxTipos.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                        fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
+                    }
+                });
+                buttonConfirmar.setOnAction((ActionEvent e) -> {
+                    
+                    if (choiceBoxTipos.getSelectionModel().isEmpty()) {
+                        
+                    } else if (fieldDetalles.getText().isEmpty()) {
+                        
+                    } else if (fieldMonto.getText().isEmpty()) {
+                        
+                    } else if (fieldCuotas.getText().isEmpty()) {
+                        
+                    } else {
+                        
+                        String tipo = choiceBoxTipos.getSelectionModel()
+                                .getSelectedItem().toString();
+                        String detalles = fieldDetalles.getText();
+                        String monto = fieldMonto.getText();
+                        String cuotas = fieldCuotas.getText();
+                        
+                        Deuda newDeuda = new Deuda();
+                        newDeuda.setTipo(tipo);
+                        newDeuda.setDetalles(detalles);
+                        newDeuda.setMonto(Double.valueOf(monto));
+                        newDeuda.setCuotas(Integer.parseInt(cuotas));
+                        newDeuda.setPagada(Boolean.FALSE);
+                        newDeuda.setAplazar(Boolean.FALSE);
+                        newDeuda.setRestante(Double.valueOf(monto));
+                        newDeuda.setCreacion(new Timestamp(new Date().getTime()));
+                        newDeuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
+                        
+                        deudaMultple(newDeuda);
+                        
+                        dialogStage.close();
+                    }
+                });  
+                dialogStage.show();
+                
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
+    public void editarDeuda(EmpleadoTable empleadoTable) {
         
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Edición de Deuda");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonConfirmar = new Button("guardar");
+        TextField fieldMonto = new TextField();
+        TextField fieldCuotas = new TextField();
+        Text textMonto = new Text("Monto");
+        Text textCuotas = new Text("Cuotas");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(textMonto, 
+                fieldMonto, textCuotas, fieldCuotas, buttonConfirmar).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        fieldMonto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        fieldCuotas.setText(empleadoTable.getCuotas().toString());
+        fieldMonto.setText(empleadoTable.getMonto().toString());
+        buttonConfirmar.setOnAction((ActionEvent e) -> {
+
+            if (fieldMonto.getText().isEmpty()) {
+
+            } else if (fieldCuotas.getText().isEmpty()) {
+
+            } else {
+
+                String monto = fieldMonto.getText();
+                String cuotas = fieldCuotas.getText();
+
+                empleadoTable.setMonto(Double.valueOf(monto));
+                empleadoTable.setCuotas(Integer.valueOf(cuotas));
+                
+                data.set(data.indexOf(empleadoTable), empleadoTable);
+
+                dialogStage.close();
+            }
+        });  
+        dialogStage.show();
+
+
+    }
+    
+    public void deudaMultple(Deuda deuda) {
+        
+        this.deuda = deuda;
+        
+        filterField.clear();
+        
+        marcarTodos.setVisible(true);
+        buttonImprimir.setVisible(false);
+        buttonDeudas.setVisible(false);
+        buttonGuardar.setVisible(true);
+        
+        data.stream().forEach((empleadoTable) -> {
+            empleadoTable.setCuotas(deuda.getCuotas());
+            empleadoTable.setMonto(deuda.getMonto());
+        });
+        
+        empleadosTableView.getColumns().remove(departamentoColumna);
+        
+        deudasColumna.setText("Monto");
+        deudasColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
+        
+        cuotasColumna = new TableColumn("Cuotas");
+        cuotasColumna.setMaxWidth(60);
+        cuotasColumna.setMinWidth(60);
+        cuotasColumna.setStyle("-fx-alignment: center;");
+        cuotasColumna.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
+        
+        agregarColumna = new TableColumn("Deuda");
+        agregarColumna.setMaxWidth(50);
+        agregarColumna.setStyle("-fx-alignment: center;");
+        agregarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        agregarColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
+            private final CheckBox checkBoxAgregar = new CheckBox();
+
+            @Override
+            protected void updateItem(EmpleadoTable empleadoTable, boolean empty) {
+                super.updateItem(empleadoTable, empty);
+
+                if (empleadoTable == null) {
+                    setGraphic(null);
+                    return;
+                }
+                
+                setGraphic(checkBoxAgregar);
+                if (checkBoxAgregar != null) {
+                    checkBoxAgregar.setSelected(empleadoTable.getAgregar());
+                }
+                checkBoxAgregar.setOnAction(event -> {
+                    empleadoTable.setAgregar(checkBoxAgregar.isSelected());
+                     
+                });
+            } 
+        });
+        empleadosTableView.getColumns().addAll(cuotasColumna, agregarColumna);
+        
+        enDeudaMultiple = true;
+        
+        dialogoInformacion();
+    }
+    
+    public void dialogoInformacion() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Sobre deudas multiples");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Marque los empleados a los cuales desea agregarle la deuda,"),
+                new Text("adicionalmente puede editar individualmente el monto y las cuotas"),
+                 new Text("haciendo doble click en el empleado,"), 
+                 new Text("al finalizar utilize el boton guardar para agregar las deudas."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
     }
     
     public void mostrarDeudas(Usuario empleado) {
@@ -197,19 +617,6 @@ public class DeudasEmpleadosController implements Initializable {
                return;
             }
         }
-    }
-    
-    public void dialogWait() {
-        dialogLoading = new Stage();
-        dialogLoading.initModality(Modality.APPLICATION_MODAL);
-        dialogLoading.setResizable(false);
-        dialogLoading.setTitle("Cargando...");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
-        dialogLoading.getIcons().add(new Image(stageIcon));
-        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Cargando espere...")).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        dialogLoading.show();
     }
     
     public void imprimir(File file) {
@@ -400,7 +807,11 @@ public class DeudasEmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    mostrarDeudas(new UsuarioDAO().findById(rowData.getId()));
+                    if (enDeudaMultiple) {
+                        editarDeuda(rowData);
+                    } else {
+                        mostrarDeudas(new UsuarioDAO().findById(rowData.getId()));
+                    }
                 }
             });
             return row ;
@@ -453,7 +864,37 @@ public class DeudasEmpleadosController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonGuardar.setTooltip(
+            new Tooltip("Guardar deudas")
+        );
+        buttonGuardar.setOnMouseEntered((MouseEvent t) -> {
+            buttonGuardar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/guardar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonGuardar.setOnMouseExited((MouseEvent t) -> {
+            buttonGuardar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/guardar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     } 
+    
+    private static Deuda cloneDeuda(Deuda obj){
+        try{
+            Deuda clone = obj.getClass().newInstance();
+            for (Field field : obj.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                field.set(clone, field.get(obj));
+            }
+            return clone;
+        }catch(Exception e){
+            return null;
+        }
+    }
     
     // Login items
     @FXML

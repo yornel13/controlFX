@@ -6,8 +6,10 @@
 package aplicacion.control;
 
 import aplicacion.control.reports.ReporteDeudas;
+import aplicacion.control.tableModel.DeudaTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
@@ -105,7 +107,7 @@ public class DeudasController implements Initializable {
     private TableColumn tipoColumna;
     
     @FXML
-    private TableColumn<Deuda, Deuda> borrarColumna;
+    private TableColumn<DeudaTable, DeudaTable> borrarColumna;
     
     @FXML
     private Button buttonAgregar;
@@ -116,7 +118,7 @@ public class DeudasController implements Initializable {
     @FXML
     private TableView deudasTableView;
     
-    private ObservableList<Deuda> data;
+    private ObservableList<DeudaTable> data;
     
     ArrayList<Deuda> deudas;
     
@@ -226,7 +228,7 @@ public class DeudasController implements Initializable {
                         dialogStage.close();
                         
                         String detalle = "agrego una deudo al empleado " 
-                            + empleado.getNombre() + " " + empleado.getApellido() 
+                            + empleado.getApellido()+ " " + empleado.getNombre()
                                 + " por " + monto + "$";
                         aplicacionControl.au.saveElimino(detalle, aplicacionControl.permisos.getUsuario());
                         
@@ -261,7 +263,7 @@ public class DeudasController implements Initializable {
         });
     }
     
-    public void deleteDeuda(Deuda deuda) {
+    public void deleteDeuda(Deuda deuda, DeudaTable deudaTable) {
         if (Objects.equals(deuda.getMonto(), deuda.getRestante())) {
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -277,7 +279,7 @@ public class DeudasController implements Initializable {
             buttonOk.setOnAction((ActionEvent e) -> {
                 new DeudaDAO().delete(deuda);
                 HibernateSessionFactory.getSession().flush();
-                data.remove(deuda);
+                data.remove(deudaTable);
                 dialogStage.close();
                 deudasEmpleadosController.empleadoEditado(empleado);
                 
@@ -298,7 +300,7 @@ public class DeudasController implements Initializable {
         }
     }
     
-    public void cambiarCuotasDeuda(Deuda deuda) {
+    public void cambiarCuotasDeuda(Deuda deuda, DeudaTable deudaTable) {
         if (Objects.equals(deuda.getMonto(), 0d)) {
             
         } else {
@@ -322,7 +324,7 @@ public class DeudasController implements Initializable {
                     deuda.setCuotas(Integer.parseInt(fieldCuotas.getText()));
                     deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
                     HibernateSessionFactory.getSession().flush();
-                    data.set(data.indexOf(deuda), deuda);
+                    data.set(data.indexOf(deudaTable), deudaTable);
                     dialogStage.close();
                     deudasEmpleadosController.empleadoEditado(empleado);
                         
@@ -378,7 +380,7 @@ public class DeudasController implements Initializable {
         dialogWait();
         
         ReporteDeudas datasource = new ReporteDeudas();
-        datasource.addAll((List<Deuda>) deudasTableView.getItems());
+        datasource.addAll((List<Deuda>) new DeudaDAO().findAllByEmpleadoId(empleado.getId()));
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DEUDAS_EMPLEADO);
@@ -525,25 +527,39 @@ public class DeudasController implements Initializable {
         deudas = new ArrayList<>();
         deudas.addAll(deudaDao.findAllByEmpleadoId(empleado.getId()));
         data = FXCollections.observableArrayList(); 
-        data.addAll(deudas);
+        for (Deuda deuda: deudas) {
+            DeudaTable deudaTable = new DeudaTable();
+            deudaTable.setId(deuda.getId());
+            deudaTable.setCreacion(deuda.getCreacion());
+            deudaTable.setUltimaModificacion(deuda.getUltimaModificacion());
+            deudaTable.setMonto(deuda.getMonto());
+            deudaTable.setRestante(deuda.getRestante());
+            deudaTable.setAplazar(deuda.getAplazar());
+            deudaTable.setPagada(deuda.getPagada());
+            deudaTable.setCuotas(deuda.getCuotas());
+            deudaTable.setTipo(deuda.getTipo());
+            deudaTable.setDetalles(deuda.getDetalles());
+            deudaTable.setFecha(Fechas.getFechaConMes(deuda.getCreacion()));
+            data.add(deudaTable);
+        }
         deudasTableView.setItems(data);
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("creacion"));
+        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("fecha"));
         detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
         montoColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
         restanteColumna.setCellValueFactory(new PropertyValueFactory<>("restante"));
         cuotasColumna.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
         tipoColumna.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        borrarColumna.setCellFactory(param -> new TableCell<Deuda, Deuda>() {
+        borrarColumna.setCellFactory(param -> new TableCell<DeudaTable, DeudaTable>() {
             private final Button borrarButton = new Button("Borrar");
 
             @Override
-            protected void updateItem(Deuda deuda, boolean empty) {
+            protected void updateItem(DeudaTable deuda, boolean empty) {
                 super.updateItem(deuda, empty);
 
                 if (deuda == null) {
@@ -553,7 +569,7 @@ public class DeudasController implements Initializable {
 
                 setGraphic(borrarButton);
                 borrarButton.setOnAction(event -> {
-                    deleteDeuda(deuda);
+                    deleteDeuda(new DeudaDAO().findById(deuda.getId()), deuda);
                 });
             }
         });
@@ -561,11 +577,12 @@ public class DeudasController implements Initializable {
         deudasTableView.setEditable(Boolean.FALSE);
         
         deudasTableView.setRowFactory( (Object tv) -> {
-            TableRow<Deuda> row = new TableRow<>();
+            TableRow<DeudaTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    Deuda rowData = row.getItem();
-                    cambiarCuotasDeuda(rowData);
+                    DeudaTable rowData = row.getItem();
+                    cambiarCuotasDeuda(new DeudaDAO().findById(rowData.getId()),
+                            rowData);
                 }
             });
             return row ;
