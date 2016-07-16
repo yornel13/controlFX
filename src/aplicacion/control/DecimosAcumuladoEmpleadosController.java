@@ -5,42 +5,46 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteAcumulacionDecimosVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
-import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
+import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
+import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -50,11 +54,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -63,12 +69,13 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.joda.time.DateTime;
 
 /**
  *
  * @author Yornel
  */
-public class DecimosEmpleadosController implements Initializable {
+public class DecimosAcumuladoEmpleadosController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -90,13 +97,16 @@ public class DecimosEmpleadosController implements Initializable {
     private TableColumn apellidoColumna;
     
     @FXML 
-    private TableColumn departamentoColumna;
-    
-    @FXML 
     private TableColumn cargoColumna;
     
     @FXML 
-    private TableColumn<EmpleadoTable, EmpleadoTable>  decimosColumna;
+    private TableColumn terceroColumna;
+    
+    @FXML 
+    private TableColumn cuartoColumna;
+    
+    @FXML 
+    private TableColumn detallesColumna;
     
     @FXML
     private Button buttonAtras;
@@ -107,14 +117,30 @@ public class DecimosEmpleadosController implements Initializable {
     @FXML
     private Button buttonCambiarVentana;
     
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
+    private DatePicker pickerDe;
+    
+    @FXML 
+    private DatePicker pickerHasta;
+    
+    public Timestamp inicio;
+    public Timestamp fin;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     private Stage dialogLoading;
     
-    Integer si;
-    Integer no;
+    public static final String PAGADO = "Pagado";
+    public static final String RETENIDO = "Retenido";
+    public static final String SIN_GENERAR = "Sin Generar";    
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -131,131 +157,26 @@ public class DecimosEmpleadosController implements Initializable {
     } 
     
     @FXML
+    public void onClickMore(ActionEvent event) throws ParseException {
+        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        setTableInfo();
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) throws ParseException  {
+        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        setTableInfo();
+    }
+    
+    @FXML
     public void cambiarVentana(ActionEvent event) {
-        aplicacionControl.mostrarDecimosAcumuladoEmpleados(empresa, stagePrincipal);
-    }
-    
-    public void mostrarNoAcumulaDecimos(Usuario empleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
-                try {
-                    
-                    Stage dialogStage = new Stage();
-                    dialogStage.initModality(Modality.APPLICATION_MODAL);
-                    dialogStage.setResizable(false);
-                    dialogStage.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                    dialogStage.getIcons().add(new Image(stageIcon));
-                    Button buttonOk = new Button("Si, no acumula");
-                    Button buttonCancelar = new Button("No, cancelar.");
-                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("¿Seguro que desea marcar que NO acumula decimos el empleado?"), buttonOk, buttonCancelar).
-                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                    buttonOk.setPrefWidth(100);
-                    buttonCancelar.setPrefWidth(100);
-                    buttonOk.setOnAction((ActionEvent e) -> {
-                        
-                        empleado.getDetallesEmpleado().setAcumulaDecimos(false);
-                        HibernateSessionFactory.getSession().flush();
-                        
-                        dialogStage.close();
-                        
-                        empleadoEditado(empleado);
-                        
-                        completado();
-
-                        // Registro para auditar
-                        String detalles = "marco que el empleado " 
-                                + empleado.getNombre() + " " + empleado.getApellido() + " no acumula decimos";
-                        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-                    }); 
-                    buttonCancelar.setOnAction((ActionEvent e) -> {
-                        dialogStage.close();
-                        empleadoEditado(empleado);
-                    }); 
-                    
-                    dialogStage.showAndWait();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
-    }
-    
-    public void mostrarAcumulaDecimos(Usuario empleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
-                try {
-                    
-                    Stage dialogStage = new Stage();
-                    dialogStage.initModality(Modality.APPLICATION_MODAL);
-                    dialogStage.setResizable(false);
-                    dialogStage.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-                    dialogStage.getIcons().add(new Image(stageIcon));
-                    Button buttonOk = new Button("Si, si acumula");
-                    Button buttonCancelar = new Button("No, cancelar.");
-                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                    children(new Text("¿Seguro que desea marcar que SI acumula decimos el empleado?"), buttonOk, buttonCancelar).
-                    alignment(Pos.CENTER).padding(new Insets(25)).build()));
-                    buttonOk.setPrefWidth(100);
-                    buttonCancelar.setPrefWidth(100);
-                    buttonOk.setOnAction((ActionEvent e) -> {
-                        
-                        empleado.getDetallesEmpleado().setAcumulaDecimos(true);
-                        HibernateSessionFactory.getSession().flush();
-                        
-                        dialogStage.close();
-                        
-                        empleadoEditado(empleado);
-                        
-                        completado();
-
-                        // Registro para auditar
-                        String detalles = "marco que el empleado " 
-                                + empleado.getNombre() + " " + empleado.getApellido() + " si acumula decimos";
-                        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
-                    }); 
-                    buttonCancelar.setOnAction((ActionEvent e) -> {
-                        dialogStage.close();
-                        empleadoEditado(empleado);
-                    }); 
-                    
-                    dialogStage.showAndWait();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
-    }
-    
-    public void completado() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Completado");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Acumulación de decimos modificado con exito."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        dialogStage.show();
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
+        aplicacionControl.mostrarDecimosEmpleados(empresa, stagePrincipal);
     }
     
     public void dialogWait() {
@@ -273,41 +194,64 @@ public class DecimosEmpleadosController implements Initializable {
     
     public void imprimir(File file) {
         
+        Double pagado3 = 0d;
+        Double pagado4 = 0d;
+        Double pagado;
+        Double retenido3 = 0d;
+        Double retenido4 = 0d;
+        Double retenido;
+        Double total3 = 0d;
+        Double total4 = 0d;
+        Double total;
+        
         dialogWait();
         
+        List<EmpleadoTable> empleadosImprimir = (List<EmpleadoTable>) empleadosTableView.getItems();
+        
         ReporteAcumulacionDecimosVarios datasource = new ReporteAcumulacionDecimosVarios();
-        datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
+        datasource.addAll(empleadosImprimir);
         
-        si = 0;
-        no = 0;
-        
-        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) empleadosTableView.getItems()) {
-            if (empleadoTable.getAcumulaDecimos()) {
-                 si ++;
-             } else {
-                 no ++;
-             }
+        for (EmpleadoTable empleadoTable: empleadosImprimir) {
+            total3 += empleadoTable.getDecimo3();
+            total4 += empleadoTable.getDecimo4();
+            if (empleadoTable.getDetalles().equalsIgnoreCase(PAGADO)) {
+                pagado3 += empleadoTable.getDecimo3();
+                pagado4 += empleadoTable.getDecimo4();
+            } else if (empleadoTable.getDetalles().equalsIgnoreCase(RETENIDO)) {
+                retenido3 += empleadoTable.getDecimo3();
+                retenido4 += empleadoTable.getDecimo4();
+            }
         }
         
+        pagado = pagado3 + pagado4;
+        retenido = retenido3 + retenido4;
+        total = total3 + total4;
+        
         try {
-            InputStream inputStream = new FileInputStream(Const.REPORTE_ACUMULACION_DECIMOS_EMPLEADOS);
+            InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMOS_ACUMULADOS_POR_MES);
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
-            parametros.put("siglas", empresa.getSiglas());
-            parametros.put("correo", "Correo: " + empresa.getEmail());
-            parametros.put("detalles", 
-                         "Ruc: " + empresa.getNumeracion() 
-                    + " - Direccion: " + empresa.getDireccion() 
-                    + " - Tel: " + empresa.getTelefono1());
-            parametros.put("si", String.valueOf(si));
-            parametros.put("no", String.valueOf(no));
+            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            parametros.put("pagado3", round(pagado3).toString());
+            parametros.put("pagado4", round(pagado4).toString());
+            parametros.put("pagado", round(pagado).toString());
+            parametros.put("retenido3", round(retenido3).toString());
+            parametros.put("retenido4", round(retenido4).toString());
+            parametros.put("retenido", round(retenido).toString());
+            parametros.put("total3", round(total3).toString());
+            parametros.put("total4", round(total4).toString());
+            parametros.put("total", round(total).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            JasperPrint jasperPrint;
+            if(empleadosImprimir.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else 
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
-            String filename = "acumulado_decimos_" + System.currentTimeMillis();
+            String filename = "acumulado_decimos_mensual_" + System.currentTimeMillis();
             
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
@@ -331,12 +275,12 @@ public class DecimosEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Acumulacion de Decimos");
+        dialogStage.setTitle("Acumulacion de Decimos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Completado."), buttonOk).
+        children(new Text("LA impresión fue completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -365,7 +309,7 @@ public class DecimosEmpleadosController implements Initializable {
         Button buttonSiDocumento = new Button("Seleccionar ruta");
         Button buttonNoDocumento = new Button("Salir");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se imprimira la información de acumulacion de decimos de los empleados"), 
+        children(new Text("Se imprimira el informe de los decimos acumulados en el mes selecionado,"), 
                 new Text("Seleccione la ruta de guardado"), 
                 buttonSiDocumento, buttonNoDocumento).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
@@ -382,31 +326,21 @@ public class DecimosEmpleadosController implements Initializable {
         dialogStage.showAndWait();
     }
     
-    public void empleadoEditado(Usuario user) {
-        for (EmpleadoTable empleadoTable: data) {
-            if(Objects.equals(empleadoTable.getId(), user.getId())) {
-                EmpleadoTable empleado = new EmpleadoTable();
-                empleado.setId(user.getId());
-                empleado.setNombre(user.getNombre());
-                empleado.setApellido(user.getApellido());
-                empleado.setCedula(user.getCedula());
-                empleado.setEmpresa(user.getDetallesEmpleado()
-                        .getEmpresa().getNombre());
-                empleado.setTelefono(user.getTelefono());
-                empleado.setDepartamento(user.getDetallesEmpleado()
-                        .getDepartamento().getNombre());
-                empleado.setCargo(user.getDetallesEmpleado()
-                        .getCargo().getNombre());
-                empleado.setAcumulaDecimos(user.getDetallesEmpleado()
-                        .getAcumulaDecimos());
-                data.set(data.indexOf(empleadoTable), empleado);
-                return;
-            }
-        }
+    public void setEmpresa(Empresa empresa) throws ParseException {
+        this.empresa = empresa;
+       
+        DateTime dateTime = new DateTime(getToday().getTime());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+                .getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+                .minusMonths(1).plusDays(1).getMillis());
+        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+       
+       setTableInfo();
     }
     
-    public void setEmpresa(Empresa empresa) {
-        this.empresa = empresa;
+    public void setTableInfo() {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
@@ -414,25 +348,44 @@ public class DecimosEmpleadosController implements Initializable {
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
-             EmpleadoTable empleado = new EmpleadoTable();
-             empleado.setId(user.getId());
-             empleado.setNombre(user.getNombre());
-             empleado.setApellido(user.getApellido());
-             empleado.setCedula(user.getCedula());
-             empleado.setEmpresa(user.getDetallesEmpleado()
-                     .getEmpresa().getNombre());
-             empleado.setTelefono(user.getTelefono());
-             empleado.setDepartamento(user.getDetallesEmpleado()
-                     .getDepartamento().getNombre());
-             empleado.setCargo(user.getDetallesEmpleado()
-                     .getCargo().getNombre());
-             empleado.setAcumulaDecimos(user.getDetallesEmpleado()
-                     .getAcumulaDecimos());
-             
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            empleado.setAcumulaDecimos(user.getDetallesEmpleado()
+                    .getAcumulaDecimos());
+            
+            RolIndividualDAO rolDao = new RolIndividualDAO();
+            
+            RolIndividual rolIndividual = rolDao.findByFechaAndEmpleadoIdAndDetalles(fin, 
+                    user.getId(), Const.ROL_PAGO_INDIVIDUAL);
+            
+            if (rolIndividual != null) {
+                empleado.setDecimo3(rolIndividual.getDecimoTercero());
+                empleado.setDecimo4(rolIndividual.getDecimoCuarto());
+                if (rolIndividual.getDecimosPagado()) {
+                    empleado.setDetalles(PAGADO);
+                } else {
+                    empleado.setDetalles(RETENIDO);
+                }
+            } else {
+                empleado.setDecimo3(0d);
+                empleado.setDecimo4(0d);
+                empleado.setDetalles(SIN_GENERAR);
+            }
+            
             return empleado;
-         }).forEach((empleado) -> {
-             data.add(empleado);
-         });
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
         empleadosTableView.setItems(data);
 
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
@@ -466,6 +419,31 @@ public class DecimosEmpleadosController implements Initializable {
         empleadosTableView.setItems(sortedData);
     }
     
+    public void mostrarDecimosGenerados(Usuario empleado, EmpleadoTable empleadoTable) {
+        try {
+            FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDecimosGenerado.fxml"));
+            AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+            Stage ventana = new Stage();
+            ventana.setTitle("Decimos del empleado " + empleado.getApellido()+ " " 
+                    + empleado.getNombre());
+            String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+            ventana.getIcons().add(new Image(stageIcon));
+            ventana.setResizable(false);
+            ventana.initOwner(stagePrincipal);
+            Scene scene = new Scene(ventanaAuditar);
+            ventana.setScene(scene);
+            DecimosGeneradoController controller = loader.getController();
+            controller.setStagePrincipal(ventana);
+            controller.setProgramaPrincipal(aplicacionControl);
+            controller.setEmpleado(empleado, inicio, fin, empleadoTable);
+            ventana.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            //tratar la excepción
+        } 
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         empleadosTableView.setEditable(Boolean.FALSE);
@@ -476,42 +454,22 @@ public class DecimosEmpleadosController implements Initializable {
        
         apellidoColumna.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         
-        departamentoColumna.setCellValueFactory(new PropertyValueFactory<>("departamento"));
-        
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
-        decimosColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        decimosColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
-            private final CheckBox checkBoxDeuda = new CheckBox();
-
-            @Override
-            protected void updateItem(EmpleadoTable empleado, boolean empty) {
-                super.updateItem(empleado, empty);
-
-                if (empleado == null) {
-                    setGraphic(null);
-                    return;
-                }
-                
-                setGraphic(checkBoxDeuda);
-                if (checkBoxDeuda != null)
-                    checkBoxDeuda.setSelected(empleado.getAcumulaDecimos());
-                checkBoxDeuda.setOnAction(event -> {
-                     if (empleado.getAcumulaDecimos()) {
-                         mostrarNoAcumulaDecimos(new UsuarioDAO().findById(empleado.getId()));
-                     } else {
-                         mostrarAcumulaDecimos(new UsuarioDAO().findById(empleado.getId()));
-                     }
-                });
-            }
-        });
+        terceroColumna.setCellValueFactory(new PropertyValueFactory<>("decimo3"));
         
+        cuartoColumna.setCellValueFactory(new PropertyValueFactory<>("decimo4"));
+        
+        detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+       
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    //mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    //if (!rowData.getDetalles().equalsIgnoreCase(SIN_GENERAR))
+                        mostrarDecimosGenerados(new UsuarioDAO()
+                                .findById(rowData.getId()), rowData);
                 }
             });
             return row ;
@@ -548,7 +506,7 @@ public class DecimosEmpleadosController implements Initializable {
                     + "-fx-background-color: transparent;");
         });
         buttonCambiarVentana.setTooltip(
-            new Tooltip("Ver acumulado")
+            new Tooltip("Ver quienes acumulan")
         );
         buttonCambiarVentana.setOnMouseEntered((MouseEvent t) -> {
             buttonCambiarVentana.setStyle("-fx-background-image: "
@@ -563,6 +521,24 @@ public class DecimosEmpleadosController implements Initializable {
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
+        });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
     } 
     

@@ -13,7 +13,6 @@ import aplicacion.control.util.Const;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
 import hibernate.dao.UsuarioDAO;

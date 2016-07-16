@@ -93,18 +93,6 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Nombre]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Transparent" x="187" y="0" width="100" height="30"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Apellido]]></text>
 			</staticText>
 			<staticText>
@@ -143,6 +131,18 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Cantidad de deudas]]></text>
 			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="187" y="0" width="100" height="30"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Nombre]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
@@ -153,14 +153,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cedula}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Transparent" x="87" y="5" width="100" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{nombre}]]></textFieldExpression>
-			</textField>
-			<textField>
 				<reportElement mode="Transparent" x="187" y="5" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{apellido}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nombre}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Transparent" x="287" y="5" width="100" height="20"/>
@@ -182,6 +177,11 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
 				<text><![CDATA[$]]></text>
 			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="87" y="5" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{apellido}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>

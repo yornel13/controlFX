@@ -9,6 +9,7 @@ import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
@@ -73,7 +74,6 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import java.util.Objects;
 import javafx.scene.control.TableRow;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -83,20 +83,11 @@ import hibernate.model.AbonoDeuda;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
-import javafx.stage.StageStyle;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
@@ -389,6 +380,7 @@ public class PagoMensualPagadoController implements Initializable {
             parametros.put("numero", rolIndividual.getId().toString()); 
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
             parametros.put("total", round(aPercibirValor).toString());
+            parametros.put("fecha_recibo", Fechas.getFechaConMes(rolIndividual.getFecha()));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -900,7 +892,7 @@ public class PagoMensualPagadoController implements Initializable {
             try {
                 int pagoId = pagoMes.getId();
         
-                for (AbonoDeuda abonoDeuda: new AbonoDeudaDAO().findByPagoId(pagoId)) {
+                for (AbonoDeuda abonoDeuda: new AbonoDeudaDAO().findAllByPagoId(pagoId)) {
                     Deuda deuda = abonoDeuda.getDeuda();
                     deuda.setRestante(deuda.getRestante() + abonoDeuda.getMonto());
                     deuda.setCuotas(deuda.getCuotas() + 1);

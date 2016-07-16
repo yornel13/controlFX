@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="390.0" maxWidth="550.0" minHeight="390.0" minWidth="550.0" prefHeight="390.0" prefWidth="550.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.DeudaController">
+    <children>
+      <TableView fx:id="deudasTableView" layoutX="6.0" layoutY="121.0" maxHeight="200.0" maxWidth="548.0" minHeight="200.0" minWidth="548.0" prefHeight="200.0" prefWidth="548.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="fechaColumna" prefWidth="144.0" text="Fecha De Abono" />
+          <TableColumn fx:id="numeroColumna" prefWidth="126.0" text="Numero de Pago" />
+            <TableColumn fx:id="montoColumna" minWidth="0.0" prefWidth="156.0" text="Monto Abonado" />
+            <TableColumn fx:id="restanteColumna" prefWidth="120.0" text="Monto Restante" />
+        </columns>
+      </TableView>
+      <Button fx:id="buttonImprimir" layoutX="500.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="354.0" layoutY="342.0" prefHeight="25.0" prefWidth="194.0">
+         <children>
+            <Pane prefHeight="25.0" prefWidth="105.0" style="-fx-background-color: #eea82f;" />
+            <Label prefHeight="20.0" prefWidth="92.0" text="Debe" textFill="#0d0707" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="debeText" text="0.00" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
+         </children>
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="104.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="90.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
+      <Label fx:id="fechaText" contentDisplay="RIGHT" layoutX="21.0" layoutY="93.0" prefHeight="17.0" prefWidth="320.0" textFill="WHITE" underline="true">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="detallesText" layoutX="21.0" layoutY="40.0" prefHeight="17.0" prefWidth="267.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="montoText" layoutX="21.0" layoutY="66.0" prefHeight="17.0" prefWidth="267.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="tipoText" layoutX="21.0" layoutY="14.0" prefHeight="17.0" prefWidth="267.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="estadoText" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="409.0" layoutY="93.0" prefHeight="17.0" prefWidth="134.0" textAlignment="RIGHT" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Label fx:id="cuotasText" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="409.0" layoutY="66.0" prefHeight="17.0" prefWidth="134.0" textAlignment="RIGHT" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="12.0" />
+         </font>
+      </Label>
+      <Button fx:id="buttonCambiar" layoutX="440.0" layoutY="10.0" mnemonicParsing="false" onAction="#cambiarCuotas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/cambiar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+    </children>
+</AnchorPane>

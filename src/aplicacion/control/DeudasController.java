@@ -42,6 +42,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -59,11 +60,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -118,13 +121,13 @@ public class DeudasController implements Initializable {
     @FXML
     private TableView deudasTableView;
     
-    private ObservableList<DeudaTable> data;
+    public ObservableList<DeudaTable> data;
     
     ArrayList<Deuda> deudas;
     
     Stage dialogLoading;
     
-    private DeudasEmpleadosController deudasEmpleadosController;
+    public DeudasEmpleadosController deudasEmpleadosController;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -380,13 +383,14 @@ public class DeudasController implements Initializable {
         dialogWait();
         
         ReporteDeudas datasource = new ReporteDeudas();
-        datasource.addAll((List<Deuda>) new DeudaDAO().findAllByEmpleadoId(empleado.getId()));
+        List<Deuda> deudasImprimir = (List<Deuda>) new DeudaDAO().findAllByEmpleadoId(empleado.getId());
+        datasource.addAll(deudasImprimir);
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DEUDAS_EMPLEADO);
         
             Map<String, String> parametros = new HashMap();
-            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
             parametros.put("empresa", empresa.getNombre());
@@ -399,7 +403,12 @@ public class DeudasController implements Initializable {
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            JasperPrint jasperPrint;
+            if (deudasImprimir.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
             String filename = "deudas_" + empleado.getNombre();
             
@@ -417,7 +426,7 @@ public class DeudasController implements Initializable {
             
             // Registro para auditar
             String detalles = "genero el recibo de deudas del empleado "
-                    + empleado.getNombre() + " " + empleado.getApellido();
+                    + empleado.getApellido()+ " " + empleado.getNombre();
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();
@@ -545,6 +554,39 @@ public class DeudasController implements Initializable {
         deudasTableView.setItems(data);
     }
     
+    public void mostrarDeuda(Deuda deuda, DeudaTable deudaTable) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeuda.fxml"));
+                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Deuda de " + empleado.getApellido()+ " " + empleado.getNombre());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaDeudas);
+                    ventana.setScene(scene);
+                    DeudaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setProgramaDeudas(this);
+                    controller.setDeuda(deuda, deudaTable);
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
+        }
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
@@ -581,8 +623,7 @@ public class DeudasController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     DeudaTable rowData = row.getItem();
-                    cambiarCuotasDeuda(new DeudaDAO().findById(rowData.getId()),
-                            rowData);
+                    mostrarDeuda(new DeudaDAO().findById(rowData.getId()), rowData);
                 }
             });
             return row ;

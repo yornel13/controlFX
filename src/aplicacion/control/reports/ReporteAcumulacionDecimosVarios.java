@@ -39,8 +39,8 @@ public class ReporteAcumulacionDecimosVarios implements JRDataSource {
             case "cargo":
                 valor = lista.get(indiceActual).getCargo();
                 break;
-            case "monto":
-                valor = 0.00;
+            case "departamento":
+                valor = lista.get(indiceActual).getDepartamento();
                 break;
             case "decimos":
                 if (lista.get(indiceActual).getAcumulaDecimos()) {
@@ -50,6 +50,15 @@ public class ReporteAcumulacionDecimosVarios implements JRDataSource {
                     valor = "No";
                     break;
                 }
+            case "decimo3":
+                valor = lista.get(indiceActual).getDecimo3().toString();
+                break;
+            case "decimo4":
+                valor = lista.get(indiceActual).getDecimo4().toString();
+                break;
+            case "detalles":
+                valor = lista.get(indiceActual).getDetalles();
+                break;
             default:
                 break; 
         }

@@ -45,6 +45,7 @@ public class RolIndividual implements java.io.Serializable {
 	private String cedula;
 	private String empresa;
 	private String rolesCliente;
+        private Boolean decimosPagado;
 	private Set pagoMeses = new HashSet(0);
 
 	// Constructors
@@ -398,4 +399,13 @@ public class RolIndividual implements java.io.Serializable {
 		this.pagoMeses = pagoMeses;
 	}
 
+        public Boolean getDecimosPagado() {
+            return decimosPagado;
+        }
+
+        public void setDecimosPagado(Boolean decimosPagado) {
+            this.decimosPagado = decimosPagado;
+        }
+
+        
 }

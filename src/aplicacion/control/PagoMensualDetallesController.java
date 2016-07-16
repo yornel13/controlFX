@@ -9,6 +9,7 @@ import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -81,43 +82,12 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import hibernate.dao.PagoQuincenaDAO;
 import hibernate.model.PagoQuincena;
 import java.util.Objects;
 import javafx.scene.control.TableRow;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
@@ -443,13 +413,14 @@ public class PagoMensualDetallesController implements Initializable {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
         
             Map<String, String> parametros = new HashMap();
-            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
             parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
             parametros.put("numero", pagoRol.getId().toString()); 
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
             parametros.put("total", round(aPercibirValor).toString());
+            parametros.put("fecha_recibo", Fechas.getFechaConMes(pagoRol.getFecha()));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -522,6 +493,7 @@ public class PagoMensualDetallesController implements Initializable {
             abonoDeuda.setDeuda(deuda);
             abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
             abonoDeuda.setMonto(montoAPagar);
+            abonoDeuda.setRestante(deuda.getRestante());
             abonoDeuda.setPagoMes(pagoMes);
             new AbonoDeudaDAO().save(abonoDeuda);  
         }
@@ -913,10 +885,10 @@ public class PagoMensualDetallesController implements Initializable {
             pagoRol.setInicio(inicio);
             pagoRol.setFinalizo(fin);
             pagoRol.setDias(diasTextValor);
-            pagoRol.setHorasNormales(Double.valueOf(normalesTextValor));
-            pagoRol.setHorasSuplementarias(Double.valueOf(suplementariasTextValor));  // RC
-            pagoRol.setHorasSobreTiempo(Double.valueOf(sobreTiempoTextValor));         // ST
-            pagoRol.setTotalHorasExtras(Double.valueOf(sobreTiempoTextValor + suplementariasTextValor));
+            pagoRol.setHorasNormales(normalesTextValor);
+            pagoRol.setHorasSuplementarias(suplementariasTextValor);  // RC
+            pagoRol.setHorasSobreTiempo(sobreTiempoTextValor);         // ST
+            pagoRol.setTotalHorasExtras(sobreTiempoTextValor + suplementariasTextValor);
             pagoRol.setSalario(sueldoTotalTextValor);
             pagoRol.setMontoHorasSuplementarias(montoSumplementariasTextValor);
             pagoRol.setMontoHorasSobreTiempo(montoSobreTiempoTextValor);
@@ -937,6 +909,10 @@ public class PagoMensualDetallesController implements Initializable {
             pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
             pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
             pagoRol.setUsuario(empleado);
+            if (empleado.getDetallesEmpleado().getAcumulaDecimos()) 
+                pagoRol.setDecimosPagado(Boolean.FALSE);
+            else 
+                pagoRol.setDecimosPagado(Boolean.TRUE);
         }
         
         if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {

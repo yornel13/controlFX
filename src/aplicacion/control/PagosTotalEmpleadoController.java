@@ -117,6 +117,38 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -456,7 +488,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
         
             Map<String, String> parametros = new HashMap();
-            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
             parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
@@ -545,7 +577,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         // Registro para auditar
         String detalles = "genero el rol individual nro: " + pagoRol.getId() 
                 + " del lapso " + getFechaConMes(inicio)+ " a " + getFechaConMes(fin) 
-                + " para el empleado " + empleado.getNombre() + " " + empleado.getApellido();
+                + " para el empleado " + empleado.getApellido()+ " " + empleado.getNombre();
         aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
         
         dialogLoading.close();

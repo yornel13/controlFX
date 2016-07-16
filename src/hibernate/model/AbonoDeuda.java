@@ -16,6 +16,7 @@ public class AbonoDeuda implements java.io.Serializable {
 	private Deuda deuda;
 	private PagoMes pagoMes;
 	private Double monto;
+        private Double restante;
 	private Timestamp fecha;
 
 	// Constructors
@@ -82,4 +83,13 @@ public class AbonoDeuda implements java.io.Serializable {
 		this.fecha = fecha;
 	}
 
+        public Double getRestante() {
+            return restante;
+        }
+
+        public void setRestante(Double restante) {
+            this.restante = restante;
+        }
+
+        
 }

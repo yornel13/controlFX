@@ -93,13 +93,6 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -330,6 +323,7 @@ public class PagoMensualController implements Initializable {
                     parametros.put("numero", empleadoTable.getRolIndividual().getId().toString()); 
                     parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
                     parametros.put("total", round(empleadoTable.getSueldo()).toString());
+                    parametros.put("fecha_recibo", Fechas.getFechaConMes(empleadoTable.getRolIndividual().getFecha()));
 
                     JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
                     JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -409,6 +403,7 @@ public class PagoMensualController implements Initializable {
                     abonoDeuda.setDeuda(deuda);
                     abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
                     abonoDeuda.setMonto(montoAPagar);
+                    abonoDeuda.setRestante(deuda.getRestante());
                     abonoDeuda.setPagoMes(pagoMes);
                     new AbonoDeudaDAO().save(abonoDeuda);  
                 }
@@ -741,6 +736,10 @@ public class PagoMensualController implements Initializable {
             pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
             pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
             pagoRol.setUsuario(empleado);
+            if (empleado.getDetallesEmpleado().getAcumulaDecimos()) 
+                pagoRol.setDecimosPagado(Boolean.FALSE);
+            else 
+                pagoRol.setDecimosPagado(Boolean.TRUE);
             
             empleadoTable.setPagado("No");
             empleadoTable.setPagar(true);

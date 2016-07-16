@@ -5,7 +5,9 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.reports.ReporteDecimosGenerado;
 import aplicacion.control.reports.ReporteRolDePagoQuincenal;
+import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
@@ -51,24 +53,23 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import aplicacion.control.util.MaterialDesignButton;
 import static aplicacion.control.util.Numeros.round;
-import aplicacion.control.util.Permisos;
-import hibernate.HibernateSessionFactory;
-import hibernate.dao.PagoMesDAO;
-import hibernate.dao.PagoQuincenaDAO;
-import hibernate.model.PagoQuincena;
+import hibernate.dao.RolClienteDAO;
+import hibernate.dao.RolIndividualDAO;
+import hibernate.model.RolCliente;
+import hibernate.model.RolIndividual;
+import java.util.ArrayList;
+import java.util.List;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.HBoxBuilder;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 
 /**
  *
  * @author Yornel
  */
-public class PagoQuincenalPagadoController implements Initializable {
+public class DecimosGeneradoController implements Initializable {
 
     private Stage stagePrincipal;
     
@@ -89,21 +90,33 @@ public class PagoQuincenalPagadoController implements Initializable {
     private Label lapsoText;
     
     @FXML
-    private Label fechaText;
-    
+    private Label decimo3Text;
+     
     @FXML
-    private Label totalIngresos;
+    private Label decimo4Text;
+     
+    @FXML
+    private Label totalDecimosText;
+     
+    @FXML
+    private Label totalAcumuladoText;
+     
+    @FXML
+    private Label totalPagadoText;
+     
+    @FXML
+    private Label estadoText;
     
-    public PagoQuincena pagoQuincena;
+    
+    public Timestamp inicio;
+    public Timestamp fin;
+    
     public Usuario usuario;
     
     Stage dialogLoading;
     
     @FXML
     private Button buttonImprimir;
-    
-    @FXML
-    private Button buttonBorrar;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -120,29 +133,64 @@ public class PagoQuincenalPagadoController implements Initializable {
     public void imprimir(File file, Boolean enviarCorreo) {
         
         dialogWait();
+        
+        Integer dias = 0;
+        Double horas = 0d;
+        Double decimo3 = 0d;
+        Double decimo4 = 0d;
+        Double suma;
+        
+        RolClienteDAO pagoDAO = new RolClienteDAO();
+        ArrayList<RolCliente> pagos = new ArrayList<>();
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, usuario.getId()));
+        if (pagos.isEmpty())
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, usuario.getId()));
+        
+        for (RolCliente rolCliente: pagos) {
+            dias += rolCliente.getDias();
+            horas += rolCliente.getHorasNormales();
+            horas += rolCliente.getTotalHorasExtras();
+            decimo3 += rolCliente.getDecimoTercero();
+            decimo4 += rolCliente.getDecimoCuarto();
+        }
+        
+        suma = decimo3 + decimo4;
       
-        ReporteRolDePagoQuincenal datasource = new ReporteRolDePagoQuincenal();
-        datasource.add(pagoQuincena);
+        ReporteDecimosGenerado datasource = new ReporteDecimosGenerado();
+        datasource.addAll(pagos);
 
             try {
-                InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_ADELANTO_QUINCENAL);
+                InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMOS_MES_EMPLEADO);
 
                 Map<String, String> parametros = new HashMap();
                 parametros.put("empleado", usuario.getNombre() + " " + usuario.getApellido());
                 parametros.put("cedula", usuario.getCedula());
                 parametros.put("cargo", usuario.getDetallesEmpleado().getCargo().getNombre());
                 parametros.put("empresa", usuario.getDetallesEmpleado().getEmpresa().getNombre());
-                parametros.put("numero", pagoQuincena.getId().toString()); 
-                parametros.put("lapso", getFechaConMes(pagoQuincena.getInicioMes()) 
-                        + " al " + getFechaConMes(pagoQuincena.getFinMes()));
-                parametros.put("total", round(pagoQuincena.getMonto()).toString());
-                parametros.put("fecha_recibo", Fechas.getFechaConMes(pagoQuincena.getFecha()));
+                parametros.put("siglas", usuario.getDetallesEmpleado().getEmpresa().getSiglas());
+                parametros.put("correo", "Correo: " + usuario.getDetallesEmpleado().getEmpresa().getEmail());
+                parametros.put("detalles", 
+                             "Ruc: " + usuario.getDetallesEmpleado().getEmpresa().getNumeracion() 
+                        + " - Direccion: " + usuario.getDetallesEmpleado().getEmpresa().getDireccion() 
+                        + " - Tel: " + usuario.getDetallesEmpleado().getEmpresa().getTelefono1());
+                parametros.put("lapso", getFechaConMes(inicio)  + " al " + getFechaConMes(fin));
+                 parametros.put("estado", estadoText.getText());
+                parametros.put("dias", dias.toString());
+                parametros.put("horas", horas.toString());
+                parametros.put("decimo3", round(decimo3).toString());
+                parametros.put("decimo4", round(decimo4).toString());
+                parametros.put("suma", round(suma).toString());
 
                 JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
                 JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+                
+                JasperPrint jasperPrint;
+                if (pagos.isEmpty())
+                    jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+                else
+                    jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
 
-                String filename = "pago_quincenal_" + pagoQuincena.getId();
+                String filename = "decimos_generados_" + System.currentTimeMillis();
 
                 if (file != null) {
                     JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
@@ -152,10 +200,10 @@ public class PagoQuincenalPagadoController implements Initializable {
                     JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
                     CorreoUtil.mandarCorreo(usuario.getDetallesEmpleado().getEmpresa().getNombre(), 
                             usuario.getEmail(), Const.ASUNTO_ADELANTO_QUINCENAL, 
-                            "Recibo de adelanto quincenal del mes que empieza el " 
-                                    + getFechaConMes(pagoQuincena.getInicioMes()) 
+                            "Recibo de decimos generados del mes que empieza el " 
+                                    + getFechaConMes(inicio) 
                                     + " y termina el " 
-                                    + getFechaConMes(pagoQuincena.getFinMes()), 
+                                    + getFechaConMes(fin), 
                             pdf.getPath(), filename + ".pdf");
                 }
                 dialogoCompletado();
@@ -172,15 +220,15 @@ public class PagoQuincenalPagadoController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Rol individua");
+        dialogStage.setTitle("Decimos generados");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Guardar Documento");
         Button buttonNoDocumento = new Button("No Guardar");
         CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Ya se genero el pago quincenal de este empleado, \n"
-                + " ¿Desea guardar el documento de pago nuevamente?."), 
+        children(new Text("Seleccione la ruta para guardar, \n"
+                + " el recibo de decimos generados de el mes seleccionado."), 
                 buttonSiDocumento, buttonNoDocumento, enviarCorreo).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonSiDocumento.setOnAction((ActionEvent e) -> {
@@ -213,12 +261,12 @@ public class PagoQuincenalPagadoController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago Quincenal");
+        dialogStage.setTitle("Decimos Generados");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Completado."), buttonOk).
+        children(new Text("Impresion de decimos completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -243,132 +291,40 @@ public class PagoQuincenalPagadoController implements Initializable {
         dialogLoading.show();
     }
     
-    @FXML
-    public void borrarPago(ActionEvent event) {
+    public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin, 
+            EmpleadoTable empleadoTable) {
+        this.usuario = empleado;
+        this.inicio = inicio;
+        this.fin = fin;
         
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Precaución");
-                String stageIcon = AplicacionControl.class
-                        .getResource("imagenes/icon_error.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));
-                MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
-                MaterialDesignButton buttonNo = new MaterialDesignButton("no");
-                HBox hBox = HBoxBuilder.create()
-                        .spacing(10.0) //In case you are using HBoxBuilder
-                        .padding(new Insets(5, 5, 5, 5))
-                        .alignment(Pos.CENTER)
-                        .children(buttonOk, buttonNo)
-                        .build();
-                hBox.maxWidth(120);
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Seguro que desea Borrar este Adelanto quincenal?"),
-                         new Text("No podra recuperarlo!"), hBox).
-                alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                buttonOk.setMinWidth(50);
-                buttonNo.setMinWidth(50);
-                buttonOk.setOnAction((ActionEvent e) -> {
-                    dialogStage.close();
-                    dialogWait();
-                    hacerBorrado();
-                });
-                buttonNo.setOnAction((ActionEvent e) -> {
-                    dialogStage.close();
-                });
-                dialogStage.showAndWait();
-                
+        empleadoText.setText(usuario.getApellido()+ " " + usuario.getNombre());
+        cedulaText.setText("Cedula: " + usuario.getCedula());
+        cargoText.setText(usuario.getDetallesEmpleado()
+                .getCargo().getNombre());
+        lapsoText.setText("Lapso: " + Fechas.getFechaConMes(inicio) + " a " 
+                + Fechas.getFechaConMes(fin));
+        
+        RolIndividualDAO rolDao = new RolIndividualDAO();
+        List<RolIndividual> rolIndividuales = rolDao.findAllByEmpleadoId(usuario.getId());
+        
+        Double acumulado = 0d;
+        Double pagado = 0d;
+        for (RolIndividual rolIndividual: rolIndividuales) {
+            Double decimos = rolIndividual.getDecimoTercero() 
+                        + rolIndividual.getDecimoCuarto();
+            if (rolIndividual.getDecimosPagado()) {
+                pagado += decimos;
             } else {
-                aplicacionControl.noPermitido();
+                acumulado += decimos;
             }
         }
-    }
-    
-    void hacerBorrado() {
-        
-        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(pagoQuincena.getFinMes(), 
-                        pagoQuincena.getUsuario().getId()) == null) {
-            new PagoQuincenaDAO().delete(pagoQuincena);
-            HibernateSessionFactory.getSession().flush();
-            String detalles = "elemino el pago quincenal numero " + pagoQuincena.getId()
-                    + ", del empleado " + pagoQuincena.getUsuario().getNombre() 
-                    + " " + pagoQuincena.getUsuario().getApellido();
-            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-            dialogLoading.close();
-            stagePrincipal.close();
-            pagoQuincenalController.setTableInfo();
-            dialogoBorradoCompletado();
-            
-        } else {
-            dialogLoading.close();
-            dialogoBorradoError();  
-        } 
-         
-    }
-    
-    public void dialogoBorradoError() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago Quincenal");
-        String stageIcon = AplicacionControl.class
-                .getResource("imagenes/icon_error.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("No se puede borrar este adelanto,"), 
-                new Text("borre primero el pago mensual."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-            dialogStage.close();
-        });
-        buttonOk.prefWidth(80);
-        dialogStage.showAndWait();
-    }
-    
-    public void dialogoBorradoCompletado() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago Quincenal");
-        String stageIcon = AplicacionControl.class
-                .getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se borro este pago con exito."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-            dialogStage.close();
-        });
-        buttonOk.prefWidth(80);
-        dialogStage.showAndWait();
-    }
-    
-    public void setPago(PagoQuincena pagoQuincena) throws ParseException {
-        
-        this.pagoQuincena = pagoQuincena;
-        this.usuario = pagoQuincena.getUsuario();
-        
-        empleadoText.setText(pagoQuincena.getUsuario().getApellido()+ " " 
-                + pagoQuincena.getUsuario().getNombre());
-        cedulaText.setText(pagoQuincena.getUsuario().getCedula());
-        cargoText.setText(pagoQuincena.getUsuario().getDetallesEmpleado()
-                .getCargo().getNombre());
-        lapsoText.setText(Fechas.getFechaConMes(pagoQuincena.getInicioMes()) + " a " 
-                + Fechas.getFechaConMes(pagoQuincena.getFinMes()));
-        fechaText.setText(Fechas.getFechaConMes(pagoQuincena.getFecha()));
-        totalIngresos.setText(round(pagoQuincena.getMonto()).toString());
+        totalAcumuladoText.setText("$"+round(acumulado).toString());
+        totalPagadoText.setText("$"+round(pagado).toString());
+        estadoText.setText(empleadoTable.getDetalles());
+        decimo3Text.setText("$"+empleadoTable.getDecimo3().toString());
+        decimo4Text.setText("$"+empleadoTable.getDecimo4().toString());
+        totalDecimosText.setText("$"+round(empleadoTable.getDecimo3() 
+                + empleadoTable.getDecimo4()).toString());
         
     }
     
@@ -388,24 +344,6 @@ public class PagoQuincenalPagadoController implements Initializable {
         buttonImprimir.setOnMouseExited((MouseEvent t) -> {
             buttonImprimir.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/imprimir.png'); "
-                    + "-fx-background-position: center center; "
-                    + "-fx-background-repeat: stretch; "
-                    + "-fx-background-color: transparent;");
-        });
-        
-        buttonBorrar.setTooltip(
-            new Tooltip("Borrar Pago")
-        );
-        buttonBorrar.setOnMouseEntered((MouseEvent t) -> {
-            buttonBorrar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/borrar.png'); "
-                    + "-fx-background-position: center center; "
-                    + "-fx-background-repeat: stretch; "
-                    + "-fx-background-color: #29B6F6;");
-        });
-        buttonBorrar.setOnMouseExited((MouseEvent t) -> {
-            buttonBorrar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/borrar.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");

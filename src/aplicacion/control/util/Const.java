@@ -40,6 +40,7 @@ public class Const {
     public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "report/adelanto_quincenal_varios.jrxml";
     public static final String REPORTE_SUELDO_EMPLEADOS = "report/sueldo_varios.jrxml";
     public static final String REPORTE_ACUMULACION_DECIMOS_EMPLEADOS = "report/acumulacion_decimos_varios.jrxml";
+    public static final String REPORTE_DECIMOS_ACUMULADOS_POR_MES = "report/decimos_acumulados_por_mes.jrxml";
     public static final String REPORTE_ACTUARIALES_EMPLEADOS = "report/actuariales_varios.jrxml";
     public static final String REPORTE_IESS_EMPLEADOS = "report/iess_varios.jrxml";
     public static final String REPORTE_AUDITORIA = "report/auditoria.jrxml";
@@ -47,6 +48,9 @@ public class Const {
     public static final String REPORTE_ROL_INDIVIDUAL = "report/rol_individual.jrxml";
     public static final String REPORTE_ROL_UNITARIO = "report/rol_unitario.jrxml";
     public static final String REPORTE_PAGO_ADELANTO_QUINCENAL = "report/adelanto_quincenal_individual.jrxml";
+    public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL = "report/deuda_empleado_individual.jrxml";
+    public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL_SIN_ABONO = "report/deuda_empleado_individual_sin_abono.jrxml";
+    public static final String REPORTE_DECIMOS_MES_EMPLEADO = "report/decimos_mes_empleado.jrxml";
     
     /************* Correo **************/
     // Asunto

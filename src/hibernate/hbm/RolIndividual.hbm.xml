@@ -99,6 +99,9 @@
     <property name="rolesCliente" type="java.lang.String">
       <column name="roles_cliente" />
     </property>
+     <property name="decimosPagado" type="java.lang.Boolean">
+      <column name="decimos_pagado" />
+    </property>
     <set inverse="true" name="pagoMeses">
       <key>
         <column name="rol_individual_id"/>

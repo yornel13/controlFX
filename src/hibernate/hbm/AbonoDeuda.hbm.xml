@@ -19,6 +19,9 @@
         <property name="monto" type="java.lang.Double">
             <column name="monto" precision="8" not-null="true" />
         </property>
+        <property name="restante" type="java.lang.Double">
+            <column name="restante" precision="8" not-null="true" />
+        </property>
         <property name="fecha" type="java.sql.Timestamp">
             <column name="fecha" length="19" not-null="true" />
         </property>

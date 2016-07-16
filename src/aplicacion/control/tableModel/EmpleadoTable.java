@@ -53,6 +53,9 @@ public class EmpleadoTable {
     private Boolean agregar;
     private Double monto;
     private Integer cuotas;
+    private Double decimo3;
+    private Double decimo4;
+    private String detalles;
 
     public EmpleadoTable() {
         problem = false;
@@ -340,6 +343,30 @@ public class EmpleadoTable {
 
     public void setCuotas(Integer cuotas) {
         this.cuotas = cuotas;
+    }
+
+    public Double getDecimo3() {
+        return decimo3;
+    }
+
+    public void setDecimo3(Double decimo3) {
+        this.decimo3 = decimo3;
+    }
+
+    public Double getDecimo4() {
+        return decimo4;
+    }
+
+    public void setDecimo4(Double decimo4) {
+        this.decimo4 = decimo4;
+    }
+
+    public String getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(String detalles) {
+        this.detalles = detalles;
     }
  
     
