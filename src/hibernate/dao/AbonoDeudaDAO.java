@@ -3,7 +3,6 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.AbonoDeuda;
-import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;

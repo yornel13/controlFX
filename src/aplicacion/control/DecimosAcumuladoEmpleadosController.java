@@ -605,8 +605,8 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
             
             if (rolIndividual != null) {
                 
-                empleado.setDecimo3(rolIndividual.getDecimoTercero());
-                empleado.setDecimo4(rolIndividual.getDecimoCuarto());
+                empleado.setDecimo3(round(rolIndividual.getDecimoTercero()));
+                empleado.setDecimo4(round(rolIndividual.getDecimoCuarto()));
                 
                 if (rolIndividual.getDecimosPagado()) {
                     empleado.setDetallesD3(PAGADO);

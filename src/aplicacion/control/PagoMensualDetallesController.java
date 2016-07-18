@@ -590,42 +590,67 @@ public class PagoMensualDetallesController implements Initializable {
     @FXML
     public void onClickGenerarRecibo(ActionEvent event) {
         
-        if (empleado != null) {
-           
-            if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
-            
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Generar Rol individual");
-                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));
-                Button buttonOk = new Button("Si");
-                Button buttonNo = new Button("no");
-                HBox hBox = HBoxBuilder.create()
-                        .spacing(10.0) //In case you are using HBoxBuilder
-                        .padding(new Insets(5, 5, 5, 5))
-                        .alignment(Pos.CENTER)
-                        .children(buttonOk, buttonNo)
-                        .build();
-                hBox.maxWidth(120);
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Seguro que desea generar el rol individual para este empleado?"), hBox).
-                alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                buttonOk.setMinWidth(50);
-                buttonNo.setMinWidth(50);
-                buttonOk.setOnAction((ActionEvent e) -> {
-                    dialogStage.close();
-                    generarRolIndividual();
-                    
-                });
-                buttonNo.setOnAction((ActionEvent e) -> {
-                    dialogStage.close();
-                });
-                dialogStage.showAndWait();
-                
+        if (aPercibirValor > 0d) {
+        
+            if (empleado != null) {
+
+                if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
+
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Generar Rol individual");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    Button buttonOk = new Button("Si");
+                    Button buttonNo = new Button("no");
+                    HBox hBox = HBoxBuilder.create()
+                            .spacing(10.0) //In case you are using HBoxBuilder
+                            .padding(new Insets(5, 5, 5, 5))
+                            .alignment(Pos.CENTER)
+                            .children(buttonOk, buttonNo)
+                            .build();
+                    hBox.maxWidth(120);
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("¿Seguro que desea generar el rol individual para este empleado?"), hBox).
+                    alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                    buttonOk.setMinWidth(50);
+                    buttonNo.setMinWidth(50);
+                    buttonOk.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                        generarRolIndividual();
+
+                    });
+                    buttonNo.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                    });
+                    dialogStage.showAndWait();
+
+                } else {
+                   {
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.setResizable(false);
+                        dialogStage.setTitle("Rol individua");
+                        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                        dialogStage.getIcons().add(new Image(stageIcon));
+                        Button buttonOk = new Button("ok");
+                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+                        children(new Text("Ya el empleado tiene un rol individual para esta fecha."), buttonOk).
+                        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                        buttonOk.setOnAction((ActionEvent e) -> {
+                            dialogStage.close();
+                        });
+                        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                            dialogStage.close();
+                        });
+                        dialogStage.showAndWait();
+                    } 
+                }
+
+
             } else {
-               {
+                {
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(Modality.APPLICATION_MODAL);
                     dialogStage.setResizable(false);
@@ -634,7 +659,7 @@ public class PagoMensualDetallesController implements Initializable {
                     dialogStage.getIcons().add(new Image(stageIcon));
                     Button buttonOk = new Button("ok");
                     dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-                    children(new Text("Ya el empleado tiene un rol individual para esta fecha."), buttonOk).
+                    children(new Text("No hay empleado seleccionado."), buttonOk).
                     alignment(Pos.CENTER).padding(new Insets(10)).build()));
                     buttonOk.setOnAction((ActionEvent e) -> {
                         dialogStage.close();
@@ -643,21 +668,19 @@ public class PagoMensualDetallesController implements Initializable {
                         dialogStage.close();
                     });
                     dialogStage.showAndWait();
-                } 
+                }
             }
-            
-            
         } else {
             {
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
-                dialogStage.setTitle("Rol individua");
+                dialogStage.setTitle("Pago Mensual");
                 String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
                 dialogStage.getIcons().add(new Image(stageIcon));
                 Button buttonOk = new Button("ok");
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-                children(new Text("No hay empleado seleccionado."), buttonOk).
+                children(new Text("No se puede hacer pagos con valores negativos."), buttonOk).
                 alignment(Pos.CENTER).padding(new Insets(10)).build()));
                 buttonOk.setOnAction((ActionEvent e) -> {
                     dialogStage.close();

@@ -367,7 +367,7 @@ public class PagoMensualController implements Initializable {
             EmpleadoTable empleadoTable = data.get(usuarios.indexOf(user));
             empleadosParaImprimir.add(empleadoTable);
             usuariosParaImprimir.add(user);
-            if (empleadoTable.getPagar()) {
+            if (empleadoTable.getPagar() && empleadoTable.getSueldo() > 0d) {
                 new RolIndividualDAO().save(empleadoTable.getRolIndividual());
         
                 PagoMes pagoMes = new PagoMes();
@@ -488,11 +488,11 @@ public class PagoMensualController implements Initializable {
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
         
-        checkBoxPagarTodos.setSelected(true);
         setTableInfo();
     }
     
     public void setTableInfo() {
+        checkBoxPagarTodos.setSelected(false);
         
         iess = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.IESS);
         if (iess != null) 

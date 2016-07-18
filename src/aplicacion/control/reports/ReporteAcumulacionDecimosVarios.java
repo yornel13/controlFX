@@ -6,6 +6,7 @@
 package aplicacion.control.reports;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import static aplicacion.control.util.Numeros.round;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -51,10 +52,10 @@ public class ReporteAcumulacionDecimosVarios implements JRDataSource {
                     break;
                 }
             case "decimo3":
-                valor = lista.get(indiceActual).getDecimo3().toString();
+                valor = round(lista.get(indiceActual).getDecimo3()).toString();
                 break;
             case "decimo4":
-                valor = lista.get(indiceActual).getDecimo4().toString();
+                valor = round(lista.get(indiceActual).getDecimo4()).toString();
                 break;
             case "detallesD3":
                 valor = lista.get(indiceActual).getDetallesD3();

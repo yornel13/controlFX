@@ -211,36 +211,66 @@ public class PagoQuincenalController implements Initializable {
     
     @FXML
     public void pagarAdelanto(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pagar Adelanto Quincenal");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("Si");
-        Button buttonNo = new Button("no");
-        HBox hBox = HBoxBuilder.create()
-                .spacing(10.0) //In case you are using HBoxBuilder
-                .padding(new Insets(5, 5, 5, 5))
-                .alignment(Pos.CENTER)
-                .children(buttonOk, buttonNo)
-                .build();
-        hBox.maxWidth(120);
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Seguro que desea pagar el adelanto Quincenal "
-                + "a estos empleado?"), hBox).
-        alignment(Pos.CENTER).padding(new Insets(20)).build()));
-        buttonOk.setMinWidth(50);
-        buttonNo.setMinWidth(50);
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-            hacerPago();
+        if (hayParaPagar()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Pagar Adelanto Quincenal");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("Si");
+            Button buttonNo = new Button("no");
+            HBox hBox = HBoxBuilder.create()
+                    .spacing(10.0) //In case you are using HBoxBuilder
+                    .padding(new Insets(5, 5, 5, 5))
+                    .alignment(Pos.CENTER)
+                    .children(buttonOk, buttonNo)
+                    .build();
+            hBox.maxWidth(120);
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+            children(new Text("¿Seguro que desea pagar el adelanto Quincenal "
+                    + "a estos empleado?"), hBox).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            buttonOk.setMinWidth(50);
+            buttonNo.setMinWidth(50);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+                hacerPago();
 
-        });
-        buttonNo.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        dialogStage.show();
+            });
+            buttonNo.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.show();
+        } else {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Adelanto Quincenal");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("No hay empleados seleccionados para hacer el pago."), buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonOk.setPrefWidth(60);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
+            dialogStage.showAndWait();
+        }
+    }
+    
+    public Boolean hayParaPagar() {
+        for (EmpleadoTable empleadoTable: data) {
+            if (empleadoTable.getPagar()) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public void imprimir(File file, Boolean enviarCorreo) {
@@ -412,11 +442,11 @@ public class PagoQuincenalController implements Initializable {
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
         
-        checkBoxPagarTodos.setSelected(true);
         setTableInfo();
     }
     
     public void setTableInfo() {
+        checkBoxPagarTodos.setSelected(false);
         count = 0;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
@@ -474,6 +504,8 @@ public class PagoQuincenalController implements Initializable {
         }
          
         filtro();
+        
+        pagarATodos(null);
     }
     
      public void dialogAdvertencia() {

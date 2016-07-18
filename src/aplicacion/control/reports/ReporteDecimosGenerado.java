@@ -33,17 +33,17 @@ public class ReporteDecimosGenerado implements JRDataSource {
                 valor = lista.get(indiceActual).getClienteNombre();
                 break; 
             case "horas":
-                valor = String.valueOf(lista.get(indiceActual).getHorasNormales() 
-                        + lista.get(indiceActual).getTotalHorasExtras());
+                valor = round(lista.get(indiceActual).getHorasNormales() 
+                        + lista.get(indiceActual).getTotalHorasExtras()).toString();
                 break;
             case "dias":
                 valor = lista.get(indiceActual).getDias().toString();
                 break;
             case "decimo3":
-                valor = lista.get(indiceActual).getDecimoTercero().toString();
+                valor = round(lista.get(indiceActual).getDecimoTercero()).toString();
                 break;
             case "decimo4":
-                valor = lista.get(indiceActual).getDecimoCuarto().toString();
+                valor = round(lista.get(indiceActual).getDecimoCuarto()).toString();
                 break;
             case "suma":
                 valor = round(lista.get(indiceActual).getDecimoTercero() +
