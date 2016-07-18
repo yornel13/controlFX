@@ -51,16 +51,17 @@ public class EmpleadoTable {
     public PagoQuincena pagoQuincena;
     private Boolean activo;
     private Boolean agregar;
-    private Double monto;
-    private Integer cuotas;
+    private String monto;
+    private String cuotas;
     private Double decimo3;
     private Double decimo4;
-    private String detalles;
+    private String detallesD3;
+    private String detallesD4;
 
     public EmpleadoTable() {
         problem = false;
         agregar = false;
-        monto = 0.0;
+        monto = "0.0";
     }
     
     public Integer getId() {
@@ -329,19 +330,19 @@ public class EmpleadoTable {
         this.agregar = agregar;
     }
 
-    public Double getMonto() {
+    public String getMonto() {
         return monto;
     }
 
-    public void setMonto(Double monto) {
+    public void setMonto(String monto) {
         this.monto = monto;
     }
 
-    public Integer getCuotas() {
+    public String getCuotas() {
         return cuotas;
     }
 
-    public void setCuotas(Integer cuotas) {
+    public void setCuotas(String cuotas) {
         this.cuotas = cuotas;
     }
 
@@ -361,13 +362,25 @@ public class EmpleadoTable {
         this.decimo4 = decimo4;
     }
 
-    public String getDetalles() {
-        return detalles;
+    public String getDetallesD3() {
+        return detallesD3;
     }
 
-    public void setDetalles(String detalles) {
-        this.detalles = detalles;
+    public void setDetallesD3(String detallesD3) {
+        this.detallesD3 = detallesD3;
     }
+
+    public String getDetallesD4() {
+        return detallesD4;
+    }
+
+    public void setDetallesD4(String detallesD4) {
+        this.detallesD4 = detallesD4;
+    }
+
+    
+
+    
  
     
 }

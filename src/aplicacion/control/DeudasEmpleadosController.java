@@ -44,6 +44,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -56,11 +57,13 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -183,19 +186,21 @@ public class DeudasEmpleadosController implements Initializable {
         dialogWait();
         for (EmpleadoTable empleadoTable: 
                 (List<EmpleadoTable>) data) {
-            if (empleadoTable.getAgregar()) {
+            if (empleadoTable.getAgregar() 
+                    && Double.valueOf(empleadoTable.getMonto()) > 0d) {
                 
                 Deuda newDeuda;
                 newDeuda = cloneDeuda(deuda);
-                newDeuda.setMonto(empleadoTable.getMonto());
-                 newDeuda.setRestante(empleadoTable.getMonto());
-                newDeuda.setCuotas(empleadoTable.getCuotas());
+                newDeuda.setMonto(Double.valueOf(empleadoTable.getMonto()));
+                 newDeuda.setRestante(Double.valueOf(empleadoTable.getMonto()));
+                newDeuda.setCuotas(Integer.valueOf(empleadoTable.getCuotas()));
                 newDeuda.setUsuario(findUsuarioById(empleadoTable.getId()));
                 new DeudaDAO().save(newDeuda);
                
                 String detalle = "agrego una deudo al empleado " 
                         + empleadoTable.getApellido()+ " " 
                         + empleadoTable.getNombre()
+                        + " del tipo " + newDeuda.getTipo()
                         + " por $" + newDeuda.getMonto();
                 aplicacionControl.au.saveAgrego(detalle, 
                         aplicacionControl.permisos.getUsuario());
@@ -214,12 +219,16 @@ public class DeudasEmpleadosController implements Initializable {
         empleadosTableView.getColumns().remove(deudasColumna);
         empleadosTableView.getColumns().remove(cargoColumna);
         
-        deudasColumna.setText("Total Deudas");
+        deudasColumna = new TableColumn("Total Deudas");
         deudasColumna.setCellValueFactory(
                 new PropertyValueFactory<>("totalMontoDeudas"));
+        deudasColumna.setMinWidth(100);
+        deudasColumna.setStyle("-fx-alignment: center;");
         
         empleadosTableView.getColumns().addAll(departamentoColumna, 
                 cargoColumna, deudasColumna);
+        
+        empleadosTableView.setEditable(false);
         
         enDeudaMultiple = false;
         
@@ -352,10 +361,11 @@ public class DeudasEmpleadosController implements Initializable {
                 ArrayList<DeudaTipo> deudaTipos = new ArrayList<>();
                 deudaTipos.addAll(new DeudaTipoDAO().findAll());
                 
-                String[] itemsTipos = new String[deudaTipos.size()];
+                String[] itemsTipos = new String[deudaTipos.size() + 1];
                 deudaTipos.stream().forEach((deudaTipo) -> {
                     itemsTipos[deudaTipos.indexOf(deudaTipo)] = deudaTipo.getNombre();
                 });
+                itemsTipos[deudaTipos.size()] = "+ CREAR";
                 
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -366,32 +376,29 @@ public class DeudasEmpleadosController implements Initializable {
                 Button buttonConfirmar = new Button("Crear");
                 ChoiceBox choiceBoxTipos = new ChoiceBox();
                 TextField fieldDetalles = new TextField();
-                TextField fieldMonto = new TextField();
                 TextField fieldCuotas = new TextField();
                 Text textTipo = new Text("Tipo");
                 Text textDetalles = new Text("Detalles");
-                Text textMonto = new Text("Monto");
                 Text textCuotas = new Text("Cuotas");
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(textTipo, choiceBoxTipos, textDetalles, fieldDetalles, textMonto, 
-                        fieldMonto, textCuotas, fieldCuotas, buttonConfirmar).
+                children(textTipo, choiceBoxTipos, textDetalles, fieldDetalles, 
+                        textCuotas, fieldCuotas, buttonConfirmar).
                 alignment(Pos.CENTER).padding(new Insets(20)).build()));
                 choiceBoxTipos.setItems(FXCollections.observableArrayList(itemsTipos));
-                fieldMonto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
                 choiceBoxTipos.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                        fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
+                        if (newValue.intValue() == (deudaTipos.size())) {
+                            agregarDeuda();
+                            dialogStage.close();
+                        } else
+                            fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
                     }
                 });
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
                     
                     if (choiceBoxTipos.getSelectionModel().isEmpty()) {
-                        
-                    } else if (fieldDetalles.getText().isEmpty()) {
-                        
-                    } else if (fieldMonto.getText().isEmpty()) {
                         
                     } else if (fieldCuotas.getText().isEmpty()) {
                         
@@ -400,17 +407,16 @@ public class DeudasEmpleadosController implements Initializable {
                         String tipo = choiceBoxTipos.getSelectionModel()
                                 .getSelectedItem().toString();
                         String detalles = fieldDetalles.getText();
-                        String monto = fieldMonto.getText();
                         String cuotas = fieldCuotas.getText();
                         
                         Deuda newDeuda = new Deuda();
                         newDeuda.setTipo(tipo);
                         newDeuda.setDetalles(detalles);
-                        newDeuda.setMonto(Double.valueOf(monto));
+                        newDeuda.setMonto(0d);
                         newDeuda.setCuotas(Integer.parseInt(cuotas));
                         newDeuda.setPagada(Boolean.FALSE);
                         newDeuda.setAplazar(Boolean.FALSE);
-                        newDeuda.setRestante(Double.valueOf(monto));
+                        newDeuda.setRestante(0d);
                         newDeuda.setCreacion(new Timestamp(new Date().getTime()));
                         newDeuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
                         
@@ -421,6 +427,55 @@ public class DeudasEmpleadosController implements Initializable {
                 });  
                 dialogStage.show();
                 
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
+    private void agregarDeuda() {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Nuevo tipo de deuda");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValor = new Button("Agregar");
+                TextField field = new TextField();
+                TextField fieldCuotas = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Escriba el nombre del tipo de deuda"), field, 
+                        new Text("Cuotas por defecto"), fieldCuotas, cambiarValor).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                field.setPrefWidth(150);
+                fieldCuotas.setPrefWidth(50);
+                fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+                cambiarValor.setPrefWidth(100);
+                dialogStage.show();
+                cambiarValor.setOnAction((ActionEvent e) -> {
+                    if (field.getText().isEmpty()) {
+
+                    } else if (fieldCuotas.getText().isEmpty()) {
+
+                    } else {
+                        DeudaTipo deudaTipo = new DeudaTipo();
+                        deudaTipo.setActivo(Boolean.TRUE);
+                        deudaTipo.setNombre(field.getText());
+                        deudaTipo.setCuotas(Integer.parseInt(fieldCuotas.getText()));
+                        new DeudaTipoDAO().save(deudaTipo);
+                        dialogStage.close();
+                        nuevaDeuda();
+
+                        // Registro para auditar
+                        String detalles = "agrego el tipo de deuda " 
+                                + deudaTipo.getNombre();
+                        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    }
+                }); 
             } else {
                aplicacionControl.noPermitido();
             }
@@ -446,8 +501,8 @@ public class DeudasEmpleadosController implements Initializable {
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
         fieldMonto.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        fieldCuotas.setText(empleadoTable.getCuotas().toString());
-        fieldMonto.setText(empleadoTable.getMonto().toString());
+        fieldCuotas.setText(empleadoTable.getCuotas());
+        fieldMonto.setText(empleadoTable.getMonto());
         buttonConfirmar.setOnAction((ActionEvent e) -> {
 
             if (fieldMonto.getText().isEmpty()) {
@@ -459,8 +514,8 @@ public class DeudasEmpleadosController implements Initializable {
                 String monto = fieldMonto.getText();
                 String cuotas = fieldCuotas.getText();
 
-                empleadoTable.setMonto(Double.valueOf(monto));
-                empleadoTable.setCuotas(Integer.valueOf(cuotas));
+                empleadoTable.setMonto(monto);
+                empleadoTable.setCuotas(cuotas);
                 
                 data.set(data.indexOf(empleadoTable), empleadoTable);
 
@@ -484,20 +539,72 @@ public class DeudasEmpleadosController implements Initializable {
         buttonGuardar.setVisible(true);
         
         data.stream().forEach((empleadoTable) -> {
-            empleadoTable.setCuotas(deuda.getCuotas());
-            empleadoTable.setMonto(deuda.getMonto());
+            empleadoTable.setCuotas(deuda.getCuotas().toString());
+            empleadoTable.setMonto(deuda.getMonto().toString());
         });
         
         empleadosTableView.getColumns().remove(departamentoColumna);
         
+        empleadosTableView.setEditable(true);
+       
+        
         deudasColumna.setText("Monto");
         deudasColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
+        deudasColumna.setCellFactory(TextFieldTableCell.forTableColumn());
+        deudasColumna.setOnEditCommit(
+            new EventHandler<CellEditEvent<EmpleadoTable, String>>() {
+                @Override
+                public void handle(CellEditEvent<EmpleadoTable, String> t) {
+                    Double newValue;
+                    try {
+                        newValue = Double.valueOf(t.getNewValue());
+                    } catch (NumberFormatException e) {
+                        newValue = Double.valueOf(t.getOldValue());
+                        dialogoErrorMonto();
+                    }
+                    EmpleadoTable empleadoTable = ((EmpleadoTable) t.getTableView().getItems()
+                            .get(t.getTablePosition().getRow()));     
+                    
+                    empleadoTable.setMonto(newValue.toString());
+                    if (newValue > 0d) {
+                        empleadoTable.setAgregar(true);
+                    } else {
+                        empleadoTable.setAgregar(false);
+                    }
+                    data.set(data.indexOf(empleadoTable), empleadoTable);
+                }
+            }
+        );
         
         cuotasColumna = new TableColumn("Cuotas");
         cuotasColumna.setMaxWidth(60);
         cuotasColumna.setMinWidth(60);
         cuotasColumna.setStyle("-fx-alignment: center;");
         cuotasColumna.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
+        cuotasColumna.setCellFactory(TextFieldTableCell.forTableColumn());
+        cuotasColumna.setOnEditCommit(
+            new EventHandler<CellEditEvent<EmpleadoTable, String>>() {
+                @Override
+                public void handle(CellEditEvent<EmpleadoTable, String> t) {
+                    Integer newValue;
+                    try {
+                        newValue = Integer.valueOf(t.getNewValue());
+                        if (newValue <= 0 || newValue > 12) {
+                            newValue = Integer.valueOf(t.getOldValue());
+                            dialogoErrorCuotas();
+                        }
+                    } catch (NumberFormatException e) {
+                        newValue = Integer.valueOf(t.getOldValue());
+                        dialogoErrorCuotas();
+                    }
+                    EmpleadoTable empleadoTable = ((EmpleadoTable) t.getTableView().getItems()
+                            .get(t.getTablePosition().getRow()));     
+                    
+                    empleadoTable.setCuotas(newValue.toString());
+                    data.set(data.indexOf(empleadoTable), empleadoTable);
+                }
+            }
+        );
         
         agregarColumna = new TableColumn("Deuda");
         agregarColumna.setMaxWidth(50);
@@ -532,6 +639,48 @@ public class DeudasEmpleadosController implements Initializable {
         dialogoInformacion();
     }
     
+    public void dialogoErrorMonto() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Error de monto");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Por favor ingrese un monto valido."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+    }
+    
+    public void dialogoErrorCuotas() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Error de cuotas");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Por favor ingrese un numero valido (1-12)."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+    }
+    
     public void dialogoInformacion() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -541,10 +690,10 @@ public class DeudasEmpleadosController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Marque los empleados a los cuales desea agregarle la deuda,"),
+        children(new Text("Puede marcar o desmarcar los empleados a los cuales desea agregarle la deuda,"),
                 new Text("adicionalmente puede editar individualmente el monto y las cuotas"),
-                 new Text("haciendo doble click en el empleado,"), 
-                 new Text("al finalizar utilize el boton guardar para agregar las deudas."), buttonOk).
+                 new Text("haciendo click en la celda correspondiente, al finalizar utilize el boton guardar"), 
+                 new Text("para agregar las deudas."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -690,29 +839,31 @@ public class DeudasEmpleadosController implements Initializable {
     
     @FXML
     public void dialogoImprimir(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Deudas");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonSiDocumento = new Button("Seleccionar ruta");
-        Button buttonNoDocumento = new Button("Salir");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Seleccione la ruta de guardado"), 
-                buttonSiDocumento, buttonNoDocumento).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonSiDocumento.setOnAction((ActionEvent e) -> {
-            File file = seleccionarDirectorio();
-            if (file != null) {
+        if (!empleadosTableView.getItems().isEmpty()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Imprimir Deudas");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonSiDocumento = new Button("Seleccionar ruta");
+            Button buttonNoDocumento = new Button("Salir");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("Seleccione la ruta de guardado"), 
+                    buttonSiDocumento, buttonNoDocumento).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonSiDocumento.setOnAction((ActionEvent e) -> {
+                File file = seleccionarDirectorio();
+                if (file != null) {
+                    dialogStage.close();
+                    imprimir(file);
+                }
+            });
+            buttonNoDocumento.setOnAction((ActionEvent e) -> {
                 dialogStage.close();
-                imprimir(file);
-            }
-        });
-        buttonNoDocumento.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        dialogStage.showAndWait();
+            });
+            dialogStage.showAndWait();
+        }
     }
     
     public void setEmpresa(Empresa empresa) {
@@ -806,9 +957,7 @@ public class DeudasEmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    if (enDeudaMultiple) {
-                        editarDeuda(rowData);
-                    } else {
+                    if (!enDeudaMultiple) {
                         mostrarDeudas(new UsuarioDAO().findById(rowData.getId()));
                     }
                 }

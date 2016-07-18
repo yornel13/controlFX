@@ -39,9 +39,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -91,6 +93,12 @@ public class GestionDeudasController implements Initializable {
     private ObservableList<Deuda> data;
     
     ArrayList<Deuda> deudas;
+    
+    @FXML
+    private Button buttonAgregar;
+    
+    @FXML
+    private Button buttonListo;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -425,6 +433,41 @@ public class GestionDeudasController implements Initializable {
                 }
             });
             return row ;
+        });
+        
+        buttonAgregar.setTooltip(
+            new Tooltip("Agregar deuda")
+        );
+        buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAgregar.setOnMouseExited((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonListo.setTooltip(
+            new Tooltip("Hecho")
+        );
+        buttonListo.setOnMouseEntered((MouseEvent t) -> {
+            buttonListo.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_listo.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonListo.setOnMouseExited((MouseEvent t) -> {
+            buttonListo.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_listo.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

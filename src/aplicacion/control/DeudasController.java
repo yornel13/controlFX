@@ -165,10 +165,11 @@ public class DeudasController implements Initializable {
                 ArrayList<DeudaTipo> deudaTipos = new ArrayList<>();
                 deudaTipos.addAll(new DeudaTipoDAO().findAll());
                 
-                String[] itemsTipos = new String[deudaTipos.size()];
+                String[] itemsTipos = new String[deudaTipos.size() + 1];
                 deudaTipos.stream().forEach((deudaTipo) -> {
                     itemsTipos[deudaTipos.indexOf(deudaTipo)] = deudaTipo.getNombre();
                 });
+                itemsTipos[deudaTipos.size()] = "+ CREAR";
                 
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -195,14 +196,16 @@ public class DeudasController implements Initializable {
                 choiceBoxTipos.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
                     @Override
                     public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                        fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
+                        if (newValue.intValue() == (deudaTipos.size())) {
+                            agregarDeuda();
+                            dialogStage.close();
+                        } else
+                            fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
                     }
                 });
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
                     
                     if (choiceBoxTipos.getSelectionModel().isEmpty()) {
-                        
-                    } else if (fieldDetalles.getText().isEmpty()) {
                         
                     } else if (fieldMonto.getText().isEmpty()) {
                         
@@ -232,7 +235,8 @@ public class DeudasController implements Initializable {
                         
                         String detalle = "agrego una deudo al empleado " 
                             + empleado.getApellido()+ " " + empleado.getNombre()
-                                + " por " + monto + "$";
+                                + " del tipo " + tipo
+                                + " por $" + Double.valueOf(monto);
                         aplicacionControl.au.saveElimino(detalle, aplicacionControl.permisos.getUsuario());
                         
                         setEmpleado(empleado);
@@ -243,6 +247,55 @@ public class DeudasController implements Initializable {
                 });  
                 dialogStage.showAndWait();
                 
+            } else {
+               aplicacionControl.noPermitido();
+            }
+        } 
+    }
+    
+    private void agregarDeuda() {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.CREAR)) {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("Nuevo tipo de deuda");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                Button cambiarValor = new Button("Agregar");
+                TextField field = new TextField();
+                TextField fieldCuotas = new TextField();
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("Escriba el nombre del tipo de deuda"), field, 
+                        new Text("Cuotas por defecto"), fieldCuotas, cambiarValor).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                field.setPrefWidth(150);
+                fieldCuotas.setPrefWidth(50);
+                fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+                cambiarValor.setPrefWidth(100);
+                dialogStage.show();
+                cambiarValor.setOnAction((ActionEvent e) -> {
+                    if (field.getText().isEmpty()) {
+
+                    } else if (fieldCuotas.getText().isEmpty()) {
+
+                    } else {
+                        DeudaTipo deudaTipo = new DeudaTipo();
+                        deudaTipo.setActivo(Boolean.TRUE);
+                        deudaTipo.setNombre(field.getText());
+                        deudaTipo.setCuotas(Integer.parseInt(fieldCuotas.getText()));
+                        new DeudaTipoDAO().save(deudaTipo);
+                        dialogStage.close();
+                        nuevaDeuda();
+
+                        // Registro para auditar
+                        String detalles = "agrego el tipo de deuda " 
+                                + deudaTipo.getNombre();
+                        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    }
+                }); 
             } else {
                aplicacionControl.noPermitido();
             }
@@ -287,9 +340,11 @@ public class DeudasController implements Initializable {
                 deudasEmpleadosController.empleadoEditado(empleado);
                 
                 // Registro para auditar
-                String detalles = "elimino la deuda '" + deuda.getDetalles() + "' del empleado " 
-                        + deuda.getUsuario().getNombre() + " " 
-                        + deuda.getUsuario().getApellido();
+                String detalles = "elimino la deuda del empleado " 
+                        + deuda.getUsuario().getApellido()+ " " 
+                        + deuda.getUsuario().getNombre()
+                        + " del tipo " + deuda.getTipo()
+                        + " y monto $" + deuda.getMonto();
                 aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                     
                 borradoCompleto();

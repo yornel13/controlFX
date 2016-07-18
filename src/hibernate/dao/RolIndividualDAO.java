@@ -117,7 +117,7 @@ public class RolIndividualDAO extends BaseHibernateDAO {
         public List<RolIndividual> findAllByEmpleadoId(Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_individual where "
-                            + "usuario_id = :usuario_id")
+                            + "usuario_id = :usuario_id order by inicio")
                     .addEntity(RolIndividual.class)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();

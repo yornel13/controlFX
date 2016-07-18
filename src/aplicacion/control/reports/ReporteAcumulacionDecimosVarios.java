@@ -56,8 +56,11 @@ public class ReporteAcumulacionDecimosVarios implements JRDataSource {
             case "decimo4":
                 valor = lista.get(indiceActual).getDecimo4().toString();
                 break;
-            case "detalles":
-                valor = lista.get(indiceActual).getDetalles();
+            case "detallesD3":
+                valor = lista.get(indiceActual).getDetallesD3();
+                break;
+            case "detallesD4":
+                valor = lista.get(indiceActual).getDetallesD4();
                 break;
             default:
                 break; 

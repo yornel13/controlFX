@@ -9,10 +9,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.GestionDeudasController">
+<AnchorPane id="AnchorPane" maxHeight="410.0" maxWidth="610.0" minHeight="410.0" minWidth="610.0" prefHeight="410.0" prefWidth="610.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.GestionDeudasController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="deudasTableView" layoutX="5.0" layoutY="38.0" maxHeight="-Infinity" maxWidth="590.0" minHeight="-Infinity" minWidth="590.0" prefHeight="358.0" prefWidth="590.0">
+      <TableView fx:id="deudasTableView" layoutX="10.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="600.0" minHeight="-Infinity" minWidth="590.0" prefHeight="350.0" prefWidth="600.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="fechaColumna" prefWidth="115.0" text="Fecha" />
           <TableColumn fx:id="detallesColumna" prefWidth="150.0" text="Detalles" />
@@ -20,11 +20,11 @@
             <TableColumn fx:id="restanteColumna" minWidth="0.0" prefWidth="69.0" text="Restante" />
             <TableColumn fx:id="cuotasColumna" prefWidth="48.0" text="Cuotas" />
             <TableColumn fx:id="tipoColumna" prefWidth="85.0" text="Tipo" />
-            <TableColumn fx:id="borrarColumna" prefWidth="49.0" style="-fx-alignment: CENTER;" text="Aplazar" />
+            <TableColumn fx:id="borrarColumna" prefWidth="50.0" style="-fx-alignment: CENTER;" text="Aplazar" />
         </columns>
       </TableView>
       <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
-      <Button layoutX="545.0" layoutY="5.0" mnemonicParsing="false" onAction="#agregarDeuda" prefWidth="50.0" text="Crear" />
-      <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#listo" prefWidth="50.0" text="Listo" />
+      <Button fx:id="buttonAgregar" layoutX="570.0" layoutY="10.0" mnemonicParsing="false" onAction="#agregarDeuda" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/agregar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Button fx:id="buttonListo" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#listo" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/icon_listo.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

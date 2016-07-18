@@ -378,7 +378,6 @@ public class PagoMensualDetallesController implements Initializable {
                         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
                         ventana.getIcons().add(new Image(stageIcon));
                         ventana.setResizable(false);
-                        ventana.setMaxWidth(608);
                         ventana.initOwner(stagePrincipal);
                         Scene scene = new Scene(ventanaDeudas);
                         ventana.setScene(scene);

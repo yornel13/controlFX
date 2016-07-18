@@ -5,22 +5,24 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Roboto;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
-import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -29,6 +31,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
+import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
@@ -157,11 +164,16 @@ public class InEmpresaController implements Initializable {
             buttonPagos.getItems().add(menuItemQuincenal);
             MenuItem menuItemMensual = new MenuItem("Mensual");
             buttonPagos.getItems().add(menuItemMensual);
+            MenuItem menuItemDecimos = new MenuItem("Decimos");
+            buttonPagos.getItems().add(menuItemDecimos);
             menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarPagoQuincenal(empresa, stagePrincipal);
             });
-             menuItemMensual.setOnAction((ActionEvent actionEvent) -> {
+            menuItemMensual.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarPagoMensual(empresa, stagePrincipal);
+            });
+            menuItemDecimos.setOnAction((ActionEvent actionEvent) -> {
+                mostrarDecimos();
             });
             buttonPagos.setOnMouseEntered((MouseEvent t) -> {
                 buttonPagos.setStyle("-fx-background-color: #E0E0E0;");
@@ -255,6 +267,64 @@ public class InEmpresaController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+    }
+    
+    public void mostrarDecimos() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonTercero = new MaterialDesignButton("DECIMO TERCERO");
+        Button buttonCuarto = new MaterialDesignButton("DECIMO CUARTO");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonTercero, buttonCuarto)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Selecione el decimo"), hBox).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        
+        buttonTercero.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+        buttonTercero.setMinHeight(55);
+        buttonTercero.setMaxWidth(170);
+        buttonTercero.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            aplicacionControl.mostrarPagoDecimoTercero(empresa, stagePrincipal);
+        });
+        buttonTercero.setOnMouseEntered((MouseEvent t) -> {
+            buttonTercero.setStyle("-fx-background-color: #E0E0E0; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonTercero.setOnMouseExited((MouseEvent t) -> {
+            buttonTercero.setStyle("-fx-background-color: #039BE5; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonTercero.setFont(Roboto.MEDIUM(15));
+            
+        buttonCuarto.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+        buttonCuarto.setMinHeight(55);
+        buttonCuarto.setMaxWidth(170);
+        buttonCuarto.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            aplicacionControl.mostrarPagoDecimoCuarto(empresa, stagePrincipal);
+        });
+        buttonCuarto.setOnMouseEntered((MouseEvent t) -> {
+            buttonCuarto.setStyle("-fx-background-color: #E0E0E0; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonCuarto.setOnMouseExited((MouseEvent t) -> {
+            buttonCuarto.setStyle("-fx-background-color: #039BE5; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonCuarto.setFont(Roboto.MEDIUM(15));
+        dialogStage.show();
     }
 
     // obtener dia sin horas

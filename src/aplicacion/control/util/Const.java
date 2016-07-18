@@ -51,12 +51,23 @@ public class Const {
     public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL = "report/deuda_empleado_individual.jrxml";
     public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL_SIN_ABONO = "report/deuda_empleado_individual_sin_abono.jrxml";
     public static final String REPORTE_DECIMOS_MES_EMPLEADO = "report/decimos_mes_empleado.jrxml";
+    public static final String REPORTE_DECIMO_TERCERO_ACUMULADOS_POR_MES = "report/decimo_tercero_acumulados_por_mes.jrxml";
+    public static final String REPORTE_DECIMO_CUARTO_ACUMULADOS_POR_MES = "report/decimo_cuarto_acumulados_por_mes.jrxml";
+    public static final String REPORTE_PAGO_DECIMO_TERCERO = "report/pago_decimo_tercero.jrxml";
+    public static final String REPORTE_PAGO_DECIMO_CUARTO = "report/pago_decimo_cuarto.jrxml";
+    public static final String REPORTE_DECIMO_TERCERO_TOTAL_EMPLEADO = "report/decimo_tercero_total_empleado.jrxml";
+    public static final String REPORTE_DECIMO_CUARTO_TOTAL_EMPLEADO = "report/decimo_cuarto_total_empleado.jrxml";
     
     /************* Correo **************/
     // Asunto
     public static final String ASUNTO_ROL_INDIVIDUAL = "Pago Mensual";
     public static final String ASUNTO_ADELANTO_QUINCENAL = "Adelanto Quincenal";
     public static final String ASUNTO_DEUDAS = "Deudas pendientes";
+    public static final String ASUNTO_PAGO_DECIMO_TERCERO = "Pago Decimo Tercero";
+    public static final String ASUNTO_PAGO_DECIMO_CUARTO = "Pago Decimo Cuarto";
+    public static final String ASUNTO_DECIMOS_GENERADO = "Decimos Generados";
+    public static final String ASUNTO_DECIMO_TERCERO_GENERADO = "Decimo Tercero Generado";
+    public static final String ASUNTO_DECIMO_CUARTO_GENERADO = "Decimo Cuarto Generado";
     // Mensaje
     public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";
     

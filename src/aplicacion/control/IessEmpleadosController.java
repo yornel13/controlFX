@@ -10,6 +10,8 @@ import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
@@ -200,6 +202,13 @@ public class IessEmpleadosController implements Initializable {
         ReporteIessVarios datasource = new ReporteIessVarios();
         datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
         
+        Double total = 0d;
+        
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            total += empleadoTable.getTotalIess();
+        }
+        
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_IESS_EMPLEADOS);
         
@@ -211,6 +220,8 @@ public class IessEmpleadosController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
+            parametros.put("lapso", getFechaConMes(inicio)  + " al " + getFechaConMes(fin));
+            parametros.put("total", round(total).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -223,7 +234,7 @@ public class IessEmpleadosController implements Initializable {
             } 
             
             // Registro para auditar
-            String detalles = "genero el recibo general de IESS total abonado de todos los empleado";
+            String detalles = "genero el recibo mensual de IESS total abonado de todos los empleado";
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();

@@ -11,7 +11,9 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.MaterialDesignButton;
 import static aplicacion.control.util.Numeros.round;
+import aplicacion.control.util.Roboto;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
@@ -55,6 +57,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -106,7 +110,10 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
     private TableColumn cuartoColumna;
     
     @FXML 
-    private TableColumn detallesColumna;
+    private TableColumn detallesD3Columna;
+    
+    @FXML 
+    private TableColumn detallesD4Columna;
     
     @FXML
     private Button buttonAtras;
@@ -193,7 +200,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
     }
     
     public void imprimir(File file) {
-        
+        /*
         Double pagado3 = 0d;
         Double pagado4 = 0d;
         Double pagado;
@@ -268,6 +275,130 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
             Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             dialogLoading.close();
+        }*/
+    }
+    
+    public void imprimirDecimoTercero(File file) {
+        
+        Double pagado3 = 0d;
+        Double retenido3 = 0d;
+        Double total3 = 0d;
+        
+        dialogWait();
+        
+        List<EmpleadoTable> empleadosImprimir = (List<EmpleadoTable>) empleadosTableView.getItems();
+        
+        ReporteAcumulacionDecimosVarios datasource = new ReporteAcumulacionDecimosVarios();
+        datasource.addAll(empleadosImprimir);
+        
+        for (EmpleadoTable empleadoTable: empleadosImprimir) {
+            total3 += empleadoTable.getDecimo3();
+            if (empleadoTable.getDetallesD3().equalsIgnoreCase(PAGADO)) {
+                pagado3 += empleadoTable.getDecimo3();
+            } else if (empleadoTable.getDetallesD3().equalsIgnoreCase(RETENIDO)) {
+                retenido3 += empleadoTable.getDecimo3();
+            }
+        }
+        
+        try {
+            InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMO_TERCERO_ACUMULADOS_POR_MES);
+        
+            Map<String, String> parametros = new HashMap();
+            parametros.put("empresa", empresa.getNombre());
+            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            parametros.put("pagado3", round(pagado3).toString());
+            parametros.put("retenido3", round(retenido3).toString());
+            parametros.put("total3", round(total3).toString());
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint;
+            if(empleadosImprimir.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else 
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = "acumulado_decimo_tercero_mensual_" + System.currentTimeMillis();
+            
+            if (file != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            
+            // Registro para auditar
+            String detalles = "genero el recibo general de acumulacion de decimo "
+                    + "tercero de todos los empleado de " 
+                    + getFechaConMes(inicio) + " al " + getFechaConMes(fin);
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
+        }
+    }
+    
+    public void imprimirDecimoCuarto(File file) {
+        
+        Double pagado4 = 0d;
+        Double retenido4 = 0d;
+        Double total4 = 0d;
+        
+        dialogWait();
+        
+        List<EmpleadoTable> empleadosImprimir = (List<EmpleadoTable>) empleadosTableView.getItems();
+        
+        ReporteAcumulacionDecimosVarios datasource = new ReporteAcumulacionDecimosVarios();
+        datasource.addAll(empleadosImprimir);
+        
+        for (EmpleadoTable empleadoTable: empleadosImprimir) {
+            total4 += empleadoTable.getDecimo4();
+            if (empleadoTable.getDetallesD4().equalsIgnoreCase(PAGADO)) {
+                pagado4 += empleadoTable.getDecimo4();
+            } else if (empleadoTable.getDetallesD4().equalsIgnoreCase(RETENIDO)) {
+                retenido4 += empleadoTable.getDecimo4();
+            }
+        }
+        
+        try {
+            InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMO_CUARTO_ACUMULADOS_POR_MES);
+        
+            Map<String, String> parametros = new HashMap();
+            parametros.put("empresa", empresa.getNombre());
+            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            parametros.put("pagado4", round(pagado4).toString());
+            parametros.put("retenido4", round(retenido4).toString());
+            parametros.put("total4", round(total4).toString());
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint;
+            if(empleadosImprimir.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else 
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = "acumulado_decimo_cuarto_mensual_" + System.currentTimeMillis();
+            
+            if (file != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            
+            // Registro para auditar
+            String detalles = "genero el recibo general de acumulacion de decimo "
+                    + "cuarto de todos los empleado de " 
+                    + getFechaConMes(inicio) + " al " + getFechaConMes(fin);
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
         }
     }
     
@@ -275,12 +406,12 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Acumulacion de Decimos");
+        dialogStage.setTitle("Decimos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("LA impresión fue completado."), buttonOk).
+        children(new Text("La impresión fue completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -303,27 +434,131 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Acumulacion de Decimos");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonSiDocumento = new Button("Seleccionar ruta");
-        Button buttonNoDocumento = new Button("Salir");
+        Button buttonTercero = new MaterialDesignButton("DECIMO TERCERO");
+        Button buttonCuarto = new MaterialDesignButton("DECIMO CUARTO");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonTercero, buttonCuarto)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Que desea imprimir?"), hBox).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+       
+        buttonTercero.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+        buttonTercero.setMinHeight(25);
+        buttonTercero.setMaxWidth(90);
+        buttonTercero.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            rutaGuardadoDecimoTercero();
+        });
+        buttonTercero.setOnMouseEntered((MouseEvent t) -> {
+            buttonTercero.setStyle("-fx-background-color: #E0E0E0; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonTercero.setOnMouseExited((MouseEvent t) -> {
+            buttonTercero.setStyle("-fx-background-color: #039BE5; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonTercero.setFont(Roboto.MEDIUM(9));
+            
+        buttonCuarto.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+        buttonCuarto.setMinHeight(25);
+        buttonCuarto.setMaxWidth(90);
+        buttonCuarto.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            rutaGuardadoDecimoCuarto();
+        });
+        buttonCuarto.setOnMouseEntered((MouseEvent t) -> {
+            buttonCuarto.setStyle("-fx-background-color: #E0E0E0; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonCuarto.setOnMouseExited((MouseEvent t) -> {
+            buttonCuarto.setStyle("-fx-background-color: #039BE5; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonCuarto.setFont(Roboto.MEDIUM(9));
+        
+        dialogStage.show();
+    }
+    
+    public void rutaGuardadoDecimoTercero() {
+         Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new MaterialDesignButton("SELECCIONAR RUTA");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se imprimira el informe de los decimos acumulados en el mes selecionado,"), 
+        children(new Text("Se imprimira el informe de los decimos tercero acumulados en el mes selecionado,"), 
                 new Text("Seleccione la ruta de guardado"), 
-                buttonSiDocumento, buttonNoDocumento).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonSiDocumento.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+        buttonSiDocumento.setMinHeight(30);
+        buttonSiDocumento.setMaxWidth(120);
+        buttonSiDocumento.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiDocumento.setStyle("-fx-background-color: #E0E0E0; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonSiDocumento.setOnMouseExited((MouseEvent t) -> {
+            buttonSiDocumento.setStyle("-fx-background-color: #039BE5; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonSiDocumento.setFont(Roboto.MEDIUM(9));
         buttonSiDocumento.setOnAction((ActionEvent e) -> {
             File file = seleccionarDirectorio();
             if (file != null) {
                 dialogStage.close();
-                imprimir(file);
+                imprimirDecimoTercero(file);
             }
         });
-        buttonNoDocumento.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
+        dialogStage.show();
+    }
+    
+     public void rutaGuardadoDecimoCuarto() {
+         Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new MaterialDesignButton("SELECCIONAR RUTA");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se imprimira el informe de los decimos cuarto acumulados en el mes selecionado,"), 
+                new Text("Seleccione la ruta de guardado"), 
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonSiDocumento.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+        buttonSiDocumento.setMinHeight(30);
+        buttonSiDocumento.setMaxWidth(120);
+        buttonSiDocumento.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiDocumento.setStyle("-fx-background-color: #E0E0E0; "
+                    + "-fx-text-fill: white;");
         });
-        dialogStage.showAndWait();
+        buttonSiDocumento.setOnMouseExited((MouseEvent t) -> {
+            buttonSiDocumento.setStyle("-fx-background-color: #039BE5; "
+                    + "-fx-text-fill: white;");
+        });
+        buttonSiDocumento.setFont(Roboto.MEDIUM(9));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                imprimirDecimoCuarto(file);
+            }
+        });
+        dialogStage.show();
     }
     
     public void setEmpresa(Empresa empresa) throws ParseException {
@@ -369,17 +604,28 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
                     user.getId(), Const.ROL_PAGO_INDIVIDUAL);
             
             if (rolIndividual != null) {
+                
                 empleado.setDecimo3(rolIndividual.getDecimoTercero());
                 empleado.setDecimo4(rolIndividual.getDecimoCuarto());
+                
                 if (rolIndividual.getDecimosPagado()) {
-                    empleado.setDetalles(PAGADO);
+                    empleado.setDetallesD3(PAGADO);
+                    empleado.setDetallesD4(PAGADO);
                 } else {
-                    empleado.setDetalles(RETENIDO);
+                    empleado.setDetallesD3(RETENIDO);
+                    empleado.setDetallesD4(RETENIDO);
+                    if (rolIndividual.getPagoDecimoTercero() != null ) {
+                        empleado.setDetallesD3(PAGADO);
+                    }
+                    if (rolIndividual.getPagoDecimoCuarto() != null ) {
+                        empleado.setDetallesD4(PAGADO);
+                    }
                 }
             } else {
                 empleado.setDecimo3(0d);
                 empleado.setDecimo4(0d);
-                empleado.setDetalles(SIN_GENERAR);
+                empleado.setDetallesD3(SIN_GENERAR);
+                empleado.setDetallesD4(SIN_GENERAR);
             }
             
             return empleado;
@@ -460,7 +706,9 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         
         cuartoColumna.setCellValueFactory(new PropertyValueFactory<>("decimo4"));
         
-        detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+        detallesD3Columna.setCellValueFactory(new PropertyValueFactory<>("detallesD3"));
+        
+        detallesD4Columna.setCellValueFactory(new PropertyValueFactory<>("detallesD4"));
        
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();

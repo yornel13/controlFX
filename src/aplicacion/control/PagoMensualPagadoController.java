@@ -420,45 +420,73 @@ public class PagoMensualPagadoController implements Initializable {
            aplicacionControl.noLogeado();
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.TOTAL, Permisos.Nivel.ELIMINAR)) {
-                Stage dialogStage = new Stage();
-                dialogStage.initModality(Modality.APPLICATION_MODAL);
-                dialogStage.setResizable(false);
-                dialogStage.setTitle("Precaución");
-                String stageIcon = AplicacionControl.class
-                        .getResource("imagenes/icon_error.png").toExternalForm();
-                dialogStage.getIcons().add(new Image(stageIcon));
-                MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
-                MaterialDesignButton buttonNo = new MaterialDesignButton("no");
-                HBox hBox = HBoxBuilder.create()
-                        .spacing(10.0) //In case you are using HBoxBuilder
-                        .padding(new Insets(5, 5, 5, 5))
-                        .alignment(Pos.CENTER)
-                        .children(buttonOk, buttonNo)
-                        .build();
-                hBox.maxWidth(120);
-                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                children(new Text("¿Seguro que desea Borrar este Pago?"),
-                         new Text("No podra recuperarlo!"), hBox).
-                alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                buttonOk.setMinWidth(50);
-                buttonNo.setMinWidth(50);
-                buttonOk.setOnAction((ActionEvent e) -> {
-                    dialogWait();
-                    ExecutorService executor = Executors.newFixedThreadPool(1);
-                    Runnable worker = new DataBaseThread();
-                    executor.execute(worker);
-                    executor.shutdown();
-                    dialogStage.close();
-                });
-                buttonNo.setOnAction((ActionEvent e) -> {
-                    dialogStage.close();
-                });
-                dialogStage.showAndWait();
+                
+                if (rolIndividual.getPagoDecimoTercero() == null 
+                        && rolIndividual.getPagoDecimoCuarto() == null) {
+                    
+                    Stage dialogStage = new Stage();
+                    dialogStage.initModality(Modality.APPLICATION_MODAL);
+                    dialogStage.setResizable(false);
+                    dialogStage.setTitle("Precaución");
+                    String stageIcon = AplicacionControl.class
+                            .getResource("imagenes/icon_error.png").toExternalForm();
+                    dialogStage.getIcons().add(new Image(stageIcon));
+                    MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+                    MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                    HBox hBox = HBoxBuilder.create()
+                            .spacing(10.0) //In case you are using HBoxBuilder
+                            .padding(new Insets(5, 5, 5, 5))
+                            .alignment(Pos.CENTER)
+                            .children(buttonOk, buttonNo)
+                            .build();
+                    hBox.maxWidth(120);
+                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                    children(new Text("¿Seguro que desea Borrar este Pago?"),
+                             new Text("No podra recuperarlo!"), hBox).
+                    alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                    buttonOk.setMinWidth(50);
+                    buttonNo.setMinWidth(50);
+                    buttonOk.setOnAction((ActionEvent e) -> {
+                        dialogWait();
+                        ExecutorService executor = Executors.newFixedThreadPool(1);
+                        Runnable worker = new DataBaseThread();
+                        executor.execute(worker);
+                        executor.shutdown();
+                        dialogStage.close();
+                    });
+                    buttonNo.setOnAction((ActionEvent e) -> {
+                        dialogStage.close();
+                    });
+                    dialogStage.showAndWait();
+                } else {
+                    dialogoBorradoNoPermitido();
+                }
      
             } else {
                 aplicacionControl.noPermitido();
             }
         }
+    }
+    
+    public void dialogoBorradoNoPermitido() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Rol individua");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("No se puede borrar el pago mensual porque tiene"),
+                new Text("pagos de decimos asociados, borrelos primero."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
     }
     
     public void borradoTerminado() {

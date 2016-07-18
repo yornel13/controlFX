@@ -102,6 +102,12 @@
      <property name="decimosPagado" type="java.lang.Boolean">
       <column name="decimos_pagado" />
     </property>
+     <many-to-one class="hibernate.model.PagoDecimo" fetch="select" name="PagoDecimoTercero">
+      <column name="pago_decimo_tercero_id"/>
+    </many-to-one>
+    <many-to-one class="hibernate.model.PagoDecimo" fetch="select" name="PagoDecimoCuarto">
+      <column name="pago_decimo_cuarto_id"/>
+    </many-to-one>
     <set inverse="true" name="pagoMeses">
       <key>
         <column name="rol_individual_id"/>

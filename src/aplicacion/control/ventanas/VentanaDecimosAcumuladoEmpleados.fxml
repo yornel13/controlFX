@@ -46,12 +46,13 @@
       <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
-          <TableColumn fx:id="apellidoColumna" prefWidth="150.0" text="Apellido" />
-            <TableColumn fx:id="nombreColumna" prefWidth="140.0" text="Nombre" />
-            <TableColumn fx:id="cargoColumna" prefWidth="110.0" text="Cargo" />
-            <TableColumn fx:id="terceroColumna" prefWidth="90.0" style="-fx-alignment: CENTER;" text="Decimo 3ro." />
-            <TableColumn fx:id="cuartoColumna" prefWidth="90.0" style="-fx-alignment: CENTER;" text="Decimo 4to." />
-            <TableColumn fx:id="detallesColumna" prefWidth="100.0" text="Detalles" />
+          <TableColumn fx:id="apellidoColumna" prefWidth="145.0" text="Apellido" />
+            <TableColumn fx:id="nombreColumna" prefWidth="110.0" text="Nombre" />
+            <TableColumn fx:id="cargoColumna" prefWidth="100.0" text="Cargo" />
+            <TableColumn fx:id="terceroColumna" style="-fx-alignment: CENTER;" text="Decimo 3ro." />
+            <TableColumn fx:id="detallesD3Columna" text="Detalles" />
+            <TableColumn fx:id="cuartoColumna" style="-fx-alignment: CENTER;" text="Decimo 4to." />
+            <TableColumn fx:id="detallesD4Columna" text="Detalles" />
         </columns>
       </TableView>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">

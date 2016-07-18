@@ -248,29 +248,31 @@ public class ActuarialesEmpleadosController implements Initializable {
     
     @FXML
     public void dialogoImprimir(ActionEvent event) {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Actuariales");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonSiDocumento = new Button("Seleccionar ruta");
-        Button buttonNoDocumento = new Button("Salir");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Seleccione la ruta de guardado"), 
-                buttonSiDocumento, buttonNoDocumento).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonSiDocumento.setOnAction((ActionEvent e) -> {
-            File file = seleccionarDirectorio();
-            if (file != null) {
+        if (!empleadosTableView.getItems().isEmpty()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Imprimir Actuariales");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonSiDocumento = new Button("Seleccionar ruta");
+            Button buttonNoDocumento = new Button("Salir");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("Seleccione la ruta de guardado"), 
+                    buttonSiDocumento, buttonNoDocumento).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonSiDocumento.setOnAction((ActionEvent e) -> {
+                File file = seleccionarDirectorio();
+                if (file != null) {
+                    dialogStage.close();
+                    imprimir(file);
+                }
+            });
+            buttonNoDocumento.setOnAction((ActionEvent e) -> {
                 dialogStage.close();
-                imprimir(file);
-            }
-        });
-        buttonNoDocumento.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        dialogStage.showAndWait();
+            });
+            dialogStage.showAndWait();
+        }
     }
     
     public void empleadoEditado(Usuario user) {
