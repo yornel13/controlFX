@@ -61,5 +61,10 @@
          </Pane>
       <Button fx:id="buttonDeudas" layoutX="684.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickGestionarDeudas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/deudas.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
       <Button fx:id="buttonGuardar" layoutX="684.0" layoutY="10.0" mnemonicParsing="false" onAction="#guardarDeudas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" visible="false" />
+      <Label fx:id="tipoText" alignment="CENTER" contentDisplay="CENTER" layoutX="13.0" layoutY="550.0" prefHeight="17.0" prefWidth="770.0">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="14.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>

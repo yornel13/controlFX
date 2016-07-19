@@ -140,6 +140,9 @@ public class DeudasEmpleadosController implements Initializable {
     @FXML
     private CheckBox checkBoxDeudaTodos;
     
+    @FXML
+    private Label tipoText;
+    
     TableColumn cuotasColumna;
     
     TableColumn<EmpleadoTable, EmpleadoTable> agregarColumna;
@@ -235,6 +238,8 @@ public class DeudasEmpleadosController implements Initializable {
         setEmpresa(empresa);
         
         dialogLoading.close();
+        
+        tipoText.setText("");
         
         dialogoDeudasMultiplesCompletado();
     }
@@ -528,6 +533,8 @@ public class DeudasEmpleadosController implements Initializable {
     }
     
     public void deudaMultple(Deuda deuda) {
+        
+        tipoText.setText("Deuda por " + deuda.getTipo());
         
         this.deuda = deuda;
         
@@ -979,7 +986,7 @@ public class DeudasEmpleadosController implements Initializable {
                     + "-fx-background-color: transparent;");
         });
         buttonDeudas.setTooltip(
-            new Tooltip("Agregar Deudas")
+            new Tooltip("Deudas por tipo de cuenta")
         );
         buttonDeudas.setOnMouseEntered((MouseEvent t) -> {
             buttonDeudas.setStyle("-fx-background-image: "

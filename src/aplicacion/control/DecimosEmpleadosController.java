@@ -8,7 +8,9 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteAcumulacionDecimosVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
+import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
@@ -55,6 +57,7 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -271,17 +274,32 @@ public class DecimosEmpleadosController implements Initializable {
         dialogLoading.show();
     }
     
-    public void imprimir(File file) {
+    public void imprimir(File file, Boolean noAcumulan, Boolean siAcumulan) {
         
         dialogWait();
         
+        List<EmpleadoTable> empleadosParaImprimir = new ArrayList<>();
+        
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            if (empleadoTable.getAcumulaDecimos()) {
+                if (siAcumulan) {
+                    empleadosParaImprimir.add(empleadoTable);
+                }
+            } else {
+                if (noAcumulan) {
+                    empleadosParaImprimir.add(empleadoTable);
+                }
+            }
+        }
+        
         ReporteAcumulacionDecimosVarios datasource = new ReporteAcumulacionDecimosVarios();
-        datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
+        datasource.addAll(empleadosParaImprimir);
         
         si = 0;
         no = 0;
         
-        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) empleadosTableView.getItems()) {
+        for (EmpleadoTable empleadoTable: empleadosParaImprimir) {
             if (empleadoTable.getAcumulaDecimos()) {
                  si ++;
              } else {
@@ -305,7 +323,11 @@ public class DecimosEmpleadosController implements Initializable {
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            JasperPrint jasperPrint;
+            if (empleadosParaImprimir.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
             String filename = "acumulado_decimos_" + System.currentTimeMillis();
             
@@ -331,12 +353,12 @@ public class DecimosEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Acumulacion de Decimos");
+        dialogStage.setTitle("Decimos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Completado."), buttonOk).
+        children(new Text("Se completo la impresión."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -354,19 +376,18 @@ public class DecimosEmpleadosController implements Initializable {
         return fileChooser.showDialog(stagePrincipal);
     }
     
-    @FXML
-    public void dialogoImprimir(ActionEvent event) {
+    public void dialogoImprimirTodos() {
         if (!empleadosTableView.getItems().isEmpty()) {
             Stage dialogStage = new Stage();
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
-            dialogStage.setTitle("Imprimir Acumulacion de Decimos");
+            dialogStage.setTitle("");
             String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
-            Button buttonSiDocumento = new Button("Seleccionar ruta");
-            Button buttonNoDocumento = new Button("Salir");
+            Button buttonSiDocumento = new MaterialDesignButton("Seleccionar ruta");
+            Button buttonNoDocumento = new MaterialDesignButton("Salir");
             dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-            children(new Text("Se imprimira la información de acumulacion de decimos de los empleados"), 
+            children(new Text("Se imprimira el informe completo sobre decimos,"), 
                     new Text("Seleccione la ruta de guardado"), 
                     buttonSiDocumento, buttonNoDocumento).
             alignment(Pos.CENTER).padding(new Insets(10)).build()));
@@ -374,12 +395,145 @@ public class DecimosEmpleadosController implements Initializable {
                 File file = seleccionarDirectorio();
                 if (file != null) {
                     dialogStage.close();
-                    imprimir(file);
+                    imprimir(file, true, true);
                 }
             });
             buttonNoDocumento.setOnAction((ActionEvent e) -> {
                 dialogStage.close();
             });
+            dialogStage.show();
+        }
+    }
+    
+    public void dialogoImprimirSiAcumulan() {
+        if (!empleadosTableView.getItems().isEmpty()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonSiDocumento = new MaterialDesignButton("Seleccionar ruta");
+            Button buttonNoDocumento = new MaterialDesignButton("Salir");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("Se imprimira la informe de empleados que si acumulan decimos,"), 
+                    new Text("Seleccione la ruta de guardado"), 
+                    buttonSiDocumento, buttonNoDocumento).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonSiDocumento.setOnAction((ActionEvent e) -> {
+                File file = seleccionarDirectorio();
+                if (file != null) {
+                    dialogStage.close();
+                    imprimir(file, false, true);
+                }
+            });
+            buttonNoDocumento.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.show();
+        }
+    }
+    
+    public void dialogoImprimirNoAcumulan() {
+        if (!empleadosTableView.getItems().isEmpty()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonSiDocumento = new MaterialDesignButton("Seleccionar ruta");
+            Button buttonNoDocumento = new MaterialDesignButton("Salir");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("Se imprimira el informe de empleados que no acumulan decimos,"), 
+                    new Text("Seleccione la ruta de guardado"), 
+                    buttonSiDocumento, buttonNoDocumento).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonSiDocumento.setOnAction((ActionEvent e) -> {
+                File file = seleccionarDirectorio();
+                if (file != null) {
+                    dialogStage.close();
+                    imprimir(file, true, false);
+                }
+            });
+            buttonNoDocumento.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.show();
+        }
+    }
+    
+    @FXML
+    public void dialogoImprimir(ActionEvent event) {
+        if (!empleadosTableView.getItems().isEmpty()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonTodos = new MaterialDesignButton("TODOS");
+            Button buttonNo = new MaterialDesignButton("NO ACUMULAN");
+            Button buttonSi = new MaterialDesignButton("SI ACUMULAN");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("¿Que desea imprimir?"), 
+                    buttonTodos, buttonNo, buttonSi).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            ///////////////////////// Boton 1
+            buttonTodos.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+            buttonTodos.setMinHeight(25);
+            buttonTodos.setMaxWidth(90);
+            buttonTodos.setOnAction((ActionEvent e) -> {
+                dialogoImprimirTodos();
+                dialogStage.close();
+            });
+            buttonTodos.setOnMouseEntered((MouseEvent t) -> {
+                buttonTodos.setStyle("-fx-background-color: #E0E0E0; "
+                        + "-fx-text-fill: white;");
+            });
+            buttonTodos.setOnMouseExited((MouseEvent t) -> {
+                buttonTodos.setStyle("-fx-background-color: #039BE5; "
+                        + "-fx-text-fill: white;");
+            });
+            buttonTodos.setFont(Roboto.MEDIUM(9));
+            ///////////////////////// Boton 2
+            buttonNo.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+            buttonNo.setMinHeight(25);
+            buttonNo.setMaxWidth(90);
+            buttonNo.setOnAction((ActionEvent e) -> {
+                dialogoImprimirNoAcumulan();
+                dialogStage.close();
+            });
+            buttonNo.setOnMouseEntered((MouseEvent t) -> {
+                buttonNo.setStyle("-fx-background-color: #E0E0E0; "
+                        + "-fx-text-fill: white;");
+            });
+            buttonNo.setOnMouseExited((MouseEvent t) -> {
+                buttonNo.setStyle("-fx-background-color: #039BE5; "
+                        + "-fx-text-fill: white;");
+            });
+            buttonNo.setFont(Roboto.MEDIUM(9));
+            ///////////////////////// Boton 3
+            buttonSi.setStyle("-fx-background-color: #039BE5; "
+                + "-fx-text-fill: white;");
+            buttonSi.setMinHeight(25);
+            buttonSi.setMaxWidth(90);
+            buttonSi.setOnAction((ActionEvent e) -> {
+                dialogoImprimirSiAcumulan();
+                dialogStage.close();
+            });
+            buttonSi.setOnMouseEntered((MouseEvent t) -> {
+                buttonSi.setStyle("-fx-background-color: #E0E0E0; "
+                        + "-fx-text-fill: white;");
+            });
+            buttonSi.setOnMouseExited((MouseEvent t) -> {
+                buttonSi.setStyle("-fx-background-color: #039BE5; "
+                        + "-fx-text-fill: white;");
+            });
+            buttonSi.setFont(Roboto.MEDIUM(9));
+            
             dialogStage.showAndWait();
         }
     }
