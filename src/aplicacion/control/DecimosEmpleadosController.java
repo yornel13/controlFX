@@ -566,7 +566,7 @@ public class DecimosEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {

@@ -878,38 +878,43 @@ public class DeudasEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
-
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdConDeuda(empresa.getId()));
+        
+        if (usuarios.isEmpty()) {
+            usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        }
+        
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
-             EmpleadoTable empleado = new EmpleadoTable();
-             empleado.setId(user.getId());
-             empleado.setNombre(user.getNombre());
-             empleado.setApellido(user.getApellido());
-             empleado.setCedula(user.getCedula());
-             empleado.setEmpresa(user.getDetallesEmpleado()
-                     .getEmpresa().getNombre());
-             empleado.setTelefono(user.getTelefono());
-             empleado.setDepartamento(user.getDetallesEmpleado()
-                     .getDepartamento().getNombre());
-             empleado.setCargo(user.getDetallesEmpleado()
-                     .getCargo().getNombre());
-             ArrayList<Deuda> deudas = new ArrayList<>();
-             deudas.addAll(new DeudaDAO().findAllByEmpleadoId(user.getId()));
-             Double montoDeuda = 0d;
-             Integer cantidad = 0;
-             for (Deuda deuda: deudas) {
-                 montoDeuda += deuda.getRestante();
-                 if (!deuda.getPagada()) {
-                    cantidad ++;
-                }
-             }
-             empleado.setTotalDeudas(cantidad);
-             empleado.setTotalMontoDeudas(Numeros.round(montoDeuda));
-             return empleado;
-         }).forEach((empleado) -> {
-             data.add(empleado);
-         });
+            EmpleadoTable empleado = new EmpleadoTable();
+            empleado.setId(user.getId());
+            empleado.setNombre(user.getNombre());
+            empleado.setApellido(user.getApellido());
+            empleado.setCedula(user.getCedula());
+            empleado.setEmpresa(user.getDetallesEmpleado()
+                    .getEmpresa().getNombre());
+            empleado.setTelefono(user.getTelefono());
+            empleado.setDepartamento(user.getDetallesEmpleado()
+                    .getDepartamento().getNombre());
+            empleado.setCargo(user.getDetallesEmpleado()
+                    .getCargo().getNombre());
+            
+            ArrayList<Deuda> deudas = new ArrayList<>();
+            deudas.addAll(user.getDeudas());
+            Double montoDeuda = 0d;
+            Integer cantidad = 0;
+            for (Deuda deuda: deudas) {
+                montoDeuda += deuda.getRestante();
+                if (!deuda.getPagada()) {
+                   cantidad ++;
+               }
+            }
+            empleado.setTotalDeudas(cantidad);
+            empleado.setTotalMontoDeudas(Numeros.round(montoDeuda));
+            return empleado;
+        }).forEach((empleado) -> {
+            data.add(empleado);
+        });
         empleadosTableView.setItems(data);
 
         FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);

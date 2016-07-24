@@ -93,6 +93,7 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -502,7 +503,7 @@ public class PagoMensualController implements Initializable {
         pagosQuincena.addAll(new PagoQuincenaDAO()
                 .findAllInDeterminateTime(fin));
         usuarios = new ArrayList<>();
-        usuarios.addAll(new UsuarioDAO().findByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivo(empresa.getId()));
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();

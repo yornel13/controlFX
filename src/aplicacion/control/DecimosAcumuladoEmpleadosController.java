@@ -74,6 +74,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -579,7 +580,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {

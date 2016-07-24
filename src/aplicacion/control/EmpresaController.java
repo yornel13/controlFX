@@ -114,7 +114,7 @@ public class EmpresaController implements Initializable {
         diaCorte.setText(empresa.getDiaCortePago() + " de cada mes");
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         ArrayList<Usuario> empleados = new ArrayList<>();
-        empleados.addAll(usuariosDAO.findByEmpresaIdActivo(empresa.getId()));
+        empleados.addAll(usuariosDAO.findAllByEmpresaIdActivo(empresa.getId()));
            
         totalEmpleados.setText(String.valueOf(empleados.size()));
         gerente.setText("no aplica");
