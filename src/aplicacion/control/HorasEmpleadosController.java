@@ -278,7 +278,7 @@ public class HorasEmpleadosController implements Initializable {
         sobreTiempo.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
         
         
-        empleadosTableView.getColumns().addAll(cedula, nombre, apellido, cargo, dias, horas, sobreTiempo, suplementarias);
+        empleadosTableView.getColumns().addAll(cedula, apellido, nombre, cargo, dias, horas, sobreTiempo, suplementarias);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();

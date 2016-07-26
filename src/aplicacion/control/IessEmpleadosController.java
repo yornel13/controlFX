@@ -10,7 +10,6 @@ import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.UsuarioDAO;

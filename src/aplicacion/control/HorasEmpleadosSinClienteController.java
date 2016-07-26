@@ -249,7 +249,7 @@ public class HorasEmpleadosSinClienteController implements Initializable {
         
         TableColumn nombre = new TableColumn("Empleado");
         nombre.setMinWidth(100);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        nombre.setCellValueFactory(new PropertyValueFactory<>("apellido"));
        
         TableColumn apellido = new TableColumn("Apellido");
         apellido.setMinWidth(100);
@@ -276,7 +276,7 @@ public class HorasEmpleadosSinClienteController implements Initializable {
         sobreTiempo.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
         
         
-        empleadosTableView.getColumns().addAll(cedula, nombre, cargo, dias, horas, sobreTiempo, suplementarias);
+        empleadosTableView.getColumns().addAll(cedula, apellido, cargo, dias, horas, sobreTiempo, suplementarias);
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();

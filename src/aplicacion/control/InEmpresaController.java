@@ -73,6 +73,9 @@ public class InEmpresaController implements Initializable {
     
     @FXML
     private MenuButton buttonRoles;
+            
+    @FXML
+    private Button buttonReportes;
     
     @FXML
     private Button buttonAtras;
@@ -97,6 +100,11 @@ public class InEmpresaController implements Initializable {
     @FXML
     private void verEmpleados(ActionEvent event) {
         aplicacionControl.mostrarEmpleados(empresa, stagePrincipal);
+    }
+    
+    @FXML
+    private void verReportes(ActionEvent event) {
+        aplicacionControl.mostrarReportes(empresa, stagePrincipal);
     }
     
     public void setEmpresa(Empresa empresa) {
@@ -250,6 +258,20 @@ public class InEmpresaController implements Initializable {
             });
             buttonEdicion.setOnMouseExited((MouseEvent t) -> {
                 buttonEdicion.setStyle("-fx-background-color: #039BE5;");
+            });
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_reportes.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonReportes.setGraphic(imageView);
+            buttonReportes.setFont(Roboto.MEDIUM(15));
+            buttonReportes.setOnMouseEntered((MouseEvent t) -> {
+                buttonReportes.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonReportes.setOnMouseExited((MouseEvent t) -> {
+                buttonReportes.setStyle("-fx-background-color: #039BE5;");
             });
         }
         

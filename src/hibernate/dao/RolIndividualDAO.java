@@ -123,6 +123,21 @@ public class RolIndividualDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<RolIndividual>) result;
         }
+        
+        public List<RolIndividual> findAllByRangoFechaAndEmpleadoId(Timestamp fechaInicio, 
+                Timestamp fechaFin, Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_individual "
+                            + "where inicio >= :fecha_inicio "
+                            + "and inicio < :fecha_fin "
+                            + "and usuario_id = :usuario_id")
+                    .addEntity(RolIndividual.class)
+                    .setParameter("fecha_inicio", fechaInicio)
+                    .setParameter("fecha_fin", fechaFin)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<RolIndividual>) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding RolIndividual instance with property: "

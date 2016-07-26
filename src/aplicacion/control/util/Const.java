@@ -58,6 +58,20 @@ public class Const {
     public static final String REPORTE_DECIMO_TERCERO_TOTAL_EMPLEADO = "report/decimo_tercero_total_empleado.jrxml";
     public static final String REPORTE_DECIMO_CUARTO_TOTAL_EMPLEADO = "report/decimo_cuarto_total_empleado.jrxml";
     
+    //Reportes nuevos de gestion
+    public static final String REPORTE_SUMATORIA_HORAS = "report/reporte_horas_extras.jrxml";
+    public static final String REPORTE_SUMATORIA_JUBILACION = "report/reporte_jubilacion_patronal.jrxml";
+    public static final String REPORTE_SUMATORIA_APORTE = "report/reporte_aporte_patronal.jrxml";
+    public static final String REPORTE_SUMATORIA_RESERVA = "report/reporte_fondo_reserva.jrxml";
+    public static final String REPORTE_SUMATORIA_VACACIONES = "report/reporte_vacaciones.jrxml";
+    public static final String REPORTE_SUMATORIA_UNIFORMES = "report/reporte_uniformes.jrxml";
+    public static final String REPORTE_SUMATORIA_SEGUROS = "report/reporte_seguros.jrxml";
+    public static final String REPORTE_SUMATORIA_BONOS = "report/reporte_bonos.jrxml";
+    public static final String REPORTE_SUMATORIA_TRANSPORTE = "report/reporte_transporte.jrxml";
+    public static final String REPORTE_SUMATORIA_DECIMO_TERCERO = "report/reporte_decimos_tercero.jrxml";
+    public static final String REPORTE_SUMATORIA_DECIMO_CUARTO = "report/reporte_decimos_cuarto.jrxml";
+    public static final String REPORTE_SUMATORIA_IESS = "report/reporte_iess.jrxml";
+    
     /************* Correo **************/
     // Asunto
     public static final String ASUNTO_ROL_INDIVIDUAL = "Pago Mensual";

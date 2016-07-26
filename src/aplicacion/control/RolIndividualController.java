@@ -49,6 +49,7 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -291,14 +292,18 @@ public class RolIndividualController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
-            parametros.put("empleado", empleado.getNombre() + " " + empleado.getApellido());
+            parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
             parametros.put("fecha", Fechas.getFechaConMes(inicio) + " al " + Fechas.getFechaConMes(fin));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            JasperPrint jasperPrint;
+            if (pagos.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
             String filename = "rol_individual_" + System.currentTimeMillis();
             

@@ -6,6 +6,7 @@
 package aplicacion.control.reports;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import static aplicacion.control.util.Numeros.round;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -40,7 +41,10 @@ public class ReporteIessVarios implements JRDataSource {
                 valor = lista.get(indiceActual).getCargo();
                 break;
             case "iess":
-                valor = lista.get(indiceActual).getTotalIess();
+                valor = round(lista.get(indiceActual).getTotalIess());
+                break;
+            case "monto_iess":
+                valor = round(lista.get(indiceActual).getTotalIess());
                 break;
             default:
                 break; 

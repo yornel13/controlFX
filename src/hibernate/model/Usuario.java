@@ -37,6 +37,7 @@ public class Usuario implements java.io.Serializable {
         private Set pagoQuincenas = new HashSet(0);
         private Set pagoMeses = new HashSet(0);
         private Set rolIndividuals = new HashSet(0);
+        private Set fotos = new HashSet(0);
 
 	// Constructors
 
@@ -289,6 +290,14 @@ public class Usuario implements java.io.Serializable {
         public void setRolIndividuals(Set rolIndividuals) {
             this.rolIndividuals = rolIndividuals;
         }
+
+    public Set getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(Set fotos) {
+        this.fotos = fotos;
+    }
       
         
 }

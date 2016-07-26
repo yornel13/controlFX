@@ -41,6 +41,16 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Button>
+            <Label layoutX="625.0" layoutY="15.0" text="Al filtrar usar enter para" textFill="WHITE">
+               <font>
+                  <Font name="Arial Rounded MT Bold" size="10.0" />
+               </font>
+            </Label>
+            <Label layoutX="625.0" layoutY="28.0" text="recalcular los totales" textFill="WHITE">
+               <font>
+                  <Font name="Arial Rounded MT Bold" size="10.0" />
+               </font>
+            </Label>
          </children>
       </Pane>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
@@ -215,17 +225,13 @@
       <TableView fx:id="controlClienteTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="77.0" minHeight="-Infinity" minWidth="770.0" prefHeight="420.0" prefWidth="770.0" style="-fx-background-color: white;">
          <columns>
             <TableColumn fx:id="columnaCedula" minWidth="0.0" resizable="false" text="Cedula" />
-            <TableColumn fx:id="columnaDias" minWidth="0.0" prefWidth="40.0" resizable="false" text="Dias" />
-            <TableColumn fx:id="columnaSalario" minWidth="0.0" prefWidth="65.0" resizable="false" text="Salario" />
-            <TableColumn fx:id="columnaExtras" minWidth="0.0" prefWidth="65.0" resizable="false" text="Horas Ex." />
-            <TableColumn fx:id="columnaBonos" minWidth="0.0" prefWidth="50.0" resizable="false" text="Bonos" />
-            <TableColumn fx:id="columnaVacaciones" minWidth="0.0" prefWidth="50.0" resizable="false" text="Vacaciones" />
-            <TableColumn fx:id="columnaSubTotal" minWidth="0.0" prefWidth="70.0" resizable="false" text="Subtotal" />
-            <TableColumn fx:id="columnaTercero" minWidth="0.0" prefWidth="70.0" resizable="false" text="Dec. 3ro" />
-            <TableColumn fx:id="columnaCuarto" minWidth="0.0" prefWidth="70.0" resizable="false" text="Dec. 4to" />
-            <TableColumn fx:id="columnaJubilacion" minWidth="0.0" prefWidth="70.0" resizable="false" text="Jubilacion" />
-            <TableColumn fx:id="columnaAporte" minWidth="0.0" prefWidth="75.0" resizable="false" text="Aporte" />
-            <TableColumn fx:id="columnaTotal" minWidth="0.0" prefWidth="55.0" resizable="false" text="Total" />
+            <TableColumn fx:id="columnaApellido" minWidth="0.0" prefWidth="140.0" resizable="false" text="Apellido" />
+            <TableColumn fx:id="columnaNombre" minWidth="0.0" prefWidth="140.0" resizable="false" text="Nombre" />
+            <TableColumn fx:id="columnaCargo" minWidth="0.0" prefWidth="110.0" resizable="false" text="Cargo" />
+            <TableColumn fx:id="columnaDias" minWidth="0.0" prefWidth="60.0" resizable="false" text="Dias" />
+            <TableColumn fx:id="columnaExtras" minWidth="0.0" prefWidth="70.0" resizable="false" text="Horas Ext." />
+            <TableColumn fx:id="columnaSubtotal" minWidth="0.0" resizable="false" text="Subtotal" />
+            <TableColumn fx:id="columnaTotal" minWidth="0.0" resizable="false" text="Total" />
          </columns>
       </TableView>
     </children>

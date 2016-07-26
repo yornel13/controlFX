@@ -31,8 +31,8 @@ public class ReporteRolCliente implements JRDataSource {
                 valor = lista.get(indiceActual).getCedula();
                 break; 
             case "empleado":
-                valor = lista.get(indiceActual).getUsuario().getNombre() + "\n" 
-                        + lista.get(indiceActual).getUsuario().getApellido();
+                valor = lista.get(indiceActual).getUsuario().getApellido()+ "\n" 
+                        + lista.get(indiceActual).getUsuario().getNombre();
                 break;
             case "cargo":
                 valor = lista.get(indiceActual).getUsuario().getDetallesEmpleado().getCargo().getNombre();

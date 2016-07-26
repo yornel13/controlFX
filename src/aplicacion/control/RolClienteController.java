@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -56,6 +58,7 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -84,34 +87,22 @@ public class RolClienteController implements Initializable {
     private TableColumn columnaCedula;
     
     @FXML
-    private TableColumn columnaDias;
+    private TableColumn columnaApellido;
     
     @FXML
-    private TableColumn columnaSalario;
+    private TableColumn columnaNombre;
+    
+    @FXML
+    private TableColumn columnaCargo;
+    
+    @FXML
+    private TableColumn columnaDias;
     
     @FXML
     private TableColumn columnaExtras;
     
     @FXML
-    private TableColumn columnaBonos;
-    
-    @FXML
-    private TableColumn columnaVacaciones;
-    
-    @FXML
-    private TableColumn columnaSubTotal;
-    
-    @FXML
-    private TableColumn columnaTercero;
-    
-    @FXML
-    private TableColumn columnaCuarto;
-    
-    @FXML 
-    private TableColumn columnaJubilacion;
-    
-    @FXML 
-    private TableColumn columnaAporte;
+    private TableColumn columnaSubtotal;
     
     @FXML
     private TableColumn columnaTotal;
@@ -582,27 +573,51 @@ public class RolClienteController implements Initializable {
         
         controlClienteTableView.setEditable(Boolean.FALSE);
         
-        columnaCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        columnaCedula.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<RolCliente,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<RolCliente, String> data) {
+                return new ReadOnlyStringWrapper(data.getValue()
+                        .getUsuario().getCedula());
+            }
+        });
+        
+        columnaApellido.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<RolCliente,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<RolCliente, String> data) {
+                return new ReadOnlyStringWrapper(data.getValue()
+                        .getUsuario().getApellido());
+            }
+        });
+        
+        columnaNombre.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<RolCliente,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<RolCliente, String> data) {
+                return new ReadOnlyStringWrapper(data.getValue()
+                        .getUsuario().getNombre());
+            }
+        });
+        
+        columnaCargo.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<RolCliente,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<RolCliente, String> data) {
+                return new ReadOnlyStringWrapper(data.getValue()
+                        .getUsuario().getDetallesEmpleado().getCargo().getNombre());
+            }
+        });
         
         columnaDias.setCellValueFactory(new PropertyValueFactory<>("dias"));
         
-        columnaSalario.setCellValueFactory(new PropertyValueFactory<>("salario"));
+        columnaSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
         
-        columnaExtras.setCellValueFactory(new PropertyValueFactory<>("montoHorasExtras"));
-        
-        columnaBonos.setCellValueFactory(new PropertyValueFactory<>("totalBonos"));
-        
-        columnaVacaciones.setCellValueFactory(new PropertyValueFactory<>("vacaciones"));
-        
-        columnaSubTotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
-        
-        columnaTercero.setCellValueFactory(new PropertyValueFactory<>("decimoTercero"));
-        
-        columnaCuarto.setCellValueFactory(new PropertyValueFactory<>("decimoCuarto"));
-        
-        columnaJubilacion.setCellValueFactory(new PropertyValueFactory<>("jubilacionPatronal"));
-        
-        columnaAporte.setCellValueFactory(new PropertyValueFactory<>("aportePatronal"));
+        columnaExtras.setCellValueFactory(new PropertyValueFactory<>("totalHorasExtras"));
         
         columnaTotal.setCellValueFactory(new PropertyValueFactory<>("totalIngreso"));
         

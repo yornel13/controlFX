@@ -111,5 +111,11 @@
       </key>
       <one-to-many class="hibernate.model.RolIndividual"/>
     </set>
+    <set inverse="true" name="fotos">
+      <key>
+        <column name="usuario_id" not-null="true"/>
+      </key>
+      <one-to-many class="hibernate.model.Foto"/>
+    </set>
   </class>
 </hibernate-mapping>

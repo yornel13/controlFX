@@ -64,6 +64,7 @@
                   <Font size="14.0" />
                </font>
             </Label>
+            <Button fx:id="buttonReportes" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="340.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verReportes" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="REPORTES" textFill="WHITE" />
          </children>
       </Pane>
         <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />

@@ -90,8 +90,8 @@ public class AplicacionControl extends Application {
     public void loginCompletado(Usuario usuario) {
         permisos.setUsuario(usuario);
         login.setText("Salir");
-        usuarioLogin.setText(permisos.getUsuario().getNombre() + 
-                " " + permisos.getUsuario().getApellido());
+        usuarioLogin.setText(permisos.getUsuario().getApellido()+ 
+                " " + permisos.getUsuario().getNombre());
         au = new Auditar();
         au.saveRegistro(au.INGRESO, au.LOGEO, usuario, null);
     }
@@ -251,8 +251,8 @@ public class AplicacionControl extends Application {
         });
        if (permisos != null) {
            login.setText("Salir");
-           usuarioLogin.setText(permisos.getUsuario().getNombre() + 
-                " " + permisos.getUsuario().getApellido());
+           usuarioLogin.setText(permisos.getUsuario().getApellido()+ 
+                " " + permisos.getUsuario().getNombre());
        }
     }
     
@@ -1502,7 +1502,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
                     AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    ventana.setTitle(empleado.getApellido()+ " " + empleado.getNombre());
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -1517,7 +1517,7 @@ public class AplicacionControl extends Application {
                     
                     // Registro para auditar
                     String detalles = "ingreso a rol de pago del empleado " 
-                            + empleado.getNombre() + " " + empleado.getApellido();
+                            + empleado.getApellido()+ " " + empleado.getNombre();
                     au.saveIngreso(detalles, permisos.getUsuario());
 
                 } catch (Exception e) {
@@ -1540,8 +1540,8 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoCliente.fxml"));
                     AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Empleado: " + empleado.getNombre() + " " 
-                            + empleado.getApellido() + " | Cliente: " + cliente.getNombre());
+                    ventana.setTitle("Empleado: " + empleado.getApellido()+ " " 
+                            + empleado.getNombre()+ " | Cliente: " + cliente.getNombre());
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -1556,7 +1556,7 @@ public class AplicacionControl extends Application {
                     
                     // Registro para auditar
                     String detalles = "ingreso a rol de pago del empleado " 
-                            + empleado.getNombre() + " " + empleado.getApellido();
+                            + empleado.getApellido()+ " " + empleado.getNombre();
                     au.saveIngreso(detalles, permisos.getUsuario());
 
                 } catch (Exception e) {
@@ -1579,8 +1579,8 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoSinCliente.fxml"));
                     AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Empleado: " + empleado.getNombre() + " " 
-                            + empleado.getApellido());
+                    ventana.setTitle("Empleado: " + empleado.getApellido()+ " " 
+                            + empleado.getNombre());
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -1595,7 +1595,7 @@ public class AplicacionControl extends Application {
                     
                     // Registro para auditar
                     String detalles = "ingreso a rol de pago del empleado " 
-                            + empleado.getNombre() + " " + empleado.getApellido();
+                            + empleado.getApellido()+ " " + empleado.getNombre();
                     au.saveIngreso(detalles, permisos.getUsuario());
 
                 } catch (Exception e) {
@@ -1982,7 +1982,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolIndividual.fxml"));
                     AnchorPane ventanaAuditar = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Rol del Empleado " + empleado.getNombre() + " " + empleado.getApellido());
+                    ventana.setTitle("Rol del Empleado " + empleado.getApellido()+ " " + empleado.getNombre());
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -2221,6 +2221,51 @@ public class AplicacionControl extends Application {
                     });
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarReportes(Empresa empresa, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.PAGOS, Permisos.Nivel.VER)) {
+                try {
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaReportesEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Reportes");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    ReportesEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.REPORTES, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();

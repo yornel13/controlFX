@@ -29,8 +29,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -143,6 +145,9 @@ public class RolClienteEmpleadoController implements Initializable {
     @FXML
     private GridPane gridPaneTotal;
     
+    @FXML
+    private Button buttonImprimir;
+    
     private Cliente cliente;
     private Empresa empresa;
     
@@ -188,7 +193,7 @@ public class RolClienteEmpleadoController implements Initializable {
                          "Ruc: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getNumeracion() 
                     + " - Direccion: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getDireccion() 
                     + " - Tel: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getTelefono1());
-            parametros.put("empleado", pago.getEmpleado());
+            parametros.put("empleado", pago.getUsuario().getApellido() + " " + pago.getUsuario().getNombre());
             parametros.put("cedula", pago.getCedula());
             parametros.put("cargo", pago.getUsuario().getDetallesEmpleado().getCargo().getNombre());
             parametros.put("fecha", Fechas.getFechaConMes(pago.getInicio()) + " al " + Fechas.getFechaConMes(pago.getFinalizo()));
@@ -276,8 +281,8 @@ public class RolClienteEmpleadoController implements Initializable {
     public void setRolInfo(RolCliente pago) {
         this.pago = pago;
         
-        empleadoText.setText(pago.getUsuario().getNombre() + " " 
-                + pago.getUsuario().getApellido());
+        empleadoText.setText(pago.getUsuario().getApellido()+ " " 
+                + pago.getUsuario().getNombre());
         cedulaText.setText(pago.getUsuario().getCedula());
         cargoText.setText(pago.getUsuario().getDetallesEmpleado()
                 .getCargo().getNombre());
@@ -317,6 +322,22 @@ public class RolClienteEmpleadoController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {  
-        // Nada por aqui
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     }  
 }

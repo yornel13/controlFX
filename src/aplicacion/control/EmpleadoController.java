@@ -7,6 +7,8 @@ package aplicacion.control;
 
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.FotoDAO;
+import hibernate.model.Foto;
 import hibernate.model.Usuario;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -139,8 +141,16 @@ public class EmpleadoController implements Initializable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            empleado.setFoto(bFile);
-            HibernateSessionFactory.getSession().flush();
+            Foto foto = new FotoDAO().findByEmpleadoId(empleado.getId());
+            if (foto != null) {
+                foto.setFoto(bFile);
+                HibernateSessionFactory.getSession().flush();
+            } else {
+                foto = new Foto();
+                foto.setUsuario(empleado);
+                foto.setFoto(bFile);
+                new FotoDAO().save(foto);
+            }
         }
     }
     
@@ -188,8 +198,10 @@ public class EmpleadoController implements Initializable {
         DateTime nacimiento = new DateTime(empleado.getNacimiento().getTime());
         cumpleano.setText(nacimiento.getDayOfMonth() + " de " + getMonthName(nacimiento.getMonthOfYear()) + " " + nacimiento.getYear());
         
-        if (empleado.getFoto() != null) {
-            final BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(empleado.getFoto()));
+        Foto foto = new FotoDAO().findByEmpleadoId(empleado.getId());
+        
+        if (foto != null && foto.getFoto() != null) {
+            final BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(foto.getFoto()));
             Image image  =  SwingFXUtils.toFXImage(bufferedImage, null);
             setProfileImage(image);
         }
