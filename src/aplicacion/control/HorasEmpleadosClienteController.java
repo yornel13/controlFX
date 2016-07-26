@@ -14,6 +14,7 @@ import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
+import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -25,8 +26,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -37,9 +42,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.joda.time.DateTime;
 
 /**
@@ -48,27 +55,37 @@ import org.joda.time.DateTime;
  */
 public class HorasEmpleadosClienteController implements Initializable {
     
-    private Stage stagePrincipal;
-    
     private AplicacionControl aplicacionControl;
     
     private Empresa empresa;
     private Cliente cliente;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
-    private Button agregarButton;
+    private TableColumn cedulaColumna;
     
     @FXML
-    private Pane imagenLabel;
+    private TableColumn empleadoColumna;
     
     @FXML
-    private Button homeButton;
+    private TableColumn cargoColumna;
     
     @FXML
-    private Label textFecha;
+    private TableColumn diasColumna;
+    
+    @FXML
+    private TableColumn normalesColumna;
+    
+    @FXML
+    private TableColumn sobretiempoColumna;
+    
+    @FXML
+    private TableColumn recargoColumna;
+    
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
     
     @FXML
     private DatePicker pickerDe;
@@ -80,10 +97,7 @@ public class HorasEmpleadosClienteController implements Initializable {
     private TableView empleadosTableView;
     
     @FXML
-    private TextField cedulaField;
-    
-    @FXML
-    private Label errorText;
+    private TextField filterField;
     
     private Timestamp inicio;
     private Timestamp fin;
@@ -91,6 +105,7 @@ public class HorasEmpleadosClienteController implements Initializable {
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
+    private Stage stagePrincipal;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -101,24 +116,12 @@ public class HorasEmpleadosClienteController implements Initializable {
     }
     
     @FXML
-    private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarVentanaPrincipal();
-        stagePrincipal.close();
-    }
-    
-    @FXML
-    private void returnEmpresa(ActionEvent event) {
-        aplicacionControl.mostrarInEmpresa(empresa);
-        stagePrincipal.close();
-    } 
-    
-    @FXML
     public void onClickMore(ActionEvent event) {
         pickerDe.setValue(pickerDe.getValue().plusMonths(1));
         pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
-        mostrarRegistro(null);
+        setTableInfo(empresa, inicio, fin);
     }
     
     @FXML
@@ -127,22 +130,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-        mostrarRegistro(null);
-    }
-    
-    @FXML
-    private void verRol(ActionEvent event) {
-        if (cedulaField != null) {
-            Usuario emp = new UsuarioDAO().findByCedulaAndEmpresaId(cedulaField.getText(), empresa.getId());
-            if (emp != null) {
-                errorText.setText("");
-                rolDePagoPorCliente(emp);
-            } else {
-                errorText.setText("No encontrado");
-            }
-        } else {
-            errorText.setText("No encontrado");
-        }
+        setTableInfo(empresa, inicio, fin);
     }
     
     public void setCliente(Empresa empresa, Cliente cliente) throws ParseException {
@@ -160,21 +148,6 @@ public class HorasEmpleadosClienteController implements Initializable {
         setTableInfo(empresa, inicio, fin);
         
     }
-    
-    @FXML
-    private void mostrarRegistro(ActionEvent event) {
-        if (pickerDe.getValue() == null) {
-            errorText.setText("Fechas incorrectas");
-        } else if (pickerHasta.getValue() == null) {
-            errorText.setText("Fechas incorrectas");
-        } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
-            errorText.setText("Fechas incorrectas");
-        } else {       
-            fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-            inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-            setTableInfo(empresa, inicio, fin);
-        }
-    } 
     
     private void rolDePagoPorCliente(Usuario empleado) {
         if (aplicacionControl.permisos == null) {
@@ -196,8 +169,6 @@ public class HorasEmpleadosClienteController implements Initializable {
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
-        
-        empleadosTableView.getColumns().clear(); 
         
         if (!usuarios.isEmpty()) {
             
@@ -240,59 +211,95 @@ public class HorasEmpleadosClienteController implements Initializable {
            empleadosTableView.setItems(data);
         }
         
-        TableColumn cedula = new TableColumn("Cedula");
-        cedula.setMinWidth(100);
-        cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
+        filterField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(empleado -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches first name.
+                } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } 
+                return false; // Does not match.
+            });
+        });
+
+        SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
+        empleadosTableView.setItems(sortedData);
+    }
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {   
+        empleadosTableView.setEditable(Boolean.FALSE);
         
-        TableColumn apellido = new TableColumn("Empleado");
-        apellido.setMinWidth(120);
-        apellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
+        pickerDe.setEditable(false);
+        pickerHasta.setEditable(false);
         
-        TableColumn cargo = new TableColumn("Cargo");
-        cargo.setMinWidth(120);
-        cargo.setCellValueFactory(new PropertyValueFactory<>("cargo"));
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
         
-        TableColumn dias = new TableColumn("Dias");
-        dias.setMinWidth(100);
-        dias.setCellValueFactory(new PropertyValueFactory<>("dias"));
+        cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
-        TableColumn horas = new TableColumn("Horas(N)");
-        horas.setMinWidth(80);
-        horas.setCellValueFactory(new PropertyValueFactory<>("horas"));
+        empleadoColumna.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<EmpleadoTable,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<EmpleadoTable, String> data) {
+                return new ReadOnlyStringWrapper(data.getValue().getApellido() 
+                        + " " + data.getValue().getNombre());
+            }
+        });
         
-        TableColumn suplementarias = new TableColumn("Horas(RC)");
-        suplementarias.setMinWidth(80);
-        suplementarias.setCellValueFactory(new PropertyValueFactory<>("suplementarias"));
+        cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
-        TableColumn sobreTiempo = new TableColumn("Horas(ST)");
-        sobreTiempo.setMinWidth(80);
-        sobreTiempo.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
+        diasColumna.setCellValueFactory(new PropertyValueFactory<>("dias"));
         
+        normalesColumna.setCellValueFactory(new PropertyValueFactory<>("horas"));
         
-        empleadosTableView.getColumns().addAll(cedula, apellido, cargo, dias, horas, sobreTiempo, suplementarias);
+        recargoColumna.setCellValueFactory(new PropertyValueFactory<>("suplementarias"));
+        
+        sobretiempoColumna.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    System.out.println(inicio);
-                    rolDePagoPorCliente(usuariosDAO.findById(rowData.getId()));
+                    rolDePagoPorCliente(new UsuarioDAO()
+                            .findById(rowData.getId()));
                 }
             });
             return row ;
         });
-        
-        errorText.setText("");
-    }
-    
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {   
-        empleadosTableView.setEditable(Boolean.FALSE);
-        empleadosTableView.getColumns().clear(); 
-        
-        pickerDe.setEditable(false);
-        pickerHasta.setEditable(false);
     }   
     
     public static Timestamp getToday() throws ParseException {
@@ -312,17 +319,4 @@ public class HorasEmpleadosClienteController implements Initializable {
         cal.set(Calendar.MONTH, month - 1);
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
     }
-    
-    // Login items
-    @FXML
-    public Button login;
-    
-    @FXML 
-    public Label usuarioLogin;
-    
-    @FXML
-    public void onClickLoginButton(ActionEvent event) {
-        aplicacionControl.login(login, usuarioLogin);
-    }
-    
 }

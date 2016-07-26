@@ -1437,8 +1437,8 @@ public class AplicacionControl extends Application {
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
-                    ventana.setWidth(700);
-                    ventana.setHeight(468);
+                    ventana.setWidth(708);
+                    ventana.setHeight(480);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEmpleados);
                     ventana.setScene(scene);
@@ -1471,8 +1471,8 @@ public class AplicacionControl extends Application {
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
-                    ventana.setWidth(700);
-                    ventana.setHeight(468);
+                    ventana.setWidth(708);
+                    ventana.setHeight(480);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEmpleados);
                     ventana.setScene(scene);

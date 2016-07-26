@@ -5,26 +5,19 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.DeudasController.numFilter;
 import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.DataSourceRolIndividual;
-import aplicacion.control.reports.ReporteActuarialesVarios;
 import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.MaterialDesignButtonBlue;
-import static aplicacion.control.util.Numeros.round;
-import aplicacion.control.util.Roboto;
 import hibernate.dao.PagoMesItemDAO;
-import hibernate.dao.RolClienteDAO;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.PagoMesItem;
-import hibernate.model.RolCliente;
 import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.io.File;
@@ -43,6 +36,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -57,6 +51,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -129,6 +124,9 @@ public class ReportesEmpleadosController implements Initializable {
     @FXML 
     private TableColumn telefonoColumna;
     
+    @FXML 
+    private TableColumn<EmpleadoTable, EmpleadoTable> imprimirColumna;
+    
     @FXML
     private Button buttonAtras;
     
@@ -149,6 +147,12 @@ public class ReportesEmpleadosController implements Initializable {
     
     @FXML
     private CheckBox checkBoxPermitir;
+    
+    @FXML
+    private CheckBox checkBoxMarcarTodos;
+    
+    @FXML
+    private Label contador;
     
     public Timestamp inicio;
     public Timestamp fin;
@@ -202,6 +206,20 @@ public class ReportesEmpleadosController implements Initializable {
         
     }
     
+    @FXML
+    public void marcarTodos(ActionEvent event) {
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (checkBoxMarcarTodos.isSelected()) {
+                empleadoTable.setAgregar(true);
+            } else {
+                empleadoTable.setAgregar(false);
+            }
+            data.set(data.indexOf(empleadoTable), empleadoTable);
+        }
+        contarSelecciones();
+    }
+    
     public void dialogWait() {
         dialogLoading = new Stage();
         dialogLoading.initModality(Modality.APPLICATION_MODAL);
@@ -216,12 +234,17 @@ public class ReportesEmpleadosController implements Initializable {
     }
     
     public ArrayList<RolIndividual> getRoles() {
-        List<EmpleadoTable> empleadoTables = (List<EmpleadoTable>) 
-                empleadosTableView.getItems();
+        
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar())
+                empleadosTable.add(empleado);
+        }
         
         ArrayList<RolIndividual> rolIndividualsParaImprimir = new ArrayList<>();
         
-        for (EmpleadoTable empleadoTable: empleadoTables) {
+        for (EmpleadoTable empleadoTable: empleadosTable) {
             
             Usuario empleado = null;
             
@@ -427,9 +450,14 @@ public class ReportesEmpleadosController implements Initializable {
         
         dialogWait();
         
-        List<EmpleadoTable> empleados = (List<EmpleadoTable>) empleadosTableView.getItems();
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
         
-        for (EmpleadoTable empleadoTable: empleados) {
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar())
+                empleadosTable.add(empleado);
+        }
+        
+        for (EmpleadoTable empleadoTable: empleadosTable) {
             
             Double total = 0d;
             
@@ -442,7 +470,7 @@ public class ReportesEmpleadosController implements Initializable {
         }
         
         ReporteIessVarios datasource = new ReporteIessVarios();
-        datasource.addAll(empleados);
+        datasource.addAll(empleadosTable);
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_SUMATORIA_IESS);
@@ -454,7 +482,7 @@ public class ReportesEmpleadosController implements Initializable {
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint;
-            if (empleados.isEmpty())
+            if (empleadosTable.isEmpty())
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
             else 
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
@@ -576,6 +604,26 @@ public class ReportesEmpleadosController implements Initializable {
         });
     }
     
+    public void contarSelecciones() {
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar())
+                empleadosTable.add(empleado);
+        }
+        int count = empleadosTable.size();
+        switch (count) {
+            case 0:
+                contador.setText("");
+                break;
+            case 1:
+                contador.setText("1 empleado seleccionado");
+                break;
+            default:
+                contador.setText(count + " empleados seleccionados");
+                break;
+        }
+    }
+    
     public void dialogoRuta(int reporte) {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -636,6 +684,7 @@ public class ReportesEmpleadosController implements Initializable {
             empleado.setDepartamento(user.getDetallesEmpleado()
                     .getDepartamento().getNombre());
             empleado.setCargo(user.getDetallesEmpleado().getCargo().getNombre());
+            empleado.setAgregar(false);
             return empleado;
         }).forEach((empleado) -> {
             data.add(empleado);
@@ -688,6 +737,30 @@ public class ReportesEmpleadosController implements Initializable {
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
         telefonoColumna.setCellValueFactory(new PropertyValueFactory<>("telefono"));
+        
+        imprimirColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        imprimirColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
+            private final CheckBox checkBoxSeleccionar = new CheckBox();
+
+            @Override
+            protected void updateItem(EmpleadoTable empleadoTable, boolean empty) {
+                super.updateItem(empleadoTable, empty);
+
+                if (empleadoTable == null) {
+                    setGraphic(null);
+                    return;
+                }
+                
+                setGraphic(checkBoxSeleccionar);
+                if (checkBoxSeleccionar != null) {
+                    checkBoxSeleccionar.setSelected(empleadoTable.getAgregar());
+                }
+                checkBoxSeleccionar.setOnAction(event -> {
+                     empleadoTable.setAgregar(checkBoxSeleccionar.isSelected());
+                     contarSelecciones();
+                });
+            }
+        });
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpleadoTable> row = new TableRow<>();

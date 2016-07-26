@@ -9,37 +9,46 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="440.0" maxWidth="700.0" minHeight="440.0" minWidth="700.0" prefHeight="440.0" prefWidth="700.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosSinClienteController">
+<AnchorPane id="AnchorPane" maxHeight="450.0" maxWidth="700.0" minHeight="450.0" minWidth="700.0" prefHeight="450.0" prefWidth="700.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosSinClienteController">
     <children>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="680.0" minHeight="-Infinity" minWidth="680.0" prefHeight="355.0" prefWidth="680.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
-      </TableView>
-      <Label layoutX="318.0" layoutY="10.0" text="Hasta" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Label layoutX="109.0" layoutY="10.0" text="De" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <DatePicker fx:id="pickerDe" layoutX="134.0" layoutY="5.0" promptText="inicio" />
-      <DatePicker fx:id="pickerHasta" layoutX="364.0" layoutY="5.0" promptText="fin" />
       <Accordion layoutX="184.0" layoutY="14.0" />
-      <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
-      <Button layoutX="247.0" layoutY="404.0" mnemonicParsing="false" onAction="#verRol" text="ver rol" />
-      <TextField fx:id="cedulaField" layoutX="80.0" layoutY="404.0" onAction="#verRol" />
-      <Label layoutX="19.0" layoutY="406.0" text="Cedula" textFill="#fffbfb">
+      <TextField fx:id="filterField" layoutX="10.0" layoutY="53.0" prefHeight="25.0" prefWidth="680.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+      <TableView fx:id="empleadosTableView" layoutX="10.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="680.0" minHeight="-Infinity" minWidth="680.0" prefHeight="350.0" prefWidth="680.0" style="-fx-background-color: white;">
+         <columns>
+            <TableColumn fx:id="cedulaColumna" text="Cedula" />
+            <TableColumn fx:id="empleadoColumna" prefWidth="210.0" text="Empleado" />
+            <TableColumn fx:id="cargoColumna" prefWidth="120.0" text="Cargo" />
+            <TableColumn fx:id="diasColumna" prefWidth="65.0" text="Dias" />
+            <TableColumn fx:id="normalesColumna" prefWidth="65.0" text="Horas(N)" />
+            <TableColumn fx:id="sobretiempoColumna" prefWidth="65.0" text="Horas(ST)" />
+            <TableColumn fx:id="recargoColumna" prefWidth="65.0" text="Horas(RC)" />
+         </columns>
+      </TableView>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <Label layoutX="338.0" layoutY="15.0" text="Hasta" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Button layoutX="284.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
-      <Button layoutX="514.0" layoutY="5.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
+      <Label layoutX="129.0" layoutY="15.0" text="De" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="pickerDe" layoutX="154.0" layoutY="10.0" promptText="inicio" />
+      <DatePicker fx:id="pickerHasta" layoutX="384.0" layoutY="10.0" promptText="fin" />
+      <Button layoutX="304.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
+      <Button layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
+      <Button fx:id="buttonAnterior" layoutX="302.0" layoutY="7.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="buttonSiguiente" layoutX="534.0" layoutY="7.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
     </children>
 </AnchorPane>
