@@ -147,7 +147,7 @@ public class EmpresasController implements Initializable {
                 empresa.nombre.set(emp.getNombre());
                 empresa.siglas.set(emp.getSiglas());
                 empresa.numeracion.set(emp.getNumeracion());
-                empresa.diaCortePago.set(emp.getDiaCortePago());
+                empresa.diaCortePago.set(emp.getComienzoMes());
                 empresa.creacion.set(emp.getCreacion().toString());
                 empresa.tipo.set(emp.getTipo());
                 data.set(data.indexOf(empresaTable), empresa);
@@ -172,7 +172,11 @@ public class EmpresasController implements Initializable {
                empresa.nombre.set(emp.getNombre());
                empresa.siglas.set(emp.getSiglas());
                empresa.numeracion.set(emp.getNumeracion());
-               empresa.diaCortePago.set(emp.getDiaCortePago());
+               if (emp.getComienzoMes() == 1)
+                    empresa.diaCortePago.set(30);
+               else 
+                    empresa.diaCortePago.set(emp.getComienzoMes() - 1);
+                   
                empresa.creacion.set(emp.getCreacion().toString());
                empresa.tipo.set(emp.getTipo());
                data.add(empresa);

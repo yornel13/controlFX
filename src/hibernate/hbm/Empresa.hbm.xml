@@ -52,8 +52,8 @@
         <property name="tipo" type="java.lang.String">
             <column name="tipo" />
         </property>
-        <property name="diaCortePago" type="java.lang.Integer">
-            <column name="dia_corte_pago" not-null="true" />
+        <property name="comienzoMes" type="java.lang.Integer">
+            <column name="comienzo_mes" not-null="true" />
         </property>
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />

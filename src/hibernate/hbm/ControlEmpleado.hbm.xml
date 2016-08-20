@@ -19,11 +19,14 @@
         <property name="fecha" type="java.sql.Timestamp">
             <column name="fecha" length="19" not-null="true" />
         </property>
-        <property name="horasSuplementarias" type="java.lang.Double">
-            <column name="horas_suplementarias" />
+        <property name="normales" type="java.lang.Double">
+            <column name="normales" />
         </property>
-        <property name="horasExtras" type="java.lang.Double">
-            <column name="horas_extras" />
+        <property name="recargo" type="java.lang.Double">
+            <column name="recargo" />
+        </property>
+        <property name="sobretiempo" type="java.lang.Double">
+            <column name="sobretiempo" />
         </property>
         <property name="libre" type="java.lang.Boolean">
             <column name="libre" />

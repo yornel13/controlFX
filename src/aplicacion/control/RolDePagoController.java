@@ -393,8 +393,8 @@ public class RolDePagoController implements Initializable {
         controlEmpleado.setLibre(libre);
         controlEmpleado.setFalta(falta);
         controlEmpleado.setUsuario(empleado);
-        controlEmpleado.setHorasExtras(sobreTiempo);
-        controlEmpleado.setHorasSuplementarias(suplementarias);
+        controlEmpleado.setSobretiempo(sobreTiempo);
+        controlEmpleado.setRecargo(suplementarias);
         controlEmpleado.setCliente(cliente);
         controlEmpleadoDAO.save(controlEmpleado);
         setControlEmpleadoInfo(this.empleado, 
@@ -417,11 +417,11 @@ public class RolDePagoController implements Initializable {
             controlEmpleado.setLibre(libre);
             controlEmpleado.setFalta(falto);
             if (libre || falto) {
-                controlEmpleado.setHorasExtras(0d);
-                controlEmpleado.setHorasSuplementarias(0d);
+                controlEmpleado.setSobretiempo(0d);
+                controlEmpleado.setRecargo(0d);
             } else {
-                controlEmpleado.setHorasExtras(sobreTiempo);
-                controlEmpleado.setHorasSuplementarias(suplementarias);
+                controlEmpleado.setSobretiempo(sobreTiempo);
+                controlEmpleado.setRecargo(suplementarias);
             }
             HibernateSessionFactory.getSession().flush();
 
@@ -460,8 +460,8 @@ public class RolDePagoController implements Initializable {
         for (ControlEmpleado control: controlEmpleado) {
             dias = dias + 1;
             normales = normales + 8;
-            sobreTiempo = sobreTiempo + control.getHorasExtras();
-            suplementarias = suplementarias + control.getHorasSuplementarias();
+            sobreTiempo = sobreTiempo + control.getSobretiempo();
+            suplementarias = suplementarias + control.getRecargo();
             
             ControlTable controlTable = new ControlTable();
             
@@ -474,8 +474,8 @@ public class RolDePagoController implements Initializable {
             controlTable.setDia(dateTime.toCalendar(Locale.getDefault())
                             .getDisplayName(Calendar
                                     .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
-            controlTable.setHorasExtras(control.getHorasExtras());
-            controlTable.setHorasSuplementarias(control.getHorasSuplementarias());
+            controlTable.setHorasExtras(control.getSobretiempo());
+            controlTable.setHorasSuplementarias(control.getRecargo());
             controlTable.setUsuarios(empleado);
             if (control.getLibre()) {
                controlTable.setDescanso("Libre"); 

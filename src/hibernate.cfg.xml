@@ -37,5 +37,6 @@
     <mapping resource="hibernate/hbm/PagoMesItem.hbm.xml"/>
     <mapping resource="hibernate/hbm/PagoDecimo.hbm.xml"/>
     <mapping resource="hibernate/hbm/Foto.hbm.xml"/>
+    <mapping resource="hibernate/hbm/Horario.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

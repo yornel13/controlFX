@@ -57,10 +57,16 @@ public class EmpleadoTable {
     private Double decimo4;
     private String detallesD3;
     private String detallesD4;
+    private String cliente;
+    private String horario;
+    private Boolean haveRolCliente;
+    private Boolean haveRolIndividual;
 
     public EmpleadoTable() {
         problem = false;
         agregar = false;
+        haveRolCliente = false;
+        haveRolIndividual = false;
         monto = "0.0";
     }
     
@@ -378,9 +384,36 @@ public class EmpleadoTable {
         this.detallesD4 = detallesD4;
     }
 
-    
+    public String getCliente() {
+        return cliente;
+    }
 
-    
- 
+    public void setCliente(String cliente) {
+        this.cliente = cliente;
+    }
+
+    public String getHorario() {
+        return horario;
+    }
+
+    public void setHorario(String horario) {
+        this.horario = horario;
+    }
+
+    public Boolean getHaveRolCliente() {
+        return haveRolCliente;
+    }
+
+    public void setHaveRolCliente(Boolean haveRolCliente) {
+        this.haveRolCliente = haveRolCliente;
+    }
+
+    public Boolean getHaveRolIndividual() {
+        return haveRolIndividual;
+    }
+
+    public void setHaveRolIndividual(Boolean haveRolIndividual) {
+        this.haveRolIndividual = haveRolIndividual;
+    }
     
 }

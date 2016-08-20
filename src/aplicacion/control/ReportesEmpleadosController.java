@@ -661,10 +661,10 @@ public class ReportesEmpleadosController implements Initializable {
         this.empresa = empresa;
         
         DateTime dateTime = new DateTime(getToday().getTime());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
                 .getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago())
-                .minusMonths(1).plusDays(1).getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .plusMonths(1).minusDays(1).getMillis());
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
         

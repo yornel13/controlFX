@@ -29,7 +29,7 @@ public class Empresa implements java.io.Serializable {
 	private Timestamp ultimaModificacion;
 	private String observacion;
 	private String tipo;
-	private Integer diaCortePago;
+	private Integer comienzoMes;
 	private Boolean activo;
 	private Set detallesEmpleados = new HashSet(0);
 
@@ -41,12 +41,12 @@ public class Empresa implements java.io.Serializable {
 
 	/** minimal constructor */
 	public Empresa(String nombre, String siglas, Timestamp creacion,
-			Timestamp ultimaModificacion, Integer diaCortePago, Boolean activo) {
+			Timestamp ultimaModificacion, Integer comienzoMes, Boolean activo) {
 		this.nombre = nombre;
 		this.siglas = siglas;
 		this.creacion = creacion;
 		this.ultimaModificacion = ultimaModificacion;
-		this.diaCortePago = diaCortePago;
+		this.comienzoMes = comienzoMes;
 		this.activo = activo;
 	}
 
@@ -55,7 +55,7 @@ public class Empresa implements java.io.Serializable {
 			String telefono1, String telefono2, String fax, String email,
 			String direccion, String web, String logo, Timestamp creacion,
 			Timestamp ultimaModificacion, String observacion, String tipo,
-			Integer diaCortePago, Boolean activo, Set detallesEmpleados) {
+			Integer comienzoMes, Boolean activo, Set detallesEmpleados) {
 		this.nombre = nombre;
 		this.siglas = siglas;
 		this.numeracion = numeracion;
@@ -70,7 +70,7 @@ public class Empresa implements java.io.Serializable {
 		this.ultimaModificacion = ultimaModificacion;
 		this.observacion = observacion;
 		this.tipo = tipo;
-		this.diaCortePago = diaCortePago;
+		this.comienzoMes = comienzoMes;
 		this.activo = activo;
 		this.detallesEmpleados = detallesEmpleados;
 	}
@@ -197,13 +197,13 @@ public class Empresa implements java.io.Serializable {
 		this.tipo = tipo;
 	}
 
-	public Integer getDiaCortePago() {
-		return this.diaCortePago;
-	}
+        public Integer getComienzoMes() {
+            return comienzoMes;
+        }
 
-	public void setDiaCortePago(Integer diaCortePago) {
-		this.diaCortePago = diaCortePago;
-	}
+        public void setComienzoMes(Integer comienzoMes) {
+            this.comienzoMes = comienzoMes;
+        }
 
 	public Boolean getActivo() {
 		return this.activo;

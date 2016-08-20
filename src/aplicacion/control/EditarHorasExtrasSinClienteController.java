@@ -6,8 +6,6 @@
 package aplicacion.control;
 
 import static aplicacion.control.util.Numeros.round;
-import hibernate.dao.ClienteDAO;
-import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -17,10 +15,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -29,7 +25,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -167,8 +162,8 @@ public class EditarHorasExtrasSinClienteController implements Initializable {
     public void setControlEmpleado(ControlEmpleado controlEmpleado) {
         this.controlEmpleado = controlEmpleado;
         
-        sobreTiempo.setText(this.controlEmpleado.getHorasExtras().toString());
-        suplementarias.setText(this.controlEmpleado.getHorasSuplementarias().toString());
+        sobreTiempo.setText(this.controlEmpleado.getSobretiempo().toString());
+        suplementarias.setText(this.controlEmpleado.getRecargo().toString());
         datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
         if (controlEmpleado.getLibre()) {
             marcarLibre.setSelected(true);

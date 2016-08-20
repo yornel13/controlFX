@@ -17,8 +17,9 @@ public class ControlEmpleado implements java.io.Serializable {
 	private Usuario usuario;
 	private Cliente cliente;
 	private Timestamp fecha;
-	private Double horasSuplementarias;
-	private Double horasExtras;
+	private Double normales;
+        private Double recargo;
+	private Double sobretiempo;
 	private Boolean libre;
         private Boolean vacaciones;
         private Boolean falta;
@@ -40,13 +41,10 @@ public class ControlEmpleado implements java.io.Serializable {
 
 	/** full constructor */
 	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha,
-			Double horasSuplementarias, Double horasExtras,
 			Boolean libre, Boolean vacaciones) {
 		this.usuario = usuario;
 		this.cliente = cliente;
 		this.fecha = fecha;
-		this.horasSuplementarias = horasSuplementarias;
-		this.horasExtras = horasExtras;
 		this.libre = libre;
 		this.vacaciones = vacaciones;
 	}
@@ -85,20 +83,28 @@ public class ControlEmpleado implements java.io.Serializable {
 		this.fecha = fecha;
 	}
 
-	public Double getHorasSuplementarias() {
-		return round(this.horasSuplementarias);
-	}
+        public Double getNormales() {
+            return normales;
+        }
 
-	public void setHorasSuplementarias(Double horasSuplementarias) {
-		this.horasSuplementarias = horasSuplementarias;
-	}
+        public void setNormales(Double normales) {
+            this.normales = normales;
+        }
 
-	public Double getHorasExtras() {
-		return round(this.horasExtras);
-	}
+        public Double getRecargo() {
+            return recargo;
+        }
 
-	public void setHorasExtras(Double horasExtras) {
-		this.horasExtras = horasExtras;
+        public void setRecargo(Double recargo) {
+            this.recargo = recargo;
+        }
+
+        public Double getSobretiempo() {
+            return sobretiempo;
+        }
+
+        public void setSobretiempo(Double sobretiempo) {
+            this.sobretiempo = sobretiempo;
         }
 
         public Boolean getLibre() {

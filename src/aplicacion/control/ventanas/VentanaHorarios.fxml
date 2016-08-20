@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorariosController">
+    <children>
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Button fx:id="buttonAgregar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#agregarHorario" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/agregar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Label alignment="CENTER" contentDisplay="CENTER" layoutX="226.0" layoutY="16.0" prefHeight="17.0" prefWidth="349.0" text="Horarios" textFill="WHITE">
+               <font>
+                  <Font name="Arial Rounded MT Bold" size="18.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+      <TableView fx:id="horariosTableView" layoutX="12.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="489.0" prefWidth="770.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="lapsoColumna" prefWidth="135.0" style="-fx-alignment: center;" text="Lapso" />
+            <TableColumn fx:id="nombreColumna" prefWidth="150.0" style="-fx-alignment: center;" text="Nombre" />
+            <TableColumn fx:id="efectivasColumna" prefWidth="105.0" style="-fx-alignment: center;" text="Horas Efectivas" />
+            <TableColumn fx:id="normalesColumna" prefWidth="100.0" style="-fx-alignment: center;" text="Horas (N)" />
+            <TableColumn fx:id="sobretiempoColumna" prefWidth="100.0" style="-fx-alignment: center;" text="Horas (ST)" />
+            <TableColumn fx:id="recargoColumna" prefWidth="105.0" style="-fx-alignment: center;" text="Horas (RC)" />
+            <TableColumn fx:id="borrarColumna" prefWidth="65.0" style="-fx-alignment: center;" text="Borrar" />
+        </columns>
+      </TableView>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+        <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: white;">
+            <children>
+               <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <Button fx:id="login" layoutX="725.0" layoutY="2.0" maxHeight="25.0" mnemonicParsing="false" onAction="#onClickLoginButton" prefHeight="25.0" prefWidth="75.0" style="-fx-background-color: transparent;" text="Ingresar" underline="true">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Button>
+            </children>
+         </Pane>
+    </children>
+</AnchorPane>

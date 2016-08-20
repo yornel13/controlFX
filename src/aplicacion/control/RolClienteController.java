@@ -248,9 +248,9 @@ public class RolClienteController implements Initializable {
     @FXML
     public void onClickMore(ActionEvent event) {
         pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()); 
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
         setTableInfo(inicio, fin);
         
     }
@@ -258,7 +258,7 @@ public class RolClienteController implements Initializable {
     @FXML
     public void onClickLess(ActionEvent event)  {
         pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
         setTableInfo(inicio, fin);
@@ -372,8 +372,10 @@ public class RolClienteController implements Initializable {
         DateTime dateTime;
         
         dateTime = new DateTime(getToday().getTime());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .plusMonths(1).minusDays(1).getMillis());
 
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));

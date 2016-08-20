@@ -27,7 +27,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -169,8 +168,8 @@ public class EditarHorasExtrasClienteController implements Initializable {
         this.controlEmpleado = controlEmpleado;
         this.cliente = controlEmpleado.getCliente();
         
-        sobreTiempo.setText(this.controlEmpleado.getHorasExtras().toString());
-        suplementarias.setText(this.controlEmpleado.getHorasSuplementarias().toString());
+        sobreTiempo.setText(this.controlEmpleado.getSobretiempo().toString());
+        suplementarias.setText(this.controlEmpleado.getRecargo().toString());
         datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
         if (controlEmpleado.getLibre()) {
             marcarLibre.setSelected(true);

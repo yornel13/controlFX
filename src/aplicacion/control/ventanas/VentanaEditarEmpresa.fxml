@@ -22,7 +22,6 @@
       <TextField fx:id="faxField" layoutX="113.0" layoutY="233.0" prefHeight="25.0" prefWidth="440.0" promptText="Fax (Opcional)" />
       <TextField fx:id="direccionField" layoutX="113.0" layoutY="273.0" prefHeight="25.0" prefWidth="440.0" promptText="Direccion" />
       <TextField fx:id="emailField" layoutX="113.0" layoutY="313.0" prefHeight="25.0" prefWidth="440.0" promptText="Email" />
-      <TextField fx:id="diaCorteField" layoutX="113.0" layoutY="353.0" onAction="#onCLickGuardar" prefHeight="25.0" prefWidth="115.0" promptText="Dia de pago (1-30)" />
       <Button fx:id="guardarButton" layoutX="199.0" layoutY="423.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
       <Label layoutX="25.0" layoutY="118.0" text="RUC" textFill="WHITE" />
       <Label layoutX="25.0" layoutY="158.0" text="Telefono" textFill="WHITE" />
@@ -36,6 +35,7 @@
             <Font name="Comic Sans MS" size="14.0" />
          </font>
       </Label>
-      <Label layoutX="26.0" layoutY="357.0" text="Dia de corte" textFill="WHITE" />
+      <Label layoutX="26.0" layoutY="357.0" text="Comienzo del Mes" textFill="WHITE" />
+      <TextField fx:id="diaCorteField" layoutX="144.0" layoutY="353.0" onAction="#onCLickGuardar" prefHeight="25.0" prefWidth="159.0" promptText="Dia de inicio del mes (1-28)" />
    </children>
 </AnchorPane>

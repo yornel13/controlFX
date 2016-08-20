@@ -95,7 +95,7 @@ public class EditarEmpresaController implements Initializable {
         faxField.setText(empresa.getFax());
         direccionField.setText(empresa.getDireccion());
         emailField.setText(empresa.getEmail());
-        diaCorteField.setText(empresa.getDiaCortePago().toString());
+        diaCorteField.setText(empresa.getComienzoMes().toString());
     }
    
     @FXML
@@ -139,7 +139,7 @@ public class EditarEmpresaController implements Initializable {
             empresa.setWeb(webField.getText());
             empresa.setEmail(emailField.getText());
             empresa.setUltimaModificacion(new Timestamp(new Date().getTime()));
-            empresa.setDiaCortePago(Integer.parseInt(diaCorteField.getText()));
+            empresa.setComienzoMes(Integer.parseInt(diaCorteField.getText()));
             
             confirmarGuardado();
         }

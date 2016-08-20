@@ -147,11 +147,21 @@ public class InEmpresaController implements Initializable {
             buttonHoras.getItems().add(menuItemEmpleado);
             MenuItem menuItemCliente = new MenuItem("Por Cliente");
             buttonHoras.getItems().add(menuItemCliente);
+            MenuItem menuItemNuevo = new MenuItem("Testing");
+            buttonHoras.getItems().add(menuItemNuevo);
+            MenuItem menuItemHorarios = new MenuItem("Horarios");
+            buttonHoras.getItems().add(menuItemHorarios);
             menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
             });
-             menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
+            menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
+            });
+            menuItemNuevo.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarHorasEmpleadosPorDia(empresa, stagePrincipal);
+            });
+            menuItemHorarios.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarHorarios(empresa, stagePrincipal);
             });
             buttonHoras.setOnMouseEntered((MouseEvent t) -> {
                 buttonHoras.setStyle("-fx-background-color: #E0E0E0;");

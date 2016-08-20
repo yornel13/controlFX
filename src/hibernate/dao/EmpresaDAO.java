@@ -38,7 +38,6 @@ public class EmpresaDAO extends BaseHibernateDAO {
 	public static final String LOGO = "logo";
 	public static final String OBSERVACION = "observacion";
 	public static final String TIPO = "tipo";
-	public static final String DIA_CORTE_PAGO = "diaCortePago";
 	public static final String ACTIVO = "activo";
 
 	public void save(Empresa transientInstance) {
@@ -158,10 +157,6 @@ public class EmpresaDAO extends BaseHibernateDAO {
 
 	public List findByTipo(Object tipo) {
 		return findByProperty(TIPO, tipo);
-	}
-
-	public List findByDiaCortePago(Object diaCortePago) {
-		return findByProperty(DIA_CORTE_PAGO, diaCortePago);
 	}
 
 	public List findByActivo(Object activo) {

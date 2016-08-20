@@ -111,7 +111,7 @@ public class EmpresaController implements Initializable {
         telefono2.setText(empresa.getTelefono2());
         fax.setText(empresa.getFax());
         email.setText(empresa.getEmail());
-        diaCorte.setText(empresa.getDiaCortePago() + " de cada mes");
+        diaCorte.setText(empresa.getComienzoMes().toString());
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         ArrayList<Usuario> empleados = new ArrayList<>();
         empleados.addAll(usuariosDAO.findAllByEmpresaIdActivo(empresa.getId()));

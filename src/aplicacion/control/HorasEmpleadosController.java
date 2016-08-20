@@ -112,7 +112,7 @@ public class HorasEmpleadosController implements Initializable {
     @FXML
     public void onClickMore(ActionEvent event) {
         pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
         mostrarRegistro(null);
@@ -121,10 +121,27 @@ public class HorasEmpleadosController implements Initializable {
     @FXML
     public void onClickLess(ActionEvent event) {
         pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
         mostrarRegistro(null);
+    }
+    
+     public void setEmpresa(Empresa empresa) throws ParseException {
+        this.empresa = empresa;
+        
+        DateTime dateTime = new DateTime(getToday().getTime());
+        
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .plusMonths(1).minusDays(1).getMillis());
+        
+        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        
+        setTableInfo(empresa, inicio, fin);
+        
     }
     
     @FXML
@@ -148,21 +165,6 @@ public class HorasEmpleadosController implements Initializable {
         stagePrincipal.close();
     } 
     
-    public void setEmpresa(Empresa empresa) throws ParseException {
-        this.empresa = empresa;
-        
-        DateTime dateTime = new DateTime(getToday().getTime());
-           
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
-        
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
-        
-        setTableInfo(empresa, inicio, fin);
-        
-    }
-    
     @FXML
     private void mostrarRegistro(ActionEvent event) {
         if (pickerDe.getValue() == null) {
@@ -172,8 +174,8 @@ public class HorasEmpleadosController implements Initializable {
         } else if (pickerDe.getValue().isAfter(pickerHasta.getValue())){
             errorText.setText("Fechas incorrectas");
         } else {  
-            Timestamp fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
-            Timestamp inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
+            fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+            inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
             setTableInfo(empresa, inicio, fin);
         }
     } 
@@ -218,8 +220,8 @@ public class HorasEmpleadosController implements Initializable {
                     if (!control.getFalta()) {
                         dias = dias + 1;
                         normales = normales + 8d;
-                        sobreTiempo = sobreTiempo + control.getHorasExtras();
-                        suplementarias = suplementarias + control.getHorasSuplementarias();
+                        sobreTiempo = sobreTiempo + control.getSobretiempo();
+                        suplementarias = suplementarias + control.getRecargo();
                     }
                 }
                

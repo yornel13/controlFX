@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosPorDiaController">
+    <children>
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="51.0" prefHeight="25.0" prefWidth="600.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Accordion layoutX="208.0" layoutY="21.0" />
+            <DatePicker fx:id="pickerDia" layoutX="104.0" layoutY="12.0" onAction="#mostrarFecha" promptText="dia" />
+            <Button fx:id="buttonSiguiente" layoutX="278.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonAnterior" layoutX="75.0" layoutY="9.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Label fx:id="fechaLabel" alignment="CENTER" layoutX="374.0" layoutY="16.0" prefHeight="17.0" prefWidth="228.0" text="Fecha" textFill="#fffbfb">
+               <font>
+                  <Font name="Arial Rounded MT Bold" size="14.0" />
+               </font>
+            </Label>
+            <Button fx:id="buttonHorario" layoutX="684.0" layoutY="10.0" mnemonicParsing="false" onAction="#cambiarHorarioVarios" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/icon_reloj.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+         </children>
+      </Pane>
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
+        <columns>
+            <TableColumn fx:id="cedulaColumna" text="Cedula" />
+            <TableColumn fx:id="empleadoColumna" prefWidth="170.0" text="Empleado" />
+            <TableColumn fx:id="cargoColumna" maxWidth="80.0" prefWidth="80.0" text="Cargo" />
+            <TableColumn fx:id="normalesColumna" prefWidth="65.0" style="-fx-alignment: CENTER;" text="Horas(N)" />
+            <TableColumn fx:id="sobretiempoColumna" prefWidth="65.0" style="-fx-alignment: CENTER;" text="Horas(ST)" />
+            <TableColumn fx:id="recargoColumna" prefWidth="65.0" style="-fx-alignment: CENTER;" text="Horas(RC)" />
+            <TableColumn fx:id="horarioColumna" prefWidth="75.0" style="-fx-alignment: CENTER;" text="Horario" />
+            <TableColumn fx:id="clienteColumna" prefWidth="130.0" style="-fx-alignment: CENTER;" text="Cliente" />
+            <TableColumn fx:id="marcarColumna" prefWidth="30.0" style="-fx-alignment: CENTER;" text="*" />
+        </columns>
+      </TableView>
+        <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
+            <children>
+               <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <Button fx:id="login" layoutX="725.0" layoutY="2.0" maxHeight="25.0" mnemonicParsing="false" onAction="#onClickLoginButton" prefHeight="25.0" prefWidth="75.0" style="-fx-background-color: transparent;" text="Ingresar" underline="true">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Button>
+            </children>
+         </Pane>
+      <Label layoutX="698.0" layoutY="58.0" text="Todos" textFill="#fffbfb">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="14.0" />
+         </font>
+      </Label>
+      <CheckBox fx:id="checkBoxMarcarTodos" layoutX="746.0" layoutY="58.0" mnemonicParsing="false" onAction="#marcarTodos" />
+      <Label fx:id="contador" alignment="CENTER" layoutX="261.0" layoutY="550.0" prefHeight="17.0" prefWidth="272.0">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="12.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

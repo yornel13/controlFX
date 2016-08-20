@@ -122,7 +122,7 @@ public class RegistrarEmpresaController implements Initializable {
             empresa.setActivo(Boolean.TRUE);
             empresa.setCreacion(new Timestamp(new Date().getTime()));
             empresa.setUltimaModificacion(new Timestamp(new Date().getTime()));
-            empresa.setDiaCortePago(Integer.parseInt(diaCorteField.getText()));
+            empresa.setComienzoMes(Integer.parseInt(diaCorteField.getText()));
             empresa.setTipo("Seguridad");
             EmpresaDAO empresaDAO = new EmpresaDAO();
             empresaDAO.save(empresa);
@@ -159,7 +159,7 @@ public class RegistrarEmpresaController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         diaCorteField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        diaCorteField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(30));
+        diaCorteField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(28));
         
         numeracionField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
         numeracionField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(999999999));

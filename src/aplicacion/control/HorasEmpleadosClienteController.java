@@ -14,7 +14,6 @@ import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
@@ -24,7 +23,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
@@ -37,7 +38,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -118,16 +118,16 @@ public class HorasEmpleadosClienteController implements Initializable {
     @FXML
     public void onClickMore(ActionEvent event) {
         pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());   
         setTableInfo(empresa, inicio, fin);
     }
     
     @FXML
     public void onClickLess(ActionEvent event) {
         pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerHasta.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
         inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
         fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
         setTableInfo(empresa, inicio, fin);
@@ -139,8 +139,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         DateTime dateTime = new DateTime(getToday().getTime());
            
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes()).getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes()).plusMonths(1).minusDays(1).getMillis());
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -170,23 +170,27 @@ public class HorasEmpleadosClienteController implements Initializable {
         usuarios = new ArrayList<>();
         usuarios.addAll(usuariosDAO.findByEmpresaId(empresa.getId()));
         
+        data = FXCollections.observableArrayList();
+        
         if (!usuarios.isEmpty()) {
             
            ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
-           data = FXCollections.observableArrayList(); 
+            
+           List<ControlEmpleado> controlEmpleados = controlDAO
+                   .findAllByClienteIdInDeterminateTime(cliente.getId(), inicio, fin);
            
            usuarios.stream().map((user) -> {
-               Integer dias = 0;
-               Double normales = 0d;
-               Double sobreTiempo = 0d;
-               Double suplementarias = 0d;
-                for (ControlEmpleado control: controlDAO
-                        .findAllByEmpleadoIdClienteIdInDeterminateTime(
-                               user.getId(), cliente.getId(), inicio, fin)) {
-                    dias = dias + 1;
-                    normales = normales + 8d;
-                    sobreTiempo = sobreTiempo + control.getHorasExtras();
-                    suplementarias = suplementarias + control.getHorasSuplementarias();
+                Integer dias = 0;
+                Double normales = 0d;
+                Double sobreTiempo = 0d;
+                Double suplementarias = 0d;
+                for (ControlEmpleado control: controlEmpleados) {
+                    if (Objects.equals(user.getId(), control.getUsuario().getId())) {
+                        dias += 1;
+                        normales += 8d;
+                        sobreTiempo += control.getSobretiempo();
+                        suplementarias += control.getRecargo();
+                    }
                 }
                 EmpleadoTable empleado = new EmpleadoTable();
                 empleado.setId(user.getId());

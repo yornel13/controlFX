@@ -200,6 +200,44 @@ public class RolClienteDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<RolCliente>) result;
         }
+        
+        public List<RolCliente> findAllByEntreFechaAndEmpresaId(Timestamp fecha, 
+                Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_cliente "
+                            + "JOIN usuario "
+                            + "ON usuario.id = rol_cliente.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where inicio <= :fecha "
+                            + "and finalizo >= :fecha "
+                            + "and empresa_id = :empresa_id")
+                    .addEntity(RolCliente.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<RolCliente>) result;
+        }
+        
+        public List<RolCliente> findAllByEntreFechaAndEmpresaIdAndEmpleadoId(Timestamp fecha, 
+                Integer empresaId, Integer usuarioId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_cliente "
+                            + "JOIN usuario "
+                            + "ON usuario.id = rol_cliente.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where inicio <= :fecha "
+                            + "and finalizo >= :fecha "
+                            + "and empresa_id = :empresa_id "
+                            + "and usuario_id = :usuario_id")
+                    .addEntity(RolCliente.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("empresa_id", empresaId)
+                    .setParameter("usuario_id", usuarioId);
+            Object result = query.list();
+            return (List<RolCliente>) result;
+        }
 
 	public List findByProperty(String propertyName, Object value) {
 		log.debug("finding Pago instance with property: " + propertyName

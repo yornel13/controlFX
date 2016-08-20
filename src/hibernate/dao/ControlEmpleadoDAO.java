@@ -26,8 +26,9 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 	private static final Logger log = LoggerFactory
 			.getLogger(ControlEmpleadoDAO.class);
 	// property constants
-	public static final String HORAS_SUPLEMENTARIAS = "horasSuplementarias";
-	public static final String HORAS_EXTRAS = "horasExtras";
+        public static final String NORMALES = "normales";
+	public static final String SOBRETIEMPO = "sobretiempo";
+	public static final String RECARGO = "recargo";
 
 	public void save(ControlEmpleado transientInstance) {
 		log.debug("saving ControlEmpleado instance");
@@ -107,6 +108,19 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
                 return (List<ControlEmpleado>) result;
 	}
         
+        public List<ControlEmpleado> findAllByClienteIdInDeterminateTime(
+                Integer clienteId, Timestamp inicio, Timestamp fin) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado WHERE cliente_id = :cliente_id "
+                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("cliente_id", clienteId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+                Object result = query.list();
+                return (List<ControlEmpleado>) result;
+	}
+        
         public List<ControlEmpleado> findAllByEmpleadoIdSinClienteInDeterminateTime(
                 Integer usuarioId, Timestamp inicio, Timestamp fin) {
 		Query query = getSession().
@@ -120,6 +134,18 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
                 return (List<ControlEmpleado>) result;
 	}
         
+        public List<ControlEmpleado> findAllBySinClienteInDeterminateTime(
+                Timestamp inicio, Timestamp fin) {
+            Query query = getSession().
+                createSQLQuery("SELECT * FROM control_empleado WHERE cliente_id is null "
+                        + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                .addEntity(ControlEmpleado.class)
+                .setParameter("inicio", inicio)
+                .setParameter("fin", fin);
+            Object result = query.list();
+            return (List<ControlEmpleado>) result;
+	}
+        
         public ControlEmpleado findByFecha(Timestamp fecha, Integer usuarioId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM control_empleado where fecha = :fecha "
@@ -129,6 +155,33 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
                     .setParameter("usuario_id", usuarioId);
             Object result = query.uniqueResult();
             return (ControlEmpleado) result;
+        }
+        
+        public List<ControlEmpleado> findAllByFechaAndEmpresaId(Timestamp fecha, 
+                Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "JOIN usuario "
+                            + "ON usuario.id = control_empleado.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where fecha = :fecha "
+                            + "and empresa_id = :empresa_id")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<ControlEmpleado>) result;
+        }
+        
+        public List<ControlEmpleado> findAllByUltimosRegistros() {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM "
+                            + "(SELECT distinct * FROM control_empleado ORDER BY id DESC) "
+                            + "AS t1 group by usuario_id")
+                    .addEntity(ControlEmpleado.class);
+            Object result = query.list();
+            return (List<ControlEmpleado>) result;
         }
 
 	public List findByExample(ControlEmpleado instance) {
@@ -160,12 +213,12 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public List findByHorasSuplementarias(Object horasSuplementarias) {
-		return findByProperty(HORAS_SUPLEMENTARIAS, horasSuplementarias);
+	public List findByRecargo(Object recargo) {
+		return findByProperty(RECARGO, recargo);
 	}
 
-	public List findByHorasExtras(Object horasExtras) {
-		return findByProperty(HORAS_EXTRAS, horasExtras);
+	public List findBySobretiempo(Object sobretiempo) {
+		return findByProperty(SOBRETIEMPO, sobretiempo);
 	}
 
 	public List findAll() {

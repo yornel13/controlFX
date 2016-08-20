@@ -114,8 +114,10 @@ public class PagosEmpleadosController implements Initializable {
         
         DateTime dateTime = new DateTime(getToday().getTime());
            
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).getMillis());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getDiaCortePago()).minusMonths(1).plusDays(1).getMillis());
+        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .getMillis());
+        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                .plusMonths(1).minusDays(1).getMillis());
         
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -177,8 +179,8 @@ public class PagosEmpleadosController implements Initializable {
                 for (ControlEmpleado control: controlDAO.findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio, fin)) {
                     dias = dias + 1;
                     normales = normales + 8d;
-                    sobreTiempo = sobreTiempo + control.getHorasExtras();
-                    suplementarias = suplementarias + control.getHorasSuplementarias();
+                    sobreTiempo = sobreTiempo + control.getSobretiempo();
+                    suplementarias = suplementarias + control.getRecargo();
                 }
                
                 EmpleadoTable empleado = new EmpleadoTable();
