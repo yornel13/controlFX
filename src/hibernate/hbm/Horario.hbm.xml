@@ -31,5 +31,8 @@
         <property name="creacion" type="java.sql.Timestamp">
             <column name="creacion" length="19" not-null="true" />
         </property>
+        <property name="medioDia" type="java.lang.Boolean">
+      <column name="medio_dia" not-null="true"/>
+    </property>
     </class>
 </hibernate-mapping>

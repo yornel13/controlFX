@@ -94,9 +94,6 @@ public class DeudasEmpleadosController implements Initializable {
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
     private TableView empleadosTableView;

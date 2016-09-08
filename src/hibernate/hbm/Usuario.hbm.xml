@@ -117,5 +117,11 @@
       </key>
       <one-to-many class="hibernate.model.Foto"/>
     </set>
+     <set inverse="true" name="planillaIesses">
+      <key>
+        <column name="usuario_id" not-null="true"/>
+      </key>
+      <one-to-many class="hibernate.model.PlanillaIess"/>
+    </set>
   </class>
 </hibernate-mapping>

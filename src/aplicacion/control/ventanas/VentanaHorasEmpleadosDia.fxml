@@ -15,7 +15,7 @@
          <children>
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
-            <TextField fx:id="filterField" layoutX="70.0" layoutY="51.0" prefHeight="25.0" prefWidth="600.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="56.0" prefHeight="25.0" prefWidth="613.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo, departamento ó cliente)." />
             <Accordion layoutX="208.0" layoutY="21.0" />
             <DatePicker fx:id="pickerDia" layoutX="104.0" layoutY="12.0" onAction="#mostrarFecha" promptText="dia" />
             <Button fx:id="buttonSiguiente" layoutX="278.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
@@ -28,7 +28,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Button>
-            <Label fx:id="fechaLabel" alignment="CENTER" layoutX="374.0" layoutY="16.0" prefHeight="17.0" prefWidth="228.0" text="Fecha" textFill="#fffbfb">
+            <Label fx:id="fechaLabel" alignment="CENTER" layoutX="355.0" layoutY="19.0" prefHeight="17.0" prefWidth="228.0" text="Fecha" textFill="#fffbfb">
                <font>
                   <Font name="Arial Rounded MT Bold" size="14.0" />
                </font>
@@ -74,5 +74,9 @@
             <Font name="Arial Rounded MT Bold" size="12.0" />
          </font>
       </Label>
+      <Button fx:id="buttonBorrar" layoutX="624.0" layoutY="10.0" mnemonicParsing="false" onAction="#borrarHorarios" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/icon_borrar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Button fx:id="leyenda1" layoutX="30.0" layoutY="552.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: #A5D6A7; -fx-border-color: #000000;" />
+      <Button fx:id="leyenda2" layoutX="60.0" layoutY="552.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: #dddddd7; -fx-border-color: #000000;" />
+      <Button fx:id="leyenda3" layoutX="90.0" layoutY="552.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #000000;" />
     </children>
 </AnchorPane>

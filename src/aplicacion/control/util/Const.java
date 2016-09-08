@@ -57,6 +57,7 @@ public class Const {
     public static final String REPORTE_PAGO_DECIMO_CUARTO = "report/pago_decimo_cuarto.jrxml";
     public static final String REPORTE_DECIMO_TERCERO_TOTAL_EMPLEADO = "report/decimo_tercero_total_empleado.jrxml";
     public static final String REPORTE_DECIMO_CUARTO_TOTAL_EMPLEADO = "report/decimo_cuarto_total_empleado.jrxml";
+    public static final String REPORTE_PLANILLA_IESS_EMPLEADOS = "report/planilla_iess_varios.jrxml";
     
     //Reportes nuevos de gestion
     public static final String REPORTE_SUMATORIA_HORAS = "report/reporte_horas_extras.jrxml";
@@ -85,6 +86,12 @@ public class Const {
     // Mensaje
     public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";
     
-  
-   
+    //Casos en Horarios
+    public static final String TRABAJO = "T"; 
+    public static final String LIBRE = "L";
+    public static final String FALTA = "F";
+    public static final String VACACIONES = "V";
+    public static final String PERMISO = "P";
+    public static final String DM = "D";  // Descanso Medico
+    public static final String CM = "C";  // Cita Medica
 }

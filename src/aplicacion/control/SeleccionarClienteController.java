@@ -63,6 +63,8 @@ public class SeleccionarClienteController implements Initializable {
     
     private HorarioEmpleadoController horarioEmpleadoController;
     
+    private HorarioEmpleadoClienteController horarioEmpleadoClienteController;
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -75,10 +77,18 @@ public class SeleccionarClienteController implements Initializable {
             horarioEmpleadoController) {
         this.horarioEmpleadoController = horarioEmpleadoController;
     }
+    
+    public void setHorarioEmpleadoController(HorarioEmpleadoClienteController 
+            horarioEmpleadoClienteController) {
+        this.horarioEmpleadoClienteController = horarioEmpleadoClienteController;
+    }
   
     private void returnCliente(Cliente cliente) {
         stagePrincipal.close();
-        horarioEmpleadoController.setCliente(cliente);
+        if (horarioEmpleadoController != null)
+            horarioEmpleadoController.setCliente(cliente);
+        else if (horarioEmpleadoClienteController != null)
+            horarioEmpleadoClienteController.setCliente(cliente);
     }
     
     public void setClientes(List<Cliente> clientes) {

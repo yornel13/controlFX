@@ -6,10 +6,12 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.HorarioDAO;
@@ -34,8 +36,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
@@ -52,8 +59,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -61,14 +71,19 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.joda.time.DateTime;
 
@@ -78,7 +93,7 @@ import org.joda.time.DateTime;
  */
 public class HorasEmpleadosPorDiaController implements Initializable {
     
-    private AplicacionControl aplicacionControl;
+    public AplicacionControl aplicacionControl;
     
     private Empresa empresa;
     
@@ -117,6 +132,9 @@ public class HorasEmpleadosPorDiaController implements Initializable {
     
     @FXML
     private Button buttonHorario;
+    
+    @FXML
+    private Button buttonBorrar;
     
     @FXML
     private Button buttonAnterior;
@@ -159,6 +177,17 @@ public class HorasEmpleadosPorDiaController implements Initializable {
     List<Cliente> clientes;
     
     List<RolCliente> rolClientes;
+    
+    Dialog<Void> dialog;
+    
+    @FXML
+    private Button leyenda1;
+    
+    @FXML
+    private Button leyenda2;
+    
+    @FXML
+    private Button leyenda3;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -297,6 +326,126 @@ public class HorasEmpleadosPorDiaController implements Initializable {
         contarSelecciones();
     }
     
+    @FXML
+    public void borrarHorarios(ActionEvent event) {
+        if (!contador.getText().equals("")) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            MaterialDesignButtonBlue buttonOk = new MaterialDesignButtonBlue("Si");
+            MaterialDesignButtonBlue buttonNo = new MaterialDesignButtonBlue("no");
+            HBox hBox = HBoxBuilder.create()
+                    .spacing(10.0) //In case you are using HBoxBuilder
+                    .padding(new Insets(5, 5, 5, 5))
+                    .alignment(Pos.CENTER)
+                    .children(buttonOk, buttonNo)
+                    .build();
+            hBox.maxWidth(120);
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+            children(new Text("¿Seguro que desea borrar estos horarios?"), hBox).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            buttonOk.setMinWidth(50);
+            buttonNo.setMinWidth(50);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                borrarHorarios();
+                dialogStage.close();
+            });
+            buttonNo.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.showAndWait();
+        } else {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class
+                    .getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new MaterialDesignButtonBlue("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+            children(new Text("No has seleccionado ningun horario para eliminar."), 
+                    buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            dialogStage.show();
+            buttonOk.setMaxWidth(60);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
+        }
+    }
+    
+    private void loadingMode(){
+        dialog = new Dialog<>();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(stagePrincipal);//stage here is the stage of your webview
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        Label loader = new Label("   Cargando, por favor espere...");
+        loader.setContentDisplay(ContentDisplay.LEFT);
+        loader.setGraphic(new ProgressIndicator());
+        dialog.getDialogPane().setGraphic(loader);
+        dialog.getDialogPane().setStyle("-fx-background-color: #E0E0E0;");
+        dialog.getDialogPane().setPrefSize(250, 75);
+        DropShadow ds = new DropShadow();
+        ds.setOffsetX(1.3); 
+        ds.setOffsetY(1.3); 
+        ds.setColor(Color.DARKGRAY);
+        dialog.getDialogPane().setEffect(ds);
+        dialog.show();
+    }
+    
+    public void closeDialogMode() {
+        if (dialog != null) {
+           Stage toClose = (Stage) dialog.getDialogPane()
+                   .getScene().getWindow();
+           toClose.close();
+           dialog.close();
+           dialog = null;
+        }
+    }
+    
+    public void borrarHorarios() {
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new HorasEmpleadosPorDiaController.DataBaseThread(1);
+        executor.execute(worker);
+        executor.shutdown();
+
+        loadingMode();
+    }
+    
+    public void updateWindows() {
+        closeDialogMode();
+        borradoCompletado();
+    }
+    
+    public void borradoCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new MaterialDesignButtonBlue("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se borraron los horarios con exito."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setMaxWidth(50);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+    }
+    
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
         
@@ -363,7 +512,7 @@ public class HorasEmpleadosPorDiaController implements Initializable {
             for (EmpleadoTable empleadoTable: data) {
                 if(Objects.equals(empleadoTable.getId(), user.getId())) {
                     EmpleadoTable empleado = new EmpleadoTable();
-                    Integer dias = 0;
+                    Double dias = 0d;
                     Double normales = 0d;
                     Double sobreTiempo = 0d;
                     Double suplementarias = 0d;
@@ -376,10 +525,18 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                         empleado.setCliente(controlEmpleado.getCliente().getNombre());
                     
                     empleado.setHorario("No guardado");
-                    if (controlEmpleado.getLibre()) {
+                    if (controlEmpleado.getCaso().equals(Const.LIBRE)) {
                         empleado.setHorario("Libre");
-                    } else if (controlEmpleado.getFalta()) {
+                    } else if (controlEmpleado.getCaso().equals(Const.FALTA)) {
                         empleado.setHorario("Falta");
+                    } else if (controlEmpleado.getCaso().equals(Const.VACACIONES)) {
+                        empleado.setHorario("Vacaciones");
+                    } else if (controlEmpleado.getCaso().equals(Const.PERMISO)) {
+                        empleado.setHorario("Permiso");
+                    } else if (controlEmpleado.getCaso().equals(Const.DM)) {
+                        empleado.setHorario("D. Medico");
+                    } else if (controlEmpleado.getCaso().equals(Const.CM)) {
+                        empleado.setHorario("C. Medica");
                     } else {
                         for (Horario horario: horarios) {
                             if (horario.getNormales().equals(controlEmpleado.getNormales())
@@ -456,24 +613,34 @@ public class HorasEmpleadosPorDiaController implements Initializable {
             
             usuarios.stream().map((user) -> {
                 EmpleadoTable empleado = new EmpleadoTable();
-                Integer dias = 0;
                 Double normales = 0d;
                 Double sobreTiempo = 0d;
                 Double suplementarias = 0d;
                 for (ControlEmpleado control: controlEmpleados) {
                     if (Objects.equals(user.getId(), control.getUsuario().getId())) {
-                        dias += 1;
                         normales += control.getNormales();
                         sobreTiempo += control.getSobretiempo();
                         suplementarias += control.getRecargo();
                         if (control.getCliente() != null)
                             empleado.setCliente(control.getCliente().getNombre());
                         
+                        empleado.setHoras(round(normales));
+                        empleado.setSobreTiempo(round(sobreTiempo));
+                        empleado.setSuplementarias(round(suplementarias));
+                        
                         empleado.setHorario("No guardado");
-                        if (control.getLibre()) {
+                        if (control.getCaso().equals(Const.LIBRE)) {
                             empleado.setHorario("Libre");
-                        } else if (control.getFalta()) {
+                        } else if (control.getCaso().equals(Const.FALTA)) {
                             empleado.setHorario("Falta");
+                        } else if (control.getCaso().equals(Const.VACACIONES)) {
+                            empleado.setHorario("Vacaciones");
+                        } else if (control.getCaso().equals(Const.PERMISO)) {
+                            empleado.setHorario("Permiso");
+                        } else if (control.getCaso().equals(Const.DM)) {
+                            empleado.setHorario("D. Medico");
+                        } else if (control.getCaso().equals(Const.CM)) {
+                            empleado.setHorario("C. Medica");
                         } else {
                             for (Horario horario: horarios) {
                                 if (horario.getNormales().equals(control.getNormales())
@@ -503,10 +670,6 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                         .getDepartamento().getNombre());
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
-                empleado.setDias(dias);
-                empleado.setHoras(round(normales));
-                empleado.setSobreTiempo(round(sobreTiempo));
-                empleado.setSuplementarias(round(suplementarias));
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);
@@ -533,6 +696,8 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                 } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
                 } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCliente().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
                 } 
                 return false; // Does not match.
@@ -638,6 +803,20 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+         buttonBorrar.setOnMouseEntered((MouseEvent t) -> {
+            buttonBorrar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_borrar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBorrar.setOnMouseExited((MouseEvent t) -> {
+            buttonBorrar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_borrar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         buttonAnterior.setTooltip(
             new Tooltip("Mes Anterior")
         );
@@ -712,6 +891,8 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                     getTableRow().setStyle("-fx-background-color:#A5D6A7");
                 } else if (empleadoTable.getProblem()) {
                     getTableRow().setStyle("-fx-background-color:lightcoral"); 
+                } else if (empleadoTable.getHoras() == null) {
+                    getTableRow().setStyle("-fx-background-color:#dddddd");
                 } else {
                     getTableRow().setStyle("");
                 }
@@ -737,6 +918,10 @@ public class HorasEmpleadosPorDiaController implements Initializable {
         
         ultimosRegistros = new ArrayList<>();
         ultimosRegistros.addAll(new ControlEmpleadoDAO().findAllByUltimosRegistros());
+        
+        leyenda1.setTooltip(new Tooltip("Ya se creo el rol cliente"));
+        leyenda2.setTooltip(new Tooltip("Dia sin horario"));
+        leyenda3.setTooltip(new Tooltip("Dia con horario"));
     }
     
     public void contarSelecciones() {
@@ -815,5 +1000,99 @@ public class HorasEmpleadosPorDiaController implements Initializable {
     @FXML
     public void onClickLoginButton(ActionEvent event) {
         aplicacionControl.login(login, usuarioLogin);
+    }
+    
+    public void error() {
+        closeDialogMode();
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new MaterialDesignButtonBlue("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+        children(new Text("Hubo un error en el proceso."), 
+                buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        dialogStage.show();
+        buttonOk.setMaxWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public class DataBaseThread implements Runnable {
+        
+        public final Integer BORRAR = 1;
+        
+        Integer opcion;
+
+        public DataBaseThread(Integer opcion){
+            this.opcion = opcion;
+        }
+
+        @Override
+        public void run() {
+    
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        cancel();
+                        if (Objects.equals(opcion, BORRAR)) {
+                            borrar();
+                        }
+                    }
+             }, 1000, 1000);
+            
+        }
+        
+        public void borrar() {
+            System.out.println("Comenzado borrado");
+            try {
+                for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+                    if (empleado.getAgregar()) {
+                        ControlEmpleado controlEmpleadoDelete = 
+                                getControlEmpleado(empleado.getId());
+                        if (controlEmpleadoDelete != null) {
+                            new ControlEmpleadoDAO().delete(controlEmpleadoDelete);
+                            controlEmpleados.remove(controlEmpleadoDelete);
+                            empleado.setHoras(null);
+                            empleado.setSobreTiempo(null);
+                            empleado.setSuplementarias(null);
+                            empleado.setHorario("");
+                            empleado.setCliente("");
+                            data.set(data.indexOf(empleado), empleado);
+                            HibernateSessionFactory.getSession().flush();
+
+                            // Registro para auditar
+                            String detalles = "elimino el horario del empleado " 
+                                    + empleado.getApellido() + " " + empleado.getNombre()
+                                    + "del dia " + Fechas.getFechaConMes(fecha);
+                            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                        }
+                    }
+                }
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        updateWindows();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        error();
+                    }
+                });
+            }
+        }
+        
     }
 }

@@ -19,7 +19,7 @@ public class RolCliente implements java.io.Serializable {
 	private Timestamp finalizo;
 	private Timestamp fecha;
 	private Double sueldo;
-	private Integer dias;
+	private Double dias;
 	private Double horasNormales;
 	private Double horasSuplementarias;
 	private Double horasSobreTiempo;
@@ -46,6 +46,7 @@ public class RolCliente implements java.io.Serializable {
 	private String clienteNombre;
         private Cliente cliente;
         private Usuario usuario;
+        private Boolean casoEspecial;
 
 	// Constructors
 
@@ -55,7 +56,7 @@ public class RolCliente implements java.io.Serializable {
 
 	/** minimal constructor */
 	public RolCliente(Timestamp inicio, Timestamp finalizo, Timestamp fecha,
-			Double sueldo, Integer dias, Double horasNormales,
+			Double sueldo, Double dias, Double horasNormales,
 			Double horasSuplementarias, Double horasSobreTiempo,
 			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
@@ -95,7 +96,7 @@ public class RolCliente implements java.io.Serializable {
 
 	/** full constructor */
 	public RolCliente(String detalles, Timestamp inicio, Timestamp finalizo,
-			Timestamp fecha, Double sueldo, Integer dias, Double horasNormales,
+			Timestamp fecha, Double sueldo, Double dias, Double horasNormales,
 			Double horasSuplementarias, Double horasSobreTiempo,
 			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
@@ -185,11 +186,11 @@ public class RolCliente implements java.io.Serializable {
 		this.sueldo = sueldo;
 	}
 
-	public Integer getDias() {
+	public Double getDias() {
 		return this.dias;
 	}
 
-	public void setDias(Integer dias) {
+	public void setDias(Double dias) {
 		this.dias = dias;
 	}
 
@@ -401,5 +402,12 @@ public class RolCliente implements java.io.Serializable {
             this.montoHorasExtras = montoHorasExtras;
         }
 
-        
+        public Boolean getCasoEspecial() {
+            return casoEspecial;
+        }
+
+        public void setCasoEspecial(Boolean casoEspecial) {
+            this.casoEspecial = casoEspecial;
+        }
+
 }

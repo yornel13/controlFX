@@ -5,7 +5,9 @@
  */
 package aplicacion.control.tableModel;
 
+import hibernate.model.ControlEmpleado;
 import hibernate.model.Usuario;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -16,36 +18,22 @@ public class ControlTable {
     private Integer id;
     private Usuario usuario;
     private String cliente;
-    private String fecha;
-    private Double horasSuplementarias;
-    private Double horasExtras;
-    private String descanso;
+    private String fechaString;
+    private Double normales;
+    private Double sobreTiempo;
+    private Double recargo;
+    private String observacion;
     private String dia;
+    private ControlEmpleado controlEmpleado;
+    private DateTime fecha;
+    private Boolean ajeno;
+    public Boolean marcar;
 
-    public String getDia() {
-        return dia;
+    public ControlTable() {
+        ajeno = false;
+        marcar = false;
     }
 
-    public void setDia(String dia) {
-        this.dia = dia;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getDescanso() {
-        return descanso;
-    }
-
-    public void setDescanso(String descanso) {
-        this.descanso = descanso;
-    }
-    
     public Integer getId() {
         return id;
     }
@@ -54,11 +42,11 @@ public class ControlTable {
         this.id = id;
     }
 
-    public Usuario getUsuarios() {
+    public Usuario getUsuario() {
         return usuario;
     }
 
-    public void setUsuarios(Usuario usuario) {
+    public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 
@@ -70,29 +58,86 @@ public class ControlTable {
         this.cliente = cliente;
     }
 
-    public String getFecha() {
+    public Double getNormales() {
+        return normales;
+    }
+
+    public void setNormales(Double normales) {
+        this.normales = normales;
+    }
+
+    public Double getSobreTiempo() {
+        return sobreTiempo;
+    }
+
+    public void setSobreTiempo(Double sobreTiempo) {
+        this.sobreTiempo = sobreTiempo;
+    }
+
+    public Double getRecargo() {
+        return recargo;
+    }
+
+    public void setRecargo(Double recargo) {
+        this.recargo = recargo;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
+    }
+
+    public String getDia() {
+        return dia;
+    }
+
+    public void setDia(String dia) {
+        this.dia = dia;
+    }
+
+    public ControlEmpleado getControlEmpleado() {
+        return controlEmpleado;
+    }
+
+    public void setControlEmpleado(ControlEmpleado controlEmpleado) {
+        this.controlEmpleado = controlEmpleado;
+    }
+
+    public String getFechaString() {
+        return fechaString;
+    }
+
+    public void setFechaString(String fechaString) {
+        this.fechaString = fechaString;
+    }
+
+    public DateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(String fecha) {
+    public void setFecha(DateTime fecha) {
         this.fecha = fecha;
     }
 
-    public Double getHorasSuplementarias() {
-        return horasSuplementarias;
+    public Boolean esAjeno() {
+        return ajeno;
     }
 
-    public void setHorasSuplementarias(Double horasSuplementarias) {
-        this.horasSuplementarias = horasSuplementarias;
+    public void setAjeno(Boolean ajeno) {
+        this.ajeno = ajeno;
     }
 
-    public Double getHorasExtras() {
-        return horasExtras;
+    public Boolean getMarcar() {
+        return marcar;
     }
 
-    public void setHorasExtras(Double horasExtras) {
-        this.horasExtras = horasExtras;
+    public void setMarcar(Boolean marcar) {
+        this.marcar = marcar;
     }
+
     
     
 }

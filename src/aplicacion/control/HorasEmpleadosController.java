@@ -210,19 +210,19 @@ public class HorasEmpleadosController implements Initializable {
            
            for (Usuario user: usuarios) {
             
-                Integer dias = 0;
+                Double dias = 0d;
                 Double normales = 0d;
                 Double sobreTiempo = 0d;
                 Double suplementarias = 0d;
                 
                 for (ControlEmpleado control: controlDAO
                         .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio, fin)) {
-                    if (!control.getFalta()) {
+                    /*if (!control.getFalta()) {
                         dias = dias + 1;
                         normales = normales + 8d;
                         sobreTiempo = sobreTiempo + control.getSobretiempo();
                         suplementarias = suplementarias + control.getRecargo();
-                    }
+                    }*/
                 }
                
                 EmpleadoTable empleado = new EmpleadoTable();

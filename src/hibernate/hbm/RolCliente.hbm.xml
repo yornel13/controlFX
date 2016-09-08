@@ -24,7 +24,7 @@
     <property name="sueldo" type="java.lang.Double">
       <column name="sueldo" not-null="true" precision="10"/>
     </property>
-    <property name="dias" type="java.lang.Integer">
+    <property name="dias" type="java.lang.Double">
       <column name="dias" not-null="true"/>
     </property>
     <property name="horasNormales" type="java.lang.Double">
@@ -95,6 +95,9 @@
     </property>
     <property name="clienteNombre" type="java.lang.String">
       <column name="cliente_nombre"/>
+    </property>
+    <property name="casoEspecial" type="java.lang.Boolean">
+      <column name="caso_especial"/>
     </property>
     <many-to-one class="hibernate.model.Cliente" fetch="select" name="cliente">
       <column name="cliente_id"/>

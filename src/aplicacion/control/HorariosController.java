@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import static aplicacion.control.DeudasController.numDecimalFilter;
+import static aplicacion.control.DeudasController.numFilter;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import aplicacion.control.util.NumberSpinner;
@@ -132,8 +133,6 @@ public class HorariosController implements Initializable {
                 Text textRC = new Text("Horas Recargo");
                 Text textST = new Text("Horas Sobretiempo");
                 fieldNormales.setText("8");
-                fieldNormales.setDisable(true);
-                fieldNormales.setEditable(false);
                 fieldRC.setText("0");
                 fieldST.setText("0");
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
@@ -141,6 +140,7 @@ public class HorariosController implements Initializable {
                         spinnerHasta, textNormales, fieldNormales, textRC, fieldRC,
                         textST, fieldST, buttonConfirmar).
                 alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                fieldNormales.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
                 fieldRC.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 fieldST.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
@@ -154,6 +154,12 @@ public class HorariosController implements Initializable {
                         horario.setRecargo(Double.valueOf(fieldRC.getText()));
                         horario.setSobretiempo(Double.valueOf(fieldST.getText()));
                         horario.setCreacion(new Timestamp(new Date().getTime()));
+                        if (Double.valueOf(fieldNormales.getText()) < 6) {
+                            horario.setMedioDia(true);
+                            dialogoMedioDia();
+                        } else {
+                            horario.setMedioDia(false);
+                        }
                         new HorarioDAO().save(horario);
                         setEmpresa(empresa);
                         dialogStage.close();
@@ -179,6 +185,27 @@ public class HorariosController implements Initializable {
         MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
         children(new Text("Las horas no pueden ser iguales."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        dialogStage.show();
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public void dialogoMedioDia() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+        children(new Text("Las horarios con menos de 6 horas normales se asumen como medio dia trabajado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
         buttonOk.setPrefWidth(60);

@@ -13,7 +13,7 @@ public class PagosTable {
     
     private Integer id;
     private String cliente;
-    private Integer dias;
+    private Double dias;
     private Double normales;
     private Double suplementarias;
     private Double sobreTiempo;
@@ -43,11 +43,11 @@ public class PagosTable {
         this.cliente = cliente;
     }
 
-    public Integer getDias() {
+    public Double getDias() {
         return dias;
     }
 
-    public void setDias(Integer dias) {
+    public void setDias(Double dias) {
         this.dias = dias;
     }
 

@@ -165,13 +165,13 @@ public class EditarHorasExtrasSinClienteController implements Initializable {
         sobreTiempo.setText(this.controlEmpleado.getSobretiempo().toString());
         suplementarias.setText(this.controlEmpleado.getRecargo().toString());
         datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
-        if (controlEmpleado.getLibre()) {
+        /*if (controlEmpleado.getLibre()) {
             marcarLibre.setSelected(true);
             checkLibre(null);
         } else if (controlEmpleado.getFalta()) {
             marcarFalta.setSelected(true);
             checkFalta(null);
-        }
+        }*/
     }
 
   

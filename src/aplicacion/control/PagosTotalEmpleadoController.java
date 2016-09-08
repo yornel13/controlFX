@@ -247,7 +247,7 @@ public class PagosTotalEmpleadoController implements Initializable {
     
     // Totales de el empleado
     
-    private Integer diasTextValor;
+    private Double diasTextValor;
 
     private Double normalesTextValor;
 
@@ -601,7 +601,7 @@ public class PagosTotalEmpleadoController implements Initializable {
         
         if (empleado != null) {
            
-            if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
+            if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
             
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -728,14 +728,14 @@ public class PagosTotalEmpleadoController implements Initializable {
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, empleadoId));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, empleadoId));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, empleadoId));
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, empleadoId));
         
         pagoMesItems = new ArrayList<>();
         deudasAPagar = new ArrayList<>();
         
-        diasTextValor = 0;
+        diasTextValor = 0d;
         normalesTextValor = 0d;
         suplementariasTextValor = 0d;
         sobreTiempoTextValor = 0d;
@@ -944,7 +944,7 @@ public class PagosTotalEmpleadoController implements Initializable {
             pagoRol.setUsuario(empleado);
         }
         
-        if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
+        if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
             textError.setTextFill(Color.YELLOW);
             textError.setText("Ya se creo el rol de pago individual de este mes");
         } else {

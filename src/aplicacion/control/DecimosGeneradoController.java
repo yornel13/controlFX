@@ -158,7 +158,7 @@ public class DecimosGeneradoController implements Initializable {
         
         dialogWait();
         
-        Integer dias = 0;
+        Double dias = 0d;
         Double horas = 0d;
         Double decimo3 = 0d;
         Double decimo4 = 0d;
@@ -166,9 +166,9 @@ public class DecimosGeneradoController implements Initializable {
         
         RolClienteDAO pagoDAO = new RolClienteDAO();
         ArrayList<RolCliente> pagos = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, usuario.getId()));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, usuario.getId()));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, usuario.getId()));
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, usuario.getId()));
         
         for (RolCliente rolCliente: pagos) {
             dias += rolCliente.getDias();

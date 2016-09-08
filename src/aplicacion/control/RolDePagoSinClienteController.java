@@ -267,7 +267,7 @@ public class RolDePagoSinClienteController implements Initializable {
     
     public void generarPago() {
         
-        if (new RolClienteDAO().findByFechaAndEmpleadoIdSinCliente(fin, 
+        if (new RolClienteDAO().findByFechaAndEmpleadoIdSinCliente(inicio, 
                 empleado.getId()) == null) {
         
             pago.setDetalles("");
@@ -440,8 +440,6 @@ public class RolDePagoSinClienteController implements Initializable {
         ControlEmpleado controlEmpleado = new ControlEmpleado();
         controlEmpleado = new ControlEmpleado();
         controlEmpleado.setFecha(fecha);
-        controlEmpleado.setLibre(libre);
-        controlEmpleado.setFalta(falta);
         controlEmpleado.setUsuario(empleado);
         controlEmpleado.setSobretiempo(sobreTiempo);
         controlEmpleado.setRecargo(suplementarias);
@@ -464,8 +462,6 @@ public class RolDePagoSinClienteController implements Initializable {
         
             controlEmpleado.setFecha(fecha);
             controlEmpleado.setCliente(cliente);
-            controlEmpleado.setLibre(libre);
-            controlEmpleado.setFalta(falta);
             if (libre || falta) {
                 controlEmpleado.setSobretiempo(0d);
                 controlEmpleado.setRecargo(0d);
@@ -495,7 +491,7 @@ public class RolDePagoSinClienteController implements Initializable {
        
         ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
         
-        Integer dias = 0;
+        Double dias = 0d;
         Double normales = 0d;
         Double sobreTiempo = 0d;
         Double suplementarias = 0d;
@@ -519,16 +515,16 @@ public class RolDePagoSinClienteController implements Initializable {
                 controlTable.setCliente(control.getCliente().getNombre());
             }
             DateTime dateTime = new DateTime(control.getFecha().getTime());
-            controlTable.setFecha(dateTime.toString("dd-MM-yyyy"));
+            controlTable.setFechaString(dateTime.toString("dd-MM-yyyy"));
             controlTable.setDia(dateTime.toCalendar(Locale.getDefault())
                             .getDisplayName(Calendar
                                     .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
-            controlTable.setHorasExtras(control.getSobretiempo());
-            controlTable.setHorasSuplementarias(control.getRecargo());
-            controlTable.setUsuarios(empleado);
-            if (control.getLibre() != null && control.getLibre()) {
+            controlTable.setSobreTiempo(control.getSobretiempo());
+            controlTable.setRecargo(control.getRecargo());
+            //controlTable.setUsuarios(empleado);
+            /*if (control.getLibre() != null && control.getLibre()) {
                controlTable.setDescanso("Libre"); 
-            } 
+            } */
             controlEmpleadoTable.add(controlTable);
         }
        

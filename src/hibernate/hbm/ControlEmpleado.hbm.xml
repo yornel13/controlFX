@@ -28,14 +28,17 @@
         <property name="sobretiempo" type="java.lang.Double">
             <column name="sobretiempo" />
         </property>
-        <property name="libre" type="java.lang.Boolean">
-            <column name="libre" />
+        <property name="caso" type="java.lang.String">
+            <column name="caso" />
         </property>
-        <property name="vacaciones" type="java.lang.Boolean">
-            <column name="vacaciones" />
+        <property name="medioDia" type="java.lang.Boolean">
+            <column name="medio_dia" />
         </property>
-        <property name="falta" type="java.lang.Boolean">
-            <column name="falta" />
+        <property name="horaInicio" type="java.lang.Integer">
+            <column name="hora_inicio" />
+        </property>
+         <property name="horaFin" type="java.lang.Integer">
+            <column name="hora_fin" />
         </property>
     </class>
 </hibernate-mapping>

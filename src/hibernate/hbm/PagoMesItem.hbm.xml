@@ -15,7 +15,7 @@
     <property name="descripcion" type="java.lang.String">
       <column name="descripcion" not-null="true"/>
     </property>
-    <property name="dias" type="java.lang.Integer">
+    <property name="dias" type="java.lang.Double">
       <column name="dias"/>
     </property>
     <property name="horas" type="java.lang.Double">

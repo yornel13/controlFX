@@ -246,7 +246,7 @@ public class PagoMensualPagadoController implements Initializable {
     
     // Totales de el empleado
     
-    private Integer diasTextValor;
+    private Double diasTextValor;
 
     private Double normalesTextValor;
 
@@ -614,14 +614,14 @@ public class PagoMensualPagadoController implements Initializable {
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, empleadoId));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, empleadoId));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, empleadoId));
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, empleadoId));
         
         pagoMesItems = new ArrayList<>();
         deudasAPagar = new ArrayList<>();
         
-        diasTextValor = 0;
+        diasTextValor = 0d;
         normalesTextValor = 0d;
         suplementariasTextValor = 0d;
         sobreTiempoTextValor = 0d;

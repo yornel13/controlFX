@@ -94,14 +94,14 @@ public class HorasExtrasClienteController implements Initializable {
     
     public void setProgramaPrincipal(RolDePagoClienteController rolDePagoClienteController) {
         this.rolDePagoClienteController = rolDePagoClienteController;
-        if (!rolDePagoClienteController.controlEmpleado.isEmpty()) {
+        /*if (!rolDePagoClienteController.controlEmpleado.isEmpty()) {
           lastControl = rolDePagoClienteController.controlEmpleado.get(rolDePagoClienteController.controlEmpleado.size() - 1); 
           DateTime dateTime = new DateTime(lastControl.getFecha().getTime());
           datePickerFecha.setValue(getDateFromTimestamp(new Timestamp(dateTime.plusDays(1).getMillis())));
           
         } else {
            datePickerFecha.setValue(getDateFromTimestamp(rolDePagoClienteController.inicio));
-        }
+        }*/
     }
     
     @FXML

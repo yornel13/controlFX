@@ -21,7 +21,7 @@ public class RolIndividual implements java.io.Serializable {
 	private String detalles;
 	private Timestamp fecha;
 	private Double sueldo;
-	private Integer dias;
+	private Double dias;
 	private Double horasNormales;
 	private Double horasSuplementarias;
 	private Double horasSobreTiempo;
@@ -58,7 +58,7 @@ public class RolIndividual implements java.io.Serializable {
 
 	/** minimal constructor */
 	public RolIndividual(Timestamp inicio, Timestamp finalizo, Timestamp fecha,
-			Double sueldo, Integer dias, Double horasNormales,
+			Double sueldo, Double dias, Double horasNormales,
 			Double horasSuplementarias, Double horasSobreTiempo,
 			Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
@@ -100,7 +100,7 @@ public class RolIndividual implements java.io.Serializable {
 
 	/** full constructor */
 	public RolIndividual(Usuario usuario, Timestamp inicio, Timestamp finalizo,
-			String detalles, Timestamp fecha, Double sueldo, Integer dias,
+			String detalles, Timestamp fecha, Double sueldo, Double dias,
 			Double horasNormales, Double horasSuplementarias,
 			Double horasSobreTiempo, Double totalHorasExtras, Double salario,
 			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
@@ -201,11 +201,11 @@ public class RolIndividual implements java.io.Serializable {
 		this.sueldo = sueldo;
 	}
 
-	public Integer getDias() {
+	public Double getDias() {
 		return this.dias;
 	}
 
-	public void setDias(Integer dias) {
+	public void setDias(Double dias) {
 		this.dias = dias;
 	}
 

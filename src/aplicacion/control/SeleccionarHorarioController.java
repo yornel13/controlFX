@@ -72,6 +72,7 @@ public class SeleccionarHorarioController implements Initializable {
     List<Horario> horarios;
     
     private HorarioEmpleadoController horarioEmpleadoController;
+    private HorarioEmpleadoClienteController horarioEmpleadoClienteController;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -85,10 +86,18 @@ public class SeleccionarHorarioController implements Initializable {
             horarioEmpleadoController) {
         this.horarioEmpleadoController = horarioEmpleadoController;
     }
+    
+    public void setHorarioEmpleadoController(HorarioEmpleadoClienteController 
+            horarioEmpleadoClienteController) {
+        this.horarioEmpleadoClienteController = horarioEmpleadoClienteController;
+    }
   
     private void returnHorario(Horario horario) {
         stagePrincipal.close();
-        horarioEmpleadoController.setHorario(horario);
+        if (horarioEmpleadoController != null)
+            horarioEmpleadoController.setHorario(horario);
+        else if (horarioEmpleadoClienteController != null)
+            horarioEmpleadoClienteController.setHorario(horario);
     }
     
     public void setHorarios(List<Horario> horarios) {

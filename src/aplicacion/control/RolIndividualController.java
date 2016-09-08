@@ -403,7 +403,7 @@ public class RolIndividualController implements Initializable {
         
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoId(fin, empleado.getId()));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoId(inicio, empleado.getId()));
         
         sueldoTotalTextValor = 0d;
         extraTextValor = 0d;

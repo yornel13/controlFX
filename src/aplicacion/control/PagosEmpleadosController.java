@@ -171,7 +171,7 @@ public class PagosEmpleadosController implements Initializable {
            
            for (Usuario user: usuarios) {
             
-                Integer dias = 0;
+                Double dias = 0d;
                 Double normales = 0d;
                 Double sobreTiempo = 0d;
                 Double suplementarias = 0d;

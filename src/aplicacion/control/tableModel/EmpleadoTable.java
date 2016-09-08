@@ -5,11 +5,13 @@
  */
 package aplicacion.control.tableModel;
 
+import hibernate.model.Actuariales;
 import hibernate.model.Deuda;
 import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
 import hibernate.model.PagoQuincena;
 import hibernate.model.RolIndividual;
+import hibernate.model.Usuario;
 import java.util.ArrayList;
 
 /**
@@ -26,7 +28,7 @@ public class EmpleadoTable {
     private String departamento;
     private String cargo;
     private String empresa;
-    private Integer dias;
+    private Double dias;
     private Double horas;
     private Double suplementarias;
     private Double sobreTiempo;
@@ -61,12 +63,19 @@ public class EmpleadoTable {
     private String horario;
     private Boolean haveRolCliente;
     private Boolean haveRolIndividual;
+    private Boolean planilla;
+    private Usuario usuario;
+    private RolCliente rolCliente;
+    private String bono;
+    private String transporte;
+    private Actuariales actuariales;
 
     public EmpleadoTable() {
         problem = false;
         agregar = false;
         haveRolCliente = false;
         haveRolIndividual = false;
+        cliente = "";
         monto = "0.0";
     }
     
@@ -134,11 +143,11 @@ public class EmpleadoTable {
         this.empresa = empresa;
     }
 
-    public Integer getDias() {
+    public Double getDias() {
         return dias;
     }
 
-    public void setDias(Integer dias) {
+    public void setDias(Double dias) {
         this.dias = dias;
     }
 
@@ -415,5 +424,55 @@ public class EmpleadoTable {
     public void setHaveRolIndividual(Boolean haveRolIndividual) {
         this.haveRolIndividual = haveRolIndividual;
     }
+
+    public Boolean getPlanilla() {
+        return planilla;
+    }
+
+    public void setPlanilla(Boolean planilla) {
+        this.planilla = planilla;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public RolCliente getRolCliente() {
+        return rolCliente;
+    }
+
+    public void setRolCliente(RolCliente rolCliente) {
+        this.rolCliente = rolCliente;
+    }
+
+    public String getBono() {
+        return bono;
+    }
+
+    public void setBono(String bono) {
+        this.bono = bono;
+    }
+
+    public String getTransporte() {
+        return transporte;
+    }
+
+    public void setTransporte(String transporte) {
+        this.transporte = transporte;
+    }
+
+    public Actuariales getActuariales() {
+        return actuariales;
+    }
+
+    public void setActuariales(Actuariales actuariales) {
+        this.actuariales = actuariales;
+    }
+
+    
     
 }

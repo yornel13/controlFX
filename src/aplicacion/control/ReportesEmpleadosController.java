@@ -254,7 +254,7 @@ public class ReportesEmpleadosController implements Initializable {
                 }
             }
             
-            Integer diasTextValor = 0;
+            Double diasTextValor = 0d;
             Double normalesTextValor = 0d;
             Double suplementariasTextValor = 0d;
             Double sobreTiempoTextValor = 0d;

@@ -104,8 +104,10 @@ public class RolIndividualDAO extends BaseHibernateDAO {
         
         public RolIndividual findByFechaAndEmpleadoIdAndDetalles(Timestamp fecha, Integer empleadoId, String detalles) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM rol_individual where finalizo = :fecha "
-                            + "and usuario_id = :usuario_id and detalles = :detalles")
+                    createSQLQuery("SELECT * FROM rol_individual "
+                            + "where inicio = :fecha "
+                            + "and usuario_id = :usuario_id "
+                            + "and detalles = :detalles")
                     .addEntity(RolIndividual.class)
                     .setParameter("fecha", fecha)
                     .setParameter("detalles", detalles)
@@ -114,10 +116,27 @@ public class RolIndividualDAO extends BaseHibernateDAO {
             return (RolIndividual) result;
         }
         
+        public List<RolIndividual> findAllByFechaAndEmpresaId(Timestamp fecha, Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_individual "
+                            + "JOIN usuario "
+                            + "ON usuario.id = rol_individual.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where inicio = :fecha "
+                            + "and empresa_id = :empresa_id")
+                    .addEntity(RolIndividual.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<RolIndividual>) result;
+        }
+        
         public List<RolIndividual> findAllByEmpleadoId(Integer empleadoId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM rol_individual where "
-                            + "usuario_id = :usuario_id order by inicio")
+                    createSQLQuery("SELECT * FROM rol_individual "
+                            + "where usuario_id = :usuario_id "
+                            + "order by inicio")
                     .addEntity(RolIndividual.class)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();

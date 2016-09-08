@@ -470,7 +470,7 @@ public class PagoQuincenalController implements Initializable {
             empleado.setPagar(true);
             
             PagoQuincena pagoQuincena = new PagoQuincenaDAO()
-                    .findInDeterminateTimeByUsuarioId(fin, empleado.getId());
+                    .findInDeterminateTimeByUsuarioId(inicio, empleado.getId());
             if (pagoQuincena != null) {
                 empleado.setQuincenal(pagoQuincena.getMonto());
                 empleado.setPagado("Si");
@@ -478,7 +478,7 @@ public class PagoQuincenalController implements Initializable {
                 empleado.setPagoQuincena(pagoQuincena);
             } else {
                 if (user.getDetallesEmpleado().getQuincena() != null) { 
-                    if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(fin, 
+                    if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(inicio, 
                         empleado.getId()) == null) {
                         empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
                     } else {
@@ -613,10 +613,10 @@ public class PagoQuincenalController implements Initializable {
     }
     
     void borrarPago(int usuarioId) {
-        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(fin, 
+        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(inicio, 
                         usuarioId) == null) {
            PagoQuincena pagoQuincena = new PagoQuincenaDAO()
-                    .findInDeterminateTimeByUsuarioId(fin, usuarioId);
+                    .findInDeterminateTimeByUsuarioId(inicio, usuarioId);
             new PagoQuincenaDAO().delete(pagoQuincena);
             HibernateSessionFactory.getSession().flush();
             String detalles = "elemino el pago quincenal numero " + pagoQuincena.getId()

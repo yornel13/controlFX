@@ -6,33 +6,52 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.ControlTable;
+import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.MaterialDesignButtonBlue;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
+import hibernate.dao.ClienteDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.HorarioDAO;
 import hibernate.dao.RolClienteDAO;
+import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.model.Actuariales;
 import hibernate.model.Cliente;
 import hibernate.model.Constante;
 import hibernate.model.ControlEmpleado;
+import hibernate.model.Horario;
 import hibernate.model.RolCliente;
+import hibernate.model.RolIndividual;
 import hibernate.model.Seguro;
 import hibernate.model.Uniforme;
 import hibernate.model.Usuario;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -46,8 +65,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -55,17 +77,24 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Years;
 
 /**
  *
@@ -75,24 +104,36 @@ public class RolDePagoClienteController implements Initializable {
     
     private Stage stagePrincipal;
     
-    private AplicacionControl aplicacionControl;
+    public AplicacionControl aplicacionControl;
     
     private Usuario empleado;
     
-    public ArrayList<ControlEmpleado> controlEmpleado;
-    private ArrayList<ControlTable> controlEmpleadoTable;
-   
-    @FXML
-    private Button administradoresButton;
+    public ArrayList<ControlEmpleado> controlesEmpleado;
+    private ArrayList<ControlTable> controlesDiarios;
     
     @FXML
-    private Button agregarButton;
+    private TableColumn fechaColumna;
     
     @FXML
-    private Pane imagenLabel;
+    private TableColumn diaColumna;
     
     @FXML
-    private Button ver;
+    private TableColumn clienteColumna;
+    
+    @FXML
+    private TableColumn normalesColumna;
+    
+    @FXML
+    private TableColumn sobreTiempoColumna;
+    
+    @FXML
+    private TableColumn recargoColumna;
+    
+    @FXML
+    private TableColumn observacionColumna;
+    
+    @FXML
+    private  TableColumn<ControlTable, ControlTable> marcarColumna;
     
     @FXML
     private TableView empleadosTableView;
@@ -122,46 +163,16 @@ public class RolDePagoClienteController implements Initializable {
     private Label totalRecargo;
     
     @FXML
-    private Label totalBono;
-    
-    @FXML
-    private Label totalTransporte;
-    
-    @FXML
     private Label totalBonos;
-    
-    @FXML
-    private Label totalVacaciones;
     
     @FXML
     private Label subTotal;
     
     @FXML
-    private Label totalDecimo3;
-    
-    @FXML
-    private Label totalDecimo4;
-    
-    @FXML
     private Label totalReserva;
     
     @FXML
-    private Label totalJubilacion;
-    
-    @FXML
-    private Label totalAporte;
-    
-    @FXML
-    private Label totalSeguros;
-    
-    @FXML
-    private Label totalUniformes;
-    
-    @FXML
     private Label totalIngresos;  
-    
-    @FXML
-    private Label textEmpleado;
     
     @FXML
     private DatePicker pickerDe;
@@ -170,16 +181,13 @@ public class RolDePagoClienteController implements Initializable {
     private DatePicker pickerHasta;
     
     @FXML
-    private TextField bonoField;
+    private Button leyenda1;
     
     @FXML
-    private TextField transporteField;
+    private Button leyenda2;
     
     @FXML
-    private TextField vacacionesField;
-    
-    @FXML
-    private CheckBox checkVacaciones;
+    private Button leyenda3;
     
     @FXML 
     private Button expandirButton;
@@ -193,7 +201,52 @@ public class RolDePagoClienteController implements Initializable {
     @FXML
     private Button buttonSiguiente;
     
-    private Cliente cliente;
+    @FXML
+    private Button buttonHorario;
+    
+    @FXML
+    private Button buttonBorrar;
+    
+    @FXML 
+    private Button buttonGenerarRol;
+    
+    @FXML
+    private CheckBox checkBoxMarcarTodos;
+    
+    @FXML
+    private TextField bonoField;
+    
+    @FXML
+    private TextField transporteField;
+    
+    @FXML
+    private TextField vacacionesField;
+    
+    @FXML
+    private TextField decimo3Field;
+    
+    @FXML
+    private TextField decimo4Field;
+    
+    @FXML
+    private TextField jubilacionField;
+    
+    @FXML
+    private TextField aporteField;
+    
+    @FXML
+    private TextField segurosField;
+    
+    @FXML
+    private TextField uniformeField;
+    
+    @FXML
+    private CheckBox checkBoxCasoEspecial;
+    
+    @FXML
+    private Label indicacion1;
+    
+    public Cliente cliente;
     
     private ObservableList<ControlTable> data;
     
@@ -203,8 +256,22 @@ public class RolDePagoClienteController implements Initializable {
     
     private Boolean editable = true;
     
+    private Button buttonchangeBono;
+    
+    List<Horario> horarios;
+    List<Cliente> clientes;
+    
     Timestamp fin;
     Timestamp inicio;
+    
+    Dialog<Void> dialog;
+    private Uniforme uniforme;
+    private Seguro seguro;
+    private Actuariales actuariales;
+    private Constante decimoCuarto;
+    
+    private Boolean casoEspecial = false;
+    private Boolean variableVacaciones = false;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -215,27 +282,18 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     @FXML
-    private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarVentanaPrincipal();
-        stagePrincipal.close();
-    }
-    
-    @FXML
-    private void onClickCalcular(ActionEvent event) {
-        if (editable)
-            setControlEmpleadoInfo(empleado, inicio, fin);
-        else 
-            dialogError();
+    public void cambiarBono(ActionEvent event) {
+        
     }
     
     @FXML
     private void expandir(ActionEvent event) {
         if (expandirButton.getText().equalsIgnoreCase("Expandir")) {
-            empleadosTableView.setPrefHeight(495);
+            empleadosTableView.setPrefHeight(475);
             expandirButton.setText("Contraer");
             gridPaneTotal.setVisible(false);
         } else {
-            empleadosTableView.setPrefHeight(220);
+            empleadosTableView.setPrefHeight(240);
             expandirButton.setText("Expandir");
             gridPaneTotal.setVisible(true);
         }
@@ -261,58 +319,108 @@ public class RolDePagoClienteController implements Initializable {
     
     @FXML
     public void onClickPago(ActionEvent event) {
-        
-        String faltantes = "";
-        if (pago.getVacaciones().equals(0d)) {
-            faltantes += " Sin vacaciones.";
-        } 
-        if (pago.getBono().equals(0d)) {
-            faltantes += " Sin bono.";
+        if (indicacion1.getText().equals("")) {
+            if (editable) {
+                if (aplicacionControl.permisos == null) {
+                   aplicacionControl.noLogeado();
+                } else {
+                    if (aplicacionControl.permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.CREAR)) {
+
+                        String faltantes = "";
+
+                        if (pago.getBono().equals(0d)) {
+                            faltantes += "Sin bono.";
+                        }
+                        if (pago.getTransporte().equals(0d)) {
+                            faltantes += " Sin transporte.";
+                        }
+
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.setResizable(false);
+                        dialogStage.setTitle("Pago " + new DateTime(pago.getInicio().getTime())
+                                .toString("dd-MM-yyyy") + " a " + new DateTime(pago.getFinalizo()
+                                        .getTime()).toString("dd-MM-yyyy"));
+                        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+                        dialogStage.getIcons().add(new Image(stageIcon));
+                        Button buttonOk = new Button("ok");
+                        Text falta = new Text(faltantes);
+                        falta.setFill(Color.RED);
+                        Text clienteText = new Text("para el cliente " + pago.getClienteNombre()+ "?");
+                        if (cliente == null) 
+                            clienteText.setText("Administrativo");
+                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                        children(new Text("¿Desea generar el rol de pago del empleado " + pago.getEmpleado()),
+                                clienteText, falta, buttonOk).
+                        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+                        buttonOk.setPrefWidth(50);
+                        dialogStage.show();
+                        buttonOk.setOnAction((ActionEvent e) -> {
+                            generarPago();
+                            dialogStage.close();
+
+                        });  
+
+
+                    } else {
+                        aplicacionControl.noPermitido();
+                    }
+                }
+            } else {
+                dialogError();
+            }
+        } else {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+            children(new Text("Despues de escribir los montos presiona enter."), buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            dialogStage.show();
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
         }
-        if (pago.getTransporte().equals(0d)) {
-            faltantes += " Sin transporte.";
+    }
+    
+    @FXML
+    public void marcarCasoEspecial(ActionEvent event) {
+        if (editable) {
+            if (checkBoxCasoEspecial.isSelected()) {
+                casoEspecial = true;
+                enableCasoEspecial();
+            } else {
+                casoEspecial = false;
+                disableCasoEspecial();
+                calcularHoras(null);
+            }
         }
-        
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago " + new DateTime(pago.getInicio().getTime())
-                .toString("dd-MM-yyyy") + " a " + new DateTime(pago.getFinalizo()
-                        .getTime()).toString("dd-MM-yyyy"));
-        String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Desea generar el rol de pago del empleado " + pago.getEmpleado()),
-                new Text("para el cliente " + pago.getClienteNombre()+ "?" + faltantes), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonOk.setPrefWidth(50);
-        dialogStage.show();
-        buttonOk.setOnAction((ActionEvent e) -> {
-            generarPago();
-            dialogStage.close();
-            
-        });  
     }
     
     public void generarPago() {
         
-        if (new RolClienteDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
-                empleado.getId(), cliente.getId()) == null) {
-        
-            pago.setDetalles("");
-            new RolClienteDAO().save(pago);
+        pago.setCasoEspecial(casoEspecial);
+        pago.setDetalles("");
+        new RolClienteDAO().save(pago);
 
-            // Registro para auditar
-            String detalles = "genero un pago al empleado " 
+        // Registro para auditar
+        String detalles;
+        if (cliente != null)
+            detalles = "genero un rol de pago al empleado " 
                 + empleado.getNombre() + " " + empleado.getApellido() + " para el cliente " 
                     + pago.getClienteNombre();
-            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
-            
-            dialogCompletado();
-        } else {
-            dialogError();
-        }
+        else 
+            detalles = "genero un rol de pago al empleado administrativo " 
+                + empleado.getNombre() + " " + empleado.getApellido(); 
+        
+        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+
+        dialogCompletado();
+        
     }
     
     public void dialogCompletado() {
@@ -337,12 +445,12 @@ public class RolDePagoClienteController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("No se guardo");
+        dialogStage.setTitle("");
         String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Ya hay un rol creado con esta fecha y con este cliente."), buttonOk).
+        children(new Text("No se puede editar este registro."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogStage.show();
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -361,7 +469,11 @@ public class RolDePagoClienteController implements Initializable {
         } else {       
             fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
             inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-            setControlEmpleadoInfo(empleado, inicio, fin);
+            try {
+                setControlEmpleadoInfo(empleado, inicio, fin); 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     } 
     
@@ -403,69 +515,227 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     @FXML
-    public void mostrarEditarHoras(ControlEmpleado controlEmpleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.EDITAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaEditarHorasExtrasCliente.fxml"));
-                    AnchorPane ventanaHoras = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaHoras);
-                    ventana.setScene(scene);
-                    EditarHorasExtrasClienteController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setControlEmpleado(controlEmpleado);
-                    ventana.show();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
+    public void cambiarHorarioVarios(ActionEvent event) throws IOException {
+        ArrayList<ControlTable> diasMarcados = new ArrayList<>();
+        for (ControlTable diaMarcado: (List<ControlTable>) data) {
+            if (diaMarcado.getMarcar()) {
+                diasMarcados.add(diaMarcado);
             }
         }
-    }
-    
-    @FXML
-    private void onClickVacaciones(ActionEvent event) {
-        if (checkVacaciones.isSelected()) {
-            vacacionesField.setDisable(false);
-        } else {
-            vacacionesField.setDisable(true);
-            vacacionesField.setText("");
+        
+        if (!diasMarcados.isEmpty())
+            abrirCambioMultiple(diasMarcados);
+        else {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class
+                    .getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new MaterialDesignButtonBlue("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+            children(new Text("No has seleccionado ningun dia."), 
+                    buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            dialogStage.show();
+            buttonOk.setMaxWidth(60);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
         }
     }
     
-    private void borrarHoras(ControlEmpleado controlEmpleado, ControlTable controlTable) {
-        if (editable)
+    public void abrirCambioMultiple(ArrayList<ControlTable> diasMarcados) throws IOException {
+        if (editable) {
             if (aplicacionControl.permisos == null) {
                aplicacionControl.noLogeado();
             } else {
-                if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.ELIMINAR)) {
+                if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
 
-                    new ControlEmpleadoDAO().delete(controlEmpleado);
-                    HibernateSessionFactory.getSession().flush();
-                    // Registro para auditar
-                    String detalles = "elimino un registro diario del empleado " 
-                        + empleado.getNombre() + " " + empleado.getApellido() 
-                        + " con fecha " + new DateTime(controlEmpleado.getFecha()
-                                .getTime()).toString("dd-MM-yyyy");
-                    aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
-                    data.remove(controlTable);
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class
+                            .getResource("ventanas/VentanaHorarioEmpleadoCliente.fxml"));
+                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Multiples dias");
+                    String stageIcon = AplicacionControl.class
+                            .getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRolDePago);
+                    ventana.setScene(scene);
+                    HorarioEmpleadoClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setRolDePagoCliente(this);
+                    controller.setCliente(cliente);
+                    controller.setEmpleadoMultiplesDias(empleado, diasMarcados, inicio, fin);
+                    ventana.show();
 
                 } else {
                    aplicacionControl.noPermitido();
                 }
             } 
+        } else {
+            dialogError();
+        }
+    }
+    
+    @FXML
+    public void borrarHorarios(ActionEvent event) {
+        ArrayList<ControlTable> diasMarcados = new ArrayList<>();
+        for (ControlTable diaMarcado: (List<ControlTable>) data) {
+            if (diaMarcado.getMarcar()) {
+                diasMarcados.add(diaMarcado);
+            }
+        }
+        
+        if (!diasMarcados.isEmpty()) {
+            borrarHoras(diasMarcados);
+        } else {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class
+                    .getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new MaterialDesignButtonBlue("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+            children(new Text("No has seleccionado ningun dia."), 
+                    buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            dialogStage.show();
+            buttonOk.setMaxWidth(60);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
+        }
+    }
+    
+    private void loadingMode(){
+        dialog = new Dialog<>();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(stagePrincipal);//stage here is the stage of your webview
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        Label loader = new Label("   Cargando, por favor espere...");
+        loader.setContentDisplay(ContentDisplay.LEFT);
+        loader.setGraphic(new ProgressIndicator());
+        dialog.getDialogPane().setGraphic(loader);
+        dialog.getDialogPane().setStyle("-fx-background-color: #E0E0E0;");
+        dialog.getDialogPane().setPrefSize(250, 75);
+        DropShadow ds = new DropShadow();
+        ds.setOffsetX(1.3); 
+        ds.setOffsetY(1.3); 
+        ds.setColor(Color.DARKGRAY);
+        dialog.getDialogPane().setEffect(ds);
+        dialog.show();
+    }
+    
+    public void closeDialogMode() {
+        if (dialog != null) {
+           Stage toClose = (Stage) dialog.getDialogPane()
+                   .getScene().getWindow();
+           toClose.close();
+           dialog.close();
+           dialog = null;
+        }
+    }
+    
+    @FXML
+    public void marcarTodos(ActionEvent event) {
+        for (ControlTable control: 
+                (List<ControlTable>) empleadosTableView.getItems()) {
+            if (checkBoxMarcarTodos.isSelected()) {
+                control.setMarcar(true);
+            } else {
+                control.setMarcar(false);
+            }
+            data.set(data.indexOf(control), control);
+        }
+    }
+    
+    private void horarioEmpleado(ControlEmpleado controlEmpleado, 
+            Timestamp fecha) throws IOException {
+        if (editable) {
+            if (aplicacionControl.permisos == null) {
+               aplicacionControl.noLogeado();
+            } else {
+                if (aplicacionControl.permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
+
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorarioEmpleadoCliente.fxml"));
+                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Empleado: " + empleado.getApellido()+ " " 
+                            + empleado.getNombre());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRolDePago);
+                    ventana.setScene(scene);
+                    HorarioEmpleadoClienteController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setRolDePagoCliente(this);
+                    controller.setStage(ventana);
+                    controller.setCliente(cliente);
+                    controller.setEmpleado(empleado, controlEmpleado, fecha, editable, inicio);
+                    ventana.show();
+
+                } else {
+                   aplicacionControl.noPermitido();
+                }
+            } 
+        } else {
+            dialogError();
+        }
+    }
+    
+    private void borrarHoras(ArrayList<ControlTable> diasMarcados) {
+        if (editable)
+            if (aplicacionControl.permisos == null) {
+                aplicacionControl.noLogeado();
+            } else {
+                Stage dialogStage = new Stage();
+                dialogStage.initModality(Modality.APPLICATION_MODAL);
+                dialogStage.setResizable(false);
+                dialogStage.setTitle("");
+                String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+                dialogStage.getIcons().add(new Image(stageIcon));
+                MaterialDesignButtonBlue buttonOk = new MaterialDesignButtonBlue("Si");
+                MaterialDesignButtonBlue buttonNo = new MaterialDesignButtonBlue("no");
+                HBox hBox = HBoxBuilder.create()
+                        .spacing(10.0) //In case you are using HBoxBuilder
+                        .padding(new Insets(5, 5, 5, 5))
+                        .alignment(Pos.CENTER)
+                        .children(buttonOk, buttonNo)
+                        .build();
+                hBox.maxWidth(120);
+                dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+                children(new Text("¿Seguro que desea borrar estos horarios?"), hBox).
+                alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                buttonOk.setMinWidth(50);
+                buttonNo.setMinWidth(50);
+                buttonOk.setOnAction((ActionEvent e) -> {
+                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                    Runnable worker = new RolDePagoClienteController.DataBaseThread(1);
+                    executor.execute(worker);
+                    executor.shutdown();
+
+                    loadingMode();
+                    dialogStage.close();
+                });
+                buttonNo.setOnAction((ActionEvent e) -> {
+                    dialogStage.close();
+                });
+                dialogStage.showAndWait();
+                } 
         else {
             dialogError();
         }
@@ -476,10 +746,7 @@ public class RolDePagoClienteController implements Initializable {
             Boolean falta) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
         ControlEmpleado controlEmpleado = new ControlEmpleado();
-        controlEmpleado = new ControlEmpleado();
         controlEmpleado.setFecha(fecha);
-        controlEmpleado.setLibre(libre);
-        controlEmpleado.setFalta(falta);
         controlEmpleado.setUsuario(empleado);
         controlEmpleado.setSobretiempo(sobreTiempo);
         controlEmpleado.setRecargo(suplementarias);
@@ -496,32 +763,173 @@ public class RolDePagoClienteController implements Initializable {
         aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
     }
     
-    public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Double suplementarias, 
-            Double sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre,
-            Boolean falta) throws ParseException {
-        
-        controlEmpleado.setFecha(fecha);
-        controlEmpleado.setCliente(cliente);
-        controlEmpleado.setLibre(libre);
-        controlEmpleado.setFalta(falta);
-        if (libre || falta) {
-            controlEmpleado.setSobretiempo(0d);
-            controlEmpleado.setRecargo(0d);
-        } else {
-            controlEmpleado.setSobretiempo(sobreTiempo);
-            controlEmpleado.setRecargo(suplementarias);
+    public void cambiarControlEmpleado(ControlEmpleado control) {
+        Boolean agregar = true;
+        for (ControlEmpleado controlEmpleado: controlesEmpleado) {
+            if (controlEmpleado.getFecha().equals(control.getFecha())) {
+                controlesEmpleado.set(controlesEmpleado.indexOf(controlEmpleado), control);
+            }
         }
-        HibernateSessionFactory.getSession().flush();
+        if (agregar)
+                controlesEmpleado.add(control);
         
-        setControlEmpleadoInfo(empleado, 
-                Timestamp.valueOf(pickerDe.getValue().atStartOfDay()), 
-                Timestamp.valueOf(pickerHasta.getValue().atStartOfDay()));
+        int descansosMedicos = 0;
         
-        // Registro para auditar
-        String detalles = "edito un registro diario del empleado " 
-            + empleado.getNombre() + " " + empleado.getApellido() 
-            + " con fecha " + new DateTime(fecha.getTime()).toString("dd-MM-yyyy");
-        aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+        for (ControlTable controlTable: data) {
+            ControlEmpleado controlUso = controlTable.getControlEmpleado();
+            if (controlUso != null) {
+                if(Objects.equals(controlTable.getFecha().getMillis(), 
+                    new DateTime(control.getFecha()).getMillis())) {
+                    // nothing to do
+                } else {
+                    if (control.getCaso().equals(Const.DM)) {
+                        descansosMedicos++;
+                    }
+                }
+            }
+        }
+        
+        for (ControlTable controlTable: data) {
+            if(Objects.equals(controlTable.getFecha().getMillis(), 
+                    new DateTime(control.getFecha()).getMillis())) {
+                
+                ControlTable controlDiario = new ControlTable();
+                controlDiario.setControlEmpleado(control);
+                controlDiario.setFecha(controlTable.getFecha());
+                controlDiario.setFechaString(controlDiario.getFecha().toString("dd-MM-yyyy"));
+                controlDiario.setDia(controlDiario.getFecha().toCalendar(Locale.getDefault())
+                            .getDisplayName(Calendar
+                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
+                    
+                controlDiario.setId(control.getId());
+                if (control.getCliente() != null) {
+                    controlDiario.setCliente(control.getCliente().getNombre());
+                }
+                controlDiario.setNormales(control.getNormales());
+                controlDiario.setSobreTiempo(control.getSobretiempo());
+                controlDiario.setRecargo(control.getRecargo());
+                if (control.getCaso().equals(Const.LIBRE)) {
+                   controlDiario.setObservacion("Libre"); 
+                } else if (control.getCaso().equals(Const.FALTA)) {
+                   controlDiario.setObservacion("Falta"); 
+                } else if (control.getCaso().equals(Const.VACACIONES)) {
+                   controlDiario.setObservacion("Vacaciones"); 
+                } else if (control.getCaso().equals(Const.PERMISO)) {
+                   controlDiario.setObservacion("Permiso"); 
+                } else if (control.getCaso().equals(Const.DM)) {
+                    controlDiario.setObservacion("D. Medico"); 
+                    if (descansosMedicos > 3) {
+                        controlDiario.setNormales(0d);
+                        controlDiario.setSobreTiempo(0d);
+                        controlDiario.setRecargo(0d);
+                    }
+                } else if (control.getCaso().equals(Const.CM)) {
+                   controlDiario.setObservacion("C. Medica"); 
+                } else if (control.getMedioDia()) {
+                    controlDiario.setObservacion("1/2 Dia"); 
+                }
+                if (control.getCliente() != null 
+                        && cliente.getId().equals(control.getCliente().getId())
+                        || cliente == null && control.getCliente() == null) {
+                } else {
+                    controlDiario.setAjeno(true);
+                }
+                
+                controlesDiarios.set(controlesDiarios.indexOf(controlTable), controlDiario);
+                
+                calcularHoras(null);
+            }
+        }
+    }
+    
+    public void quitarControlEmpleado(ControlTable controlTableDelete) {
+        ControlEmpleado control = controlTableDelete.getControlEmpleado();
+        for (ControlEmpleado controlEmpleado: controlesEmpleado) {
+            if (controlEmpleado.getFecha().equals(control.getFecha())) {
+                controlesEmpleado.remove(control);
+            }
+        }
+        
+        for (ControlTable controlTable: data) {
+            if(Objects.equals(controlTable.getFecha().getMillis(), 
+                    new DateTime(control.getFecha()).getMillis())) {
+                ControlTable controlDiario = new ControlTable();
+                controlDiario.setMarcar(controlTableDelete.getMarcar());
+                controlDiario.setFecha(controlTableDelete.getFecha());
+                controlDiario.setFechaString(controlDiario.getFecha().toString("dd-MM-yyyy"));
+                controlDiario.setDia(controlDiario.getFecha().toCalendar(Locale.getDefault())
+                                .getDisplayName(Calendar
+                                        .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
+                controlesDiarios.set(controlesDiarios.indexOf(controlTable), controlDiario);
+            }
+        }
+    }
+    
+    @FXML
+    public void calcularVacaciones(ActionEvent event) {
+        variableVacaciones = true;
+        casoEspecial = false;
+        calcularHoras(event);
+        variableVacaciones = false;
+        casoEspecial = true;
+    }
+    
+    @FXML
+    public void calcularHoras(ActionEvent event) {
+        
+        data = FXCollections.observableArrayList();
+        data.addAll(controlesDiarios);
+        empleadosTableView.setItems(data);
+                
+        Double dias = 0d;
+        Double normales = 0d;
+        Double sobreTiempo = 0d;
+        Double suplementarias = 0d;
+        
+        int descansosMedicos = 0;
+
+        for (ControlTable controlToCalcule: controlesDiarios) {
+            ControlEmpleado uControl = controlToCalcule.getControlEmpleado();
+            if (uControl != null) {
+                
+                if (uControl.getCaso().equals(Const.DM)) {
+                       descansosMedicos++;
+                } 
+                
+                if (cliente != null // todo antes era uControl.getCliente()
+                    && cliente.getId().equals(uControl.getCliente().getId())
+                    || cliente == null && uControl.getCliente() == null) {
+                    
+                    if (uControl.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                            || uControl.getCaso().equalsIgnoreCase(Const.LIBRE)
+                            || uControl.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                            || uControl.getCaso().equalsIgnoreCase(Const.CM)) {
+
+                        if (uControl.getMedioDia())
+                            dias += 0.5; 
+                        else
+                            dias += 1;
+
+                        normales += uControl.getNormales();
+                        sobreTiempo += uControl.getSobretiempo();
+                        suplementarias += uControl.getRecargo();
+
+                    } else if (uControl.getCaso().equalsIgnoreCase(Const.DM)) {
+                        if (descansosMedicos <= 3) {
+                            if (uControl.getMedioDia())
+                                dias += 0.5; 
+                            else
+                                dias += 1;
+
+                            normales += uControl.getNormales();
+                        }
+                    }
+                }
+            }
+        }
+
+        indicacion1.setText("");
+        calcularPago(dias, normales, sobreTiempo, suplementarias, false);
     }
     
     public void setEmpleado(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) throws ParseException {
@@ -533,122 +941,126 @@ public class RolDePagoClienteController implements Initializable {
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
         
+        horarios = (List<Horario>) new HorarioDAO().findAll();
+        clientes = new ClienteDAO().findAllActivo();
+        
         setControlEmpleadoInfo(empleado, inicio, fin);
     }
     
-    public void setControlEmpleadoInfo(Usuario empleado, Timestamp inicio, Timestamp fin) {
-        
-        empleadosTableView.getColumns().clear(); 
+    public void setControlEmpleadoInfo(Usuario empleado, Timestamp inicio, Timestamp fin) throws ParseException {
         
         ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
         
-        Integer dias = 0;
+        Double dias = 0d;
         Double normales = 0d;
         Double sobreTiempo = 0d;
         Double suplementarias = 0d;
         
-        controlEmpleado = new ArrayList<>();
-        controlEmpleadoTable = new ArrayList<>();
-        controlEmpleado.addAll(controlDAO.findAllByEmpleadoIdClienteIdInDeterminateTime(empleado.getId(), cliente.getId(), inicio, fin));
+        DateTime fechaInicial = new DateTime(inicio.getTime());
+        DateTime fechaFinal = new DateTime(fin.getTime());
         
-        for (ControlEmpleado control: controlEmpleado) {
-            dias = dias + 1;
-            normales = normales + 8;
-            sobreTiempo = sobreTiempo + control.getSobretiempo();
-            suplementarias = suplementarias + control.getRecargo();
-            
+        int days = Days.daysBetween(fechaInicial.withTimeAtStartOfDay(), 
+                fechaFinal.withTimeAtStartOfDay()).getDays();
+        
+        controlesDiarios = new ArrayList<>();
+        
+        for(int i = 0; i <= days; i++) {
             ControlTable controlTable = new ControlTable();
-            
-            controlTable.setId(control.getId());
-            if (control.getCliente() != null) {
-                controlTable.setCliente(control.getCliente().getNombre());
-            }
-            DateTime dateTime = new DateTime(control.getFecha().getTime());
-            controlTable.setFecha(dateTime.toString("dd-MM-yyyy"));
-            controlTable.setDia(dateTime.toCalendar(Locale.getDefault())
+            controlTable.setFecha(fechaInicial.plusDays(i));
+            controlesDiarios.add(controlTable);
+        }
+        System.out.println("dias " + controlesDiarios.size());
+        int descansosMedicos = 0;
+        controlesEmpleado = new ArrayList<>();
+        controlesEmpleado.addAll(controlDAO
+                .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio, fin));
+        for (ControlTable controlDiario: controlesDiarios) {
+            controlDiario.setFechaString(controlDiario.getFecha().toString("dd-MM-yyyy"));
+            controlDiario.setDia(controlDiario.getFecha().toCalendar(Locale.getDefault())
                             .getDisplayName(Calendar
                                     .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
-            controlTable.setHorasExtras(control.getSobretiempo());
-            controlTable.setHorasSuplementarias(control.getRecargo());
-            controlTable.setUsuarios(empleado);
-            if (control.getLibre()) {
-               controlTable.setDescanso("Libre"); 
-            } else if (control.getFalta()) {
-               controlTable.setDescanso("Falta"); 
-            } 
-            controlEmpleadoTable.add(controlTable);
+            for (ControlEmpleado control: controlesEmpleado) {
+                DateTime fechaActual = new DateTime(control.getFecha().getTime());
+                if (controlDiario.getFecha().getMillis() == fechaActual.getMillis()) {
+                    
+                    controlDiario.setControlEmpleado(control);
+                    
+                    controlDiario.setId(control.getId());
+                    if (control.getCliente() != null) {
+                        controlDiario.setCliente(control.getCliente().getNombre());
+                    }
+                    controlDiario.setNormales(control.getNormales());
+                    controlDiario.setSobreTiempo(control.getSobretiempo());
+                    controlDiario.setRecargo(control.getRecargo());
+                    if (control.getCaso().equals(Const.LIBRE)) {
+                       controlDiario.setObservacion("Libre"); 
+                    } else if (control.getCaso().equals(Const.FALTA)) {
+                       controlDiario.setObservacion("Falta"); 
+                    } else if (control.getCaso().equals(Const.VACACIONES)) {
+                       controlDiario.setObservacion("Vacaciones"); 
+                    } else if (control.getCaso().equals(Const.PERMISO)) {
+                       controlDiario.setObservacion("Permiso"); 
+                    } else if (control.getCaso().equals(Const.DM)) {
+                        controlDiario.setObservacion("D. Medico"); 
+                        descansosMedicos++;
+                       
+                        if (descansosMedicos > 3) {
+                            controlDiario.setNormales(0d);
+                            controlDiario.setSobreTiempo(0d);
+                            controlDiario.setRecargo(0d);
+                        }
+                    } else if (control.getCaso().equals(Const.CM)) {
+                       controlDiario.setObservacion("C. Medica"); 
+                    } else if (control.getMedioDia()) {
+                        controlDiario.setObservacion("1/2 Dia"); 
+                    }
+                    if (cliente != null 
+                            && cliente.getId().equals(control.getCliente().getId())
+                            || cliente == null && control.getCliente() == null) {
+                        
+                        if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                || control.getCaso().equalsIgnoreCase(Const.CM)) {
+                            
+                            if (control.getMedioDia())
+                                dias += 0.5; 
+                            else
+                                dias += 1;
+                        
+                            normales += control.getNormales();
+                            sobreTiempo += control.getSobretiempo();
+                            suplementarias += control.getRecargo();
+                            
+                        } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                            if (descansosMedicos <= 3) {
+                                if (control.getMedioDia())
+                                    dias += 0.5; 
+                                else
+                                    dias += 1;
+
+                                normales += control.getNormales();
+                            }
+                        }
+                        
+                    } else {
+                        controlDiario.setAjeno(true);
+                    }
+                }
+            }
         }
        
-        data = FXCollections.observableArrayList(); 
-        if (!controlEmpleadoTable.isEmpty()) {
-           data.addAll(controlEmpleadoTable);
-        } 
+        data = FXCollections.observableArrayList();
+        data.addAll(controlesDiarios);
         empleadosTableView.setItems(data);
         
-        TableColumn dia = new TableColumn("Dia");
-        dia.setPrefWidth(80);
-        dia.setCellValueFactory(new PropertyValueFactory<>("dia"));
+        calcularPago(dias, normales, sobreTiempo, suplementarias, true); 
+    }
+    
+    public void calcularPago(Double dias, Double normales, Double sobreTiempo, 
+            Double suplementarias, Boolean searchRol) {
         
-        TableColumn fecha = new TableColumn("Fecha");
-        fecha.setPrefWidth(80);
-        fecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-       
-        TableColumn cliente = new TableColumn("Cliente");
-        cliente.setPrefWidth(200);
-        cliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
-        
-        TableColumn horasExtras = new TableColumn("ST");
-        horasExtras.setPrefWidth(40);
-        horasExtras.setCellValueFactory(new PropertyValueFactory<>("horasExtras"));
-        
-        TableColumn horasSuplementarias = new TableColumn("RC");
-        horasSuplementarias.setPrefWidth(40);
-        horasSuplementarias.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
-        
-        TableColumn horas = new TableColumn("Horas");
-        horas.setPrefWidth(80);
-        horas.setCellValueFactory(new PropertyValueFactory<>("horasSuplementarias"));
-        horas.getColumns().addAll(horasExtras, horasSuplementarias);
-        
-        TableColumn descanso = new TableColumn("Descanso");
-        descanso.setPrefWidth(100);
-        descanso.setCellValueFactory(new PropertyValueFactory<>("descanso"));
-        
-        TableColumn<ControlTable, ControlTable> delete = new TableColumn<>("Borrar");
-        delete.setPrefWidth(60);
-        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        delete.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
-            private final Button deleteButton = new Button("Borrar");
-
-            @Override
-            protected void updateItem(ControlTable controlTable, boolean empty) {
-                super.updateItem(controlTable, empty);
-
-                if (controlTable == null) {
-                    setGraphic(null);
-                    return;
-                }
-
-                setGraphic(deleteButton);
-                deleteButton.setOnAction(event -> {
-                    borrarHoras(controlDAO
-                            .findById(controlTable.getId()), controlTable);
-                });
-            }
-        });
-        
-        empleadosTableView.getColumns().addAll(fecha, dia, cliente, horas, descanso, delete);
-        
-        empleadosTableView.setRowFactory( (Object tv) -> {
-            TableRow<ControlTable> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    ControlTable rowData = row.getItem();
-                    mostrarEditarHoras(controlDAO.findById(rowData.getId()));
-                }
-            });
-            return row ;
-        });
+        pago = null;
         
         Double sueldoDia = empleado.getDetallesEmpleado().getSueldo() / 30d;
         Double sueldoHoras = empleado.getDetallesEmpleado().getSueldo() / 240d;
@@ -664,111 +1076,240 @@ public class RolDePagoClienteController implements Initializable {
         totalHorasExtras.setText(round(sobreTiempo + suplementarias).toString());
         
         // Salario
-        Double totalSalarioDouble = round(sueldoDia * Double.valueOf(dias));
+        Double totalSalarioDouble = round(sueldoDia * dias);
         totalSalario.setText(totalSalarioDouble.toString());
         Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
         totalSobreTiempo.setText(totalSobreTiempoDouble.toString());
         Double totalRecargoDouble = round(sueldoHoras * suplementarias);
         totalRecargo.setText(totalRecargoDouble.toString());
         Double totalBonoDouble = round(getBono());
-        totalBono.setText(totalBonoDouble.toString());
+        bonoField.setText(totalBonoDouble.toString());
         Double totalTransporteDouble = round(getTransporte());
-        totalTransporte.setText(totalTransporteDouble.toString());
+        transporteField.setText(totalTransporteDouble.toString());
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
         totalBonos.setText(totalBonosDouble.toString());
-        Double totalVacacionesDouble = round(getVacaciones());
-        totalVacaciones.setText(totalVacacionesDouble.toString());
+        Double totalVacacionesDouble;
+        if (variableVacaciones)
+            totalVacacionesDouble = round(vacacionesField.getText());
+        else
+            totalVacacionesDouble = casoEspecial ? round(vacacionesField.getText()) : round(getVacaciones());
+        vacacionesField.setText(totalVacacionesDouble.toString());
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
                 + totalBonosDouble + totalVacacionesDouble);
         subTotal.setText(subTotalDouble.toString());
         ////////////////////////////////////////////////////
-        Double decimoTercero = round(subTotalDouble / 12d);
-        totalDecimo3.setText(decimoTercero.toString());
-        Double decimoCuarto = round(getDecimoCuarto()/30d * Double.valueOf(dias));
-        totalDecimo4.setText(decimoCuarto.toString());
+        Double decimoTercero = casoEspecial ? round(decimo3Field.getText()) : round(subTotalDouble / 12d);
+        decimo3Field.setText(decimoTercero.toString());
+        Double decimoCuarto = casoEspecial ? round(decimo4Field.getText()) : round(getDecimoCuarto(searchRol)/30d * dias);
+        decimo4Field.setText(decimoCuarto.toString());
         totalReserva.setText(decimoTercero.toString());
-        Double jubilacionPatronal = round((getActuariales(empleado.getId())/ 360d) * Double.valueOf(dias));
-        totalJubilacion.setText(jubilacionPatronal.toString());
-        Double aportePatronal = round(subTotalDouble * 12.15d / 100d);
-        totalAporte.setText(aportePatronal.toString());
-        Double segurosDecimal = round(getSeguro(empleado.getDetallesEmpleado()
-                .getEmpresa().getId()) * Double.valueOf(dias));
-        totalSeguros.setText(segurosDecimal.toString());
-        Double uniformeDecimal = round(getUniforme(empleado.getDetallesEmpleado()
-                .getEmpresa().getId()) * Double.valueOf(dias));
-        totalUniformes.setText(uniformeDecimal.toString());
+        Double jubilacionPatronal = casoEspecial ? round(jubilacionField.getText()) : round((getActuariales(empleado.getId(), searchRol)/ 360d) * dias);
+        jubilacionField.setText(jubilacionPatronal.toString());
+        Double aportePatronal = casoEspecial ? round(aporteField.getText()) : round(subTotalDouble * 12.15d / 100d);
+        aporteField.setText(aportePatronal.toString());
+        Double segurosDecimal = casoEspecial ? round(segurosField.getText()) : round(getSeguro(empleado.getDetallesEmpleado()
+                .getEmpresa().getId(), searchRol) * dias);
+        segurosField.setText(segurosDecimal.toString());
+        Double uniformeDecimal = casoEspecial ? round(uniformeField.getText()) : round(getUniforme(empleado.getDetallesEmpleado()
+                .getEmpresa().getId(), searchRol) * dias);
+        uniformeField.setText(uniformeDecimal.toString());
         
         Double ingresoTotal = round(subTotalDouble + decimoTercero 
                 + decimoCuarto + decimoTercero + jubilacionPatronal 
                 + aportePatronal + segurosDecimal + uniformeDecimal);
         totalIngresos.setText(ingresoTotal.toString());
         
-        pago = new RolClienteDAO().findByFechaAndEmpleadoIdAndClienteId(fin, 
-                this.empleado.getId(), this.cliente.getId());
+        if (searchRol) {
+            if (cliente != null)
+                pago = new RolClienteDAO().findByFechaAndEmpleadoIdAndClienteId(inicio, 
+                        this.empleado.getId(), this.cliente.getId());
+            else 
+                pago = new RolClienteDAO().findByFechaAndEmpleadoIdSinCliente(inicio, 
+                    this.empleado.getId());
+        }
+        
         if (pago == null) {
-            pago = new RolCliente();
-            pago.setFecha(new Timestamp(new Date().getTime()));
-            pago.setInicio(inicio);
-            pago.setFinalizo(fin);
-            pago.setDias(dias);
-            pago.setHorasNormales(normales);
-            pago.setHorasSuplementarias(suplementarias);  // RC
-            pago.setHorasSobreTiempo(sobreTiempo);         // ST
-            pago.setTotalHorasExtras(sobreTiempo + suplementarias);
-            pago.setSalario(totalSalarioDouble);
-            pago.setMontoHorasSuplementarias(totalRecargoDouble);
-            pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);
-            pago.setBono(totalBonoDouble);
-            pago.setTransporte(totalTransporteDouble);
-            pago.setTotalBonos(totalBonosDouble);
-            pago.setVacaciones(totalVacacionesDouble);
-            pago.setSubtotal(subTotalDouble);
-            pago.setDecimoTercero(decimoTercero);
-            pago.setDecimoCuarto(decimoCuarto);
-            pago.setJubilacionPatronal(jubilacionPatronal);
-            pago.setAportePatronal(aportePatronal);
-            pago.setSeguros(segurosDecimal);
-            pago.setUniformes(uniformeDecimal);
-            pago.setTotalIngreso(ingresoTotal);
-            pago.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
-            pago.setCedula(empleado.getCedula());
-            pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
-            pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
-            pago.setUsuario(empleado);
-            pago.setCliente(this.cliente);
-            pago.setClienteNombre(this.cliente.getNombre());
             
-            editable = true;
+            RolIndividual rolIndividual = null;
+            
+            if (searchRol) {
+                rolIndividual = new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, 
+                        empleado.getId(), Const.ROL_PAGO_INDIVIDUAL);
+            }
+            
+            if (rolIndividual == null) {
+                pago = new RolCliente();
+                pago.setFecha(new Timestamp(new Date().getTime()));
+                pago.setInicio(inicio);
+                pago.setFinalizo(fin);
+                pago.setDias(dias);
+                pago.setHorasNormales(normales);
+                pago.setHorasSuplementarias(suplementarias);  // RC
+                pago.setHorasSobreTiempo(sobreTiempo);         // ST
+                pago.setTotalHorasExtras(sobreTiempo + suplementarias);
+                pago.setSalario(totalSalarioDouble);
+                pago.setMontoHorasSuplementarias(totalRecargoDouble);
+                pago.setMontoHorasSobreTiempo(totalSobreTiempoDouble);
+                pago.setBono(totalBonoDouble);
+                pago.setTransporte(totalTransporteDouble);
+                pago.setTotalBonos(totalBonosDouble);
+                pago.setVacaciones(totalVacacionesDouble);
+                pago.setSubtotal(subTotalDouble);
+                pago.setDecimoTercero(decimoTercero);
+                pago.setDecimoCuarto(decimoCuarto);
+                pago.setJubilacionPatronal(jubilacionPatronal);
+                pago.setAportePatronal(aportePatronal);
+                pago.setSeguros(segurosDecimal);
+                pago.setUniformes(uniformeDecimal);
+                pago.setTotalIngreso(ingresoTotal);
+                pago.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
+                pago.setCedula(empleado.getCedula());
+                pago.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
+                pago.setSueldo(empleado.getDetallesEmpleado().getSueldo());
+                pago.setUsuario(empleado);
+                pago.setCliente(cliente);
+                if (cliente != null)
+                    pago.setClienteNombre(this.cliente.getNombre());
+                
+                checkBoxCasoEspecial.setDisable(false);
+                editable = true;
+            } else {
+                checkBoxCasoEspecial.setDisable(true);
+                editable = false;
+            }
         } else {
             editable = false;
             vacacionesField.setText(pago.getVacaciones().toString());
-            totalVacaciones.setText(pago.getVacaciones().toString());
             bonoField.setText(pago.getBono().toString());
-            totalBono.setText(pago.getBono().toString());
             transporteField.setText(pago.getTransporte().toString());
-            totalTransporte.setText(pago.getTransporte().toString());
             totalBonos.setText(pago.getTotalBonos().toString());
             subTotal.setText(pago.getSubtotal().toString());
-            totalDecimo3.setText(pago.getDecimoTercero().toString());
-            totalDecimo4.setText(pago.getDecimoCuarto().toString());
+            decimo3Field.setText(pago.getDecimoTercero().toString());
+            decimo4Field.setText(pago.getDecimoCuarto().toString());
             totalReserva.setText(pago.getDecimoTercero().toString());
-            totalJubilacion.setText(pago.getJubilacionPatronal().toString());
-            totalAporte.setText(pago.getAportePatronal().toString());
-            totalSeguros.setText(pago.getSeguros().toString());
-            totalUniformes.setText(pago.getUniformes().toString());
+            jubilacionField.setText(pago.getJubilacionPatronal().toString());
+            aporteField.setText(pago.getAportePatronal().toString());
+            segurosField.setText(pago.getSeguros().toString());
+            uniformeField.setText(pago.getUniformes().toString());
             totalIngresos.setText(pago.getTotalIngreso().toString());
+            if (pago.getCasoEspecial())
+                checkBoxCasoEspecial.setSelected(true);
+            else
+                checkBoxCasoEspecial.setSelected(false);
+            
+            checkBoxCasoEspecial.setDisable(true);
         }
+        
+        buttonGenerarRol.setVisible(editable);
+        if (editable) {
+            bonoField.setEditable(true);
+            transporteField.setEditable(true);
+            bonoField.setDisable(false);
+            transporteField.setDisable(false);
+        } else {
+            bonoField.setEditable(false);
+            transporteField.setEditable(true);
+            bonoField.setDisable(true);
+            transporteField.setDisable(true);
+        }
+        
+        
+    }
+    
+    public void updateWindows() {
+        closeDialogMode();
+        calcularHoras(null);
+        borradoCompletado();
+    }
+    
+    public void borradoCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new MaterialDesignButtonBlue("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se borraron los horarios con exito."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setMaxWidth(50);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.show();
+    }
+    
+    public void error() {
+        closeDialogMode();
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new MaterialDesignButtonBlue("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+        children(new Text("Hubo un error en el proceso."), 
+                buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        dialogStage.show();
+        buttonOk.setMaxWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+    }
+    
+    public void hayRolCliente() {
+        closeDialogMode();
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new MaterialDesignButtonBlue("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+        children(new Text("No se puede eliminar los horarios por que hay un rol cliente generado."), 
+                buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        dialogStage.show();
+        buttonOk.setMaxWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
-        empleadosTableView.setEditable(Boolean.TRUE);
-        empleadosTableView.getColumns().clear(); 
+        empleadosTableView.setEditable(Boolean.FALSE);
         
-        bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
-        vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        bonoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        transporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        vacacionesField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        decimo3Field.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        decimo4Field.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        jubilacionField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        aporteField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        segurosField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        uniformeField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilterAndUpdate());
+        
+        disableCasoEspecial();
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);
@@ -791,7 +1332,149 @@ public class RolDePagoClienteController implements Initializable {
         buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
             buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
-    }  
+        
+        buttonHorario.setTooltip(
+            new Tooltip("Cambiar horario a varios")
+        );
+        buttonHorario.setOnMouseEntered((MouseEvent t) -> {
+            buttonHorario.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_reloj.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonHorario.setOnMouseExited((MouseEvent t) -> {
+            buttonHorario.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_reloj.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonBorrar.setOnMouseEntered((MouseEvent t) -> {
+            buttonBorrar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_borrar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBorrar.setOnMouseExited((MouseEvent t) -> {
+            buttonBorrar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_borrar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        
+        
+        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("fechaString"));
+        
+        diaColumna.setCellValueFactory(new PropertyValueFactory<>("dia"));
+   
+        clienteColumna.setCellValueFactory(new PropertyValueFactory<>("cliente"));
+        
+        normalesColumna.setCellValueFactory(new PropertyValueFactory<>("normales"));
+       
+        sobreTiempoColumna.setCellValueFactory(new PropertyValueFactory<>("sobreTiempo"));
+   
+        recargoColumna.setCellValueFactory(new PropertyValueFactory<>("recargo"));
+      
+        observacionColumna.setCellValueFactory(new PropertyValueFactory<>("observacion"));
+        
+        marcarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        marcarColumna.setCellFactory(param -> new TableCell<ControlTable, ControlTable>() {
+            private final CheckBox checkBoxMarcar = new CheckBox();
+
+            @Override
+            protected void updateItem(ControlTable controlTable, boolean empty) {
+                super.updateItem(controlTable, empty);
+
+                if (controlTable == null) {
+                    setGraphic(null);
+                    getTableRow().setStyle("");
+                    return;
+                }
+
+                setGraphic(checkBoxMarcar);
+                
+                checkBoxMarcar.setOnAction(event -> {
+                    controlTable.setMarcar(checkBoxMarcar.isSelected());
+                });
+                
+                if (controlTable.getMarcar()) {
+                    checkBoxMarcar.setSelected(true);
+                } else {
+                    checkBoxMarcar.setSelected(false);
+                }
+                
+                if (controlTable.esAjeno()) {
+                    getTableRow().setStyle("-fx-background-color:lightcoral");
+                } else if (controlTable.getNormales() == null) {
+                    getTableRow().setStyle("-fx-background-color:#dddddd");
+                } else {
+                    getTableRow().setStyle("");
+                }
+            }
+        });
+        
+        empleadosTableView.setRowFactory( (Object tv) -> {
+            TableRow<ControlTable> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    ControlTable rowData = row.getItem();
+                    try {
+                        horarioEmpleado(rowData.getControlEmpleado(), 
+                                new Timestamp(rowData.getFecha().getMillis()));
+                    } catch (IOException ex) {
+                        Logger.getLogger(RolDePagoClienteController
+                                .class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            return row ;
+        });
+        
+        leyenda1.setTooltip(new Tooltip("Dia trabajado a otro cliente"));
+        leyenda2.setTooltip(new Tooltip("Dia sin horario"));
+        leyenda3.setTooltip(new Tooltip("Dia con horario creado"));
+    } 
+    
+    private void enableCasoEspecial() {
+        
+        vacacionesField.setEditable(true);
+        decimo3Field.setEditable(true);
+        decimo4Field.setEditable(true);
+        jubilacionField.setEditable(true);
+        aporteField.setEditable(true);
+        segurosField.setEditable(true);
+        uniformeField.setEditable(true);
+        
+        vacacionesField.setDisable(false);
+        decimo3Field.setDisable(false);
+        decimo4Field.setDisable(false);
+        jubilacionField.setDisable(false);
+        aporteField.setDisable(false);
+        segurosField.setDisable(false);
+        uniformeField.setDisable(false);
+    }
+    
+    private void disableCasoEspecial() {
+        
+        vacacionesField.setEditable(false);
+        decimo3Field.setEditable(false);
+        decimo4Field.setEditable(false);
+        jubilacionField.setEditable(false);
+        aporteField.setEditable(false);
+        segurosField.setEditable(false);
+        uniformeField.setEditable(false);
+        
+        vacacionesField.setDisable(true);
+        decimo3Field.setDisable(true);
+        decimo4Field.setDisable(true);
+        jubilacionField.setDisable(true);
+        aporteField.setDisable(true);
+        segurosField.setDisable(true);
+        uniformeField.setDisable(true);
+    }
     
     public static String getMonthName(int month){
         Calendar cal = Calendar.getInstance();
@@ -800,21 +1483,19 @@ public class RolDePagoClienteController implements Initializable {
         return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
     }
     
-    public Double getDecimoCuarto() {
-        ConstanteDAO constanteDao = new ConstanteDAO();
-        Constante constante;
-        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.DECIMO_CUARTO);
-        if (constante == null) {
+    public Double getDecimoCuarto(Boolean buscar) {
+        if (buscar)
+            decimoCuarto = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO);
+        if (decimoCuarto == null) {
             return 30.5d;
         } else {
-            return Double.valueOf(constante.getValor());
+            return Double.valueOf(decimoCuarto.getValor());
         }
     }
     
-    public Double getActuariales(Integer empleadoId) {
-        ActuarialesDAO actuarialesDAO = new ActuarialesDAO();
-        Actuariales actuariales;
-        actuariales = actuarialesDAO.findByEmpleadoId(empleadoId);
+    public Double getActuariales(Integer empleadoId, Boolean buscar) {
+        if (buscar)
+            actuariales = new ActuarialesDAO().findByEmpleadoId(empleadoId);
         if (actuariales == null) {
             return 0d;
         } else {
@@ -822,8 +1503,9 @@ public class RolDePagoClienteController implements Initializable {
         }
     }
     
-    public Double getSeguro(Integer empresaId) {
-        Seguro seguro = new SeguroDAO().findByEmpresaId(empresaId);
+    public Double getSeguro(Integer empresaId, Boolean buscar) {
+        if (buscar)
+            seguro = new SeguroDAO().findByEmpresaId(empresaId);
         if (seguro == null) {
           return 0d;  
         } else {
@@ -831,8 +1513,9 @@ public class RolDePagoClienteController implements Initializable {
         }  
     }
     
-    public Double getUniforme(Integer empresaId) {
-        Uniforme uniforme = new UniformeDAO().findByEmpresaId(empresaId);
+    public Double getUniforme(Integer empresaId, Boolean buscar) {
+        if (buscar)
+            uniforme = new UniformeDAO().findByEmpresaId(empresaId);
         if (uniforme == null) {
           return 0d;  
         } else {
@@ -844,7 +1527,7 @@ public class RolDePagoClienteController implements Initializable {
         if (bonoField.getText().isEmpty()) {
             return 0d;
         } else {
-            return Double.valueOf(bonoField.getText());
+            return round(bonoField.getText());
         }
     }
     
@@ -852,26 +1535,165 @@ public class RolDePagoClienteController implements Initializable {
         if (transporteField.getText().isEmpty()) {
             return 0d;
         } else {
-            return Double.valueOf(transporteField.getText());
+            return round(transporteField.getText());
         }
     }
     
     public Double getVacaciones() {
-        if (vacacionesField.getText().isEmpty()) {
+        try {
+            DateTime fechaInicial = new DateTime(getToday().getTime());
+            DateTime fechaFinal = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
+            int years = Years.yearsBetween(fechaInicial.withTimeAtStartOfDay(), 
+                    fechaFinal.withTimeAtStartOfDay()).getYears();
+            int diasExtras;
+            if (years >= 5) {
+                diasExtras = years - 5;
+            } else {
+                diasExtras = 0;
+            }
+            Integer diasDerecho = 15 + diasExtras;
+            Double sueldoNeto = Double.valueOf(totalSalario.getText());
+            Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
+
+            return vacaciones;
+        } catch (Exception e) {
+            e.printStackTrace();
             return 0d;
-        } else {
-            return Double.valueOf(vacacionesField.getText());
         }
     }
     
-    public static EventHandler<KeyEvent> numDecimalFilter() {
+     public static Timestamp getToday() throws ParseException {
+        
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        Date today = new Date();
+
+        Date todayWithZeroTime = formatter.parse(formatter.format(today));
+        
+        return new Timestamp(todayWithZeroTime.getTime());
+    }
+    
+    
+    public EventHandler<KeyEvent> numDecimalFilterAndUpdate() {
 
         EventHandler<KeyEvent> aux = (KeyEvent keyEvent) -> {
+            
             if (!"0123456789.".contains(keyEvent.getCharacter())) {
                 keyEvent.consume();
-                
             }
+            String[] strArray = new String[] {keyEvent.getCharacter()};
+            int letterCount = 0;
+            for (String letter: strArray) {
+                if (letter.equalsIgnoreCase("."))
+                    letterCount++;
+            }
+            if (letterCount >= 2) {
+                keyEvent.consume();
+            }
+            
+            if (!keyEvent.getCharacter().equalsIgnoreCase("\r"))
+                indicacion1.setText("Presione enter al terminar de escribir");
+            else
+                buttonGenerarRol.requestFocus();
         };
         return aux;
+    }
+    
+    public class DataBaseThread implements Runnable {
+        
+        public final Integer BORRAR = 1;
+        
+        Integer opcion;
+
+        public DataBaseThread(Integer opcion){
+            this.opcion = opcion;
+        }
+
+        @Override
+        public void run() {
+    
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        cancel();
+                        if (Objects.equals(opcion, BORRAR)) {
+                            borrar();
+                        }
+                    }
+             }, 1000, 1000);
+            
+        }
+        
+        public void borrar() {
+            System.out.println("Comenzado borrado");
+            try {
+                Boolean cancelar = false;
+                List<RolCliente> rolClientes = new RolClienteDAO()
+                        .findAllByFechaAndEmpleadoId(inicio, empleado.getId());
+                for (ControlTable controlTable: (List<ControlTable>) data) {
+                    if (controlTable.getMarcar()) {
+                        ControlEmpleado controlEmpleadoDelete = 
+                                controlTable.getControlEmpleado();
+                        if (controlEmpleadoDelete != null) {
+                            
+                            for (RolCliente rolCliente: rolClientes) {
+                                if (rolCliente.getCliente() != null 
+                                        && controlEmpleadoDelete.getCliente() != null) {
+                                    if (controlEmpleadoDelete.getCliente()
+                                            .getId().equals(rolCliente.getCliente().getId())) {
+                                        cancelar = true;  
+                                    }
+                                } else if (rolCliente.getCliente() == null 
+                                        && controlEmpleadoDelete.getCliente() == null) {
+                                    cancelar = true;
+                                }
+                            }
+                        } 
+                    }
+                }
+                
+                if (cancelar) {
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            hayRolCliente();
+                        }
+                    });
+                } else {
+                
+                    for (ControlTable controlTable: (List<ControlTable>) data) {
+                        if (controlTable.getMarcar()) {
+                            ControlEmpleado controlEmpleadoDelete = 
+                                    controlTable.getControlEmpleado();
+                            if (controlEmpleadoDelete != null) {
+                                new ControlEmpleadoDAO().delete(controlEmpleadoDelete);
+                                controlesEmpleado.remove(controlEmpleadoDelete);
+                                HibernateSessionFactory.getSession().flush();
+                                quitarControlEmpleado(controlTable);
+
+                                // Registro para auditar
+                                String detalles = "elimino el horario del empleado " 
+                                        + empleado.getApellido() + " " + empleado.getNombre()
+                                        + "del dia " + Fechas.getFechaConMes(controlEmpleadoDelete.getFecha());
+                                aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+                            }
+                        }
+                    }
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            updateWindows();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        error();
+                    }
+                });
+            }
+        }
+        
     }
 }

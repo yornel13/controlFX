@@ -26,7 +26,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 /**
@@ -79,7 +78,7 @@ public class ClientesEmpresaController implements Initializable {
     
     @FXML
     private void mostrarEmpleadosSinCliente(ActionEvent event) {
-        aplicacionControl.mostrarHorasEmpleadosSinCliente(empresa);
+        aplicacionControl.mostrarHorasEmpleadosCliente(empresa, null, stagePrincipal);
     }
     
     @FXML
@@ -120,8 +119,7 @@ public class ClientesEmpresaController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     Cliente rowData = row.getItem();
-                    aplicacionControl.mostrarHorasEmpleadosCliente(empresa, 
-                            clientesDAO.findById(rowData.getId()));
+                    aplicacionControl.mostrarHorasEmpleadosCliente(empresa, rowData, stagePrincipal);
                 }
             });
             return row ;

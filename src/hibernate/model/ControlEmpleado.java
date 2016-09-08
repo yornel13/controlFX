@@ -2,7 +2,6 @@ package hibernate.model;
 
 // default package
 
-import static aplicacion.control.util.Numeros.round;
 import java.sql.Timestamp;
 
 /**
@@ -20,9 +19,10 @@ public class ControlEmpleado implements java.io.Serializable {
 	private Double normales;
         private Double recargo;
 	private Double sobretiempo;
-	private Boolean libre;
-        private Boolean vacaciones;
-        private Boolean falta;
+	private String caso;
+        private Boolean medioDia;
+        private Integer horaInicio;
+        private Integer horaFin;
 
 	// Constructors
 
@@ -31,22 +31,16 @@ public class ControlEmpleado implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public ControlEmpleado(Usuario usuario, Timestamp fecha,
-			Boolean libre, Boolean vacaciones) {
+	public ControlEmpleado(Usuario usuario, Timestamp fecha) {
 		this.usuario = usuario;
 		this.fecha = fecha;
-		this.libre = libre;
-		this.vacaciones = vacaciones;
 	}
 
 	/** full constructor */
-	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha,
-			Boolean libre, Boolean vacaciones) {
+	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha) {
 		this.usuario = usuario;
 		this.cliente = cliente;
 		this.fecha = fecha;
-		this.libre = libre;
-		this.vacaciones = vacaciones;
 	}
 
 	// Property accessors
@@ -107,28 +101,37 @@ public class ControlEmpleado implements java.io.Serializable {
             this.sobretiempo = sobretiempo;
         }
 
-        public Boolean getLibre() {
-            return libre;
+        public String getCaso() {
+            return caso;
         }
 
-        public void setLibre(Boolean libre) {
-            this.libre = libre;
+        public void setCaso(String caso) {
+            this.caso = caso;
         }
 
-        public Boolean getVacaciones() {
-            return vacaciones;
+        public Boolean getMedioDia() {
+            return medioDia;
         }
 
-        public void setVacaciones(Boolean vacaciones) {
-            this.vacaciones = vacaciones;
+        public void setMedioDia(Boolean medioDia) {
+            this.medioDia = medioDia;
         }
+
+        public Integer getHoraInicio() {
+            return horaInicio;
+        }
+
+        public void setHoraInicio(Integer horaInicio) {
+            this.horaInicio = horaInicio;
+        }
+
+        public Integer getHoraFin() {
+            return horaFin;
+        }
+
+        public void setHoraFin(Integer horaFin) {
+            this.horaFin = horaFin;
+        }
+
         
-        public Boolean getFalta() {
-            return falta;
-        }
-
-        public void setFalta(Boolean falta) {
-            this.falta = falta;
-        }
-
 }

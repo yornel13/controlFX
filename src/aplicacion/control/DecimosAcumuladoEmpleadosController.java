@@ -598,7 +598,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
             
             RolIndividualDAO rolDao = new RolIndividualDAO();
             
-            RolIndividual rolIndividual = rolDao.findByFechaAndEmpleadoIdAndDetalles(fin, 
+            RolIndividual rolIndividual = rolDao.findByFechaAndEmpleadoIdAndDetalles(inicio, 
                     user.getId(), Const.ROL_PAGO_INDIVIDUAL);
             
             if (rolIndividual != null) {

@@ -66,17 +66,22 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         
         public List<ControlEmpleado> findAllByEmpleadoId(Integer usuarioId) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado WHERE usuario_id = :usuario_id")
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE usuario_id = :usuario_id")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("usuario_id", usuarioId);
                 Object result = query.list();
                 return (List<ControlEmpleado>) result;
 	}
         
-        public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(Integer usuarioId, Timestamp inicio, Timestamp fin) {
+        public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(
+                Integer usuarioId, Timestamp inicio, Timestamp fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado WHERE usuario_id = :usuario_id "
-                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and fecha >= :inicio "
+                            + "and fecha <= :fin "
+                            + "order by fecha")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("inicio", inicio)
@@ -87,7 +92,8 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         
         public List<ControlEmpleado> findAllByClienteId(Integer clienteId) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado WHERE cliente_id = :cliente_id")
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE cliente_id = :cliente_id")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("cliente_id", clienteId);
                 Object result = query.list();
@@ -97,8 +103,12 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         public List<ControlEmpleado> findAllByEmpleadoIdClienteIdInDeterminateTime(
                 Integer usuarioId, Integer clienteId, Timestamp inicio, Timestamp fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado WHERE usuario_id = :usuario_id and cliente_id = :cliente_id "
-                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and cliente_id = :cliente_id "
+                            + "and fecha >= :inicio "
+                            + "and fecha <= :fin "
+                            + "order by fecha")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("cliente_id", clienteId)
@@ -111,23 +121,13 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         public List<ControlEmpleado> findAllByClienteIdInDeterminateTime(
                 Integer clienteId, Timestamp inicio, Timestamp fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado WHERE cliente_id = :cliente_id "
-                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE cliente_id = :cliente_id "
+                            + "and fecha >= :inicio "
+                            + "and fecha <= :fin "
+                            + "order by fecha")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("cliente_id", clienteId)
-                    .setParameter("inicio", inicio)
-                    .setParameter("fin", fin);
-                Object result = query.list();
-                return (List<ControlEmpleado>) result;
-	}
-        
-        public List<ControlEmpleado> findAllByEmpleadoIdSinClienteInDeterminateTime(
-                Integer usuarioId, Timestamp inicio, Timestamp fin) {
-		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado WHERE usuario_id = :usuario_id and cliente_id is null "
-                            + "and fecha >= :inicio and fecha <= :fin order by fecha")
-                    .addEntity(ControlEmpleado.class)
-                    .setParameter("usuario_id", usuarioId)
                     .setParameter("inicio", inicio)
                     .setParameter("fin", fin);
                 Object result = query.list();
@@ -137,8 +137,11 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         public List<ControlEmpleado> findAllBySinClienteInDeterminateTime(
                 Timestamp inicio, Timestamp fin) {
             Query query = getSession().
-                createSQLQuery("SELECT * FROM control_empleado WHERE cliente_id is null "
-                        + "and fecha >= :inicio and fecha <= :fin order by fecha")
+                createSQLQuery("SELECT * FROM control_empleado "
+                        + "WHERE cliente_id is null "
+                        + "and fecha >= :inicio "
+                        + "and fecha <= :fin "
+                        + "order by fecha")
                 .addEntity(ControlEmpleado.class)
                 .setParameter("inicio", inicio)
                 .setParameter("fin", fin);
@@ -146,9 +149,27 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
             return (List<ControlEmpleado>) result;
 	}
         
+        public List<ControlEmpleado> findAllByEmpleadoIdSinClienteInDeterminateTime(
+                Integer usuarioId, Timestamp inicio, Timestamp fin) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and cliente_id is null "
+                            + "and fecha >= :inicio "
+                            + "and fecha <= :fin "
+                            + "order by fecha")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+                Object result = query.list();
+                return (List<ControlEmpleado>) result;
+	}
+        
         public ControlEmpleado findByFecha(Timestamp fecha, Integer usuarioId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado where fecha = :fecha "
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "where fecha = :fecha "
                             + "and usuario_id = :usuario_id")
                     .addEntity(ControlEmpleado.class)
                     .setParameter("fecha", fecha)

@@ -290,7 +290,7 @@ public class PagoQuincenalPagadoController implements Initializable {
     
     void hacerBorrado() {
         
-        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(pagoQuincena.getFinMes(), 
+        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(pagoQuincena.getInicioMes(), 
                         pagoQuincena.getUsuario().getId()) == null) {
             new PagoQuincenaDAO().delete(pagoQuincena);
             HibernateSessionFactory.getSession().flush();

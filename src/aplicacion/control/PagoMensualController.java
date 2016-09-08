@@ -93,7 +93,6 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -501,7 +500,7 @@ public class PagoMensualController implements Initializable {
         
         pagosQuincena = new ArrayList<>();
         pagosQuincena.addAll(new PagoQuincenaDAO()
-                .findAllInDeterminateTime(fin));
+                .findAllInDeterminateTime(inicio));
         usuarios = new ArrayList<>();
         usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivo(empresa.getId()));
         data = FXCollections.observableArrayList(); 
@@ -570,14 +569,14 @@ public class PagoMensualController implements Initializable {
         ArrayList<RolCliente> pagos = new ArrayList<>();
         ArrayList<PagoMesItem> pagoMesItems = new ArrayList<>();
         ArrayList<Deuda> deudasAPagar = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(fin, 
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, 
                 empleadoTable.getId()));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(fin, 
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, 
                     empleadoTable.getId()));
         if (pagos.isEmpty()) 
             empleadoTable.setSinRoles(Boolean.TRUE);
-        Integer diasTextValor = 0;
+        Double diasTextValor = 0d;
         Double normalesTextValor = 0d;
         Double suplementariasTextValor = 0d;
         Double sobreTiempoTextValor = 0d;
@@ -702,7 +701,7 @@ public class PagoMensualController implements Initializable {
         aPercibirValor = ingresoValor - deduccionesValor;
         
         RolIndividual pagoRol;
-        pagoRol = new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(fin, 
+        pagoRol = new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, 
                 empleado.getId(), Const.ROL_PAGO_INDIVIDUAL);
         
         if (pagoRol == null) {
@@ -748,7 +747,7 @@ public class PagoMensualController implements Initializable {
            empleadoTable.setPagado("Si");
            empleadoTable.setPagar(false);
            PagoMes pagoMes = new PagoMesDAO()
-                   .findInDeterminateTimeByUsuarioId(fin, empleado.getId());
+                   .findInDeterminateTimeByUsuarioId(inicio, empleado.getId());
            aPercibirValor = pagoMes.getMonto();
         }
         

@@ -176,7 +176,7 @@ public class HorasEmpleadosSinClienteController implements Initializable {
                     .findAllBySinClienteInDeterminateTime(inicio, fin);
            
             usuarios.stream().map((user) -> {
-                Integer dias = 0;
+                Double dias = 0d;
                 Double normales = 0d;
                 Double sobreTiempo = 0d;
                 Double suplementarias = 0d;

@@ -148,17 +148,18 @@ public class InEmpresaController implements Initializable {
             MenuItem menuItemCliente = new MenuItem("Por Cliente");
             buttonHoras.getItems().add(menuItemCliente);
             MenuItem menuItemNuevo = new MenuItem("Testing");
-            buttonHoras.getItems().add(menuItemNuevo);
+            //buttonHoras.getItems().add(menuItemNuevo);
             MenuItem menuItemHorarios = new MenuItem("Horarios");
             buttonHoras.getItems().add(menuItemHorarios);
             menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
+                aplicacionControl.mostrarHorasEmpleadosPorDia(empresa, stagePrincipal);
             });
             menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
             });
             menuItemNuevo.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarHorasEmpleadosPorDia(empresa, stagePrincipal);
+                aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
+                // no esta en uso
             });
             menuItemHorarios.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarHorarios(empresa, stagePrincipal);
@@ -245,6 +246,8 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemDeudas);
             MenuItem menuItemIess = new MenuItem("IESS Acumulado");
             buttonEdicion.getItems().add(menuItemIess);
+            MenuItem menuItemPlantilla = new MenuItem("Planilla IESS");
+            buttonEdicion.getItems().add(menuItemPlantilla);
             menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
             });
@@ -262,6 +265,9 @@ public class InEmpresaController implements Initializable {
             });
             menuItemIess.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
+            });
+            menuItemPlantilla.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarPlanillaIess(empresa, stagePrincipal);     
             });
             buttonEdicion.setOnMouseEntered((MouseEvent t) -> {
                 buttonEdicion.setStyle("-fx-background-color: #E0E0E0;");

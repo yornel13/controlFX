@@ -20,6 +20,7 @@ public class Horario implements java.io.Serializable {
     private Double recargo;
     private Double sobretiempo;
     private Timestamp creacion;
+    private Boolean medioDia;
 
     // Constructors
 
@@ -101,5 +102,15 @@ public class Horario implements java.io.Serializable {
     public void setCreacion(Timestamp creacion) {
         this.creacion = creacion;
     }
+
+    public Boolean getMedioDia() {
+        return medioDia;
+    }
+
+    public void setMedioDia(Boolean medioDia) {
+        this.medioDia = medioDia;
+    }
+    
+    
 
 }

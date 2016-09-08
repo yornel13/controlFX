@@ -177,13 +177,13 @@ public class EditarHorasExtrasController implements Initializable {
             selector.getSelectionModel().select(controlEmpleado.getCliente().getNombre());
         }
         datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
-        if (controlEmpleado.getLibre()) {
+        /*if (controlEmpleado.getLibre()) {
             marcarLibre.setSelected(true);
             checkLibre(null);
         } else if (controlEmpleado.getFalta()) {
             marcarFalta.setSelected(true);
             checkFalta(null);
-        }
+        }*/
     }
 
   

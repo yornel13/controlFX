@@ -9,44 +9,80 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="450.0" maxWidth="700.0" minHeight="450.0" minWidth="700.0" prefHeight="450.0" prefWidth="700.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosClienteController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.HorasEmpleadosClienteController">
     <children>
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnClientes" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Button fx:id="buttonPagar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#crearRoles" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="600.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Button layoutX="591.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
+            <Button layoutX="361.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
+            <Accordion layoutX="216.0" layoutY="24.0" />
+            <DatePicker fx:id="pickerHasta" layoutX="441.0" layoutY="15.0" promptText="fin" />
+            <DatePicker fx:id="pickerDe" layoutX="211.0" layoutY="15.0" promptText="inicio" />
+            <Label layoutX="186.0" layoutY="20.0" text="De" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="395.0" layoutY="20.0" text="Hasta" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="703.0" layoutY="62.0" text="Todos" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="checkBoxTodos" layoutX="749.0" layoutY="62.0" mnemonicParsing="false" onAction="#marcarTodos" />
+            <Button fx:id="buttonSiguiente" layoutX="591.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonAnterior" layoutX="359.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonGuardar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#guardarRoles" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+         </children>
+      </Pane>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="10.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="680.0" minHeight="-Infinity" minWidth="680.0" prefHeight="350.0" prefWidth="680.0" style="-fx-background-color: white;">
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
           <TableColumn fx:id="empleadoColumna" prefWidth="210.0" text="Empleado" />
-            <TableColumn fx:id="cargoColumna" prefWidth="120.0" text="Cargo" />
+            <TableColumn fx:id="cargoColumna" prefWidth="180.0" text="Cargo" />
             <TableColumn fx:id="diasColumna" prefWidth="65.0" text="Dias" />
             <TableColumn fx:id="normalesColumna" prefWidth="65.0" text="Horas(N)" />
             <TableColumn fx:id="sobretiempoColumna" prefWidth="65.0" text="Horas(ST)" />
             <TableColumn fx:id="recargoColumna" prefWidth="65.0" text="Horas(RC)" />
+            <TableColumn fx:id="marcarColumna" prefWidth="30.0" text="*" />
         </columns>
       </TableView>
-      <Button layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
-      <Button layoutX="304.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
-      <DatePicker fx:id="pickerHasta" layoutX="384.0" layoutY="10.0" promptText="fin" />
-      <DatePicker fx:id="pickerDe" layoutX="154.0" layoutY="10.0" promptText="inicio" />
-      <Label layoutX="129.0" layoutY="15.0" text="De" textFill="#fffbfb">
+      <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
+         <children>
+            <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Label>
+            <Button fx:id="login" layoutX="725.0" layoutY="2.0" maxHeight="25.0" mnemonicParsing="false" onAction="#onClickLoginButton" prefHeight="25.0" prefWidth="75.0" style="-fx-background-color: transparent;" text="Ingresar" underline="true">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font>
+            </Button>
+         </children>
+      </Pane>
+      <Button fx:id="buttonBorrar" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoBorrar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/borrar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Label fx:id="contador" alignment="CENTER" layoutX="264.0" layoutY="549.0" prefHeight="17.0" prefWidth="272.0">
          <font>
-            <Font size="14.0" />
+            <Font name="Arial Rounded MT Bold" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="338.0" layoutY="15.0" text="Hasta" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Button fx:id="buttonSiguiente" layoutX="534.0" layoutY="7.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Button>
-      <Button fx:id="buttonAnterior" layoutX="302.0" layoutY="7.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
-      </Button>
-      <TextField fx:id="filterField" layoutX="10.0" layoutY="53.0" prefHeight="25.0" prefWidth="680.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+      <Button fx:id="buttonCancelar" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoCancelar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/cancelar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

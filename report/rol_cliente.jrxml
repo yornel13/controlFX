@@ -36,7 +36,7 @@
 	<parameter name="fecha" class="java.lang.String"/>
 	<field name="cedula" class="java.lang.String"/>
 	<field name="empleado" class="java.lang.String"/>
-	<field name="dias" class="java.lang.Integer"/>
+	<field name="dias" class="java.lang.Double"/>
 	<field name="salario" class="java.lang.Double"/>
 	<field name="sobretiempo" class="java.lang.Double"/>
 	<field name="recargo" class="java.lang.Double"/>
@@ -432,7 +432,7 @@
 					<rightPen lineWidth="0.75"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{dias}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{dias}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00">
 				<reportElement mode="Transparent" x="105" y="5" width="50" height="20"/>

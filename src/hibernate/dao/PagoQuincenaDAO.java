@@ -95,42 +95,33 @@ public class PagoQuincenaDAO extends BaseHibernateDAO {
 	public List findByMonto(Object monto) {
 		return findByProperty(MONTO, monto);
 	}
-        /*
-        public List<PagoQuincena> findAllInDeterminateTime(Timestamp inicio, Timestamp fin) {
-		Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago_quincena WHERE fecha >= :inicio and fecha <= :fin")
-                    .addEntity(PagoQuincena.class)
-                    .setParameter("inicio", inicio)
-                    .setParameter("fin", fin);
-                Object result = query.list();
-                return (List<PagoQuincena>) result;
-	}*/
         
-        public List<PagoQuincena> findAllInDeterminateTime(Timestamp fin) {
+        public List<PagoQuincena> findAllInDeterminateTime(Timestamp fecha) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago_quincena WHERE "
-                            + "fin_mes = :fin")
+                    createSQLQuery("SELECT * FROM pago_quincena "
+                            + "WHERE inicio_mes = :fecha")
                     .addEntity(PagoQuincena.class)
-                    .setParameter("fin", fin);
+                    .setParameter("fecha", fecha);
                 Object result = query.list();
                 return (List<PagoQuincena>) result;
 	}
         
-        public PagoQuincena findInDeterminateTimeByUsuarioId(Timestamp fin, Integer usuarioId) {
+        public PagoQuincena findInDeterminateTimeByUsuarioId(Timestamp fecha, Integer usuarioId) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago_quincena WHERE "
-                            + "usuario_id = :usuario_id and "
-                            + "fin_mes = :fin")
+                    createSQLQuery("SELECT * FROM pago_quincena "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and inicio_mes = :fecha")
                     .addEntity(PagoQuincena.class)
                     .setParameter("usuario_id", usuarioId)
-                    .setParameter("fin", fin);
+                    .setParameter("fecha", fecha);
                 Object result = query.uniqueResult();
                 return (PagoQuincena) result;
 	}
         
         public List<PagoQuincena> findAllByUsuarioId(Integer usuarioId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM pago_quincena where usuario_id = :usuario_id")
+                    createSQLQuery("SELECT * FROM pago_quincena "
+                            + "where usuario_id = :usuario_id")
                     .addEntity(PagoQuincena.class)
                     .setParameter("usuario_id", usuarioId);
             Object result = query.list();
