@@ -885,6 +885,7 @@ public class PagoMensualController implements Initializable {
 
                 if (empleadoTable == null) {
                     setGraphic(null);
+                    getTableRow().setStyle("");
                     return;
                 }
                 
@@ -899,6 +900,12 @@ public class PagoMensualController implements Initializable {
                         checkBoxpagar.setDisable(false);
                     }
                     checkBoxpagar.setSelected(empleadoTable.getPagar());
+                }
+                
+                if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                    getTableRow().setStyle("-fx-background-color:#A5D6A7");
+                } else {
+                    getTableRow().setStyle("");
                 }
                 checkBoxpagar.setOnAction(event -> {
                      empleadoTable.setPagar(checkBoxpagar.isSelected());

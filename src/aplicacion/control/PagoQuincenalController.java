@@ -738,7 +738,9 @@ public class PagoQuincenalController implements Initializable {
                      empleadoTable.setPagar(checkBoxpagar.isSelected());
                 });
                 
-                if (empleadoTable.getProblem()) {
+                if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                    getTableRow().setStyle("-fx-background-color:#A5D6A7");
+                } else if (empleadoTable.getProblem()) {
                     getTableRow().setStyle("-fx-background-color:lightcoral");
                 } else {
                     getTableRow().setStyle("");

@@ -1104,7 +1104,7 @@ public class AplicacionControl extends Application {
             if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesParaRol.fxml"));
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesParaRoles.fxml"));
                     AnchorPane ventanaClientesEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Clientes");
@@ -1116,7 +1116,7 @@ public class AplicacionControl extends Application {
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaClientesEmpresa);
                     ventana.setScene(scene);
-                    ClientesParaRolController controller = loader.getController();
+                    ClientesParaRolesController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
@@ -2000,7 +2000,10 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolCliente.fxml"));
                     AnchorPane ventanaAuditar = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Rol del Cliente " + cliente.getNombre());
+                    if (cliente != null)
+                        ventana.setTitle("Rol del Cliente " + cliente.getNombre());
+                    else 
+                        ventana.setTitle("Rol de pago para personal Administrativo");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
@@ -2023,8 +2026,12 @@ public class AplicacionControl extends Application {
                         }
                     });
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO + " del cliente " 
-                            + cliente.getNombre(), permisos.getUsuario(), null);
+                    if (cliente != null)
+                        au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO + " del cliente " 
+                                + cliente.getNombre(), permisos.getUsuario(), null);
+                    else
+                        au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO + " para "
+                                + "personal administratico", permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -283,8 +283,14 @@ public class RolClienteController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
-            parametros.put("cliente", cliente.getNombre());
-            parametros.put("numeracion", cliente.getRuc());
+            if (cliente != null) {
+                parametros.put("cliente", cliente.getNombre());
+                parametros.put("numeracion", cliente.getRuc());
+            } else {
+                parametros.put("cliente", "Personal Administrativo");
+                parametros.put("numeracion", "Personal Administrativo");
+            }
+            
             parametros.put("fecha", Fechas.getFechaConMes(inicio) + " a " + Fechas.getFechaConMes(fin));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
@@ -298,7 +304,11 @@ public class RolClienteController implements Initializable {
             } 
             
             // Registro para auditar
-            String detalles = "genero el recibo rol del cliente " + cliente.getNombre();
+            String detalles;
+            if (cliente != null)
+                detalles = "genero el recibo rol del cliente " + cliente.getNombre();
+            else
+                detalles = "genero el recibo rol del personal administrativo";
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();
@@ -388,8 +398,13 @@ public class RolClienteController implements Initializable {
         
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndClienteIdAndEmpresaId(inicio, 
-                cliente.getId(), empresa.getId()));
+        if (cliente != null)
+            pagos.addAll(pagoDAO.findAllByFechaAndClienteIdAndEmpresaId(inicio, 
+                    cliente.getId(), empresa.getId())); 
+        else
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpresaIdSinCliente(inicio, 
+                    empresa.getId())); 
+        
         sueldoTotalTextValor = 0d;
         extraTextValor = 0d;
         bonosTextValor = 0d;
