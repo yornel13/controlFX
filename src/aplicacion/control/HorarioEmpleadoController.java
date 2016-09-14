@@ -864,7 +864,7 @@ public class HorarioEmpleadoController implements Initializable {
                             controlEmpleadoNew.setRecargo(0d);
                             controlEmpleadoNew.setCaso(Const.PERMISO);
                         } else if (marcarVacaciones.isSelected()) {
-                            controlEmpleadoNew.setNormales(8d);
+                            controlEmpleadoNew.setNormales(0d);
                             controlEmpleadoNew.setSobretiempo(0d);
                             controlEmpleadoNew.setRecargo(0d);
                             controlEmpleadoNew.setCaso(Const.VACACIONES);
@@ -971,7 +971,7 @@ public class HorarioEmpleadoController implements Initializable {
                                         controlEmpleadoNew.setRecargo(0d);
                                         controlEmpleadoNew.setCaso(Const.PERMISO);
                                     } else if (marcarVacaciones.isSelected()) {
-                                        controlEmpleadoNew.setNormales(8d);
+                                        controlEmpleadoNew.setNormales(0d);
                                         controlEmpleadoNew.setSobretiempo(0d);
                                         controlEmpleadoNew.setRecargo(0d);
                                         controlEmpleadoNew.setCaso(Const.VACACIONES);
@@ -1147,7 +1147,7 @@ public class HorarioEmpleadoController implements Initializable {
                                 controlEmpleadoNew.setRecargo(0d);
                                 controlEmpleadoNew.setCaso(Const.PERMISO);
                             } else if (marcarVacaciones.isSelected()) {
-                                controlEmpleadoNew.setNormales(8d);
+                                controlEmpleadoNew.setNormales(0d);
                                 controlEmpleadoNew.setSobretiempo(0d);
                                 controlEmpleadoNew.setRecargo(0d);
                                 controlEmpleadoNew.setCaso(Const.VACACIONES);

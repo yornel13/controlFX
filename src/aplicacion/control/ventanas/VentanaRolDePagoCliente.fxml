@@ -158,8 +158,8 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <TextField fx:id="bonoField" alignment="CENTER" onAction="#calcularHoras" text="0.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <TextField fx:id="transporteField" alignment="CENTER" onAction="#calcularHoras" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <TextField fx:id="bonoField" alignment="CENTER" onAction="#calcularVacaciones" text="0.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            <TextField fx:id="transporteField" alignment="CENTER" onAction="#calcularVacaciones" text="0.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
             <TextField fx:id="vacacionesField" alignment="CENTER" onAction="#calcularVacaciones" text="0.0" GridPane.columnIndex="6" GridPane.rowIndex="1" />
          </children>
          <columnConstraints>

@@ -25,7 +25,6 @@ import hibernate.model.Cliente;
 import hibernate.model.Constante;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
-import hibernate.model.Horario;
 import hibernate.model.RolCliente;
 import hibernate.model.RolIndividual;
 import hibernate.model.Seguro;
@@ -512,7 +511,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         loadingMode();
     }
     
-    public RolCliente calcularPago(Double dias, Double normales, Double sobreTiempo, 
+    public RolCliente calcularPago(Double dias, Double diasDecimo4to, Double diasJubilacion, Double normales, Double sobreTiempo, 
             Double suplementarias, Usuario empleado, Actuariales actuariales) {
         
         RolCliente pago = null;
@@ -531,14 +530,15 @@ public class HorasEmpleadosClienteController implements Initializable {
         Double totalBonoDouble = round(0);
         Double totalTransporteDouble = round(0);
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
-        Double totalVacacionesDouble = round(getVacaciones(empleado, totalSalarioDouble));
+        Double sueldoSinVacaciones = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonoDouble + totalTransporteDouble;
+        Double totalVacacionesDouble = round(getVacaciones(empleado, sueldoSinVacaciones));
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
                 + totalBonosDouble + totalVacacionesDouble);
         ////////////////////////////////////////////////////
         Double decimoTercero = round(subTotalDouble / 12d);
-        Double decimoCuarto = round(getDecimoCuarto()/30d * dias);
-        Double jubilacionPatronal = round((getActuariales(actuariales)/ 360d) * dias);
+        Double decimoCuarto = round(getDecimoCuarto()/30d * diasDecimo4to);
+        Double jubilacionPatronal = round((getActuariales(actuariales)/ 360d) * diasJubilacion);
         Double aportePatronal = round(subTotalDouble * 12.15d / 100d);
         Double segurosDecimal = round(getSeguro(empleado.getDetallesEmpleado()
                 .getEmpresa().getId()) * dias);
@@ -608,7 +608,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         Double totalBonoDouble = round(bono);
         Double totalTransporteDouble = round(transporte);
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
-        Double totalVacacionesDouble = round(getVacaciones(empleado, totalSalarioDouble));
+        Double sueldoSinVacaciones = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonoDouble + totalTransporteDouble;
+        Double totalVacacionesDouble = round(getVacaciones(empleado, sueldoSinVacaciones));
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
                 + totalBonosDouble + totalVacacionesDouble);
@@ -719,12 +720,12 @@ public class HorasEmpleadosClienteController implements Initializable {
         }  
     }
     
-    public Double getVacaciones(Usuario empleado, Double salario) {
+    public Double getVacaciones(Usuario empleado, Double sueldoSinVacaciones) {
         try {
             DateTime fechaInicial = new DateTime(getToday().getTime());
             DateTime fechaFinal = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
-            int years = Years.yearsBetween(fechaInicial.withTimeAtStartOfDay(), 
-                    fechaFinal.withTimeAtStartOfDay()).getYears();
+            int years = Years.yearsBetween(fechaFinal.withTimeAtStartOfDay(), 
+                    fechaInicial.withTimeAtStartOfDay()).getYears();
             int diasExtras;
             if (years >= 5) {
                 diasExtras = years - 5;
@@ -732,7 +733,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                 diasExtras = 0;
             }
             Integer diasDerecho = 15 + diasExtras;
-            Double sueldoNeto = salario;
+            Double sueldoNeto = sueldoSinVacaciones;
             Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
 
             return vacaciones;
@@ -1004,7 +1005,6 @@ public class HorasEmpleadosClienteController implements Initializable {
                         
                         if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                 || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
                                 || control.getCaso().equalsIgnoreCase(Const.CM)) {
                             
                             if (control.getMedioDia())
@@ -1535,6 +1535,8 @@ public class HorasEmpleadosClienteController implements Initializable {
 
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     Double dias = 0d;
+                    Double diasDecimo4to = 0d;
+                    Double diasJubilacion = 0d;
                     Double normales = 0d;
                     Double sobreTiempo = 0d;
                     Double suplementarias = 0d;
@@ -1551,7 +1553,6 @@ public class HorasEmpleadosClienteController implements Initializable {
 
                             if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                     || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
                                     || control.getCaso().equalsIgnoreCase(Const.CM)) {
 
                                 if (control.getMedioDia())
@@ -1573,11 +1574,38 @@ public class HorasEmpleadosClienteController implements Initializable {
                                     normales += control.getNormales();
                                 }
                             }
+                            
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                    || control.getCaso().equalsIgnoreCase(Const.PERMISO)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)
+                                    || control.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                                if (control.getMedioDia())
+                                    diasJubilacion += 0.5; 
+                                else
+                                    diasJubilacion += 1;
+
+                            } 
+                            
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)
+                                    || control.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                                if (control.getMedioDia())
+                                    diasDecimo4to += 0.5; 
+                                else
+                                    diasDecimo4to += 1;
+
+                            } 
                         }
                     }
                     Actuariales actuariales = new ActuarialesDAO().findByEmpleadoId(empleadoTable.getId());
                     empleadoTable.setActuariales(actuariales);
-                    RolCliente rolCliente = calcularPago(dias, normales, sobreTiempo, suplementarias, usuario, actuariales);
+                    RolCliente rolCliente = calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, usuario, actuariales);
                     empleadoTable.setRolCliente(rolCliente);
                     empleadoTable.setBono("0");
                     empleadoTable.setTransporte("0");

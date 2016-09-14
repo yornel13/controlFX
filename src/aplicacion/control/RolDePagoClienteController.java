@@ -867,11 +867,15 @@ public class RolDePagoClienteController implements Initializable {
     
     @FXML
     public void calcularVacaciones(ActionEvent event) {
-        variableVacaciones = true;
-        casoEspecial = false;
-        calcularHoras(event);
-        variableVacaciones = false;
-        casoEspecial = true;
+        if (casoEspecial) {
+            variableVacaciones = true;
+            casoEspecial = false;
+            calcularHoras(event);
+            variableVacaciones = false;
+            casoEspecial = true;
+        } else {
+            calcularHoras(event);
+        }
     }
     
     @FXML
@@ -882,6 +886,8 @@ public class RolDePagoClienteController implements Initializable {
         empleadosTableView.setItems(data);
                 
         Double dias = 0d;
+        Double diasDecimo4to = 0d;
+        Double diasJubilacion = 0d;
         Double normales = 0d;
         Double sobreTiempo = 0d;
         Double suplementarias = 0d;
@@ -902,7 +908,6 @@ public class RolDePagoClienteController implements Initializable {
                     
                     if (uControl.getCaso().equalsIgnoreCase(Const.TRABAJO)
                             || uControl.getCaso().equalsIgnoreCase(Const.LIBRE)
-                            || uControl.getCaso().equalsIgnoreCase(Const.VACACIONES)
                             || uControl.getCaso().equalsIgnoreCase(Const.CM)) {
 
                         if (uControl.getMedioDia())
@@ -924,12 +929,39 @@ public class RolDePagoClienteController implements Initializable {
                             normales += uControl.getNormales();
                         }
                     }
+                    
+                    if (uControl.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                            || uControl.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                            || uControl.getCaso().equalsIgnoreCase(Const.PERMISO)
+                            || uControl.getCaso().equalsIgnoreCase(Const.LIBRE)
+                            || uControl.getCaso().equalsIgnoreCase(Const.CM)
+                            || uControl.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                        if (uControl.getMedioDia())
+                            diasJubilacion += 0.5; 
+                        else
+                            diasJubilacion += 1;
+
+                    } 
+                    
+                    if (uControl.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                            || uControl.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                            || uControl.getCaso().equalsIgnoreCase(Const.LIBRE)
+                            || uControl.getCaso().equalsIgnoreCase(Const.CM)
+                            || uControl.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                        if (uControl.getMedioDia())
+                            diasDecimo4to += 0.5; 
+                        else
+                            diasDecimo4to += 1;
+
+                    } 
                 }
             }
         }
 
         indicacion1.setText("");
-        calcularPago(dias, normales, sobreTiempo, suplementarias, false);
+        calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, false);
     }
     
     public void setEmpleado(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) throws ParseException {
@@ -952,6 +984,8 @@ public class RolDePagoClienteController implements Initializable {
         ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
         
         Double dias = 0d;
+        Double diasDecimo4to = 0d;
+        Double diasJubilacion = 0d;
         Double normales = 0d;
         Double sobreTiempo = 0d;
         Double suplementarias = 0d;
@@ -1020,7 +1054,6 @@ public class RolDePagoClienteController implements Initializable {
                         
                         if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                 || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
                                 || control.getCaso().equalsIgnoreCase(Const.CM)) {
                             
                             if (control.getMedioDia())
@@ -1043,6 +1076,33 @@ public class RolDePagoClienteController implements Initializable {
                             }
                         }
                         
+                        if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                || control.getCaso().equalsIgnoreCase(Const.PERMISO)
+                                || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                || control.getCaso().equalsIgnoreCase(Const.CM)
+                                || control.getCaso().equalsIgnoreCase(Const.DM)) {
+                            
+                            if (control.getMedioDia())
+                                diasJubilacion += 0.5; 
+                            else
+                                diasJubilacion += 1;
+                            
+                        } 
+                        
+                        if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                || control.getCaso().equalsIgnoreCase(Const.CM)
+                                || control.getCaso().equalsIgnoreCase(Const.DM)) {
+                            
+                            if (control.getMedioDia())
+                                diasDecimo4to += 0.5; 
+                            else
+                                diasDecimo4to += 1;
+                            
+                        } 
+                        
                     } else {
                         controlDiario.setAjeno(true);
                     }
@@ -1054,10 +1114,10 @@ public class RolDePagoClienteController implements Initializable {
         data.addAll(controlesDiarios);
         empleadosTableView.setItems(data);
         
-        calcularPago(dias, normales, sobreTiempo, suplementarias, true); 
+        calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, true); 
     }
     
-    public void calcularPago(Double dias, Double normales, Double sobreTiempo, 
+    public void calcularPago(Double dias, Double diasDecimo4to, Double diasJubilacion, Double normales, Double sobreTiempo, 
             Double suplementarias, Boolean searchRol) {
         
         pago = null;
@@ -1089,10 +1149,11 @@ public class RolDePagoClienteController implements Initializable {
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
         totalBonos.setText(totalBonosDouble.toString());
         Double totalVacacionesDouble;
+        Double sueldoSinVacaciones = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonoDouble + totalTransporteDouble;
         if (variableVacaciones)
             totalVacacionesDouble = round(vacacionesField.getText());
         else
-            totalVacacionesDouble = casoEspecial ? round(vacacionesField.getText()) : round(getVacaciones());
+            totalVacacionesDouble = casoEspecial ? round(vacacionesField.getText()) : round(getVacaciones(sueldoSinVacaciones));
         vacacionesField.setText(totalVacacionesDouble.toString());
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
@@ -1101,10 +1162,10 @@ public class RolDePagoClienteController implements Initializable {
         ////////////////////////////////////////////////////
         Double decimoTercero = casoEspecial ? round(decimo3Field.getText()) : round(subTotalDouble / 12d);
         decimo3Field.setText(decimoTercero.toString());
-        Double decimoCuarto = casoEspecial ? round(decimo4Field.getText()) : round(getDecimoCuarto(searchRol)/30d * dias);
+        Double decimoCuarto = casoEspecial ? round(decimo4Field.getText()) : round(getDecimoCuarto(searchRol)/30d * diasDecimo4to);
         decimo4Field.setText(decimoCuarto.toString());
         totalReserva.setText(decimoTercero.toString());
-        Double jubilacionPatronal = casoEspecial ? round(jubilacionField.getText()) : round((getActuariales(empleado.getId(), searchRol)/ 360d) * dias);
+        Double jubilacionPatronal = casoEspecial ? round(jubilacionField.getText()) : round((getActuariales(empleado.getId(), searchRol)/ 360d) * diasJubilacion);
         jubilacionField.setText(jubilacionPatronal.toString());
         Double aportePatronal = casoEspecial ? round(aporteField.getText()) : round(subTotalDouble * 12.15d / 100d);
         aporteField.setText(aportePatronal.toString());
@@ -1539,20 +1600,23 @@ public class RolDePagoClienteController implements Initializable {
         }
     }
     
-    public Double getVacaciones() {
+    public Double getVacaciones(Double sueldoSinVacaciones) {
         try {
             DateTime fechaInicial = new DateTime(getToday().getTime());
             DateTime fechaFinal = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
-            int years = Years.yearsBetween(fechaInicial.withTimeAtStartOfDay(), 
-                    fechaFinal.withTimeAtStartOfDay()).getYears();
+            int years = Years.yearsBetween(fechaFinal.withTimeAtStartOfDay(), 
+                    fechaInicial.withTimeAtStartOfDay()).getYears();
+            System.out.println("inicio " + fechaInicial);
+            System.out.println("Final " + fechaFinal);
             int diasExtras;
             if (years >= 5) {
                 diasExtras = years - 5;
             } else {
                 diasExtras = 0;
             }
+            System.out.println("dias extras " + diasExtras);
             Integer diasDerecho = 15 + diasExtras;
-            Double sueldoNeto = Double.valueOf(totalSalario.getText());
+            Double sueldoNeto = sueldoSinVacaciones;
             Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
 
             return vacaciones;
