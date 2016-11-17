@@ -9,19 +9,29 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #099ab9;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.EmpleadosParaRolController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.EmpleadosParaRolController">
     <children>
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <TextField fx:id="filterField" layoutX="12.0" layoutY="58.0" prefHeight="25.0" prefWidth="770.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Label layoutX="268.0" layoutY="13.0" text="Selección de empleado" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
       <Accordion layoutX="40.0" layoutY="14.0" />
-      <TableView fx:id="empleadosTableView" layoutX="5.0" layoutY="40.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="520.0" prefWidth="780.0">
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="96.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="453.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
-          <TableColumn fx:id="cedulaColumna" prefWidth="100.0" text="Cedula" />
+          <TableColumn fx:id="cedulaColumna" text="Cedula" />
           <TableColumn fx:id="apellidoColumna" prefWidth="200.0" text="Apellido" />
             <TableColumn fx:id="nombreColumna" prefWidth="180.0" text="Nombre" />
             <TableColumn fx:id="departamentoColumna" prefWidth="150.0" text="Departamento" />
             <TableColumn fx:id="cargoColumna" prefWidth="150.0" text="Cargo" />
         </columns>
       </TableView>
-      <Button layoutX="5.0" layoutY="5.0" mnemonicParsing="false" onAction="#returnConfiguracion" prefHeight="25.0" prefWidth="44.0" style="-fx-background-image: url('aplicacion/control/imagenes/arrow_return.png'); -fx-background-position: center center; -fx-background-repeat: stretch;" />
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
             <children>
                <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
@@ -36,11 +46,5 @@
                </Button>
             </children>
          </Pane>
-      <Label layoutX="61.0" layoutY="8.0" text="Escriba para filtrar" textFill="#fffbfb">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <TextField fx:id="filterField" layoutX="183.0" layoutY="5.0" prefHeight="25.0" prefWidth="437.0" promptText="Cedula, nombre, o apellido" />
     </children>
 </AnchorPane>

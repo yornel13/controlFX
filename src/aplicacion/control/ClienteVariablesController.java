@@ -81,10 +81,14 @@ public class ClienteVariablesController implements Initializable {
     
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
-        setSeguro(new SeguroDAO().findByClienteId(cliente.getId()));
-        setUniforme(new UniformeDAO().findByClienteId(cliente.getId()));
-        //setDecimoCuarto(new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO));
-        //setIess(new ConstanteDAO().findUniqueResultByNombre(Const.IESS)); 
+        if (cliente != null) {
+            setSeguro(new SeguroDAO().findByClienteId(cliente.getId()));
+            setUniforme(new UniformeDAO().findByClienteId(cliente.getId()));
+        } else {
+            setSeguro(new SeguroDAO().findAdministrativo());
+            setUniforme(new UniformeDAO().findAdministrativo());
+        }
+        
     }
     
     public void setSeguro(Seguro seguro) {
@@ -102,24 +106,6 @@ public class ClienteVariablesController implements Initializable {
             valorUniforme.setText("$" + this.uniforme.getValor().toString());
         } else {
             valorUniforme.setText("$0.0");
-        }
-    }
-    
-    public void setDecimoCuarto(Constante decimoCuarto) {
-        this.decimoCuarto = decimoCuarto;
-        if (decimoCuarto != null) {
-            valorDecimoCuarto.setText("$" + this.decimoCuarto.getValor());
-        } else {
-            valorDecimoCuarto.setText("$0.0");
-        }
-    }
-    
-    public void setIess(Constante iess) {
-        this.iess = iess;
-        if (iess != null) {
-            valorIess.setText(this.iess.getValor() + "%");
-        } else {
-            valorIess.setText("0.0%");
         }
     }
     
@@ -163,8 +149,12 @@ public class ClienteVariablesController implements Initializable {
                     }
                     Seguro newSeguro = new Seguro();
                     newSeguro.setActivo(Boolean.TRUE);
-                    newSeguro.setCliente(cliente);
-                    newSeguro.setNombre("Seguro");
+                    if (cliente != null) {
+                        newSeguro.setCliente(cliente);
+                        newSeguro.setNombre("Seguro");
+                    } else {
+                        newSeguro.setNombre("administrativo");
+                    }
                     newSeguro.setValor(newSeguroValue);
                     newSeguro.setFecha(new Timestamp(new Date().getTime()));
                     new SeguroDAO().save(newSeguro);
@@ -172,8 +162,14 @@ public class ClienteVariablesController implements Initializable {
                     dialogStage.close();
                     
                     // Registro para auditar
-                    String detalles = "edito el valor del seguro del cliente " 
+                    String detalles;
+                    if (cliente != null) {
+                        detalles = "edito el valor del seguro del cliente " 
                             + cliente.getNombre();
+                    } else {
+                        detalles = "edito el valor del seguro del personal "
+                                + "administrativo";
+                    }
                     aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                 }); 
             } else {
@@ -216,8 +212,12 @@ public class ClienteVariablesController implements Initializable {
                     }
                     Uniforme newUniforme = new Uniforme();
                     newUniforme.setActivo(Boolean.TRUE);
-                    newUniforme.setCliente(cliente);
-                    newUniforme.setNombre("Uniforme");
+                    if (cliente != null) {
+                        newUniforme.setCliente(cliente);
+                        newUniforme.setNombre("Uniforme");
+                    } else {
+                        newUniforme.setNombre("administrativo");
+                    }
                     newUniforme.setValor(newUniformeValue);
                     newUniforme.setFecha(new Timestamp(new Date().getTime()));
                     new UniformeDAO().save(newUniforme);
@@ -225,8 +225,14 @@ public class ClienteVariablesController implements Initializable {
                     dialogStage.close();
                     
                     // Registro para auditar
-                    String detalles = "edito el valor del uniforme del cliente " 
+                    String detalles;
+                    if (cliente != null) {
+                        detalles = "edito el valor del uniforme del cliente " 
                             + cliente.getNombre();
+                    } else {
+                        detalles = "edito el valor del uniforme del personal "
+                                + "administrativo";
+                    }
                     aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
                 }); 
             } else {

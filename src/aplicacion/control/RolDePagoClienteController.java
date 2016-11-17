@@ -10,7 +10,9 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
+import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.roundInt;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
@@ -843,13 +845,17 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     public void quitarControlEmpleado(ControlTable controlTableDelete) {
-        ControlEmpleado control = controlTableDelete.getControlEmpleado();
+        ControlEmpleado control = controlTableDelete.getControlEmpleado();/*
+        System.out.println("recorrido de for");
         for (ControlEmpleado controlEmpleado: controlesEmpleado) {
+            System.out.println("recorrido de for");
             if (controlEmpleado.getFecha().equals(control.getFecha())) {
+                System.out.println("conincidencia para borrar");
                 controlesEmpleado.remove(control);
             }
-        }
+        }*/
         
+        System.out.println("for data");
         for (ControlTable controlTable: data) {
             if(Objects.equals(controlTable.getFecha().getMillis(), 
                     new DateTime(control.getFecha()).getMillis())) {
@@ -1048,31 +1054,32 @@ public class RolDePagoClienteController implements Initializable {
                     } else if (control.getMedioDia()) {
                         controlDiario.setObservacion("1/2 Dia"); 
                     }
-                    if (cliente != null 
-                            && cliente.getId().equals(control.getCliente().getId())
-                            || cliente == null && control.getCliente() == null) {
+                    if (cliente == null && control.getCliente() == null ||
+                            cliente != null && control.getCliente() != null && cliente.getId().equals(control.getCliente().getId())) {
                         
                         if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                 || control.getCaso().equalsIgnoreCase(Const.LIBRE)
                                 || control.getCaso().equalsIgnoreCase(Const.CM)) {
                             
-                            if (control.getMedioDia())
+                            if (control.getMedioDia()) {
                                 dias += 0.5; 
-                            else
+                                normales += 4;
+                            } else {
                                 dias += 1;
-                        
-                            normales += control.getNormales();
+                                normales += 8;
+                            }
                             sobreTiempo += control.getSobretiempo();
                             suplementarias += control.getRecargo();
                             
                         } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                             if (descansosMedicos <= 3) {
-                                if (control.getMedioDia())
+                                if (control.getMedioDia()) {
                                     dias += 0.5; 
-                                else
+                                    normales += 4;
+                                } else {
                                     dias += 1;
-
-                                normales += control.getNormales();
+                                    normales += 8;
+                                }
                             }
                         }
                         
@@ -1114,6 +1121,7 @@ public class RolDePagoClienteController implements Initializable {
         data.addAll(controlesDiarios);
         empleadosTableView.setItems(data);
         
+        
         calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, true); 
     }
     
@@ -1121,6 +1129,11 @@ public class RolDePagoClienteController implements Initializable {
             Double suplementarias, Boolean searchRol) {
         
         pago = null;
+        int days = controlesDiarios.size();
+        if (days != 30) {
+            dias = (30d/days) * dias;
+            normales = (240d/(days*8d)) * normales;
+        }
         
         Double sueldoDia = empleado.getDetallesEmpleado().getSueldo() / 30d;
         Double sueldoHoras = empleado.getDetallesEmpleado().getSueldo() / 240d;
@@ -1129,7 +1142,10 @@ public class RolDePagoClienteController implements Initializable {
         sobreTiempo = round(sobreTiempo);
         suplementarias = round(suplementarias);
         
-        totalDias.setText(dias.toString());
+        if (days != 30) 
+            totalDias.setText(roundInt(dias).toString());
+        else
+            totalDias.setText(dias.toString());
         totalHorasN.setText(normales.toString());
         totalHorasRC.setText(suplementarias.toString());
         totalHorasST.setText(sobreTiempo.toString());
@@ -1169,11 +1185,9 @@ public class RolDePagoClienteController implements Initializable {
         jubilacionField.setText(jubilacionPatronal.toString());
         Double aportePatronal = casoEspecial ? round(aporteField.getText()) : round(subTotalDouble * 12.15d / 100d);
         aporteField.setText(aportePatronal.toString());
-        Double segurosDecimal = casoEspecial ? round(segurosField.getText()) : round(getSeguro(empleado.getDetallesEmpleado()
-                .getEmpresa().getId(), searchRol) * dias);
+        Double segurosDecimal = casoEspecial ? round(segurosField.getText()) : round(getSeguro(searchRol) * dias);
         segurosField.setText(segurosDecimal.toString());
-        Double uniformeDecimal = casoEspecial ? round(uniformeField.getText()) : round(getUniforme(empleado.getDetallesEmpleado()
-                .getEmpresa().getId(), searchRol) * dias);
+        Double uniformeDecimal = casoEspecial ? round(uniformeField.getText()) : round(getUniforme(searchRol) * dias);
         uniformeField.setText(uniformeDecimal.toString());
         
         Double ingresoTotal = round(subTotalDouble + decimoTercero 
@@ -1564,9 +1578,14 @@ public class RolDePagoClienteController implements Initializable {
         }
     }
     
-    public Double getSeguro(Integer empresaId, Boolean buscar) {
-        if (buscar)
-            seguro = new SeguroDAO().findByEmpresaId(empresaId);
+    public Double getSeguro(Boolean buscar) {
+        if (buscar) {
+            if (cliente != null) {
+                seguro = new SeguroDAO().findByClienteId(cliente.getId());
+            } else {
+                seguro = new SeguroDAO().findAdministrativo();
+            }
+        }
         if (seguro == null) {
           return 0d;  
         } else {
@@ -1574,9 +1593,14 @@ public class RolDePagoClienteController implements Initializable {
         }  
     }
     
-    public Double getUniforme(Integer empresaId, Boolean buscar) {
-        if (buscar)
-            uniforme = new UniformeDAO().findByEmpresaId(empresaId);
+    public Double getUniforme(Boolean buscar) {
+        if (buscar) {
+            if (cliente != null) {
+                uniforme = new UniformeDAO().findByClienteId(cliente.getId());
+            } else {
+                uniforme = new UniformeDAO().findAdministrativo();
+            }
+        }
         if (uniforme == null) {
           return 0d;  
         } else {
@@ -1615,7 +1639,7 @@ public class RolDePagoClienteController implements Initializable {
                 diasExtras = 0;
             }
             System.out.println("dias extras " + diasExtras);
-            Integer diasDerecho = 15 + diasExtras;
+            Integer diasDerecho = 16 + diasExtras;
             Double sueldoNeto = sueldoSinVacaciones;
             Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
 
@@ -1724,11 +1748,9 @@ public class RolDePagoClienteController implements Initializable {
                         }
                     });
                 } else {
-                
                     for (ControlTable controlTable: (List<ControlTable>) data) {
                         if (controlTable.getMarcar()) {
-                            ControlEmpleado controlEmpleadoDelete = 
-                                    controlTable.getControlEmpleado();
+                            ControlEmpleado controlEmpleadoDelete = controlTable.getControlEmpleado();
                             if (controlEmpleadoDelete != null) {
                                 new ControlEmpleadoDAO().delete(controlEmpleadoDelete);
                                 controlesEmpleado.remove(controlEmpleadoDelete);

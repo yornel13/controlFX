@@ -41,9 +41,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -210,6 +212,18 @@ public class RolIndividualController implements Initializable {
     ///////////////////////////////
     
     @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Button buttonImprimir;
+    
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
     private DatePicker pickerDe;
     
     @FXML 
@@ -237,7 +251,7 @@ public class RolIndividualController implements Initializable {
     }
     
     @FXML
-    private void returnEmpresa(ActionEvent event) {
+    private void returnEmpleados(ActionEvent event) {
         aplicacionControl.mostrarEmpleadosParaRol(empresa, stagePrincipal);
     } 
     
@@ -387,10 +401,18 @@ public class RolIndividualController implements Initializable {
         DateTime dateTime;
         
         dateTime = new DateTime(getToday().getTime());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .getMillis());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .plusMonths(1).minusDays(1).getMillis());
+        
+        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).getMillis());
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .plusMonths(1).minusDays(1).getMillis());
+        } else {
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .minusDays(1).getMillis());
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).minusMonths(1).getMillis());
+        }
 
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -520,6 +542,56 @@ public class RolIndividualController implements Initializable {
         
         pickerDe.setEditable(false);
         pickerHasta.setEditable(false);
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Pagar a seleccionados")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     } 
     
     // Login items

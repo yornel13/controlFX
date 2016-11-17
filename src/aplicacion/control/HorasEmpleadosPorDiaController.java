@@ -786,6 +786,7 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonImprimir.setVisible(false);  // ocultado porque no se ha hecho el reporte
         buttonHorario.setTooltip(
             new Tooltip("Cambiar horario a varios")
         );
@@ -1074,7 +1075,7 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                             // Registro para auditar
                             String detalles = "elimino el horario del empleado " 
                                     + empleado.getApellido() + " " + empleado.getNombre()
-                                    + "del dia " + Fechas.getFechaConMes(fecha);
+                                    + " del dia " + Fechas.getFechaConMes(fecha);
                             aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                         }
                     }

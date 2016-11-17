@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Numeros;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import hibernate.model.RolCliente;
@@ -296,7 +297,7 @@ public class RolClienteEmpleadoController implements Initializable {
         lapsoText.setText(Fechas.getFechaConMes(pago.getInicio()) + " a " 
                 + Fechas.getFechaConMes(pago.getFinalizo()));
        
-        totalDias.setText(pago.getDias().toString());
+        totalDias.setText(Numeros.roundInt(pago.getDias()).toString());
         totalHorasN.setText(pago.getHorasNormales().toString());
         totalHorasRC.setText(pago.getHorasSuplementarias().toString());
         totalHorasST.setText(pago.getHorasSobreTiempo().toString());

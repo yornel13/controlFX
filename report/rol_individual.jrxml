@@ -377,7 +377,7 @@
 	</columnHeader>
 	<detail>
 		<band height="65" splitType="Stretch">
-			<textField>
+			<textField pattern="###0">
 				<reportElement mode="Transparent" x="0" y="5" width="30" height="20"/>
 				<box>
 					<pen lineWidth="0.75"/>
@@ -930,7 +930,7 @@
 				</textElement>
 				<text><![CDATA[Dias]]></text>
 			</staticText>
-			<textField>
+			<textField pattern="###0">
 				<reportElement mode="Transparent" x="0" y="45" width="33" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$V{dias}]]></textFieldExpression>

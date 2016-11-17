@@ -11,11 +11,13 @@ import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.DeudaDAO;
+import hibernate.dao.FotoDAO;
 import hibernate.dao.PagoQuincenaDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
+import hibernate.model.Foto;
 import hibernate.model.Usuario;
 import java.net.URL;
 import java.util.ArrayList;
@@ -217,6 +219,10 @@ public class EmpleadosController implements Initializable {
                         alignment(Pos.CENTER).padding(new Insets(25)).build()));
                         buttonConfirmar.setOnAction((ActionEvent e) -> {
 
+                           
+                            Foto foto = new FotoDAO().findByEmpleadoId(empleadoTable.getId());
+                            if (foto != null)
+                                new FotoDAO().delete(foto);
                             new UsuarioDAO().delete(new UsuarioDAO()
                                     .findById(empleadoTable.getId()));
                             HibernateSessionFactory.getSession().flush();

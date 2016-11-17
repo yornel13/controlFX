@@ -302,10 +302,17 @@ public class IessEmpleadosController implements Initializable {
         this.empresa = empresa; 
         
         DateTime dateTime = new DateTime(getToday().getTime());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .getMillis());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .plusMonths(1).minusDays(1).getMillis());
+        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).getMillis());
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .plusMonths(1).minusDays(1).getMillis());
+        } else {
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .minusDays(1).getMillis());
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).minusMonths(1).getMillis());
+        }
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
        

@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Permisos;
+import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
 import hibernate.dao.ControlEmpleadoDAO;
@@ -32,6 +33,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -76,6 +78,9 @@ public class ClientesController implements Initializable {
     private TableColumn<Cliente, Cliente> borrarColumna;
     
     @FXML
+    private Button buttonAdministrativo;
+    
+    @FXML
     private TableView clientesTableView;
     
     private ObservableList<Cliente> data;
@@ -106,6 +111,11 @@ public class ClientesController implements Initializable {
         aplicacionControl.mostrarConfiguracion();
         stagePrincipal.close();
     } 
+    
+    @FXML
+    private void mostrarEmpleadosSinCliente(ActionEvent event) {
+        aplicacionControl.mostrarClienteVariables(null, stagePrincipal);
+    }
     
     public void deleteCliente(Cliente cliente) {
         
@@ -269,6 +279,22 @@ public class ClientesController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        
+        {
+            Image imageGuardia = new Image(getClass()
+                    .getResourceAsStream("imagenes/bt_administrativo.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonAdministrativo.setGraphic(imageView);
+            buttonAdministrativo.setFont(Roboto.MEDIUM(15));
+            buttonAdministrativo.setOnMouseEntered((MouseEvent t) -> {
+                buttonAdministrativo.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonAdministrativo.setOnMouseExited((MouseEvent t) -> {
+                buttonAdministrativo.setStyle("-fx-background-color: #039BE5;");
+            });
+        }
     } 
     
     // Login items

@@ -30,6 +30,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 /**
@@ -41,9 +42,6 @@ public class EmpleadosParaRolController implements Initializable {
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
     private TableView empleadosTableView;
@@ -66,6 +64,9 @@ public class EmpleadosParaRolController implements Initializable {
     @FXML 
     private TableColumn cargoColumna;
     
+    @FXML
+    private Button buttonAtras;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
@@ -82,7 +83,7 @@ public class EmpleadosParaRolController implements Initializable {
     }
     
     @FXML
-    private void returnConfiguracion(ActionEvent event) {
+    private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
     } 
@@ -210,6 +211,21 @@ public class EmpleadosParaRolController implements Initializable {
                 }
             });
             return row ;
+        });
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     } 
     

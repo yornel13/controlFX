@@ -89,6 +89,10 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.Numeros;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
+import javafx.util.Callback;
 
 /**
  *
@@ -814,7 +818,7 @@ public class PagoMensualDetallesController implements Initializable {
             decimosText.setText("No");
         }
         
-        diasText.setText(diasTextValor.toString());   
+        diasText.setText(Numeros.roundInt(diasTextValor).toString());   
         normalesText.setText(normalesTextValor.toString());
         suplementariasText.setText(suplementariasTextValor.toString());
         sobreTiempoText.setText(sobreTiempoTextValor.toString());
@@ -952,7 +956,15 @@ public class PagoMensualDetallesController implements Initializable {
         
         columnaCliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
         
-        columnaDias.setCellValueFactory(new PropertyValueFactory<>("dias"));
+        columnaDias.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<PagosTable,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<PagosTable, String> data) {
+                return new ReadOnlyStringWrapper(Numeros.roundInt(data.getValue()
+                        .getDias()).toString());
+            }
+        });
         
         columnaNormales.setCellValueFactory(new PropertyValueFactory<>("normales"));
         

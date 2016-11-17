@@ -15,7 +15,7 @@
       <Pane layoutX="90.0" layoutY="100.0" prefHeight="500.0" prefWidth="620.0" style="-fx-background-color: white;">
          <children>
               <Button fx:id="buttonEmpleados" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="160.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="EMPLEADOS" textFill="WHITE" />
-            <MenuButton fx:id="buttonEdicion" layoutX="35.0" layoutY="250.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" GETIÓN" textAlignment="CENTER" textFill="WHITE">
+            <MenuButton fx:id="buttonEdicion" layoutX="35.0" layoutY="250.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" GESTIÓN" textAlignment="CENTER" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" text="Action 1" />
                   <MenuItem mnemonicParsing="false" text="Action 2" />

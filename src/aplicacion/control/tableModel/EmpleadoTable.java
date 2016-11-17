@@ -69,6 +69,7 @@ public class EmpleadoTable {
     private String bono;
     private String transporte;
     private Actuariales actuariales;
+    private Integer diasInt;
 
     public EmpleadoTable() {
         problem = false;
@@ -471,6 +472,14 @@ public class EmpleadoTable {
 
     public void setActuariales(Actuariales actuariales) {
         this.actuariales = actuariales;
+    }
+
+    public Integer getDiasInt() {
+        return diasInt;
+    }
+
+    public void setDiasInt(Integer diasInt) {
+        this.diasInt = diasInt;
     }
 
     

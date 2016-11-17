@@ -9,6 +9,7 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
+import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -90,6 +91,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.joda.time.Years;
 
 /**
@@ -540,11 +542,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         Double decimoCuarto = round(getDecimoCuarto()/30d * diasDecimo4to);
         Double jubilacionPatronal = round((getActuariales(actuariales)/ 360d) * diasJubilacion);
         Double aportePatronal = round(subTotalDouble * 12.15d / 100d);
-        Double segurosDecimal = round(getSeguro(empleado.getDetallesEmpleado()
-                .getEmpresa().getId()) * dias);
-        Double uniformeDecimal = round(getUniforme(empleado.getDetallesEmpleado()
-                .getEmpresa().getId()) * dias);
-        
+        Double segurosDecimal = round(getSeguro() * dias);
+        Double uniformeDecimal = round(getUniforme() * dias);
         Double ingresoTotal = round(subTotalDouble + decimoTercero 
                 + decimoCuarto + decimoTercero + jubilacionPatronal 
                 + aportePatronal + segurosDecimal + uniformeDecimal);
@@ -700,9 +699,14 @@ public class HorasEmpleadosClienteController implements Initializable {
         }
     }
     
-    public Double getSeguro(Integer empresaId) {
-        if (seguro == null)
-            seguro = new SeguroDAO().findByEmpresaId(empresaId);
+    public Double getSeguro() {
+        if (seguro == null) {
+            if (cliente != null) {
+                seguro = new SeguroDAO().findByClienteId(cliente.getId());
+            } else {
+                seguro = new SeguroDAO().findAdministrativo();
+            }
+        }
         if (seguro == null) {
           return 0d;  
         } else {
@@ -710,9 +714,14 @@ public class HorasEmpleadosClienteController implements Initializable {
         }  
     }
     
-    public Double getUniforme(Integer empresaId) {
-        if (uniforme == null)
-            uniforme = new UniformeDAO().findByEmpresaId(empresaId);
+    public Double getUniforme() {
+        if (uniforme == null) {
+            if (cliente != null) {
+                uniforme = new UniformeDAO().findByClienteId(cliente.getId());
+            } else {
+                uniforme = new UniformeDAO().findAdministrativo();
+            }
+        }
         if (uniforme == null) {
           return 0d;  
         } else {
@@ -732,7 +741,7 @@ public class HorasEmpleadosClienteController implements Initializable {
             } else {
                 diasExtras = 0;
             }
-            Integer diasDerecho = 15 + diasExtras;
+            Integer diasDerecho = 16 + diasExtras;
             Double sueldoNeto = sueldoSinVacaciones;
             Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
 
@@ -989,6 +998,12 @@ public class HorasEmpleadosClienteController implements Initializable {
                    .findAllByFechaAndEmpresaIdSinCliente(inicio, empresa.getId());
             }
             
+            ///////////////// Calculando dias del mes ///////////////////////
+            DateTime fechaInicial = new DateTime(inicio.getTime());
+            DateTime fechaFinal = new DateTime(fin.getTime());
+            final int days = Days.daysBetween(fechaInicial.withTimeAtStartOfDay(), 
+                fechaFinal.withTimeAtStartOfDay()).getDays() + 1;
+            ///////////////////////////////////////////////////////////////
             usuarios.stream().map((user) -> {
                 Double dias = 0d;
                 Double normales = 0d;
@@ -1007,26 +1022,32 @@ public class HorasEmpleadosClienteController implements Initializable {
                                 || control.getCaso().equalsIgnoreCase(Const.LIBRE)
                                 || control.getCaso().equalsIgnoreCase(Const.CM)) {
                             
-                            if (control.getMedioDia())
+                            if (control.getMedioDia()) {
                                 dias += 0.5; 
-                            else
+                                normales += 4;
+                            } else {
                                 dias += 1;
-                        
-                            normales += control.getNormales();
+                                normales += 8;
+                            }
                             sobreTiempo += control.getSobretiempo();
                             suplementarias += control.getRecargo();
                             
                         } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                             if (descansosMedicos <= 3) {
-                                if (control.getMedioDia())
+                                if (control.getMedioDia()) {
                                     dias += 0.5; 
-                                else
+                                    normales += 4;
+                                } else {
                                     dias += 1;
-
-                                normales += control.getNormales();
+                                    normales += 8;
+                                }
                             }
                         }
                     }
+                }
+                if (days != 30) {
+                    dias = (30d/days) * dias;
+                    normales = (240d/(days*8d)) * normales;
                 }
                 EmpleadoTable empleado = new EmpleadoTable();
                 empleado.setId(user.getId());
@@ -1040,7 +1061,8 @@ public class HorasEmpleadosClienteController implements Initializable {
                         .getDepartamento().getNombre());
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
-                empleado.setDias(dias);
+                empleado.setDias(round(dias));
+                empleado.setDiasInt(Numeros.roundInt(dias));
                 empleado.setHoras(round(normales));
                 empleado.setSobreTiempo(round(sobreTiempo));
                 empleado.setSuplementarias(round(suplementarias));
@@ -1250,7 +1272,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
         
-        diasColumna.setCellValueFactory(new PropertyValueFactory<>("dias"));
+        diasColumna.setCellValueFactory(new PropertyValueFactory<>("diasInt"));
         
         normalesColumna.setCellValueFactory(new PropertyValueFactory<>("horas"));
         
@@ -1402,17 +1424,18 @@ public class HorasEmpleadosClienteController implements Initializable {
                         empleadosRol.add(empleadoTable);
                     }
                 }
-
+                System.out.println(empleadosRol.size() + " empleados marcados");
                 ///////////// Removiendo empleado que tenga rol individual//////////////
                 List<RolIndividual> rolIndividuales = new RolIndividualDAO()
                         .findAllByFechaAndEmpresaId(inicio, empresa.getId());
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolIndividual rolIndividual: rolIndividuales) {
-                        if (empleadoTable.getId() == rolIndividual.getUsuario().getId()) {
+                        if (empleadoTable.getId().equals(rolIndividual.getUsuario().getId())) {
                             empleadosParaRemover.add(empleadoTable);
                         }
                     }
                 }
+                System.out.println(empleadosParaRemover.size() + " empleados para remover de los marcados");
                 empleadosRol.removeAll(empleadosParaRemover);
                 empleadosParaRemover = new ArrayList<>();
 
@@ -1425,15 +1448,16 @@ public class HorasEmpleadosClienteController implements Initializable {
                     rolesCliente = new RolClienteDAO()
                         .findAllByFechaSinCliente(inicio);
 
+                System.out.println(rolesCliente.size()+" encontrados en db");
                 List<RolCliente> rolesClienteDelete = new ArrayList<>();
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolCliente rolCliente: rolesCliente) {
-                        if (empleadoTable.getId() == rolCliente.getUsuario().getId()) {
+                        if (empleadoTable.getId().equals(rolCliente.getUsuario().getId())) {
                             rolesClienteDelete.add(rolCliente);
                         }
                     }
                 }
-
+                System.out.println(rolesClienteDelete.size()+" para borrar");
                 for (RolCliente rolCliente: rolesClienteDelete) {
                     new RolClienteDAO().delete(rolCliente);
                     HibernateSessionFactory.getSession().flush();
@@ -1468,17 +1492,18 @@ public class HorasEmpleadosClienteController implements Initializable {
                         empleadosRol.add(empleadoTable);
                     }
                 }
-
+                System.out.println(empleadosRol.size() + " empleados marcados");
                 List<RolIndividual> rolIndividuales = new RolIndividualDAO()
                         .findAllByFechaAndEmpresaId(inicio, empresa.getId());
 
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolIndividual rolIndividual: rolIndividuales) {
-                        if (empleadoTable.getId() == rolIndividual.getUsuario().getId()) {
+                        if (empleadoTable.getId().equals(rolIndividual.getUsuario().getId())) {
                             empleadosParaRemover.add(empleadoTable);
                         }
                     }
                 }
+                System.out.println(empleadosParaRemover.size() + " empleados para remover de los marcados");
                 empleadosRol.removeAll(empleadosParaRemover);
                 empleadosParaRemover = new ArrayList<>();
 
@@ -1492,7 +1517,7 @@ public class HorasEmpleadosClienteController implements Initializable {
 
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolCliente rolCliente: rolesCliente) {
-                        if (empleadoTable.getId() == rolCliente.getUsuario().getId()) {
+                        if (empleadoTable.getId().equals(rolCliente.getUsuario().getId())) {
                             empleadosParaRemover.add(empleadoTable);
                         }
                     }
@@ -1512,7 +1537,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                 for (ControlEmpleado controlEmpleado: controlesEmpleados) {
                     Boolean agregar = true;
                     for (Usuario usuario: usuariosRol) {
-                        if (usuario.getId() == controlEmpleado.getUsuario().getId()) {
+                        if (usuario.getId().equals(controlEmpleado.getUsuario().getId())) {
                             agregar = false;
                         }
                     }
@@ -1523,7 +1548,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     Boolean agregar = true;
                     for (Usuario usuario: usuariosRol) {
-                        if (empleadoTable.getId() == usuario.getId()) {
+                        if (empleadoTable.getId().equals(usuario.getId())) {
                             agregar = false;
                         }
                     }
@@ -1555,23 +1580,25 @@ public class HorasEmpleadosClienteController implements Initializable {
                                     || control.getCaso().equalsIgnoreCase(Const.LIBRE)
                                     || control.getCaso().equalsIgnoreCase(Const.CM)) {
 
-                                if (control.getMedioDia())
+                                if (control.getMedioDia()) {
                                     dias += 0.5; 
-                                else
+                                    normales += 4;
+                                } else {
                                     dias += 1;
-
-                                normales += control.getNormales();
+                                    normales += 8;
+                                }
                                 sobreTiempo += control.getSobretiempo();
                                 suplementarias += control.getRecargo();
 
                             } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                                 if (descansosMedicos <= 3) {
-                                    if (control.getMedioDia())
+                                    if (control.getMedioDia()) {
                                         dias += 0.5; 
-                                    else
+                                        normales += 4;
+                                    } else {
                                         dias += 1;
-
-                                    normales += control.getNormales();
+                                        normales += 8;
+                                    }
                                 }
                             }
                             
@@ -1602,6 +1629,16 @@ public class HorasEmpleadosClienteController implements Initializable {
 
                             } 
                         }
+                    }
+                    ///////////////// Calculando dias del mes ///////////////////////
+                    DateTime fechaInicial = new DateTime(inicio.getTime());
+                    DateTime fechaFinal = new DateTime(fin.getTime());
+                    final int days = Days.daysBetween(fechaInicial.withTimeAtStartOfDay(), 
+                        fechaFinal.withTimeAtStartOfDay()).getDays() + 1;
+                    ///////////////////////////////////////////////////////////////
+                    if (days != 30) {
+                        dias = (30d/days) * dias;
+                        normales = (240d/(days*8d)) * normales;
                     }
                     Actuariales actuariales = new ActuarialesDAO().findByEmpleadoId(empleadoTable.getId());
                     empleadoTable.setActuariales(actuariales);

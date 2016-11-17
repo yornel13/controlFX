@@ -9,6 +9,7 @@ import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
+import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.RolClienteDAO;
 import hibernate.model.Cliente;
@@ -382,10 +383,17 @@ public class RolClienteController implements Initializable {
         DateTime dateTime;
         
         dateTime = new DateTime(getToday().getTime());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .getMillis());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .plusMonths(1).minusDays(1).getMillis());
+        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).getMillis());
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .plusMonths(1).minusDays(1).getMillis());
+        } else {
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .minusDays(1).getMillis());
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).minusMonths(1).getMillis());
+        }
 
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
@@ -630,7 +638,18 @@ public class RolClienteController implements Initializable {
             }
         });
         
-        columnaDias.setCellValueFactory(new PropertyValueFactory<>("dias"));
+        //columnaDias.setCellValueFactory(new PropertyValueFactory<>("dias"));
+        
+        columnaDias.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<RolCliente,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<RolCliente, String> data) {
+                return new ReadOnlyStringWrapper(Numeros.roundInt(data.getValue()
+                        .getDias()).toString());
+            }
+        });
+        
         
         columnaSubtotal.setCellValueFactory(new PropertyValueFactory<>("subtotal"));
         

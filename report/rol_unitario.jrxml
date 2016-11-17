@@ -320,7 +320,7 @@
 	</columnHeader>
 	<detail>
 		<band height="200" splitType="Stretch">
-			<textField>
+			<textField pattern="###0">
 				<reportElement mode="Transparent" x="0" y="5" width="30" height="20"/>
 				<box>
 					<pen lineWidth="0.75"/>

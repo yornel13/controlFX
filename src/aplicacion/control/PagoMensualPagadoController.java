@@ -89,6 +89,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.Numeros;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ObservableValue;
+import javafx.util.Callback;
 
 /**
  *
@@ -386,7 +390,7 @@ public class PagoMensualPagadoController implements Initializable {
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
-            String filename = "rol_individual_" + rolIndividual.getId();
+            String filename = "rol_pago_" + rolIndividual.getId();
             
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
@@ -711,7 +715,7 @@ public class PagoMensualPagadoController implements Initializable {
         decimosText.setText("Si");
         
         
-        diasText.setText(rolIndividual.getDias().toString());   
+        diasText.setText(Numeros.roundInt(rolIndividual.getDias()).toString());   
         normalesText.setText(rolIndividual.getHorasNormales().toString());
         suplementariasText.setText(rolIndividual.getHorasSuplementarias().toString());
         sobreTiempoText.setText(rolIndividual.getHorasSobreTiempo().toString());
@@ -762,7 +766,15 @@ public class PagoMensualPagadoController implements Initializable {
         
         columnaCliente.setCellValueFactory(new PropertyValueFactory<>("cliente"));
         
-        columnaDias.setCellValueFactory(new PropertyValueFactory<>("dias"));
+        columnaDias.setCellValueFactory(new Callback<TableColumn
+                .CellDataFeatures<PagosTable,String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TableColumn
+                    .CellDataFeatures<PagosTable, String> data) {
+                return new ReadOnlyStringWrapper(Numeros.roundInt(data.getValue()
+                        .getDias()).toString());
+            }
+        });
         
         columnaNormales.setCellValueFactory(new PropertyValueFactory<>("normales"));
         

@@ -9,6 +9,7 @@ import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
+import hibernate.dao.UsuarioDAO;
 import hibernate.model.Deuda;
 import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
@@ -211,6 +212,7 @@ public class GestionDeudasController implements Initializable {
                         newDeuda.setUsuario(empleado);
                         
                         new DeudaDAO().save(newDeuda);
+                        new UsuarioDAO().getSession().refresh(newDeuda.getUsuario());
                         dialogStage.close();
                         
                         String detalle = "agrego una deudo al empleado " 
@@ -267,6 +269,7 @@ public class GestionDeudasController implements Initializable {
             buttonOk.setOnAction((ActionEvent e) -> {
                 new DeudaDAO().delete(deuda);
                 HibernateSessionFactory.getSession().flush();
+                new UsuarioDAO().getSession().refresh(deuda.getUsuario());
                 data.remove(deuda);
                 dialogStage.close();
                 
@@ -309,6 +312,7 @@ public class GestionDeudasController implements Initializable {
                     deuda.setCuotas(Integer.parseInt(fieldCuotas.getText()));
                     deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
                     HibernateSessionFactory.getSession().flush();
+                    new UsuarioDAO().getSession().refresh(deuda.getUsuario());
                     data.set(data.indexOf(deuda), deuda);
                     dialogStage.close();
                         

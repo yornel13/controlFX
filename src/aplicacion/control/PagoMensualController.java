@@ -329,7 +329,7 @@ public class PagoMensualController implements Initializable {
                     JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
                     JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
 
-                    String filename = "rol_individual_" + empleadoTable.getRolIndividual().getId();
+                    String filename = "rol_pago_" + empleadoTable.getRolIndividual().getId();
 
                     if (file != null) {
                         JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
@@ -481,10 +481,17 @@ public class PagoMensualController implements Initializable {
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
         DateTime dateTime = new DateTime(getToday().getTime());
-        inicio = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .getMillis());
-        fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                .plusMonths(1).minusDays(1).getMillis());
+        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).getMillis());
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .plusMonths(1).minusDays(1).getMillis());
+        } else {
+            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .minusDays(1).getMillis());
+            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).minusMonths(1).getMillis());
+        }
         pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
         pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
         

@@ -99,12 +99,34 @@ public class RegistroAccionesDAO extends BaseHibernateDAO {
             return (List<RegistroAcciones>) result;
         }
         
+        public List<RegistroAcciones> findAllDesc(Timestamp inicio, Timestamp fin) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where fecha >= :inicio and fecha <= :fin order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
         public List<RegistroAcciones> findAllByAccionIdDesc(Integer accionId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM registro_acciones where accion_tipo_id = "
                             + ":accion_tipo_id order by fecha DESC")
                     .addEntity(RegistroAcciones.class)
                     .setParameter("accion_tipo_id", accionId);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
+        public List<RegistroAcciones> findAllByAccionIdDesc(Timestamp inicio, Timestamp fin, Integer accionId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where fecha >= :inicio and fecha <= :fin and accion_tipo_id = "
+                            + ":accion_tipo_id order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("accion_tipo_id", accionId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
             Object result = query.list();
             return (List<RegistroAcciones>) result;
         }
@@ -119,6 +141,18 @@ public class RegistroAccionesDAO extends BaseHibernateDAO {
             return (List<RegistroAcciones>) result;
         }
         
+        public List<RegistroAcciones> findAllDescByUsuarioId(Timestamp inicio, Timestamp fin, Integer usuarioId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where fecha >= :inicio and fecha <= :fin and usuario_id = "
+                            + ":usuario_id order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
         public List<RegistroAcciones> findAllDescByUsuarioIdAndAccionId(Integer usuarioId, Integer accionId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM registro_acciones where usuario_id = "
@@ -127,6 +161,20 @@ public class RegistroAccionesDAO extends BaseHibernateDAO {
                     .addEntity(RegistroAcciones.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("accion_tipo_id", accionId);
+            Object result = query.list();
+            return (List<RegistroAcciones>) result;
+        }
+        
+        public List<RegistroAcciones> findAllDescByUsuarioIdAndAccionId(Timestamp inicio, Timestamp fin, Integer usuarioId, Integer accionId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM registro_acciones where fecha >= :inicio and fecha <= :fin and usuario_id = "
+                            + ":usuario_id and accion_tipo_id = :accion_tipo_id "
+                            + "order by fecha DESC")
+                    .addEntity(RegistroAcciones.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("accion_tipo_id", accionId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
             Object result = query.list();
             return (List<RegistroAcciones>) result;
         }

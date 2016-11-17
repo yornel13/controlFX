@@ -1823,7 +1823,10 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClienteVariables.fxml"));
                     AnchorPane ventanaConfiguracionEmpresa = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Cliente " + cliente.getNombre() + " - Constantes.");
+                    if (cliente != null)
+                        ventana.setTitle("Cliente " + cliente.getNombre() + " - Constantes.");
+                    else
+                        ventana.setTitle("Personal Administrativo - Constantes.");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);

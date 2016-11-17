@@ -177,7 +177,7 @@
 				</textElement>
 				<textFieldExpression class="java.lang.Double"><![CDATA[$F{deducciones}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="210" y="0" width="49" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isItalic="true"/>

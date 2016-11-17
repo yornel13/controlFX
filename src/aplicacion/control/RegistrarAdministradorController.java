@@ -28,6 +28,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -103,7 +104,7 @@ public class RegistrarAdministradorController implements Initializable {
     private Pane panelUsuario;
     
     @FXML 
-    private ChoiceBox choiceBoxEmpleado;
+    private Button buttonEmpleado;
     
     @FXML
     private Label errorText;
@@ -122,6 +123,8 @@ public class RegistrarAdministradorController implements Initializable {
     
     @FXML 
     private DatePicker datePickerContratacion;
+    
+    private Usuario usuarioSeleccionado;
     
     IdentidadDAO identidadDAO;
     
@@ -148,11 +151,37 @@ public class RegistrarAdministradorController implements Initializable {
     public void onClickAsignar(ActionEvent event) {
         if (checkBoxAsignar.isSelected()) {
             panelUsuario.setVisible(false);
-            choiceBoxEmpleado.setVisible(true);
+            buttonEmpleado.setVisible(true);
         } else {
             panelUsuario.setVisible(true);
-            choiceBoxEmpleado.setVisible(false);
+            buttonEmpleado.setVisible(false);
         }
+    }
+    
+    @FXML
+    public void onSelectEmpleado(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(AplicacionControl.class
+                .getResource("ventanas/VentanaSeleccionarEmpleado.fxml"));
+        AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
+        Stage ventana = new Stage();
+        ventana.setTitle("");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/security_dialog.png").toExternalForm();
+        ventana.getIcons().add(new Image(stageIcon));
+        ventana.setResizable(false);
+        ventana.initOwner(stagePrincipal);
+        Scene scene = new Scene(ventanaRolDePago);
+        ventana.setScene(scene);
+        SeleccionarEmpleadoController controller = loader.getController();
+        controller.setStagePrincipal(ventana);
+        controller.setParentController(this);
+        controller.setUsuarios(empleados);
+        ventana.show();
+    }
+    
+    void setEmpleado(Usuario usuario) {
+        usuarioSeleccionado = usuario;
+        buttonEmpleado.setText(usuario.getApellido()+" "+usuario.getNombre());
     }
     
     @FXML
@@ -175,18 +204,18 @@ public class RegistrarAdministradorController implements Initializable {
         
             if (checkBoxAsignar.isSelected()) {
                 
-                if (choiceBoxEmpleado.getSelectionModel().isEmpty()) {
+                if (usuarioSeleccionado == null) {
                    errorText.setText("Seleccione el empleado");  
                 } else {
                     if (identidadDAO.findByNombreUsuarioActivo(usuarioField.getText()) == null) {
 
                         Identidad identidad = new Identidad();
 
-                        Integer usuarioId = empleados.get(choiceBoxEmpleado.getSelectionModel().getSelectedIndex()).getId();
+                        Integer usuarioId = usuarioSeleccionado.getId();
 
                         if (identidadDAO.findByUsuarioIdActivo(usuarioId) == null) {
 
-                            guardarIdentidad(empleados.get(choiceBoxEmpleado.getSelectionModel().getSelectedIndex()));
+                            guardarIdentidad(usuarioSeleccionado);
                             
                         } else {
                             errorText.setText("El empleado ya tiene un usario creado");  
@@ -337,12 +366,7 @@ public class RegistrarAdministradorController implements Initializable {
             itemsEstadosCivil[estadosCivil.indexOf(obj)] = obj.getNombre();
         }
         
-        for (Usuario obj: empleados) {
-            itemsEmpleados[empleados.indexOf(obj)] = obj.getNombre() + " " + obj.getApellido();
-        }
-        
         estadoCivilChoiceBox.setItems(FXCollections.observableArrayList(itemsEstadosCivil)); 
-        choiceBoxEmpleado.setItems(FXCollections.observableArrayList(itemsEmpleados));
         
         RolesDAO rolesDAO = new RolesDAO();
         roles = (ArrayList<Roles>) rolesDAO.findAll();
@@ -371,4 +395,5 @@ public class RegistrarAdministradorController implements Initializable {
         };
         return aux;
     }
+
 }

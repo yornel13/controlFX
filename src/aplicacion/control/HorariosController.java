@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,6 +33,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -121,7 +123,6 @@ public class HorariosController implements Initializable {
                 dialogStage.getIcons().add(new Image(stageIcon));
                 Button buttonConfirmar = new MaterialDesignButtonBlue("Crear");
                 TextField fieldNombre = new TextField();
-                TextField fieldNormales = new TextField();
                 TextField fieldRC = new TextField();
                 TextField fieldST = new TextField();
                 NumberSpinner spinnderDe = new NumberSpinner();
@@ -129,37 +130,47 @@ public class HorariosController implements Initializable {
                 Text textNombre = new Text("Nombre");
                 Text textDe = new Text("De (Hora)");
                 Text textHasta = new Text("Hasta (Hora)");
-                Text textNormales = new Text("Horas Normales");
                 Text textRC = new Text("Horas Recargo");
                 Text textST = new Text("Horas Sobretiempo");
-                fieldNormales.setText("8");
+                CheckBox medioDia = new CheckBox("Medio dia");
+                Text textNormales = new Text();
+                textNormales.setText("8 horas normales");
                 fieldRC.setText("0");
                 fieldST.setText("0");
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
                 children(textNombre, fieldNombre, textDe, spinnderDe, textHasta, 
-                        spinnerHasta, textNormales, fieldNormales, textRC, fieldRC,
-                        textST, fieldST, buttonConfirmar).
+                        spinnerHasta, textRC, fieldRC,
+                        textST, fieldST, medioDia, textNormales, buttonConfirmar).
                 alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                fieldNormales.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+                medioDia.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                        if (newValue) {
+                            textNormales.setText("4 horas normales");
+                        } else {
+                            textNormales.setText("8 horas normales");
+                        }
+                    }
+                });
                 fieldRC.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 fieldST.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
-                    if (Integer.valueOf(spinnderDe.getNumber().toString()) 
-                            != Integer.valueOf(spinnerHasta.getNumber().toString())) {
+                    if (!Integer.valueOf(spinnderDe.getNumber().toString()).equals(
+                            Integer.valueOf(spinnerHasta.getNumber().toString()))) {
                         Horario horario = new Horario();
                         horario.setNombre(fieldNombre.getText());
                         horario.setHoraInicio(Integer.valueOf(spinnderDe.getNumber().toString()));
                         horario.setHoraFin(Integer.valueOf(spinnerHasta.getNumber().toString()));
-                        horario.setNormales(Double.valueOf(fieldNormales.getText()));
+                        if (textNormales.getText().contains("4")) {
+                           horario.setNormales(4d); 
+                           horario.setMedioDia(true);
+                        } else {
+                            horario.setNormales(8d);
+                            horario.setMedioDia(false);
+                        }
                         horario.setRecargo(Double.valueOf(fieldRC.getText()));
                         horario.setSobretiempo(Double.valueOf(fieldST.getText()));
                         horario.setCreacion(new Timestamp(new Date().getTime()));
-                        if (Double.valueOf(fieldNormales.getText()) < 6) {
-                            horario.setMedioDia(true);
-                            dialogoMedioDia();
-                        } else {
-                            horario.setMedioDia(false);
-                        }
                         new HorarioDAO().save(horario);
                         setEmpresa(empresa);
                         dialogStage.close();
@@ -184,28 +195,7 @@ public class HorariosController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
-        children(new Text("Las horas no pueden ser iguales."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(20)).build()));
-        dialogStage.show();
-        buttonOk.setPrefWidth(60);
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-            dialogStage.close();
-        });
-    }
-    
-    public void dialogoMedioDia() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
-        children(new Text("Las horarios con menos de 6 horas normales se asumen como medio dia trabajado."), buttonOk).
+        children(new Text("La hora inicial y final no pueden ser iguales."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
         buttonOk.setPrefWidth(60);

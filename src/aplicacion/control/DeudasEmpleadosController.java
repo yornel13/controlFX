@@ -13,6 +13,7 @@ import aplicacion.control.util.Const;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
 import hibernate.dao.UsuarioDAO;
@@ -192,11 +193,11 @@ public class DeudasEmpleadosController implements Initializable {
                 Deuda newDeuda;
                 newDeuda = cloneDeuda(deuda);
                 newDeuda.setMonto(Double.valueOf(empleadoTable.getMonto()));
-                 newDeuda.setRestante(Double.valueOf(empleadoTable.getMonto()));
+                newDeuda.setRestante(Double.valueOf(empleadoTable.getMonto()));
                 newDeuda.setCuotas(Integer.valueOf(empleadoTable.getCuotas()));
                 newDeuda.setUsuario(findUsuarioById(empleadoTable.getId()));
                 new DeudaDAO().save(newDeuda);
-               
+                new UsuarioDAO().getSession().refresh(newDeuda.getUsuario());
                 String detalle = "agrego una deudo al empleado " 
                         + empleadoTable.getApellido()+ " " 
                         + empleadoTable.getNombre()
@@ -206,6 +207,7 @@ public class DeudasEmpleadosController implements Initializable {
                         aplicacionControl.permisos.getUsuario());
             } 
         }
+       
         filterField.clear();
         checkBoxDeudaTodos.setSelected(false);
         
@@ -875,8 +877,9 @@ public class DeudasEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdConDeuda(empresa.getId()));
         
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdConDeuda(empresa.getId()));
+        System.out.println(usuarios.size()+" tamaño de users");
         if (usuarios.isEmpty()) {
             usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
         }

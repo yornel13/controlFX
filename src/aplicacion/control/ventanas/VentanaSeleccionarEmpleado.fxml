@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="410.0" maxWidth="620.0" minHeight="410.0" minWidth="620.0" prefHeight="410.0" prefWidth="620.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.SeleccionarEmpleadoController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="usuariosTableView" layoutX="10.0" layoutY="60.0" maxHeight="330.0" maxWidth="600.0" minHeight="340.0" minWidth="600.0" prefHeight="330.0" prefWidth="600.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="cedulaColumna" prefWidth="100.0" text="Cedula" />
+          <TableColumn fx:id="apellidoColumna" prefWidth="250.0" text="Apellidos" />
+            <TableColumn fx:id="nombreColumna" prefWidth="240.0" text="Nombre" />
+        </columns>
+      </TableView>
+      <Accordion layoutX="184.0" layoutY="14.0" />
+      <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
+      <TextField fx:id="filterField" layoutX="10.0" layoutY="30.0" prefHeight="25.0" prefWidth="600.0" promptText="Cedula, apellido o nombre..." />
+      <Label alignment="CENTER" layoutX="148.0" layoutY="5.0" prefHeight="17.0" prefWidth="336.0" text="Doble click para selccionar el usuario" textFill="WHITE">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="12.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>
