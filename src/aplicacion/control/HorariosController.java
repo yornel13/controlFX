@@ -6,17 +6,21 @@
 package aplicacion.control;
 
 import static aplicacion.control.DeudasController.numDecimalFilter;
-import static aplicacion.control.DeudasController.numFilter;
+import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.MaterialDesignButtonBlue;
-import aplicacion.control.util.NumberSpinner;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.HorarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.Horario;
 import java.net.URL;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -35,6 +39,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -52,6 +58,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.converter.LocalTimeStringConverter;
 
 /**
  *
@@ -125,8 +132,10 @@ public class HorariosController implements Initializable {
                 TextField fieldNombre = new TextField();
                 TextField fieldRC = new TextField();
                 TextField fieldST = new TextField();
-                NumberSpinner spinnderDe = new NumberSpinner();
-                NumberSpinner spinnerHasta = new NumberSpinner();
+                Spinner spinnderDe = spinnerDe();
+                Spinner spinnerHasta = spinnerHasta();
+               
+                
                 Text textNombre = new Text("Nombre");
                 Text textDe = new Text("De (Hora)");
                 Text textHasta = new Text("Hasta (Hora)");
@@ -154,13 +163,24 @@ public class HorariosController implements Initializable {
                 });
                 fieldRC.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
                 fieldST.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+                
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
-                    if (!Integer.valueOf(spinnderDe.getNumber().toString()).equals(
-                            Integer.valueOf(spinnerHasta.getNumber().toString()))) {
-                        Horario horario = new Horario();
-                        horario.setNombre(fieldNombre.getText());
-                        horario.setHoraInicio(Integer.valueOf(spinnderDe.getNumber().toString()));
-                        horario.setHoraFin(Integer.valueOf(spinnerHasta.getNumber().toString()));
+                    
+                    Horario horario = new Horario();
+                    horario.setNombre(fieldNombre.getText());
+                    try {
+                        String s1 = spinnderDe.getEditor().getText();
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                        long ms1 = sdf.parse(s1).getTime();
+                        Time timeDe = new Time(ms1);
+                        String s2 = spinnerHasta.getEditor().getText();
+                        long ms2 = sdf.parse(s2).getTime();
+                        Time timeHasta = new Time(ms2);
+                        //Time timeDe = Time.valueOf(spinnderDe.getEditor().getText());
+                        //Time timeHasta = Time.valueOf(spinnerHasta.getEditor().getText());
+                        
+                        horario.setEntrada(timeDe);
+                        horario.setSalida(timeHasta);
                         if (textNormales.getText().contains("4")) {
                            horario.setNormales(4d); 
                            horario.setMedioDia(true);
@@ -174,7 +194,7 @@ public class HorariosController implements Initializable {
                         new HorarioDAO().save(horario);
                         setEmpresa(empresa);
                         dialogStage.close();
-                    } else {
+                    } catch (ParseException ex) {
                         errorHoras();
                     }
                 });
@@ -195,7 +215,8 @@ public class HorariosController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         MaterialDesignButton buttonOk = new MaterialDesignButton("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
-        children(new Text("La hora inicial y final no pueden ser iguales."), buttonOk).
+        children(new Text("Hay un problema en las horas De o Hasta,"), 
+                new Text("por favor use el formato adecuado HH:mm."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
         dialogStage.show();
         buttonOk.setPrefWidth(60);
@@ -212,6 +233,76 @@ public class HorariosController implements Initializable {
         aplicacionControl.mostrarInEmpresa(empresa);
         stagePrincipal.close();
     } 
+    
+    public Spinner<LocalTime> spinnerDe() {
+        Spinner<LocalTime> spinner = new Spinner<>(new SpinnerValueFactory<LocalTime>() {
+            
+            {
+                setConverter(new LocalTimeStringConverter(DateTimeFormatter
+                        .ofPattern("HH:mm"), DateTimeFormatter.ofPattern("HH:mm")));
+            }
+            
+            @Override
+            public void decrement(int steps) {
+                if (getValue() == null)
+                    setValue(LocalTime.of(5, 59));
+                else {
+                    LocalTime time = (LocalTime) getValue();
+                    setValue(time.minusMinutes(steps));
+                }
+            }
+
+            @Override
+            public void increment(int steps) {
+                if (this.getValue() == null)
+                    setValue(LocalTime.of(6, 1));
+                else {
+                    LocalTime time = (LocalTime) getValue();
+                    setValue(time.plusMinutes(steps));
+                }
+            }
+        });
+        spinner.setEditable(true);
+        TextField text = spinner.getEditor();
+        text.setText("06:00");
+        
+        return spinner;
+    }
+    
+    public Spinner<LocalTime> spinnerHasta() {
+        Spinner<LocalTime> spinner = new Spinner<>(new SpinnerValueFactory<LocalTime>() {
+            
+            {
+                setConverter(new LocalTimeStringConverter(DateTimeFormatter
+                        .ofPattern("HH:mm"), DateTimeFormatter.ofPattern("HH:mm")));
+            }
+            
+            @Override
+            public void decrement(int steps) {
+                if (getValue() == null)
+                    setValue(LocalTime.of(13, 59));
+                else {
+                    LocalTime time = (LocalTime) getValue();
+                    setValue(time.minusMinutes(steps));
+                }
+            }
+
+            @Override
+            public void increment(int steps) {
+                if (this.getValue() == null)
+                    setValue(LocalTime.of(14, 1));
+                else {
+                    LocalTime time = (LocalTime) getValue();
+                    setValue(time.plusMinutes(steps));
+                }
+            }
+        });
+        spinner.setEditable(true);
+        TextField text = spinner.getEditor();
+        text.setText("14:00");
+        
+        return spinner;
+    }
     
     public void deleteHorario(Horario horario) {
         if (aplicacionControl.permisos == null) {
@@ -313,27 +404,8 @@ public class HorariosController implements Initializable {
             public ObservableValue<String> call(TableColumn
                     .CellDataFeatures<Horario, String> data) {
                 
-                String lapso;
-                
-                if (data.getValue().getHoraInicio() == 0) {
-                    lapso = "12am";
-                } else if (data.getValue().getHoraInicio() < 12) {
-                    lapso = data.getValue().getHoraInicio() + "am";
-                } else if (data.getValue().getHoraInicio() == 12) {
-                    lapso = "12pm";
-                } else {
-                    lapso = (data.getValue().getHoraInicio() - 12) + "pm";
-                }
-                
-                if (data.getValue().getHoraFin()== 0) {
-                    lapso = lapso + "-" + "12am";
-                } else if (data.getValue().getHoraFin() < 12) {
-                    lapso = lapso + "-" + data.getValue().getHoraFin() + "am";
-                } else if (data.getValue().getHoraFin() == 12) {
-                    lapso = lapso + "-" + "12pm";
-                } else {
-                    lapso = lapso + "-" + (data.getValue().getHoraFin() - 12) + "pm";
-                }
+                String lapso = Fechas.getHora(data.getValue().getEntrada())
+                        +" - "+Fechas.getHora(data.getValue().getSalida());
                 
                 return new ReadOnlyStringWrapper(lapso);
             }
@@ -347,16 +419,8 @@ public class HorariosController implements Initializable {
             public ObservableValue<String> call(TableColumn
                     .CellDataFeatures<Horario, String> data) {
                 
-                String lapso;
-                
-                if (data.getValue().getHoraInicio() < data.getValue().getHoraFin()) {
-                    lapso = (data.getValue().getHoraFin() 
-                            - data.getValue().getHoraInicio()) + " horas";
-                } else {
-                    int tiempo = (24 - data.getValue().getHoraInicio() ) 
-                            + (data.getValue().getHoraFin());
-                    lapso = tiempo + " horas";
-                }
+                String lapso = Fechas.differenceBetweenHours(data.getValue()
+                        .getEntrada(), data.getValue().getSalida());
                 
                 return new ReadOnlyStringWrapper(lapso);
             }

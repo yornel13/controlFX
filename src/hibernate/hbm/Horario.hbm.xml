@@ -13,12 +13,6 @@
         <property name="nombre" type="java.lang.String">
             <column name="nombre" not-null="true"/>
         </property>
-        <property name="horaInicio" type="java.lang.Integer">
-           <column name="hora_inicio" not-null="true"/>
-        </property>
-        <property name="horaFin" type="java.lang.Integer">
-           <column name="hora_fin" not-null="true"/>
-        </property>
         <property name="normales" type="java.lang.Double">
             <column name="normales" />
         </property>
@@ -33,6 +27,12 @@
         </property>
         <property name="medioDia" type="java.lang.Boolean">
       <column name="medio_dia" not-null="true"/>
+    </property>
+    <property name="entrada" type="java.sql.Time">
+        <column name="entrada" not-null="true"/>
+    </property>
+    <property name="salida" type="java.sql.Time">
+        <column name="salida" not-null="true" />
     </property>
     </class>
 </hibernate-mapping>

@@ -119,8 +119,8 @@ public class PagosEmpleadosController implements Initializable {
         fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
                 .plusMonths(1).minusDays(1).getMillis());
         
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         
         setTableInfo(empresa, inicio, fin);
         

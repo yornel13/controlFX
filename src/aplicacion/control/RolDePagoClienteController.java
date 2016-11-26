@@ -97,6 +97,7 @@ import javafx.stage.StageStyle;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -976,8 +977,8 @@ public class RolDePagoClienteController implements Initializable {
         this.inicio = inicio;
         this.fin = fin;
         
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         
         horarios = (List<Horario>) new HorarioDAO().findAll();
         clientes = new ClienteDAO().findAllActivo();

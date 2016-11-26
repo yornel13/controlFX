@@ -481,8 +481,8 @@ public class RolDePagoSinClienteController implements Initializable {
         this.inicio = inicio;
         this.fin = fin;
         
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         
         setControlEmpleadoInfo(empleado, inicio, fin);
     }

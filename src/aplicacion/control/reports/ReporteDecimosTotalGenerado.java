@@ -15,6 +15,7 @@ import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

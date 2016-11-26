@@ -34,11 +34,11 @@
         <property name="medioDia" type="java.lang.Boolean">
             <column name="medio_dia" />
         </property>
-        <property name="horaInicio" type="java.lang.Integer">
-            <column name="hora_inicio" />
+         <property name="entrada" type="java.sql.Time">
+            <column name="entrada" not-null="true"/>
         </property>
-         <property name="horaFin" type="java.lang.Integer">
-            <column name="hora_fin" />
+        <property name="salida" type="java.sql.Time">
+            <column name="salida" not-null="true"/>
         </property>
     </class>
 </hibernate-mapping>

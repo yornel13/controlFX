@@ -93,6 +93,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -615,8 +617,8 @@ public class PlanillaIessController implements Initializable {
             inicio = new Timestamp(dateTime.withDayOfMonth(empresa
                     .getComienzoMes()).minusMonths(1).getMillis());
         }
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
        
         setTableInfo();
     }

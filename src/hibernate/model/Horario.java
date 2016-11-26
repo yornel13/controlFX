@@ -2,6 +2,7 @@ package hibernate.model;
 
 // default package
 
+import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -14,13 +15,13 @@ public class Horario implements java.io.Serializable {
 
     private Integer id;
     private String nombre;
-    private Integer horaInicio;
-    private Integer horaFin;
     private Double normales;
     private Double recargo;
     private Double sobretiempo;
     private Timestamp creacion;
     private Boolean medioDia;
+    private Time entrada;
+    private Time salida;
 
     // Constructors
 
@@ -28,12 +29,9 @@ public class Horario implements java.io.Serializable {
     public Horario() {
     }
 
-    public Horario(Integer id, String nombre, Integer horaInicio, Integer 
-            horaFin, Double normales, Double recargo, Double sobretiempo) {
+    public Horario(Integer id, String nombre, Double normales, Double recargo, Double sobretiempo) {
         this.id = id;
         this.nombre = nombre;
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
         this.normales = normales;
         this.recargo = recargo;
         this.sobretiempo = sobretiempo;
@@ -53,22 +51,6 @@ public class Horario implements java.io.Serializable {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public Integer getHoraInicio() {
-        return horaInicio;
-    }
-
-    public void setHoraInicio(Integer horaInicio) {
-        this.horaInicio = horaInicio;
-    }
-
-    public Integer getHoraFin() {
-        return horaFin;
-    }
-
-    public void setHoraFin(Integer horaFin) {
-        this.horaFin = horaFin;
     }
 
     public Double getNormales() {
@@ -109,6 +91,22 @@ public class Horario implements java.io.Serializable {
 
     public void setMedioDia(Boolean medioDia) {
         this.medioDia = medioDia;
+    }
+
+    public Time getEntrada() {
+        return entrada;
+    }
+
+    public void setEntrada(Time entrada) {
+        this.entrada = entrada;
+    }
+
+    public Time getSalida() {
+        return salida;
+    }
+
+    public void setSalida(Time salida) {
+        this.salida = salida;
     }
     
     

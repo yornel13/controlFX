@@ -7,7 +7,6 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.UsuarioDAO;
@@ -42,6 +41,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -137,8 +137,8 @@ public class HorasEmpleadosController implements Initializable {
         fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
                 .plusMonths(1).minusDays(1).getMillis());
         
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         
         setTableInfo(empresa, inicio, fin);
         

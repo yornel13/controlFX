@@ -86,6 +86,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Numeros.round;
+import java.sql.Time;
 
 /**
  *
@@ -456,7 +458,7 @@ public class HorasEmpleadosPorDiaController implements Initializable {
            
         fecha = new Timestamp(dateTime.getMillis());
         
-        pickerDia.setValue(Fechas.getDateFromTimestamp(fecha));
+        pickerDia.setValue(Fechas.getLocalFromTimestamp(fecha));
         
         setTableInfo(fecha);
         
@@ -538,14 +540,7 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                     } else if (controlEmpleado.getCaso().equals(Const.CM)) {
                         empleado.setHorario("C. Medica");
                     } else {
-                        for (Horario horario: horarios) {
-                            if (horario.getNormales().equals(controlEmpleado.getNormales())
-                                        && horario.getRecargo().equals(controlEmpleado.getRecargo())
-                                        && horario.getSobretiempo().equals(controlEmpleado.getSobretiempo())) {
-                                empleado.setHorario(getLapso(horario));
-                                break;
-                            }
-                        }
+                       empleado.setHorario(getLapso(controlEmpleado.getEntrada(), controlEmpleado.getSalida()));
                     }
                     empleado.setId(user.getId());
                     empleado.setNombre(user.getNombre());
@@ -642,14 +637,8 @@ public class HorasEmpleadosPorDiaController implements Initializable {
                         } else if (control.getCaso().equals(Const.CM)) {
                             empleado.setHorario("C. Medica");
                         } else {
-                            for (Horario horario: horarios) {
-                                if (horario.getNormales().equals(control.getNormales())
-                                            && horario.getRecargo().equals(control.getRecargo())
-                                            && horario.getSobretiempo().equals(control.getSobretiempo())) {
-                                    empleado.setHorario(getLapso(horario));
-                                    break;
-                                }
-                            }
+                            empleado.setHorario(getLapso(control.getEntrada(), 
+                                    control.getSalida()));
                         }
                     }
                 }
@@ -707,30 +696,39 @@ public class HorasEmpleadosPorDiaController implements Initializable {
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
     }
     
-    public String getLapso(Horario horario) {
-        String lapso;
-                
-        if (horario.getHoraInicio() == 0) {
-            lapso = "12am";
-        } else if (horario.getHoraInicio() < 12) {
-            lapso = horario.getHoraInicio() + "am";
-        } else if (horario.getHoraInicio() == 12) {
-            lapso = "12pm";
-        } else {
-            lapso = (horario.getHoraInicio() - 12) + "pm";
-        }
+    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+        filteredData.setPredicate(empleado -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
 
-        if (horario.getHoraFin()== 0) {
-            lapso = lapso + "-" + "12am";
-        } else if (horario.getHoraFin() < 12) {
-            lapso = lapso + "-" + horario.getHoraFin() + "am";
-        } else if (horario.getHoraFin() == 12) {
-            lapso = lapso + "-" + "12pm";
-        } else {
-            lapso = lapso + "-" + (horario.getHoraFin() - 12) + "pm";
-        }
+            if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCliente().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } 
+            return false; // Does not match.
+        });
+    }
+    
+    public String getLapso(Time entrada, Time salida) {
+        
+        String lapso = Fechas.getHora(entrada)
+                        +" - "+Fechas.getHora(salida);
         
         return lapso;
     }

@@ -69,6 +69,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -395,8 +396,8 @@ public class RolClienteController implements Initializable {
                     .getComienzoMes()).minusMonths(1).getMillis());
         }
 
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         setTableInfo(inicio, fin);
     }
     

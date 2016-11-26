@@ -2,6 +2,7 @@ package hibernate.model;
 
 // default package
 
+import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -21,8 +22,8 @@ public class ControlEmpleado implements java.io.Serializable {
 	private Double sobretiempo;
 	private String caso;
         private Boolean medioDia;
-        private Integer horaInicio;
-        private Integer horaFin;
+        private Time entrada;
+        private Time salida;
 
 	// Constructors
 
@@ -117,20 +118,20 @@ public class ControlEmpleado implements java.io.Serializable {
             this.medioDia = medioDia;
         }
 
-        public Integer getHoraInicio() {
-            return horaInicio;
+        public Time getEntrada() {
+            return entrada;
         }
 
-        public void setHoraInicio(Integer horaInicio) {
-            this.horaInicio = horaInicio;
+        public void setEntrada(Time entrada) {
+            this.entrada = entrada;
         }
 
-        public Integer getHoraFin() {
-            return horaFin;
+        public Time getSalida() {
+            return salida;
         }
 
-        public void setHoraFin(Integer horaFin) {
-            this.horaFin = horaFin;
+        public void setSalida(Time salida) {
+            this.salida = salida;
         }
 
         

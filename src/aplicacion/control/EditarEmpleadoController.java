@@ -333,9 +333,9 @@ public class EditarEmpleadoController implements Initializable {
         } else {
             sexoMasculinoClick(null);
         }
-        datePicker.setValue(Fechas.getDateFromTimestamp(empleado.getNacimiento()));
-        datePickerInicio.setValue(Fechas.getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaInicio()));
-        datePickerContratacion.setValue(Fechas.getDateFromTimestamp(empleado.getDetallesEmpleado().getFechaContrato()));
+        datePicker.setValue(Fechas.getLocalFromTimestamp(empleado.getNacimiento()));
+        datePickerInicio.setValue(Fechas.getLocalFromTimestamp(empleado.getDetallesEmpleado().getFechaInicio()));
+        datePickerContratacion.setValue(Fechas.getLocalFromTimestamp(empleado.getDetallesEmpleado().getFechaContrato()));
     }
     
     @Override

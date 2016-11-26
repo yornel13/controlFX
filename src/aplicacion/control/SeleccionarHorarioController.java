@@ -5,9 +5,11 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Fechas;
 import hibernate.model.Cliente;
 import hibernate.model.Horario;
 import java.net.URL;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -124,7 +126,8 @@ public class SeleccionarHorarioController implements Initializable {
 
                 if (horario.getNombre().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches first name.
-                } else if (getLapso(horario).toLowerCase().contains(lowerCaseFilter)) {
+                } else if (getLapso(horario.getEntrada(), horario.getSalida())
+                        .toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
                 }
                 return false; // Does not match.
@@ -148,27 +151,8 @@ public class SeleccionarHorarioController implements Initializable {
             public ObservableValue<String> call(TableColumn
                     .CellDataFeatures<Horario, String> data) {
                 
-                String lapso;
-                
-                if (data.getValue().getHoraInicio() == 0) {
-                    lapso = "12am";
-                } else if (data.getValue().getHoraInicio() < 12) {
-                    lapso = data.getValue().getHoraInicio() + "am";
-                } else if (data.getValue().getHoraInicio() == 12) {
-                    lapso = "12pm";
-                } else {
-                    lapso = (data.getValue().getHoraInicio() - 12) + "pm";
-                }
-                
-                if (data.getValue().getHoraFin()== 0) {
-                    lapso = lapso + "-" + "12am";
-                } else if (data.getValue().getHoraFin() < 12) {
-                    lapso = lapso + "-" + data.getValue().getHoraFin() + "am";
-                } else if (data.getValue().getHoraFin() == 12) {
-                    lapso = lapso + "-" + "12pm";
-                } else {
-                    lapso = lapso + "-" + (data.getValue().getHoraFin() - 12) + "pm";
-                }
+                String lapso = Fechas.getHora(data.getValue().getEntrada())
+                        +" - "+Fechas.getHora(data.getValue().getSalida());
                 
                 return new ReadOnlyStringWrapper(lapso);
             }
@@ -191,28 +175,10 @@ public class SeleccionarHorarioController implements Initializable {
         });
     } 
     
-    public String getLapso(Horario horario) {
-        String lapso;
-                
-        if (horario.getHoraInicio() == 0) {
-            lapso = "12am";
-        } else if (horario.getHoraInicio() < 12) {
-            lapso = horario.getHoraInicio() + "am";
-        } else if (horario.getHoraInicio() == 12) {
-            lapso = "12pm";
-        } else {
-            lapso = (horario.getHoraInicio() - 12) + "pm";
-        }
-
-        if (horario.getHoraFin()== 0) {
-            lapso = lapso + "-" + "12am";
-        } else if (horario.getHoraFin() < 12) {
-            lapso = lapso + "-" + horario.getHoraFin() + "am";
-        } else if (horario.getHoraFin() == 12) {
-            lapso = lapso + "-" + "12pm";
-        } else {
-            lapso = lapso + "-" + (horario.getHoraFin() - 12) + "pm";
-        }
+    public String getLapso(Time entrada, Time salida) {
+        
+        String lapso = Fechas.getHora(entrada)
+                        +" - "+Fechas.getHora(salida);
         
         return lapso;
     }

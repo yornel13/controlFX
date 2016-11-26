@@ -10,7 +10,6 @@ import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import aplicacion.control.util.Numeros;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
@@ -93,6 +92,7 @@ import javafx.util.Callback;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -945,8 +945,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         }
            
         
-        pickerDe.setValue(Fechas.getDateFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getDateFromTimestamp(fin));
+        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
+        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         
         setTableInfo(empresa, inicio, fin);
         
@@ -1110,6 +1110,31 @@ public class HorasEmpleadosClienteController implements Initializable {
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
+    }
+    
+    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+        filteredData.setPredicate(empleado -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
+
+            if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } 
+            return false; // Does not match.
+        });
     }
     
     @Override

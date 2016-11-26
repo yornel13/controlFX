@@ -21,6 +21,7 @@ import hibernate.model.Usuario;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -169,8 +170,8 @@ public class HorarioEmpleadoController implements Initializable {
     Dialog<Void> dialog;
     
     boolean medioDia;
-    int horaInicio = 6;
-    int horaFin = 14;
+    Time entrada = new Time(6, 0, 0);
+    Time salida = new Time(14, 0, 0);
     
     private List<ControlEmpleado> ultimosRegistros;
     private HorasEmpleadosPorDiaController horasEmpleadosPorDiaController;
@@ -192,13 +193,6 @@ public class HorarioEmpleadoController implements Initializable {
     private void checkTrabajo(ActionEvent event) {
         panelHoras.setVisible(true);
         panelHorario.setVisible(true);
-        if (Double.valueOf(normales.getText()).equals(0d)) {
-            normales.setText("8.0");
-            horaInicio = 6;
-            horaFin = 14;
-            medioDia = false;
-            horarioButton.setText("6am-2pm");
-        }
         panelEspecial.setVisible(false);
         verificarDia();
     }
@@ -208,8 +202,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(false);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
     }
     
@@ -218,8 +210,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(false);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
         verificarDia();
     }
@@ -229,8 +219,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(true);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
         verificarDia();
     }
@@ -241,8 +229,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(true);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
         verificarDia();
     }
@@ -253,8 +239,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(true);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
         verificarDia();
     }
@@ -265,8 +249,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(true);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
         verificarDia();
     }
@@ -277,8 +259,6 @@ public class HorarioEmpleadoController implements Initializable {
         panelHoras.setVisible(false);
         panelHorario.setVisible(false);
         panelEspecial.setVisible(true);
-        horaInicio = 0;
-        horaFin = 0;
         medioDia = false;
         verificarDia();
     }
@@ -326,6 +306,35 @@ public class HorarioEmpleadoController implements Initializable {
     
     @FXML
     private void guardar(ActionEvent event)  {
+        if (horarioButton.getText().isEmpty() && marcarTrabajo.isSelected()) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("");
+            String stageIcon = AplicacionControl.class
+                    .getResource("imagenes/icon_error.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("ok");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("Debes seleccionar un horario."), buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
+            dialogStage.show();
+        } else {
+            if (!marcarTrabajo.isSelected()) {
+                entrada = new Time(0, 0, 0);
+                salida = new Time(0, 0, 0);
+            }
+            saveHorario();
+        }
+    }
+    
+    private void saveHorario()  {
         if (marcarEspecial.isSelected() 
                 && !marcarPermiso.isSelected() 
                 && !marcarVacaciones.isSelected()
@@ -488,14 +497,22 @@ public class HorarioEmpleadoController implements Initializable {
     }
     
     public void setHorario(Horario horario) {
-        horarioButton.setText(horario.getNombre() + " " + getLapso(horario));
+        horarioButton.setText(getLapso(horario.getEntrada(), horario.getSalida()));
         normales.setText(horario.getNormales().toString());
         suplementarias.setText(horario.getRecargo().toString());
         sobreTiempo.setText(horario.getSobretiempo().toString());
-        horaInicio = horario.getHoraInicio();
-        horaFin = horario.getHoraFin();
+        entrada = horario.getEntrada();
+        salida = horario.getSalida();
         medioDia = horario.getMedioDia();
         verificarDia();
+    }
+    
+    public String getLapso(Time entrada, Time salida) {
+        
+        String lapso = Fechas.getHora(entrada)
+                        +" - "+Fechas.getHora(salida);
+        
+        return lapso;
     }
     
     public void setCliente(Cliente cliente) {
@@ -513,8 +530,8 @@ public class HorarioEmpleadoController implements Initializable {
         this.editable = editable;
         if (controlEmpleado != null) {
             
-            horaInicio = controlEmpleado.getHoraInicio();
-            horaFin = controlEmpleado.getHoraFin();
+            entrada = controlEmpleado.getEntrada();
+            salida = controlEmpleado.getSalida();
             medioDia = controlEmpleado.getMedioDia();
             
             normales.setText(controlEmpleado.getNormales().toString());
@@ -540,14 +557,7 @@ public class HorarioEmpleadoController implements Initializable {
                 marcarDM.setSelected(true);
                 checkDM(null);
             } else {
-                for (Horario horario: horarios) {
-                    if (horario.getNormales().equals(controlEmpleado.getNormales())
-                            && horario.getRecargo().equals(controlEmpleado.getRecargo())
-                            && horario.getSobretiempo().equals(controlEmpleado.getSobretiempo())) {
-                        horarioButton.setText(horario.getNombre() + " " + getLapso(horario));
-                        break;
-                    }
-                }
+                horarioButton.setText(getLapso(controlEmpleado.getEntrada(), controlEmpleado.getSalida()));
             }
             
             if (controlEmpleado.getCliente() != null) {
@@ -582,26 +592,10 @@ public class HorarioEmpleadoController implements Initializable {
         String output = dia.substring(0, 1).toUpperCase() + dia.substring(1);
         fechaLabel.setText(output + " " + Fechas.getFechaConMes(fecha));
     }
-    
-    public void compararHorario(Double normales, Double sobretiempo, Double recargo) {
-        Boolean vacio = true;
-        for (Horario horario: horarios) {
-            if (horario.getNormales().equals(normales)
-                    && horario.getRecargo().equals(sobretiempo)
-                    && horario.getSobretiempo().equals(recargo)) {
-                horarioButton.setText(horario.getNombre() + " " + getLapso(horario));
-                vacio = false;
-                return;
-            }
-        } 
-        if (vacio)
-            horarioButton.setText("");
-    }
-
   
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        normales.setText("8");
+        normales.setText("0");
         suplementarias.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         sobreTiempo.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         normales.setEditable(false);
@@ -661,6 +655,8 @@ public class HorarioEmpleadoController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        
+        buttonBorrarHorario.setVisible(false);
     } 
     
     public void updateWindows() {
@@ -676,32 +672,6 @@ public class HorarioEmpleadoController implements Initializable {
         horasEmpleadosPorDiaController.setTableInfo(fecha);
         stagePrincipal.close();
         dialogoCompletado();
-    }
-    
-    public String getLapso(Horario horario) {
-        String lapso;
-                
-        if (horario.getHoraInicio() == 0) {
-            lapso = "12am";
-        } else if (horario.getHoraInicio() < 12) {
-            lapso = horario.getHoraInicio() + "am";
-        } else if (horario.getHoraInicio() == 12) {
-            lapso = "12pm";
-        } else {
-            lapso = (horario.getHoraInicio() - 12) + "pm";
-        }
-
-        if (horario.getHoraFin()== 0) {
-            lapso = lapso + "-" + "12am";
-        } else if (horario.getHoraFin() < 12) {
-            lapso = lapso + "-" + horario.getHoraFin() + "am";
-        } else if (horario.getHoraFin() == 12) {
-            lapso = lapso + "-" + "12pm";
-        } else {
-            lapso = lapso + "-" + (horario.getHoraFin() - 12) + "pm";
-        }
-        
-        return lapso;
     }
     
     public static EventHandler<KeyEvent> numDecimalFilter() {
@@ -879,8 +849,8 @@ public class HorarioEmpleadoController implements Initializable {
                             controlEmpleadoNew.setRecargo(0d);
                             controlEmpleadoNew.setCaso(Const.DM);
                         } 
-                        controlEmpleadoNew.setHoraInicio(horaInicio);
-                        controlEmpleadoNew.setHoraFin(horaFin);
+                        controlEmpleadoNew.setEntrada(entrada);
+                        controlEmpleadoNew.setSalida(salida);
                         controlEmpleadoNew.setMedioDia(medioDia);
                         controlEmpleadoNew.setUsuario(usuario);
                         controlEmpleadoNew.setCliente(cliente);
@@ -986,8 +956,8 @@ public class HorarioEmpleadoController implements Initializable {
                                         controlEmpleadoNew.setRecargo(0d);
                                         controlEmpleadoNew.setCaso(Const.DM);
                                     } 
-                                controlEmpleadoNew.setHoraInicio(horaInicio);
-                                controlEmpleadoNew.setHoraFin(horaFin);
+                                controlEmpleadoNew.setEntrada(entrada);
+                                controlEmpleadoNew.setSalida(salida);
                                 controlEmpleadoNew.setMedioDia(medioDia);
                                 controlEmpleadoNew.setUsuario(usuario);
                                 controlEmpleadoNew.setCliente(cliente);
@@ -1067,8 +1037,8 @@ public class HorarioEmpleadoController implements Initializable {
                             controlEmpleadoNew.setRecargo(0d);
                             controlEmpleadoNew.setCaso(Const.DM);
                         } 
-                    controlEmpleadoNew.setHoraInicio(horaInicio);
-                    controlEmpleadoNew.setHoraFin(horaFin);
+                    controlEmpleadoNew.setEntrada(entrada);
+                    controlEmpleadoNew.setSalida(salida);
                     controlEmpleadoNew.setMedioDia(medioDia);
                     controlEmpleadoNew.setUsuario(empleado);
                     controlEmpleadoNew.setCliente(cliente);
@@ -1162,8 +1132,8 @@ public class HorarioEmpleadoController implements Initializable {
                                 controlEmpleadoNew.setRecargo(0d);
                                 controlEmpleadoNew.setCaso(Const.DM);
                             } 
-                            controlEmpleadoNew.setHoraInicio(horaInicio);
-                            controlEmpleadoNew.setHoraFin(horaFin);
+                            controlEmpleadoNew.setEntrada(entrada);
+                            controlEmpleadoNew.setSalida(salida);
                             controlEmpleadoNew.setMedioDia(medioDia);
                             controlEmpleadoNew.setUsuario(empleado);
                             controlEmpleadoNew.setCliente(cliente);
