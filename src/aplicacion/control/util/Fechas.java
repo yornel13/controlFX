@@ -5,8 +5,12 @@
  */
 package aplicacion.control.util;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -46,6 +50,14 @@ public class Fechas {
     }
     
     public static String getFechaConMes(DateTime dateTime) {
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear()) 
+                + " " + dateTime.getYear();
+        return fecha;
+    }
+    
+    public static String getFechaConMes(Date date) {
+        DateTime dateTime = new DateTime(date.getTime());
         String fecha = dateTime.getDayOfMonth() + " de " 
                 + getMonthName(dateTime.getMonthOfYear()) 
                 + " " + dateTime.getYear();
@@ -107,5 +119,16 @@ public class Fechas {
     public static Time getTimeFromLocalTime(LocalTime local) {
         Time time = new Time(local.getHour(), local.getMinute(), 0);
         return time;
+    }
+    
+     public static Timestamp getToday() throws ParseException {
+        
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        java.util.Date today = new java.util.Date();
+
+        java.util.Date todayWithZeroTime = formatter.parse(formatter.format(today));
+        
+        return new Timestamp(todayWithZeroTime.getTime());
     }
 }

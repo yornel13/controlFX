@@ -13,12 +13,12 @@ import hibernate.model.Usuario;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -153,22 +153,22 @@ public class HorasExtrasClienteController implements Initializable {
                 stagePrincipal.close();
 
                 if (marcarLibre.isSelected()) {
-                    rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, timestamp, true, false);
+                    rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, new Date(timestamp.getTime()), true, false);
                 } else if (marcarFalta.isSelected()) {
-                    rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, timestamp, false, true);
+                    rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, new Date(timestamp.getTime()), false, true);
                 } else {
                     if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
-                       rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, timestamp, false, false); 
+                       rolDePagoClienteController.guardarRegistro(empleado, 0d, 0d, cliente, new Date(timestamp.getTime()), false, false); 
                     } else if (suplementarias.getText().isEmpty()) {
                         rolDePagoClienteController.guardarRegistro(empleado, 0d, 
-                            round(Double.valueOf(sobreTiempo.getText())), cliente, timestamp, false, false);
+                            round(Double.valueOf(sobreTiempo.getText())), cliente, new Date(timestamp.getTime()), false, false);
                     } else if (sobreTiempo.getText().isEmpty()) {
                         rolDePagoClienteController.guardarRegistro(empleado, 
-                            round(Double.valueOf(suplementarias.getText())), 0d, cliente, timestamp, false, false);
+                            round(Double.valueOf(suplementarias.getText())), 0d, cliente, new Date(timestamp.getTime()), false, false);
                     } else {
                         rolDePagoClienteController.guardarRegistro(empleado, 
                                 round(Double.valueOf(suplementarias.getText())), 
-                                round(Double.valueOf(sobreTiempo.getText())), cliente, timestamp, false, false);
+                                round(Double.valueOf(sobreTiempo.getText())), cliente, new Date(timestamp.getTime()), false, false);
                     }
                 }
             } else {
@@ -213,17 +213,6 @@ public class HorasExtrasClienteController implements Initializable {
             }
         };
         return aux;
-    }
-    
-    public static Timestamp getToday() throws ParseException {
-        
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        Date today = new Date();
-
-        Date todayWithZeroTime = formatter.parse(formatter.format(today));
-        
-        return new Timestamp(todayWithZeroTime.getTime());
     }
     
     public static LocalDate getDateFromTimestamp(Timestamp timestamp) {

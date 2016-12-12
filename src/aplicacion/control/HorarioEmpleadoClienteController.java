@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.ControlTable;
+import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
@@ -20,6 +21,7 @@ import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -28,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -167,6 +168,9 @@ public class HorarioEmpleadoClienteController implements Initializable {
     private ArrayList<ControlTable> controlsTables;
     private Timestamp fechaInicio;
     private Timestamp fechaFin;
+    private AsignarHorariosController asignarHorariosController;
+    private String dia;
+    private EmpleadoTable empleadoTable;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -341,45 +345,92 @@ public class HorarioEmpleadoClienteController implements Initializable {
                 && !marcarDM.isSelected()) {
             // Nothing to do
         } else {
-            if (multiple) {
-                ExecutorService executor = Executors.newFixedThreadPool(1);
-                Runnable worker = new HorarioEmpleadoClienteController.DataBaseThread();
-                executor.execute(worker);
-                executor.shutdown();
-
-                loadingMode();
-            } else {
-                if (editable) {
-
+            if (asignarHorariosController == null) {
+            
+                if (multiple) {
                     ExecutorService executor = Executors.newFixedThreadPool(1);
                     Runnable worker = new HorarioEmpleadoClienteController.DataBaseThread();
                     executor.execute(worker);
                     executor.shutdown();
 
                     loadingMode();
-
                 } else {
-                    Stage dialogStage = new Stage();
-                    dialogStage.initModality(Modality.APPLICATION_MODAL);
-                    dialogStage.setResizable(false);
-                    dialogStage.setTitle("");
-                    String stageIcon = AplicacionControl.class
-                            .getResource("imagenes/icon_error.png").toExternalForm();
-                    dialogStage.getIcons().add(new Image(stageIcon));
-                    Button buttonOk = new MaterialDesignButtonBlue("ok");
-                    dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
-                    children(new Text("No se puede cambiar porque ya se creo el rol."), 
-                            buttonOk).
-                    alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                    dialogStage.show();
-                    buttonOk.setMaxWidth(60);
-                    buttonOk.setOnAction((ActionEvent e) -> {
-                        dialogStage.close();
-                    });
-                    buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-                        dialogStage.close();
-                    });
+                    if (editable) {
+
+                        ExecutorService executor = Executors.newFixedThreadPool(1);
+                        Runnable worker = new HorarioEmpleadoClienteController.DataBaseThread();
+                        executor.execute(worker);
+                        executor.shutdown();
+
+                        loadingMode();
+
+                    } else {
+                        Stage dialogStage = new Stage();
+                        dialogStage.initModality(Modality.APPLICATION_MODAL);
+                        dialogStage.setResizable(false);
+                        dialogStage.setTitle("");
+                        String stageIcon = AplicacionControl.class
+                                .getResource("imagenes/icon_error.png").toExternalForm();
+                        dialogStage.getIcons().add(new Image(stageIcon));
+                        Button buttonOk = new MaterialDesignButtonBlue("ok");
+                        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
+                        children(new Text("No se puede cambiar porque ya se creo el rol."), 
+                                buttonOk).
+                        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+                        dialogStage.show();
+                        buttonOk.setMaxWidth(60);
+                        buttonOk.setOnAction((ActionEvent e) -> {
+                            dialogStage.close();
+                        });
+                        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                            dialogStage.close();
+                        });
+                    }
                 }
+            } else {
+                ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
+                if (marcarTrabajo.isSelected()) {
+                    controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
+                    controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
+                    controlEmpleadoNew.setRecargo(Double.valueOf(suplementarias.getText()));
+                    controlEmpleadoNew.setCaso(Const.TRABAJO);
+                } else if (marcarLibre.isSelected()) {
+                    controlEmpleadoNew.setNormales(8d);
+                    controlEmpleadoNew.setSobretiempo(0d);
+                    controlEmpleadoNew.setRecargo(0d);
+                    controlEmpleadoNew.setCaso(Const.LIBRE);
+                } else if (marcarFalta.isSelected()) {
+                    controlEmpleadoNew.setNormales(0d);
+                    controlEmpleadoNew.setSobretiempo(0d);
+                    controlEmpleadoNew.setRecargo(0d);
+                    controlEmpleadoNew.setCaso(Const.FALTA);
+                } else if (marcarPermiso.isSelected()) {
+                    controlEmpleadoNew.setNormales(0d);
+                    controlEmpleadoNew.setSobretiempo(0d);
+                    controlEmpleadoNew.setRecargo(0d);
+                    controlEmpleadoNew.setCaso(Const.PERMISO);
+                } else if (marcarVacaciones.isSelected()) {
+                    controlEmpleadoNew.setNormales(0d);
+                    controlEmpleadoNew.setSobretiempo(0d);
+                    controlEmpleadoNew.setRecargo(0d);
+                    controlEmpleadoNew.setCaso(Const.VACACIONES);
+                } else if (marcarCM.isSelected()) {
+                    controlEmpleadoNew.setNormales(8d);
+                    controlEmpleadoNew.setSobretiempo(0d);
+                    controlEmpleadoNew.setRecargo(0d);
+                    controlEmpleadoNew.setCaso(Const.CM);
+                } else if (marcarDM.isSelected()) {
+                    controlEmpleadoNew.setNormales(8d);
+                    controlEmpleadoNew.setSobretiempo(0d);
+                    controlEmpleadoNew.setRecargo(0d);
+                    controlEmpleadoNew.setCaso(Const.DM);
+                } 
+                controlEmpleadoNew.setEntrada(entrada);
+                controlEmpleadoNew.setSalida(salida);
+                controlEmpleadoNew.setMedioDia(medioDia);
+                controlEmpleadoNew.setCliente(cliente);
+                stage.close();
+                asignarHorariosController.setHorarioToTurnos(controlEmpleadoNew);
             }
         }
     }
@@ -522,6 +573,20 @@ public class HorarioEmpleadoClienteController implements Initializable {
         this.controlEmpleado = controlEmpleado;
         this.fecha = fecha;
         this.editable = editable;
+        
+        setControlInfo();
+        
+        DateTime dateTime = new DateTime(fecha);
+        String dia = dateTime.toCalendar(Locale.getDefault())
+                            .getDisplayName(Calendar
+                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+        String output = dia.substring(0, 1).toUpperCase() + dia.substring(1);
+        fechaLabel.setText(output + " " + Fechas.getFechaConMes(fecha));
+        
+        verificarDia();
+    }
+    
+    void setControlInfo() {
         if (controlEmpleado != null) {
             
             entrada = controlEmpleado.getEntrada();
@@ -559,15 +624,6 @@ public class HorarioEmpleadoClienteController implements Initializable {
                 clienteButton.setText(cliente.getNombre());
             }
         } 
-        
-        DateTime dateTime = new DateTime(fecha);
-        String dia = dateTime.toCalendar(Locale.getDefault())
-                            .getDisplayName(Calendar
-                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
-        String output = dia.substring(0, 1).toUpperCase() + dia.substring(1);
-        fechaLabel.setText(output + " " + Fechas.getFechaConMes(fecha));
-        
-        verificarDia();
     }
     
     public void setEmpleadoMultiplesDias(Usuario empleado, ArrayList<ControlTable> controls, Timestamp fechaInicio, Timestamp fechaFin) {
@@ -658,17 +714,6 @@ public class HorarioEmpleadoClienteController implements Initializable {
         return aux;
     }
     
-    public static Timestamp getToday() throws ParseException {
-        
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        Date today = new Date();
-
-        Date todayWithZeroTime = formatter.parse(formatter.format(today));
-        
-        return new Timestamp(todayWithZeroTime.getTime());
-    }
-    
     public static LocalDate getDateFromTimestamp(Timestamp timestamp) {
         if (timestamp == null) {
             return null;
@@ -756,6 +801,33 @@ public class HorarioEmpleadoClienteController implements Initializable {
             dialogStage.close();
         });
     }
+
+    void setEmpleado(EmpleadoTable empleado, List<Horario> horarios, 
+            List<Cliente> clientes, String dia, ControlEmpleado controlEmpleado) {
+        this.dia = dia;
+        this.empleado = empleado.getUsuario();
+        this.empleadoTable = empleado;
+        this.clientes = clientes;
+        this.horarios = horarios;
+        fechaLabel.setText("");
+        this.controlEmpleado = controlEmpleado;
+        setControlInfo();
+        verificarDia();
+    }
+    
+    void setEmpleado(List<Horario> horarios, 
+            List<Cliente> clientes, ControlEmpleado controlEmpleado) {
+        this.clientes = clientes;
+        this.horarios = horarios;
+        fechaLabel.setText("");
+        this.controlEmpleado = controlEmpleado;
+        setControlInfo();
+        verificarDia();
+    }
+
+    void setAsignarHorarioController(AsignarHorariosController asignarHorariosController) {
+        this.asignarHorariosController = asignarHorariosController;
+    }
     
     public class DataBaseThread implements Runnable {
 
@@ -822,7 +894,7 @@ public class HorarioEmpleadoClienteController implements Initializable {
                         Timestamp fechaParaGuardar = new Timestamp(controlTable
                                 .getFecha().getMillis());
                         ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                        controlEmpleadoNew.setFecha(fechaParaGuardar);
+                        controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
                         if (marcarTrabajo.isSelected()) {
                             controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                             controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -932,7 +1004,7 @@ public class HorarioEmpleadoClienteController implements Initializable {
                     });
                 } else {
                     ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                    controlEmpleadoNew.setFecha(fecha);
+                    controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
                     if (marcarTrabajo.isSelected()) {
                         controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                         controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));

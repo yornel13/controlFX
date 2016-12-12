@@ -9,7 +9,6 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
@@ -88,6 +87,9 @@ import javafx.util.Callback;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import java.sql.Time;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

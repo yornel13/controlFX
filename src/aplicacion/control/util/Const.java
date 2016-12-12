@@ -94,4 +94,13 @@ public class Const {
     public static final String PERMISO = "P";
     public static final String DM = "D";  // Descanso Medico
     public static final String CM = "C";  // Cita Medica
+    
+    // Dias de la semana
+    public static final String LUNES = "Lunes"; 
+    public static final String MARTES = "Martes"; 
+    public static final String MIERCOLES = "Miercoles"; 
+    public static final String JUEVES = "Jueves"; 
+    public static final String VIERNES = "Viernes"; 
+    public static final String SABADO = "Sabado"; 
+    public static final String DOMINGO = "Domingo"; 
 }

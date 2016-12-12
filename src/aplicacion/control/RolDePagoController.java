@@ -384,7 +384,7 @@ public class RolDePagoController implements Initializable {
     }
     
     public void guardarRegistro(Usuario empleado, Double suplementarias, 
-            Double sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre,
+            Double sobreTiempo, Cliente cliente, java.sql.Date fecha, Boolean libre,
              Boolean falta) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
         ControlEmpleado controlEmpleado = new ControlEmpleado();
@@ -407,7 +407,7 @@ public class RolDePagoController implements Initializable {
     }
     
     public void guardarRegistroEditado(ControlEmpleado controlEmpleado, Double suplementarias, 
-            Double sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre,
+            Double sobreTiempo, Cliente cliente, java.sql.Date fecha, Boolean libre,
             Boolean falto) throws ParseException {
         
             controlEmpleado.setFecha(fecha);

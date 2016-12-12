@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.RolCliente;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
@@ -239,6 +240,24 @@ public class RolClienteDAO extends BaseHibernateDAO {
         }
         
         public List<RolCliente> findAllByEntreFechaAndEmpresaId(Timestamp fecha, 
+                Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM rol_cliente "
+                            + "JOIN usuario "
+                            + "ON usuario.id = rol_cliente.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where inicio <= :fecha "
+                            + "and finalizo >= :fecha "
+                            + "and empresa_id = :empresa_id")
+                    .addEntity(RolCliente.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<RolCliente>) result;
+        }
+        
+        public List<RolCliente> findAllByEntreFechaAndEmpresaId(Date fecha, 
                 Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "

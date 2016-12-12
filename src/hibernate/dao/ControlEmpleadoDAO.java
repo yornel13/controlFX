@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.ControlEmpleado;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
@@ -76,6 +77,22 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         
         public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(
                 Integer usuarioId, Timestamp inicio, Timestamp fin) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and fecha >= :inicio "
+                            + "and fecha <= :fin "
+                            + "order by fecha")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("inicio", inicio)
+                    .setParameter("fin", fin);
+                Object result = query.list();
+                return (List<ControlEmpleado>) result;
+	}
+        
+        public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(
+                Integer usuarioId, Date inicio, Date fin) {
 		Query query = getSession().
                     createSQLQuery("SELECT * FROM control_empleado "
                             + "WHERE usuario_id = :usuario_id "
@@ -179,6 +196,23 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
         }
         
         public List<ControlEmpleado> findAllByFechaAndEmpresaId(Timestamp fecha, 
+                Integer empresaId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM control_empleado "
+                            + "JOIN usuario "
+                            + "ON usuario.id = control_empleado.usuario_id "
+                            + "JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "where fecha = :fecha "
+                            + "and empresa_id = :empresa_id")
+                    .addEntity(ControlEmpleado.class)
+                    .setParameter("fecha", fecha)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return (List<ControlEmpleado>) result;
+        }
+        
+        public List<ControlEmpleado> findAllByFechaAndEmpresaId(Date fecha, 
                 Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM control_empleado "

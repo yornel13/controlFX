@@ -2,8 +2,8 @@ package hibernate.model;
 
 // default package
 
+import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
 
 /**
  * ControlEmpleado entity. @author MyEclipse Persistence Tools
@@ -16,7 +16,7 @@ public class ControlEmpleado implements java.io.Serializable {
 	private Integer id;
 	private Usuario usuario;
 	private Cliente cliente;
-	private Timestamp fecha;
+	private Date fecha;
 	private Double normales;
         private Double recargo;
 	private Double sobretiempo;
@@ -24,6 +24,13 @@ public class ControlEmpleado implements java.io.Serializable {
         private Boolean medioDia;
         private Time entrada;
         private Time salida;
+        
+        // uso especial
+        public String dias;
+        public String getDias() {return dias;}
+        public void setDias(String dias) {this.dias = dias;}
+        
+        
 
 	// Constructors
 
@@ -32,13 +39,13 @@ public class ControlEmpleado implements java.io.Serializable {
 	}
 
 	/** minimal constructor */
-	public ControlEmpleado(Usuario usuario, Timestamp fecha) {
+	public ControlEmpleado(Usuario usuario, Date fecha) {
 		this.usuario = usuario;
 		this.fecha = fecha;
 	}
 
 	/** full constructor */
-	public ControlEmpleado(Usuario usuario, Cliente cliente, Timestamp fecha) {
+	public ControlEmpleado(Usuario usuario, Cliente cliente, Date fecha) {
 		this.usuario = usuario;
 		this.cliente = cliente;
 		this.fecha = fecha;
@@ -70,11 +77,11 @@ public class ControlEmpleado implements java.io.Serializable {
 		this.cliente = cliente;
 	}
 
-	public Timestamp getFecha() {
+	public Date getFecha() {
 		return this.fecha;
 	}
 
-	public void setFecha(Timestamp fecha) {
+	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
 
@@ -134,5 +141,24 @@ public class ControlEmpleado implements java.io.Serializable {
             this.salida = salida;
         }
 
-        
+        @Override
+        public ControlEmpleado clone() {
+
+            ControlEmpleado newControl = new ControlEmpleado();
+            newControl.setId(id);
+            newControl.setUsuario(usuario);
+            newControl.setCliente(cliente);
+            newControl.setFecha(fecha);
+            newControl.setNormales(normales);
+            newControl.setRecargo(recargo);
+            newControl.setSobretiempo(sobretiempo);
+            newControl.setCaso(caso);
+            newControl.setMedioDia(medioDia);
+            newControl.setEntrada(entrada);
+            newControl.setSalida(salida);
+            newControl.setDias(dias);
+            
+            return newControl;
+
+        }
 }

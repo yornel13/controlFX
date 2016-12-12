@@ -10,12 +10,12 @@ import hibernate.model.ControlEmpleado;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -138,22 +138,22 @@ public class EditarHorasExtrasSinClienteController implements Initializable {
             stagePrincipal.close();
             
             if (marcarLibre.isSelected()) {
-                rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 0d, null, timestamp, true, false);
+                rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 0d, null, new Date(timestamp.getTime()), true, false);
             } else if (marcarFalta.isSelected()) {
-                rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 0d, null, timestamp, false, true);
+                rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 0d, null, new Date(timestamp.getTime()), false, true);
             } else {
                 if (suplementarias.getText().isEmpty() && sobreTiempo.getText().isEmpty()) {
-                   rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 0d, null, timestamp, false, false); 
+                   rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 0d, null, new Date(timestamp.getTime()), false, false); 
                 } else if (suplementarias.getText().isEmpty()) {
                     rolDePagoController.guardarRegistroEditado(controlEmpleado, 0d, 
-                        round(Double.valueOf(sobreTiempo.getText())), null, timestamp, false, false);
+                        round(Double.valueOf(sobreTiempo.getText())), null, new Date(timestamp.getTime()), false, false);
                 } else if (sobreTiempo.getText().isEmpty()) {
                     rolDePagoController.guardarRegistroEditado(controlEmpleado, 
-                        round(Double.valueOf(suplementarias.getText())), 0d, null, timestamp, false, false);
+                        round(Double.valueOf(suplementarias.getText())), 0d, null, new Date(timestamp.getTime()), false, false);
                 } else {
                     rolDePagoController.guardarRegistroEditado(controlEmpleado, 
                             round(Double.valueOf(suplementarias.getText())), 
-                            round(Double.valueOf(sobreTiempo.getText())), null, timestamp, false, false);
+                            round(Double.valueOf(sobreTiempo.getText())), null, new Date(timestamp.getTime()), false, false);
                 }
             }
         }
@@ -164,7 +164,7 @@ public class EditarHorasExtrasSinClienteController implements Initializable {
         
         sobreTiempo.setText(this.controlEmpleado.getSobretiempo().toString());
         suplementarias.setText(this.controlEmpleado.getRecargo().toString());
-        datePickerFecha.setValue(getDateFromTimestamp(this.controlEmpleado.getFecha()));
+        datePickerFecha.setValue(this.controlEmpleado.getFecha().toLocalDate());
         /*if (controlEmpleado.getLibre()) {
             marcarLibre.setSelected(true);
             checkLibre(null);
@@ -190,17 +190,6 @@ public class EditarHorasExtrasSinClienteController implements Initializable {
             }
         };
         return aux;
-    }
-    
-    public static Timestamp getToday() throws ParseException {
-        
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        Date today = new Date();
-
-        Date todayWithZeroTime = formatter.parse(formatter.format(today));
-        
-        return new Timestamp(todayWithZeroTime.getTime());
     }
     
     public static LocalDate getDateFromTimestamp(Timestamp timestamp) {

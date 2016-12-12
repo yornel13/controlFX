@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="565.0" maxWidth="800.0" minHeight="565.0" minWidth="800.0" prefHeight="565.0" prefWidth="800.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.AsignarHorariosController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="empleadosTableView" layoutX="10.0" layoutY="217.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="785.0" style="-fx-background-color: white;">
+        <columns>
+            <TableColumn fx:id="removeColumna" prefWidth="25.0" style="-fx-alignment: center;" />
+          <TableColumn fx:id="empleadoColumna" prefWidth="190.0" text="Empleado" />
+        </columns>
+      </TableView>
+      <Accordion layoutX="61.0" layoutY="166.0" />
+      <DatePicker fx:id="pickerHasta" layoutX="297.0" layoutY="157.0" promptText="fin" />
+      <DatePicker fx:id="pickerDe" layoutX="63.0" layoutY="157.0" promptText="inicio" />
+      <Label layoutX="19.0" layoutY="160.0" text="Desde" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="255.0" layoutY="162.0" text="Hasta" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="buttonSave" alignment="BASELINE_LEFT" layoutX="699.0" layoutY="169.0" mnemonicParsing="false" onAction="#save" prefHeight="38.0" prefWidth="95.0" style="-fx-background-color: ef5350;" text="Guardar" textFill="WHITE" />
+      <Label layoutX="22.0" layoutY="118.0" text="Selector de rango de fecha" textFill="WHITE">
+         <font>
+            <Font name="Comic Sans MS" size="12.0" />
+         </font>
+      </Label>
+      <Line endX="350.0" layoutX="122.0" layoutY="139.0" startX="-100.0" />
+      <Label layoutX="76.0" layoutY="42.0" text="Generador de horarios" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+      <Button fx:id="buttonEmpleados" alignment="BASELINE_LEFT" layoutX="411.0" layoutY="14.0" mnemonicParsing="false" onAction="#onSelectEmpleado" prefHeight="46.0" prefWidth="75.0" style="-fx-background-color: white;" text="+" textFill="#070000" />
+      <TableView fx:id="turnosTableView" layoutX="495.0" layoutY="10.0" prefHeight="150.0" prefWidth="300.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="turnoColumna" prefWidth="120.0" text="Turno" />
+          <TableColumn fx:id="clienteColumna" prefWidth="120.0" text="Cliente" />
+            <TableColumn fx:id="diasColumna" prefWidth="45.0" style="-fx-alignment: center;" text="Dias" />
+        </columns>
+      </TableView>
+      <Button fx:id="buttonAgregar" alignment="BASELINE_LEFT" layoutX="497.0" layoutY="184.0" mnemonicParsing="false" onAction="#onAddTurno" style="-fx-background-color: white;" text="Agregar" textFill="#070000" />
+      <Button fx:id="buttonDistribuir" alignment="BASELINE_LEFT" layoutX="619.0" layoutY="184.0" mnemonicParsing="false" onAction="#onDistribuir" style="-fx-background-color: white;" text="Distribuir" textFill="#070000" />
+      <Label layoutX="499.0" layoutY="160.0" text="Turnos" textFill="WHITE">
+         <font>
+            <Font name="Comic Sans MS" size="12.0" />
+         </font>
+      </Label>
+      <Line endX="80.0" layoutX="599.0" layoutY="180.0" startX="-100.0" />
+      <Button fx:id="buttonBorrar" alignment="BASELINE_LEFT" layoutX="564.0" layoutY="184.0" mnemonicParsing="false" onAction="#onRemoveTurno" style="-fx-background-color: white;" text="Borrar" textFill="#070000" />
+    </children>
+</AnchorPane>

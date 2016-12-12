@@ -21,15 +21,12 @@ import hibernate.model.Usuario;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -684,17 +681,6 @@ public class HorarioEmpleadoController implements Initializable {
         return aux;
     }
     
-    public static Timestamp getToday() throws ParseException {
-        
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-
-        Date today = new Date();
-
-        Date todayWithZeroTime = formatter.parse(formatter.format(today));
-        
-        return new Timestamp(todayWithZeroTime.getTime());
-    }
-    
     public static LocalDate getDateFromTimestamp(Timestamp timestamp) {
         if (timestamp == null) {
             return null;
@@ -812,7 +798,7 @@ public class HorarioEmpleadoController implements Initializable {
                     
                     for (Usuario usuario: empleados) {
                         ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                        controlEmpleadoNew.setFecha(fecha);
+                        controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
                         if (marcarTrabajo.isSelected()) {
                             controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                             controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -919,7 +905,7 @@ public class HorarioEmpleadoController implements Initializable {
                         for (int i=0; i<spinnder.getDias(); i++) {
                             for (Usuario usuario: empleados) {
                                 ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                                controlEmpleadoNew.setFecha(new Timestamp((new DateTime(fecha.getTime()).plusDays(i)).getMillis()));
+                                controlEmpleadoNew.setFecha(new Date((new DateTime(fecha.getTime()).plusDays(i)).getMillis()));
                                 if (marcarTrabajo.isSelected()) {
                                     controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                                     controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -1000,7 +986,7 @@ public class HorarioEmpleadoController implements Initializable {
             try {
                 if (spinnder.getDias() == 1) {
                     ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                    controlEmpleadoNew.setFecha(fecha);
+                    controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
                     if (marcarTrabajo.isSelected()) {
                         controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                         controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -1095,7 +1081,7 @@ public class HorarioEmpleadoController implements Initializable {
                                         ,fecha , fechaFin));
                         for (int i=0; i<spinnder.getDias(); i++) {
                             ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                            controlEmpleadoNew.setFecha(new Timestamp((new DateTime(fecha.getTime()).plusDays(i)).getMillis()));
+                            controlEmpleadoNew.setFecha(new Date((new DateTime(fecha.getTime()).plusDays(i)).getMillis()));
                             if (marcarTrabajo.isSelected()) {
                                 controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                                 controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));

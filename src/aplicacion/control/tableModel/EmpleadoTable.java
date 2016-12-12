@@ -6,6 +6,7 @@
 package aplicacion.control.tableModel;
 
 import hibernate.model.Actuariales;
+import hibernate.model.ControlEmpleado;
 import hibernate.model.Deuda;
 import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
@@ -70,6 +71,16 @@ public class EmpleadoTable {
     private String transporte;
     private Actuariales actuariales;
     private Integer diasInt;
+    private ArrayList<ControlEmpleado> turnos;
+    private ControlEmpleado lunes;
+    private ControlEmpleado martes;
+    private ControlEmpleado miercoles;
+    private ControlEmpleado jueves;
+    private ControlEmpleado viernes;
+    private ControlEmpleado sabado;
+    private ControlEmpleado domingo;
+    
+    
 
     public EmpleadoTable() {
         problem = false;
@@ -482,6 +493,70 @@ public class EmpleadoTable {
         this.diasInt = diasInt;
     }
 
+    public ArrayList<ControlEmpleado> getTurnos() {
+        return turnos;
+    }
+
+    public void setTurnos(ArrayList<ControlEmpleado> turnos) {
+        this.turnos = turnos;
+    }
+
+    public ControlEmpleado getLunes() {
+        return lunes;
+    }
+
+    public void setLunes(ControlEmpleado lunes) {
+        this.lunes = lunes;
+    }
+
+    public ControlEmpleado getMartes() {
+        return martes;
+    }
+
+    public void setMartes(ControlEmpleado martes) {
+        this.martes = martes;
+    }
+
+    public ControlEmpleado getMiercoles() {
+        return miercoles;
+    }
+
+    public void setMiercoles(ControlEmpleado miercoles) {
+        this.miercoles = miercoles;
+    }
+
+    public ControlEmpleado getJueves() {
+        return jueves;
+    }
+
+    public void setJueves(ControlEmpleado jueves) {
+        this.jueves = jueves;
+    }
+
+    public ControlEmpleado getViernes() {
+        return viernes;
+    }
+
+    public void setViernes(ControlEmpleado viernes) {
+        this.viernes = viernes;
+    }
+
+    public ControlEmpleado getSabado() {
+        return sabado;
+    }
+
+    public void setSabado(ControlEmpleado sabado) {
+        this.sabado = sabado;
+    }
+
+    public ControlEmpleado getDomingo() {
+        return domingo;
+    }
+
+    public void setDomingo(ControlEmpleado domingo) {
+        this.domingo = domingo;
+    }
     
     
+
 }

@@ -6,12 +6,9 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.ControlTable;
-import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
-import aplicacion.control.util.Numeros;
-import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Numeros.roundInt;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -81,7 +78,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -745,7 +741,7 @@ public class RolDePagoClienteController implements Initializable {
     }
     
     public void guardarRegistro(Usuario empleado, Double suplementarias, 
-            Double sobreTiempo, Cliente cliente, Timestamp fecha, Boolean libre,
+            Double sobreTiempo, Cliente cliente, java.sql.Date fecha, Boolean libre,
             Boolean falta) throws ParseException {
         ControlEmpleadoDAO controlEmpleadoDAO = new ControlEmpleadoDAO();
         ControlEmpleado controlEmpleado = new ControlEmpleado();

@@ -143,12 +143,14 @@ public class InEmpresaController implements Initializable {
             buttonHoras.setGraphic(imageView);
             buttonHoras.setFont(Roboto.MEDIUM(15));
             buttonHoras.getItems().clear();
+            MenuItem menuAsignar = new MenuItem("Asignar Horarios");
+            buttonHoras.getItems().add(menuAsignar);
+            MenuItem menuSemanal = new MenuItem("Por Semana");
+            buttonHoras.getItems().add(menuSemanal);
             MenuItem menuItemEmpleado = new MenuItem("Por Empleado");
             buttonHoras.getItems().add(menuItemEmpleado);
             MenuItem menuItemCliente = new MenuItem("Por Cliente");
             buttonHoras.getItems().add(menuItemCliente);
-            MenuItem menuItemNuevo = new MenuItem("Testing");
-            //buttonHoras.getItems().add(menuItemNuevo);
             MenuItem menuItemHorarios = new MenuItem("Horarios");
             buttonHoras.getItems().add(menuItemHorarios);
             menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
@@ -157,8 +159,12 @@ public class InEmpresaController implements Initializable {
             menuItemCliente.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
             });
-            menuItemNuevo.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarHorasEmpleados(empresa, stagePrincipal);
+            menuAsignar.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarAignaHorarios(empresa);
+                // no esta en uso
+            });
+            menuSemanal.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarHorarioSemanalEmpleados(empresa, stagePrincipal);
                 // no esta en uso
             });
             menuItemHorarios.setOnAction((ActionEvent actionEvent) -> {

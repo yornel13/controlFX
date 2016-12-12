@@ -16,7 +16,7 @@
         <many-to-one name="cliente" class="hibernate.model.Cliente" fetch="select">
             <column name="cliente_id" />
         </many-to-one>
-        <property name="fecha" type="java.sql.Timestamp">
+        <property name="fecha" type="java.sql.Date">
             <column name="fecha" length="19" not-null="true" />
         </property>
         <property name="normales" type="java.lang.Double">

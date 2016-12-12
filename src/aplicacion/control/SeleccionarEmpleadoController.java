@@ -62,6 +62,7 @@ public class SeleccionarEmpleadoController implements Initializable {
     List<Usuario> usuarios;
     
     private RegistrarAdministradorController registrarAdministradorController;
+    private AsignarHorariosController asignarHorariosController;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -71,13 +72,15 @@ public class SeleccionarEmpleadoController implements Initializable {
         this.registrarAdministradorController = registrarAdministradorController;
     }
     
-    public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
-        this.aplicacionControl = aplicacionControl;
+    void setParentController(AsignarHorariosController asignarHorariosController) {
+        this.asignarHorariosController = asignarHorariosController;
     }
   
     private void returnUsuario(Usuario usuario) {
         stagePrincipal.close();
-        registrarAdministradorController.setEmpleado(usuario);
+        if (registrarAdministradorController != null)
+            registrarAdministradorController.setEmpleado(usuario);
+        
        
     }
     
