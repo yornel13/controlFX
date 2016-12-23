@@ -4,6 +4,8 @@ package hibernate.model;
 
 import static aplicacion.control.util.Numeros.round;
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Pago entity. @author MyEclipse Persistence Tools
@@ -47,6 +49,7 @@ public class RolCliente implements java.io.Serializable {
         private Cliente cliente;
         private Usuario usuario;
         private Boolean casoEspecial;
+        private Set rolClientes = new HashSet(0);
 
 	// Constructors
 
@@ -410,4 +413,13 @@ public class RolCliente implements java.io.Serializable {
             this.casoEspecial = casoEspecial;
         }
 
+    public Set getRolClientes() {
+        return rolClientes;
+    }
+
+    public void setRolClientes(Set rolClientes) {
+        this.rolClientes = rolClientes;
+    }
+
+        
 }

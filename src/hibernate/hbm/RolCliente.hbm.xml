@@ -105,5 +105,11 @@
     <many-to-one class="hibernate.model.Usuario" fetch="select" name="usuario">
       <column name="usuario_id"/>
     </many-to-one>
+     <set inverse="true" name="rolClientes">
+      <key>
+        <column name="rol_cliente_id" not-null="true"/>
+      </key>
+      <one-to-many class="hibernate.model.RolCliente"/>
+    </set>
   </class>
 </hibernate-mapping>

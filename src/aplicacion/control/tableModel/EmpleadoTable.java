@@ -6,8 +6,10 @@
 package aplicacion.control.tableModel;
 
 import hibernate.model.Actuariales;
+import hibernate.model.Bonos;
 import hibernate.model.ControlEmpleado;
 import hibernate.model.Deuda;
+import hibernate.model.DiasVacaciones;
 import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
 import hibernate.model.PagoQuincena;
@@ -79,8 +81,10 @@ public class EmpleadoTable {
     private ControlEmpleado viernes;
     private ControlEmpleado sabado;
     private ControlEmpleado domingo;
-    
-    
+    private String diasVacaciones;
+    private DiasVacaciones objectVacaciones;
+    private Boolean editado;
+    private Bonos bonos;
 
     public EmpleadoTable() {
         problem = false;
@@ -555,6 +559,38 @@ public class EmpleadoTable {
 
     public void setDomingo(ControlEmpleado domingo) {
         this.domingo = domingo;
+    }
+
+    public String getDiasVacaciones() {
+        return diasVacaciones;
+    }
+
+    public void setDiasVacaciones(String diasVacaciones) {
+        this.diasVacaciones = diasVacaciones;
+    }
+
+    public Boolean getEditado() {
+        return editado;
+    }
+
+    public void setEditado(Boolean editado) {
+        this.editado = editado;
+    }
+
+    public DiasVacaciones getObjectVacaciones() {
+        return objectVacaciones;
+    }
+
+    public void setObjectVacaciones(DiasVacaciones objectVacaciones) {
+        this.objectVacaciones = objectVacaciones;
+    }
+
+    public Bonos getBonos() {
+        return bonos;
+    }
+
+    public void setBonos(Bonos bonos) {
+        this.bonos = bonos;
     }
     
     

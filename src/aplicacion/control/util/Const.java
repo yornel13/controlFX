@@ -58,6 +58,8 @@ public class Const {
     public static final String REPORTE_DECIMO_TERCERO_TOTAL_EMPLEADO = "report/decimo_tercero_total_empleado.jrxml";
     public static final String REPORTE_DECIMO_CUARTO_TOTAL_EMPLEADO = "report/decimo_cuarto_total_empleado.jrxml";
     public static final String REPORTE_PLANILLA_IESS_EMPLEADOS = "report/planilla_iess_varios.jrxml";
+    public static final String REPORTE_DIAS_DERECHO_VACACIONES = "report/reporte_dias_vacaciones.jrxml";
+    
     
     //Reportes nuevos de gestion
     public static final String REPORTE_SUMATORIA_HORAS = "report/reporte_horas_extras.jrxml";

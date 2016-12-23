@@ -94,6 +94,10 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
 import static aplicacion.control.util.Numeros.round;
+import hibernate.dao.BonosDAO;
+import hibernate.dao.DiasVacacionesDAO;
+import hibernate.model.Bonos;
+import hibernate.model.DiasVacaciones;
 
 /**
  *
@@ -266,8 +270,10 @@ public class RolDePagoClienteController implements Initializable {
     Dialog<Void> dialog;
     private Uniforme uniforme;
     private Seguro seguro;
+    private Bonos bonos;
     private Actuariales actuariales;
     private Constante decimoCuarto;
+    private DiasVacaciones diasVacaciones;
     
     private Boolean casoEspecial = false;
     private Boolean variableVacaciones = false;
@@ -405,6 +411,11 @@ public class RolDePagoClienteController implements Initializable {
         pago.setCasoEspecial(casoEspecial);
         pago.setDetalles("");
         new RolClienteDAO().save(pago);
+        if (bonos != null) {
+            bonos.setRolCliente(pago);
+            bonos.setPagado(Boolean.TRUE);
+            HibernateSessionFactory.getSession().flush();
+        }
 
         // Registro para auditar
         String detalles;
@@ -1155,9 +1166,9 @@ public class RolDePagoClienteController implements Initializable {
         totalSobreTiempo.setText(totalSobreTiempoDouble.toString());
         Double totalRecargoDouble = round(sueldoHoras * suplementarias);
         totalRecargo.setText(totalRecargoDouble.toString());
-        Double totalBonoDouble = round(getBono());
+        Double totalBonoDouble = round(getBono(searchRol));
         bonoField.setText(totalBonoDouble.toString());
-        Double totalTransporteDouble = round(getTransporte());
+        Double totalTransporteDouble = round(getTransporte(searchRol));
         transporteField.setText(totalTransporteDouble.toString());
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
         totalBonos.setText(totalBonosDouble.toString());
@@ -1166,7 +1177,7 @@ public class RolDePagoClienteController implements Initializable {
         if (variableVacaciones)
             totalVacacionesDouble = round(vacacionesField.getText());
         else
-            totalVacacionesDouble = casoEspecial ? round(vacacionesField.getText()) : round(getVacaciones(sueldoSinVacaciones));
+            totalVacacionesDouble = casoEspecial ? round(vacacionesField.getText()) : round(getVacaciones(sueldoSinVacaciones, searchRol));
         vacacionesField.setText(totalVacacionesDouble.toString());
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
@@ -1605,6 +1616,36 @@ public class RolDePagoClienteController implements Initializable {
         }  
     }
     
+    public Double getBono(Boolean buscar) {
+        if (buscar) {
+            if (cliente != null) {
+                bonos = new BonosDAO().findByClienteIdAndEmpleadoId(cliente.getId(), empleado.getId());
+            } else {
+                bonos = new BonosDAO().findByClienteNullAndEmpleadoId(empleado.getId());
+            }
+        }
+        if (bonos == null) {
+          return 0d;  
+        } else {
+            return bonos.getBono();
+        } 
+    }
+    
+    public Double getTransporte(Boolean buscar) {
+        if (buscar) {
+            if (cliente != null) {
+                bonos = new BonosDAO().findByClienteIdAndEmpleadoId(cliente.getId(), empleado.getId());
+            } else {
+                bonos = new BonosDAO().findByClienteNullAndEmpleadoId(empleado.getId());
+            }
+        }
+        if (bonos == null) {
+          return 0d;  
+        } else {
+            return bonos.getTransporte();
+        } 
+    }
+    /*
     public Double getBono() {
         if (bonoField.getText().isEmpty()) {
             return 0d;
@@ -1619,9 +1660,23 @@ public class RolDePagoClienteController implements Initializable {
         } else {
             return round(transporteField.getText());
         }
-    }
+    }*/
     
+    public Double getVacaciones(Double sueldoSinVacaciones, Boolean buscar) {
+        if (buscar)
+            diasVacaciones = new DiasVacacionesDAO().findByEmpleadoId(empleado.getId());
+        if (diasVacaciones == null) {
+            return 0d;
+        } else {
+            Integer diasDerecho = diasVacaciones.getDias();
+            Double sueldoNeto = sueldoSinVacaciones;
+            Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
+            return vacaciones;
+        }
+    }
+    /*
     public Double getVacaciones(Double sueldoSinVacaciones) {
+        
         try {
             DateTime fechaInicial = new DateTime(getToday().getTime());
             DateTime fechaFinal = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
@@ -1645,7 +1700,7 @@ public class RolDePagoClienteController implements Initializable {
             e.printStackTrace();
             return 0d;
         }
-    }
+    }*/
     
      public static Timestamp getToday() throws ParseException {
         

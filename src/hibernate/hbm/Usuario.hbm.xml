@@ -73,7 +73,13 @@
       <key>
         <column name="usuario_id" not-null="true"/>
       </key>
-      <one-to-many class="hibernate.model.Bono"/>
+      <one-to-many class="hibernate.model.Bonos"/>
+    </set>
+    <set inverse="true" name="diasVacaciones">
+      <key>
+        <column name="usuario_id" not-null="true"/>
+      </key>
+      <one-to-many class="hibernate.model.DiasVacaciones"/>
     </set>
     <set inverse="true" name="registroAccioneses">
       <key>
@@ -117,7 +123,7 @@
       </key>
       <one-to-many class="hibernate.model.Foto"/>
     </set>
-     <set inverse="true" name="planillaIesses">
+    <set inverse="true" name="planillaIesses">
       <key>
         <column name="usuario_id" not-null="true"/>
       </key>

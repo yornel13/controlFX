@@ -41,21 +41,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.paint.Color;
 import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 
 /**
  *
@@ -787,6 +772,51 @@ public class AplicacionControl extends Application {
         }
     }
     
+    public void mostrarDiasDerechoVacaciones(Empresa empresa, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
+                try {
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaVacacionesEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Dias de derecho a vacaciones");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    VacacionesEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
     public void mostrarSueldoEmpleados(Empresa empresa, Stage stage) {
         if (permisos == null) {
            noLogeado();
@@ -1086,6 +1116,51 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaClientesEmpresa);
                     ventana.setScene(scene);
                     ClientesEmpresaController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+
+                } catch (Exception e) {
+                     e.printStackTrace();
+                     //tratar la excepción
+                }
+            } else {
+               noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarClientesParaBonos(Empresa empresa, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
+                try {
+                    stage.close();
+                    System.out.println("aplicacion.control.AplicacionControl.mostrarClientes()");
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaClientesParaBonos.fxml"));
+                    AnchorPane ventanaClientesEmpresa = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empresa.getNombre() + " - Bonos y Transporte");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaClientesEmpresa);
+                    ventana.setScene(scene);
+                    ClientesParaBonosController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);
@@ -1510,6 +1585,53 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setCliente(empresa, cliente);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+           } else {
+               noPermitido();
+           }
+       } 
+    }
+    
+    public void mostrarBonosEmpleados(Empresa empresa, Cliente cliente, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
+                try {
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaBonosEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    if (cliente == null) 
+                        ventana.setTitle("Bonos para personal administrativo");
+                    else
+                        ventana.setTitle("Bonos para el cliente " + cliente.getNombre());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    BonosEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa, cliente);
                     insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
                     Platform.setImplicitExit(false);
                     ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {

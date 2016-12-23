@@ -2,8 +2,7 @@ package hibernate.dao;
 
 // default package
 
-import hibernate.model.Actuariales;
-import hibernate.model.Usuario;
+import hibernate.model.DiasVacaciones;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -22,16 +21,13 @@ import org.slf4j.LoggerFactory;
  * @see .Actuariales
  * @author MyEclipse Persistence Tools
  */
-public class ActuarialesDAO extends BaseHibernateDAO {
+public class DiasVacacionesDAO extends BaseHibernateDAO {
 	private static final Logger log = LoggerFactory
-			.getLogger(ActuarialesDAO.class);
+			.getLogger(DiasVacacionesDAO.class);
 	// property constants
-	public static final String PRIMARIO = "primario";
-	public static final String SECUNDARIO = "secundario";
-	public static final String ACTIVO = "activo";
 
-	public void save(Actuariales transientInstance) {
-		log.debug("saving Actuariales instance");
+	public void save(DiasVacaciones transientInstance) {
+		log.debug("saving DiasVacaciones instance");
 		try {
 			getSession().save(transientInstance);
 			log.debug("save successful");
@@ -41,8 +37,8 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void delete(Actuariales persistentInstance) {
-		log.debug("deleting Actuariales instance");
+	public void delete(DiasVacaciones persistentInstance) {
+		log.debug("deleting DiasVacaciones instance");
 		try {
 			getSession().delete(persistentInstance);
 			log.debug("delete successful");
@@ -52,11 +48,11 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public Actuariales findById(java.lang.Integer id) {
-		log.debug("getting Actuariales instance with id: " + id);
+	public DiasVacaciones findById(java.lang.Integer id) {
+		log.debug("getting DiasVacaciones instance with id: " + id);
 		try {
-			Actuariales instance = (Actuariales) getSession().get(
-					"hibernate.model.Actuariales", id);
+			DiasVacaciones instance = (DiasVacaciones) getSession().get(
+					"hibernate.model.DiasVacaciones", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
@@ -64,10 +60,10 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public List findByExample(Actuariales instance) {
-		log.debug("finding Actuariales instance by example");
+	public List findByExample(DiasVacaciones instance) {
+		log.debug("finding DiasVacaciones instance by example");
 		try {
-			List results = getSession().createCriteria("hibernate.model.Actuariales")
+			List results = getSession().createCriteria("hibernate.model.DiasVacaciones")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());
@@ -79,10 +75,10 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 	}
 
 	public List findByProperty(String propertyName, Object value) {
-		log.debug("finding Actuariales instance with property: " + propertyName
+		log.debug("finding DiasVacaciones instance with property: " + propertyName
 				+ ", value: " + value);
 		try {
-			String queryString = "from Actuariales as model where model."
+			String queryString = "from DiasVacaciones as model where model."
 					+ propertyName + "= ?";
 			Query queryObject = getSession().createQuery(queryString);
 			queryObject.setParameter(0, value);
@@ -93,22 +89,10 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public List findByPrimario(Object primario) {
-		return findByProperty(PRIMARIO, primario);
-	}
-
-	public List findBySecundario(Object secundario) {
-		return findByProperty(SECUNDARIO, secundario);
-	}
-
-	public List findByActivo(Object activo) {
-		return findByProperty(ACTIVO, activo);
-	}
-
 	public List findAll() {
-		log.debug("finding all Actuariales instances");
+		log.debug("finding all DiasVacaciones instances");
 		try {
-			String queryString = "from Actuariales";
+			String queryString = "from DiasVacaciones";
 			Query queryObject = getSession().createQuery(queryString);
 			return queryObject.list();
 		} catch (RuntimeException re) {
@@ -117,33 +101,33 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public Actuariales findByEmpleadoId(Integer empleadoId) {
+        public DiasVacaciones findByEmpleadoId(Integer empleadoId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM actuariales where usuario_id = :empleado_id and activo = true")
-                    .addEntity(Actuariales.class)
+                    createSQLQuery("SELECT * FROM dias_vacaciones where usuario_id = :empleado_id and activo = true")
+                    .addEntity(DiasVacaciones.class)
                     .setParameter("empleado_id", empleadoId);
             Object result = query.uniqueResult();
-            return (Actuariales) result;
+            return (DiasVacaciones) result;
         }
         
-        public List<Actuariales> findAllByEmpresaId(Integer empresaId) {
+        public List<DiasVacaciones> findAllByEmpresaId(Integer empresaId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM actuariales "
+                    createSQLQuery("SELECT * FROM dias_vacaciones "
                             + "JOIN usuario "
-                            + "ON usuario.id = actuariales.usuario_id "
+                            + "ON usuario.id = dias_vacaciones.usuario_id "
                             + "JOIN detalles_empleado "
                             + "ON detalles_empleado.id = usuario.detalles_empleado_id "
                             + "where empresa_id = :empresa_id")
-                    .addEntity(Actuariales.class)
+                    .addEntity(DiasVacaciones.class)
                     .setParameter("empresa_id", empresaId);
             Object result = query.list();
-            return (List<Actuariales>) result;
+            return (List<DiasVacaciones>) result;
         }
 
-	public Actuariales merge(Actuariales detachedInstance) {
-		log.debug("merging Actuariales instance");
+	public DiasVacaciones merge(DiasVacaciones detachedInstance) {
+		log.debug("merging DiasVacaciones instance");
 		try {
-			Actuariales result = (Actuariales) getSession().merge(
+			DiasVacaciones result = (DiasVacaciones) getSession().merge(
 					detachedInstance);
 			log.debug("merge successful");
 			return result;
@@ -153,8 +137,8 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachDirty(Actuariales instance) {
-		log.debug("attaching dirty Actuariales instance");
+	public void attachDirty(DiasVacaciones instance) {
+		log.debug("attaching dirty DiasVacaciones instance");
 		try {
 			getSession().saveOrUpdate(instance);
 			log.debug("attach successful");
@@ -164,8 +148,8 @@ public class ActuarialesDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachClean(Actuariales instance) {
-		log.debug("attaching clean Actuariales instance");
+	public void attachClean(DiasVacaciones instance) {
+		log.debug("attaching clean DiasVacaciones instance");
 		try {
 			getSession().buildLockRequest(LockOptions.NONE).lock(instance);
 			log.debug("attach successful");

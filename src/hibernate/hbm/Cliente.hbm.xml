@@ -57,5 +57,11 @@
       </key>
       <one-to-many class="hibernate.model.Uniforme"/>
     </set>
+    <set inverse="true" name="bonos">
+      <key>
+        <column name="cliente_id"/>
+      </key>
+      <one-to-many class="hibernate.model.Bonos"/>
+    </set>
   </class>
 </hibernate-mapping>

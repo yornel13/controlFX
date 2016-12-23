@@ -93,9 +93,10 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Years;
 import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
+import hibernate.dao.BonosDAO;
+import hibernate.dao.DiasVacacionesDAO;
+import hibernate.model.Bonos;
+import hibernate.model.DiasVacaciones;
 
 /**
  *
@@ -194,6 +195,10 @@ public class HorasEmpleadosClienteController implements Initializable {
     private Seguro seguro;
     private Constante decimoCuarto;
     private Boolean rolesMultiples = false;
+    
+    private ArrayList<Bonos> bonos;
+    private ArrayList<Actuariales> actuariales;
+    private ArrayList<DiasVacaciones> diasVacaciones;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -517,7 +522,7 @@ public class HorasEmpleadosClienteController implements Initializable {
     }
     
     public RolCliente calcularPago(Double dias, Double diasDecimo4to, Double diasJubilacion, Double normales, Double sobreTiempo, 
-            Double suplementarias, Usuario empleado, Actuariales actuariales) {
+            Double suplementarias, Usuario empleado) {
         
         RolCliente pago = null;
         
@@ -532,8 +537,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         Double totalSalarioDouble = round(sueldoDia * dias);
         Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
         Double totalRecargoDouble = round(sueldoHoras * suplementarias);
-        Double totalBonoDouble = round(0);
-        Double totalTransporteDouble = round(0);
+        Double totalBonoDouble = getBono(empleado);
+        Double totalTransporteDouble = getTransporte(empleado);
         Double totalBonosDouble = round(totalBonoDouble + totalTransporteDouble);
         Double sueldoSinVacaciones = totalSalarioDouble + totalSobreTiempoDouble + totalRecargoDouble + totalBonoDouble + totalTransporteDouble;
         Double totalVacacionesDouble = round(getVacaciones(empleado, sueldoSinVacaciones));
@@ -543,7 +548,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         ////////////////////////////////////////////////////
         Double decimoTercero = round(subTotalDouble / 12d);
         Double decimoCuarto = round(getDecimoCuarto()/30d * diasDecimo4to);
-        Double jubilacionPatronal = round((getActuariales(actuariales)/ 360d) * diasJubilacion);
+        Double jubilacionPatronal = round((getActuariales(empleado)/ 360d) * diasJubilacion);
         Double aportePatronal = round(subTotalDouble * 12.15d / 100d);
         Double segurosDecimal = round(getSeguro() * dias);
         Double uniformeDecimal = round(getUniforme() * dias);
@@ -694,12 +699,43 @@ public class HorasEmpleadosClienteController implements Initializable {
         }
     }
     
-    public Double getActuariales(Actuariales actuariales) {
+    public Double getActuariales(Usuario empleado) {
         if (actuariales == null) {
             return 0d;
         } else {
-            return actuariales.getPrimario() + actuariales.getSecundario();
+            for (Actuariales act: actuariales) {
+                if (act.getUsuario().getId().equals(empleado.getId())) {
+                    return act.getPrimario() + act.getSecundario();
+                }
+            }
         }
+        return 0d;
+    }
+    
+    public Double getBono(Usuario empleado) {
+        if (bonos == null) {
+            return 0d;
+        } else {
+            for (Bonos bon: bonos) {
+                if (bon.getUsuario().getId().equals(empleado.getId())) {
+                    return bon.getBono();
+                }
+            }
+        }
+        return 0d;
+    }
+    
+    public Double getTransporte(Usuario empleado) {
+        if (bonos == null) {
+            return 0d;
+        } else {
+            for (Bonos bon: bonos) {
+                if (bon.getUsuario().getId().equals(empleado.getId())) {
+                    return bon.getTransporte();
+                }
+            }
+        }
+        return 0d;
     }
     
     public Double getSeguro() {
@@ -733,26 +769,19 @@ public class HorasEmpleadosClienteController implements Initializable {
     }
     
     public Double getVacaciones(Usuario empleado, Double sueldoSinVacaciones) {
-        try {
-            DateTime fechaInicial = new DateTime(getToday().getTime());
-            DateTime fechaFinal = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());
-            int years = Years.yearsBetween(fechaFinal.withTimeAtStartOfDay(), 
-                    fechaInicial.withTimeAtStartOfDay()).getYears();
-            int diasExtras;
-            if (years >= 5) {
-                diasExtras = years - 5;
-            } else {
-                diasExtras = 0;
-            }
-            Integer diasDerecho = 16 + diasExtras;
-            Double sueldoNeto = sueldoSinVacaciones;
-            Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
-
-            return vacaciones;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (diasVacaciones == null) {
             return 0d;
+        } else {
+            for (DiasVacaciones vaca: diasVacaciones) {
+                if (vaca.getUsuario().getId().equals(empleado.getId())) {
+                    Integer diasDerecho = vaca.getDias();
+                    Double sueldoNeto = sueldoSinVacaciones;
+                    Double vacaciones = (sueldoNeto / 360d) * diasDerecho.doubleValue();
+                    return vacaciones;
+                }
+            }
         }
+        return 0d;
     }
     
     public void error() {
@@ -797,59 +826,10 @@ public class HorasEmpleadosClienteController implements Initializable {
         bonoColumna = new TableColumn("Bono");
         bonoColumna.setCellValueFactory(new PropertyValueFactory<>("bono"));
         bonoColumna.setPrefWidth(60);
-        bonoColumna.setCellFactory(TextFieldTableCell.forTableColumn());
-        bonoColumna.setOnEditCommit(
-            new EventHandler<TableColumn.CellEditEvent<EmpleadoTable, String>>() {
-                @Override
-                public void handle(TableColumn.CellEditEvent<EmpleadoTable, String> t) {
-                    Double newValue;
-                    try {
-                        newValue = round(t.getNewValue());
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace(); // TODO, quitar
-                        newValue = Double.valueOf(t.getOldValue());
-                        //dialogoErrorCuotas();
-                    }
-                    EmpleadoTable empleadoTable = ((EmpleadoTable) t.getTableView().getItems()
-                            .get(t.getTablePosition().getRow()));     
-                    empleadoTable.setBono(newValue.toString());
-                    RolCliente rolCliente = reCalcularPago(empleadoTable.getRolCliente(), 
-                            newValue, round(empleadoTable.getTransporte()));
-                    empleadoTable.setRolCliente(rolCliente);
-
-                    data.set(data.indexOf(empleadoTable), empleadoTable);
-                }
-            }
-        );
 
         transporteColumna = new TableColumn("Transporte");
         transporteColumna.setCellValueFactory(new PropertyValueFactory<>("transporte"));
         transporteColumna.setPrefWidth(60);
-        transporteColumna.setCellFactory(TextFieldTableCell.forTableColumn());
-        transporteColumna.setOnEditCommit(
-            new EventHandler<TableColumn.CellEditEvent<EmpleadoTable, String>>() {
-                @Override
-                public void handle(TableColumn.CellEditEvent<EmpleadoTable, String> t) {
-                    Double newValue;
-                    try {
-                        newValue = round(t.getNewValue());
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace(); // TODO, quitar
-                        newValue = Double.valueOf(t.getOldValue());
-                        //dialogoErrorCuotas();
-                    }
-                    EmpleadoTable empleadoTable = ((EmpleadoTable) t.getTableView().getItems()
-                            .get(t.getTablePosition().getRow()));     
-                    empleadoTable.setTransporte(newValue.toString());
-                    RolCliente rolCliente = reCalcularPago(empleadoTable.getRolCliente(), 
-                            round(empleadoTable.getBono()), newValue);
-                    empleadoTable.setRolCliente(rolCliente);
-
-                    data.set(data.indexOf(empleadoTable), empleadoTable);
-
-                }
-            }
-        );
 
         totalColumna = new TableColumn("Ingreso");
         totalColumna.setPrefWidth(60);
@@ -1411,11 +1391,18 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         private void guardar() {
             try {
-        
+                
                 for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) data) {
                     if (empleadoTable.getAgregar()) {
                         new RolClienteDAO().save(empleadoTable.getRolCliente());
-
+                        if (empleadoTable.getBonos() != null) {
+                            Bonos bono = new BonosDAO().findById(empleadoTable.getBonos().getId());
+                            if (bono != null) {
+                                bono.setRolCliente(empleadoTable.getRolCliente());
+                                bono.setPagado(Boolean.TRUE);
+                                HibernateSessionFactory.getSession().flush();
+                            }
+                        }
 
                         // Registro para auditar
                         String detalles = "genero un rol al empleado " 
@@ -1424,7 +1411,6 @@ public class HorasEmpleadosClienteController implements Initializable {
                         aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
                     }
                 }
-                
                 Platform.runLater(new Runnable() {
                     @Override public void run() {
                         updateWindowsGuardado();
@@ -1488,6 +1474,9 @@ public class HorasEmpleadosClienteController implements Initializable {
                 System.out.println(rolesClienteDelete.size()+" para borrar");
                 for (RolCliente rolCliente: rolesClienteDelete) {
                     new RolClienteDAO().delete(rolCliente);
+                    Bonos bono = new BonosDAO().findByRolId(rolCliente.getId());
+                    bono.setRolCliente(null);
+                    bono.setPagado(Boolean.FALSE);
                     HibernateSessionFactory.getSession().flush();
                 }
                 setTableInfo(empresa, inicio, fin);
@@ -1586,6 +1575,24 @@ public class HorasEmpleadosClienteController implements Initializable {
                 empleadosRol.removeAll(empleadosParaRemover);
                 empleadosParaRemover = new ArrayList<>();
 
+                ///////////////////////// Obteniendo dias de vacaciones de todos los empleados
+                diasVacaciones = new ArrayList<>();
+                diasVacaciones.addAll((ArrayList<DiasVacaciones>) 
+                    new DiasVacacionesDAO().findAllByEmpresaId(empresa.getId()));
+                ///////////////////////// Obteniendo bono y transporte de todos los empleados
+                bonos = new ArrayList<>();
+                if (cliente != null) {
+                    bonos.addAll((ArrayList<Bonos>) new BonosDAO()
+                            .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId()));
+                } else {
+                    bonos.addAll((ArrayList<Bonos>) new BonosDAO()
+                            .findAllByClienteNullAndEmpresaId(empresa.getId()));
+                }
+                ///////////////////////// Obteniendo los actuariales de todos los empleados
+                actuariales = new ArrayList<>();
+                actuariales.addAll((ArrayList<Actuariales>) 
+                    new ActuarialesDAO().findAllByEmpresaId(empresa.getId()));
+                
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     Double dias = 0d;
                     Double diasDecimo4to = 0d;
@@ -1670,10 +1677,15 @@ public class HorasEmpleadosClienteController implements Initializable {
                     }
                     Actuariales actuariales = new ActuarialesDAO().findByEmpleadoId(empleadoTable.getId());
                     empleadoTable.setActuariales(actuariales);
-                    RolCliente rolCliente = calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, usuario, actuariales);
+                    RolCliente rolCliente = calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, usuario);
                     empleadoTable.setRolCliente(rolCliente);
-                    empleadoTable.setBono("0");
-                    empleadoTable.setTransporte("0");
+                    empleadoTable.setBono(rolCliente.getBono().toString());
+                    empleadoTable.setTransporte(rolCliente.getTransporte().toString());
+                    for (Bonos bon: bonos) {
+                        if (bon.getUsuario().getId().equals(usuario.getId())) {
+                            empleadoTable.setBonos(bon);
+                        }
+                    }
                 }
 
                 Platform.runLater(new Runnable() {

@@ -254,6 +254,10 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemIess);
             MenuItem menuItemPlantilla = new MenuItem("Planilla IESS");
             buttonEdicion.getItems().add(menuItemPlantilla);
+            MenuItem menuItemVacaciones = new MenuItem("Dias de Vacaciones");
+            buttonEdicion.getItems().add(menuItemVacaciones);
+            MenuItem menuItemBonos = new MenuItem("Bono y Transporte");
+            buttonEdicion.getItems().add(menuItemBonos);
             menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
             });
@@ -274,6 +278,12 @@ public class InEmpresaController implements Initializable {
             });
             menuItemPlantilla.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarPlanillaIess(empresa, stagePrincipal);     
+            });
+            menuItemVacaciones.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarDiasDerechoVacaciones(empresa, stagePrincipal);
+            });
+            menuItemBonos.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarClientesParaBonos(empresa, stagePrincipal);     
             });
             buttonEdicion.setOnMouseEntered((MouseEvent t) -> {
                 buttonEdicion.setStyle("-fx-background-color: #E0E0E0;");

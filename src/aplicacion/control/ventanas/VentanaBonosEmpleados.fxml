@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.BonosEmpleadosController">
+    <children>
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" visible="false" />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="18.0" prefHeight="25.0" prefWidth="605.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+         </children>
+      </Pane>
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="489.0" prefWidth="770.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="cedulaColumna" text="Cedula" />
+          <TableColumn fx:id="apellidoColumna" prefWidth="180.0" text="Apellido" />
+            <TableColumn fx:id="nombreColumna" prefWidth="180.0" text="Nombre" />
+            <TableColumn fx:id="cargoColumna" prefWidth="120.0" text="Cargo" />
+            <TableColumn fx:id="bonoColumna" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: center;" text="Bono" />
+            <TableColumn fx:id="transporteColumna" minWidth="100.0" prefWidth="100.0" style="-fx-alignment: center;" text="Transporte" />
+        </columns>
+      </TableView>
+        <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
+            <children>
+               <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <Button fx:id="login" layoutX="725.0" layoutY="2.0" maxHeight="25.0" mnemonicParsing="false" onAction="#onClickLoginButton" prefHeight="25.0" prefWidth="75.0" style="-fx-background-color: transparent;" text="Ingresar" underline="true">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Button>
+            </children>
+         </Pane>
+      <Button fx:id="buttonGuardar" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoGuardar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+    </children>
+</AnchorPane>

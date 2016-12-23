@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="410.0" maxWidth="610.0" minHeight="410.0" minWidth="610.0" prefHeight="410.0" prefWidth="610.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.BonosController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="bonosTableView" layoutX="10.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="600.0" minHeight="-Infinity" minWidth="590.0" prefHeight="350.0" prefWidth="600.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="fechaColumna" prefWidth="150.0" text="Fecha" />
+          <TableColumn fx:id="detallesColumna" prefWidth="195.0" />
+            <TableColumn fx:id="bonoColumna" minWidth="0.0" prefWidth="120.0" text="Bono" />
+            <TableColumn fx:id="transporteColumna" minWidth="0.0" prefWidth="120.0" text="Transporte" />
+        </columns>
+      </TableView>
+      <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
+      <Button fx:id="buttonImprimir" layoutX="570.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" visible="false" />
+      <Label layoutX="175.0" layoutY="12.0" text="Historial de Bonos pagados" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font>
+      </Label>
+    </children>
+</AnchorPane>

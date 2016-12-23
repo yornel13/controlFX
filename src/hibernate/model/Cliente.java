@@ -27,6 +27,7 @@ public class Cliente implements java.io.Serializable {
         private Set rolClientes = new HashSet(0);
         private Set seguros = new HashSet(0);
         private Set uniformes = new HashSet(0);
+        private Set bonos = new HashSet(0);
 
 	// Constructors
 
@@ -169,5 +170,14 @@ public class Cliente implements java.io.Serializable {
         public void setUniformes(Set uniformes) {
             this.uniformes = uniformes;
         }
+
+    public Set getBonos() {
+        return bonos;
+    }
+
+    public void setBonos(Set bonos) {
+        this.bonos = bonos;
+    }
+        
         
 }

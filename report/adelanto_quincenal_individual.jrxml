@@ -49,10 +49,10 @@
 				</textElement>
 				<text><![CDATA[Adelanto Quincenal]]></text>
 			</staticText>
-			<textField pattern="dd MMMMM yyyy">
+			<textField pattern="EEEEE dd MMMMM yyyy">
 				<reportElement mode="Transparent" x="370" y="35" width="185" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{fecha_recibo}]]></textFieldExpression>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

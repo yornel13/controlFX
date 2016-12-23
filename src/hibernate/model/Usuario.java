@@ -31,6 +31,7 @@ public class Usuario implements java.io.Serializable {
 	private Set identidads = new HashSet(0);
 	private Set controlEmpleados = new HashSet(0);
 	private Set bonos = new HashSet(0);
+        private Set diasVacaciones = new HashSet(0);
 	private Set registroAccioneses = new HashSet(0);
 	private Set roleses = new HashSet(0);
         private Set deudas = new HashSet(0);
@@ -306,6 +307,14 @@ public class Usuario implements java.io.Serializable {
 
     public void setPlanillaIesses(Set planillaIesses) {
         this.planillaIesses = planillaIesses;
+    }
+
+    public Set getDiasVacaciones() {
+        return diasVacaciones;
+    }
+
+    public void setDiasVacaciones(Set diasVacaciones) {
+        this.diasVacaciones = diasVacaciones;
     }
       
         
