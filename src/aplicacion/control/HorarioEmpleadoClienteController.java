@@ -894,7 +894,7 @@ public class HorarioEmpleadoClienteController implements Initializable {
                         Timestamp fechaParaGuardar = new Timestamp(controlTable
                                 .getFecha().getMillis());
                         ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                        controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
+                        controlEmpleadoNew.setFecha(new Date(fechaParaGuardar.getTime()));
                         if (marcarTrabajo.isSelected()) {
                             controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                             controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
