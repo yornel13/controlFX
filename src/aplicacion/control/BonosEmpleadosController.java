@@ -5,17 +5,17 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteDiasVacaciones;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.BonosDAO;
-import hibernate.dao.DiasVacacionesDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Bonos;
 import hibernate.model.Cliente;
-import hibernate.model.DiasVacaciones;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
 import java.io.File;
@@ -26,7 +26,7 @@ import java.net.URL;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +52,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -82,6 +83,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -126,6 +128,21 @@ public class BonosEmpleadosController implements Initializable {
     @FXML
     private Button buttonImprimir;
     
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
+    private DatePicker pickerDe;
+    
+    @FXML 
+    private DatePicker pickerHasta;
+    
+    public Date inicio;
+    public Date fin;
+    
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Usuario> usuarios;
@@ -148,6 +165,24 @@ public class BonosEmpleadosController implements Initializable {
         aplicacionControl.mostrarClientesParaBonos(empresa, stagePrincipal);
     } 
    
+    @FXML
+    public void onClickMore(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
+        inicio = Date.valueOf(pickerDe.getValue());
+        fin = Date.valueOf(pickerHasta.getValue());  
+        setTableInfo();
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) {
+        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
+        inicio = Date.valueOf(pickerDe.getValue());
+        fin = Date.valueOf(pickerHasta.getValue());
+        setTableInfo();
+    }
+    
     public void dialogWait() {
         dialogLoading = new Stage();
         dialogLoading.initModality(Modality.APPLICATION_MODAL);
@@ -348,60 +383,43 @@ public class BonosEmpleadosController implements Initializable {
         });
     }
     
-    public void mostrarBonos(Usuario empleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaBonos.fxml"));
-                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    //ventana.setMaxWidth(608);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaDeudas);
-                    ventana.setScene(scene);
-                    BonosController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(aplicacionControl);
-                    controller.setEmpleado(empleado, cliente);
-                    ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
-    }
-    
-    public void setEmpresa(Empresa empresa, Cliente cliente) {
+    public void setEmpresa(Empresa empresa, Cliente cliente) throws ParseException {
         this.empresa = empresa;
         this.cliente = cliente;
+        DateTime dateTime = new DateTime(getToday().getTime());
+        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
+            inicio = new Date(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).getMillis());
+            fin = new Date(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .plusMonths(1).minusDays(1).getMillis());
+        } else {
+            fin = new Date(dateTime.withDayOfMonth(empresa.getComienzoMes())
+                    .minusDays(1).getMillis());
+            inicio = new Date(dateTime.withDayOfMonth(empresa
+                    .getComienzoMes()).minusMonths(1).getMillis());
+        }
+        pickerDe.setValue(inicio.toLocalDate());
+        pickerHasta.setValue(fin.toLocalDate());;
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
-        BonosDAO bdao = new BonosDAO();
-        bonos = new ArrayList<>();
-        if (cliente != null) {
-            bonos.addAll((ArrayList<Bonos>) bdao
-                .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId()));
-        } else {
-            bonos.addAll((ArrayList<Bonos>) bdao
-                .findAllByClienteNullAndEmpresaId(empresa.getId()));
-        }
         
         setTableInfo();
     }
     
     void setTableInfo() {
+        
+        BonosDAO bdao = new BonosDAO();
+        bonos = new ArrayList<>();
+        if (cliente != null) {
+            bonos.addAll((ArrayList<Bonos>) bdao
+                .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId(), inicio));
+        } else {
+            bonos.addAll((ArrayList<Bonos>) bdao
+                .findAllByClienteNullAndEmpresaId(empresa.getId(), inicio));
+        }
+        
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
@@ -464,6 +482,31 @@ public class BonosEmpleadosController implements Initializable {
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
+    }
+    
+    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+        filteredData.setPredicate(empleado -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
+
+            if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } 
+            return false; // Does not match.
+        });
     }
     
     @Override
@@ -532,7 +575,7 @@ public class BonosEmpleadosController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    mostrarBonos(new UsuarioDAO().findById(rowData.getId()));
+                    //mostrarBonos(new UsuarioDAO().findById(rowData.getId()));
                 }
             });
             return row ;
@@ -586,6 +629,24 @@ public class BonosEmpleadosController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
     } 
     
     // Login items
@@ -629,10 +690,11 @@ public class BonosEmpleadosController implements Initializable {
                     Bonos bonos = new Bonos();
                     bonos.setUsuario(empleado.getUsuario());
                     bonos.setCliente(cliente);
-                    bonos.setPagado(Boolean.FALSE);
                     bonos.setBono(Double.valueOf(empleado.getBono()));
                     bonos.setTransporte(Double.valueOf(empleado.getTransporte()));
-                    bonos.setFecha(new Timestamp(new Date().getTime()));
+                    bonos.setFecha(new Timestamp(Fechas.getToday().getTime()));
+                    bonos.setInicioMes(inicio);
+                    bonos.setFinMes(fin);
                     new BonosDAO().save(bonos);
                     if (empleado.getBonos() != null) {
                         new BonosDAO().delete(empleado.getBonos());
@@ -651,10 +713,10 @@ public class BonosEmpleadosController implements Initializable {
             bonos = new ArrayList<>();
             if (cliente != null) {
                 bonos.addAll((ArrayList<Bonos>) bdao
-                        .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId()));
+                        .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId(), inicio));
             } else {
                 bonos.addAll((ArrayList<Bonos>) bdao
-                        .findAllByClienteNullAndEmpresaId(empresa.getId()));
+                        .findAllByClienteNullAndEmpresaId(empresa.getId(), inicio));
             }
             Platform.runLater(new Runnable() {
                 @Override public void run() {

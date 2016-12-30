@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.reports.ReporteHorasTrabajadas;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
@@ -95,6 +96,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.model.ControlEmpleado;
+import java.util.List;
 
 /**
  *
@@ -414,8 +418,15 @@ public class PagoMensualDetallesController implements Initializable {
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
         datasource.addAll(pagoMesItems);
         
+        List<ControlEmpleado> controlEmpleado = new ControlEmpleadoDAO()
+                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio, fin);
+                
+        ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas();
+        horasSource.addAll(controlEmpleado);
+        
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
+            InputStream inputHoras = new FileInputStream(Const.REPORTE_HORAS_TRABAJADAS);
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
@@ -433,8 +444,16 @@ public class PagoMensualDetallesController implements Initializable {
             
             String filename = "rol_individual_" + pagoRol.getId();
             
+            ///////////////////// Horas trabajadas
+            JasperDesign jasperDesignHoras = JRXmlLoader.load(inputHoras);
+            JasperReport jasperReportHoras = JasperCompileManager.compileReport(jasperDesignHoras);
+            JasperPrint jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, horasSource);
+
+            String filenameHoras = "hora_trabajadas_" + pagoRol.getId();
+            
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+                JasperExportManager.exportReportToPdfFile(jasperPrintHoras, file.getPath() + "\\" + filenameHoras +".pdf"); 
             } 
             if (enviarCorreo) {
                 File pdf = File.createTempFile(filename, ".pdf");
@@ -446,6 +465,16 @@ public class PagoMensualDetallesController implements Initializable {
                                 + " y termina el " 
                                 + getFechaConMes(fin), 
                         pdf.getPath(), filename + ".pdf");
+                
+                File pdfHoras = File.createTempFile(filenameHoras, ".pdf");
+                JasperExportManager.exportReportToPdfStream(jasperPrintHoras, new FileOutputStream(pdfHoras));  
+                CorreoUtil.mandarCorreo(empleado.getDetallesEmpleado().getEmpresa().getNombre(), 
+                        empleado.getEmail(), Const.ASUNTO_HORAS, 
+                        "Recibo de horas trabajadas en el mes que comienza " 
+                                + getFechaConMes(inicio) 
+                                + " y termina el " 
+                                + getFechaConMes(fin), 
+                        pdfHoras.getPath(), filenameHoras + ".pdf");
             }
             
             dialogoCompletado();

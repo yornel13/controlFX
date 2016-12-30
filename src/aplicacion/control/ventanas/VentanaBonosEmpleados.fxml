@@ -15,10 +15,11 @@
          <children>
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" visible="false" />
-            <TextField fx:id="filterField" layoutX="70.0" layoutY="18.0" prefHeight="25.0" prefWidth="605.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="605.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Button fx:id="buttonGuardar" layoutX="718.0" layoutY="23.0" mnemonicParsing="false" onAction="#dialogoGuardar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
          </children>
       </Pane>
-      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="489.0" prefWidth="770.0" style="-fx-background-color: white;">
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="460.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
           <TableColumn fx:id="apellidoColumna" prefWidth="180.0" text="Apellido" />
@@ -42,6 +43,28 @@
                </Button>
             </children>
          </Pane>
-      <Button fx:id="buttonGuardar" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoGuardar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Label layoutX="395.0" layoutY="20.0" text="Hasta" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="186.0" layoutY="20.0" text="De" textFill="#fffbfb">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <DatePicker fx:id="pickerDe" layoutX="211.0" layoutY="15.0" promptText="inicio" />
+      <DatePicker fx:id="pickerHasta" layoutX="441.0" layoutY="15.0" promptText="fin" />
+      <Accordion layoutX="216.0" layoutY="24.0" />
+      <Button fx:id="buttonAnterior" layoutX="359.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="buttonSiguiente" layoutX="591.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
     </children>
 </AnchorPane>

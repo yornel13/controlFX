@@ -30,12 +30,14 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -122,7 +124,28 @@ public class EmpleadosController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.CREAR)) {
                
-               aplicacionControl.mostrarRegistrarEmpleado(empresa);
+               try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
+                    TabPane ventanaRegistrarEmpleado = (TabPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Nuevo empleado");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaRegistrarEmpleado);
+                    ventana.setScene(scene);
+                    RegistrarEmpleadoController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setEmpleadosController(this);
+                    controller.setEmpresa(empresa);
+                    ventana.show();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
                   
             } else {
                aplicacionControl.noPermitido();

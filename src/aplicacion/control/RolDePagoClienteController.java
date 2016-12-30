@@ -98,6 +98,9 @@ import hibernate.dao.BonosDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.model.Bonos;
 import hibernate.model.DiasVacaciones;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -411,11 +414,6 @@ public class RolDePagoClienteController implements Initializable {
         pago.setCasoEspecial(casoEspecial);
         pago.setDetalles("");
         new RolClienteDAO().save(pago);
-        if (bonos != null) {
-            bonos.setRolCliente(pago);
-            bonos.setPagado(Boolean.TRUE);
-            HibernateSessionFactory.getSession().flush();
-        }
 
         // Registro para auditar
         String detalles;
@@ -1619,9 +1617,9 @@ public class RolDePagoClienteController implements Initializable {
     public Double getBono(Boolean buscar) {
         if (buscar) {
             if (cliente != null) {
-                bonos = new BonosDAO().findByClienteIdAndEmpleadoId(cliente.getId(), empleado.getId());
+                bonos = new BonosDAO().findByClienteIdAndEmpleadoId(cliente.getId(), empleado.getId(), new java.sql.Date(inicio.getTime()));
             } else {
-                bonos = new BonosDAO().findByClienteNullAndEmpleadoId(empleado.getId());
+                bonos = new BonosDAO().findByClienteNullAndEmpleadoId(empleado.getId(), new java.sql.Date(inicio.getTime()));
             }
         }
         if (bonos == null) {
@@ -1634,9 +1632,9 @@ public class RolDePagoClienteController implements Initializable {
     public Double getTransporte(Boolean buscar) {
         if (buscar) {
             if (cliente != null) {
-                bonos = new BonosDAO().findByClienteIdAndEmpleadoId(cliente.getId(), empleado.getId());
+                bonos = new BonosDAO().findByClienteIdAndEmpleadoId(cliente.getId(), empleado.getId(), new java.sql.Date(inicio.getTime()));
             } else {
-                bonos = new BonosDAO().findByClienteNullAndEmpleadoId(empleado.getId());
+                bonos = new BonosDAO().findByClienteNullAndEmpleadoId(empleado.getId(), new java.sql.Date(inicio.getTime()));
             }
         }
         if (bonos == null) {

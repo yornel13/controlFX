@@ -97,6 +97,9 @@ import hibernate.dao.BonosDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.model.Bonos;
 import hibernate.model.DiasVacaciones;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -1395,14 +1398,6 @@ public class HorasEmpleadosClienteController implements Initializable {
                 for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) data) {
                     if (empleadoTable.getAgregar()) {
                         new RolClienteDAO().save(empleadoTable.getRolCliente());
-                        if (empleadoTable.getBonos() != null) {
-                            Bonos bono = new BonosDAO().findById(empleadoTable.getBonos().getId());
-                            if (bono != null) {
-                                bono.setRolCliente(empleadoTable.getRolCliente());
-                                bono.setPagado(Boolean.TRUE);
-                                HibernateSessionFactory.getSession().flush();
-                            }
-                        }
 
                         // Registro para auditar
                         String detalles = "genero un rol al empleado " 
@@ -1471,14 +1466,11 @@ public class HorasEmpleadosClienteController implements Initializable {
                         }
                     }
                 }
-                System.out.println(rolesClienteDelete.size()+" para borrar");
                 for (RolCliente rolCliente: rolesClienteDelete) {
                     new RolClienteDAO().delete(rolCliente);
-                    Bonos bono = new BonosDAO().findByRolId(rolCliente.getId());
-                    bono.setRolCliente(null);
-                    bono.setPagado(Boolean.FALSE);
                     HibernateSessionFactory.getSession().flush();
                 }
+                System.out.println(rolesClienteDelete.size()+" para borrar");
                 setTableInfo(empresa, inicio, fin);
                 
                 Platform.runLater(new Runnable() {
@@ -1583,10 +1575,10 @@ public class HorasEmpleadosClienteController implements Initializable {
                 bonos = new ArrayList<>();
                 if (cliente != null) {
                     bonos.addAll((ArrayList<Bonos>) new BonosDAO()
-                            .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId()));
+                            .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId(), new java.sql.Date(inicio.getTime())));
                 } else {
                     bonos.addAll((ArrayList<Bonos>) new BonosDAO()
-                            .findAllByClienteNullAndEmpresaId(empresa.getId()));
+                            .findAllByClienteNullAndEmpresaId(empresa.getId(), new java.sql.Date(inicio.getTime())));
                 }
                 ///////////////////////// Obteniendo los actuariales de todos los empleados
                 actuariales = new ArrayList<>();

@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolCliente;
+import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Numeros;
@@ -508,6 +509,7 @@ public class RolClienteController implements Initializable {
         SortedList<RolCliente> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(controlClienteTableView.comparatorProperty());
         controlClienteTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
         
         sueldoTotalText.setText(sueldoTotalTextValor.toString());
         extraText.setText(extraTextValor.toString());
@@ -520,6 +522,28 @@ public class RolClienteController implements Initializable {
         aporteText.setText(montoAportePatronalTextValor.toString());
         segurosText.setText(montoSegurosTextValor.toString());
         uniformeText.setText(montoUniformesTextValor.toString());
+    }
+    
+    void chequearFiltro(FilteredList<RolCliente> filteredData) {
+        filteredData.setPredicate(pago -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
+
+            if (pago.getEmpleado().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (pago.getUsuario().getDetallesEmpleado().getCargo().getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (pago.getUsuario().getDetallesEmpleado().getDepartamento().getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (pago.getUsuario().getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            }
+            return false; // Does not match.
+        });
     }
     
     void calcular() {

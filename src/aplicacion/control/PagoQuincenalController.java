@@ -81,6 +81,18 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javafx.application.Platform;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Color;
+import javafx.stage.StageStyle;
 
 /**
  *
@@ -154,10 +166,13 @@ public class PagoQuincenalController implements Initializable {
     ArrayList<PagoQuincena> pagosQuincenal;
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
+    Dialog<Void> dialog;
     
     Stage dialogLoading;
     
     Integer count;
+    
+    Label loader;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -275,54 +290,13 @@ public class PagoQuincenalController implements Initializable {
     
     public void imprimir(File file, Boolean enviarCorreo) {
         
-        dialogWait();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new PagoQuincenalController.DataBaseThread(1, file, enviarCorreo);
+        executor.execute(worker);
+        executor.shutdown();
+
+        loadingModeImprimir();
         
-        for (PagoQuincena pagoQuincena: pagosQuincenal) {
-            Usuario user = pagoQuincena.getUsuario();
-            
-            ReporteRolDePagoQuincenal datasource = new ReporteRolDePagoQuincenal();
-            datasource.add(pagoQuincena);
-
-            try {
-                InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_ADELANTO_QUINCENAL);
-
-                Map<String, String> parametros = new HashMap();
-                parametros.put("empleado", user.getNombre() + " " + user.getApellido());
-                parametros.put("cedula", user.getCedula());
-                parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
-                parametros.put("empresa", user.getDetallesEmpleado().getEmpresa().getNombre());
-                parametros.put("numero", pagoQuincena.getId().toString()); 
-                parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
-                parametros.put("total", round(pagoQuincena.getMonto()).toString());
-
-                JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
-                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
-
-                String filename = "pago_quincenal_" + pagoQuincena.getId();
-
-                if (file != null) {
-                    JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
-                } 
-                if (enviarCorreo) {
-                    File pdf = File.createTempFile(filename, ".pdf");
-                    JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
-                    CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
-                            user.getEmail(), Const.ASUNTO_ADELANTO_QUINCENAL, 
-                            "Recibo de adelanto quincenal del mes que empieza el " 
-                                    + getFechaConMes(inicio) 
-                                    + " y termina el " 
-                                    + getFechaConMes(fin), 
-                            pdf.getPath(), filename + ".pdf");
-                }
-
-            } catch (JRException | IOException ex) {
-                Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
-            } 
-        }
-        pagosQuincenal.clear();
-        dialogLoading.close();
-        dialogoCompletado();
     }
     
     public File seleccionarDirectorio() {
@@ -346,35 +320,15 @@ public class PagoQuincenalController implements Initializable {
     }
     
     public void hacerPago() {
-        dialogWait();
         
-        pagosQuincenal = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new PagoQuincenalController.DataBaseThread(0);
+        executor.execute(worker);
+        executor.shutdown();
+
+        loadingMode();
         
-        for (Usuario user: usuarios) {
-            if (data.get(usuarios.indexOf(user)).getPagar()) {
-                PagoQuincena pagoQuincena = new PagoQuincena();
-                pagoQuincena.setUsuario(user);
-                pagoQuincena.setFecha(new Timestamp(new Date().getTime()));
-                pagoQuincena.setMonto(data.get(usuarios.indexOf(user))
-                        .getQuincenal());
-                pagoQuincena.setInicioMes(inicio);
-                pagoQuincena.setFinMes(fin);
-                new PagoQuincenaDAO().save(pagoQuincena);
-                pagosQuincenal.add(pagoQuincena);
-                
-                // Registro para auditar
-                String detalles = "hizo el adelanto quincenal nro: " 
-                        + pagoQuincena.getId() 
-                        + " del lapso " + getFechaConMes(inicio)+ " a " 
-                        + getFechaConMes(fin) + " para el empleado " 
-                        + user.getNombre() + " " + user.getApellido();
-                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
-            }
-        }
-        setTableInfo();
         
-        dialogLoading.close();
-        dialogoGenerarAdelantoCompletado();
     }
     
     public void dialogoGenerarAdelantoCompletado() {
@@ -573,6 +527,31 @@ public class PagoQuincenalController implements Initializable {
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
+    }
+    
+    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+        filteredData.setPredicate(empleado -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
+
+            if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } 
+            return false; // Does not match.
+        });
     }
     
     public void dialogoBorrarPago(int usuarioId) {
@@ -839,6 +818,58 @@ public class PagoQuincenalController implements Initializable {
         }
     }
     
+    private void loadingMode(){
+        dialog = new Dialog<>();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(stagePrincipal);//stage here is the stage of your webview
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        Label loader = new Label("   Cargando, por favor espere...");
+        loader.setContentDisplay(ContentDisplay.LEFT);
+        loader.setGraphic(new ProgressIndicator());
+        dialog.getDialogPane().setGraphic(loader);
+        dialog.getDialogPane().setStyle("-fx-background-color: #E0E0E0;");
+        dialog.getDialogPane().setPrefSize(250, 75);
+        DropShadow ds = new DropShadow();
+        ds.setOffsetX(1.3); 
+        ds.setOffsetY(1.3); 
+        ds.setColor(Color.DARKGRAY);
+        dialog.getDialogPane().setEffect(ds);
+        dialog.show();
+    }
+    
+    private void loadingModeImprimir(){
+        dialog = new Dialog<>();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(stagePrincipal);//stage here is the stage of your webview
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        loader = new Label("   Imprimiendo, por favor espere...");
+        loader.setContentDisplay(ContentDisplay.LEFT);
+        loader.setGraphic(new ProgressIndicator());
+        dialog.getDialogPane().setGraphic(loader);
+        dialog.getDialogPane().setStyle("-fx-background-color: #E0E0E0;");
+        dialog.getDialogPane().setPrefSize(250, 75);
+        DropShadow ds = new DropShadow();
+        ds.setOffsetX(1.3); 
+        ds.setOffsetY(1.3); 
+        ds.setColor(Color.DARKGRAY);
+        dialog.getDialogPane().setEffect(ds);
+        dialog.show();
+    }
+    
+    private void loadingModeUpdate(int current, int total){
+        loader.setText("   Imprimiendo "+current+"/"+total+", espere...");
+    }
+    
+    public void closeDialogMode() {
+        if (dialog != null) {
+           Stage toClose = (Stage) dialog.getDialogPane()
+                   .getScene().getWindow();
+           toClose.close();
+           dialog.close();
+           dialog = null;
+        }
+    }
+    
     // Login items
     @FXML
     public Button login;
@@ -851,4 +882,142 @@ public class PagoQuincenalController implements Initializable {
         aplicacionControl.login(login, usuarioLogin);
     }
     
+    public class DataBaseThread implements Runnable {
+        
+        public final Integer GUARDAR = 0;
+        public final Integer IMPRIMIR = 1;
+        public final Integer BORRAR = 2;
+        
+        Integer opcion;
+        File file;
+        Boolean enviarCorreo;
+        
+        public DataBaseThread(Integer opcion){
+            this.opcion = opcion;
+        }
+        
+        public DataBaseThread(Integer opcion, File file, Boolean enviarCorreo){
+            this.opcion = opcion;
+            this.file = file;
+            this.enviarCorreo = enviarCorreo;
+        }
+
+        @Override
+        public void run() {
+    
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        cancel();
+                        try {
+                            if (Objects.equals(opcion, GUARDAR)) {
+                                hacerPago();
+                            } else if (Objects.equals(opcion, IMPRIMIR)) {
+                                imprimir(file, Boolean.TRUE);
+                            } 
+                        } catch (ParseException ex) {
+                            closeDialogMode();
+                        }
+                    }
+             }, 1000, 1000);
+            
+        }
+        
+        private void hacerPago() throws ParseException {
+            pagosQuincenal = new ArrayList<>();
+
+            for (Usuario user: usuarios) {
+                if (data.get(usuarios.indexOf(user)).getPagar()) {
+                    PagoQuincena pagoQuincena = new PagoQuincena();
+                    pagoQuincena.setUsuario(user);
+                    pagoQuincena.setFecha(new Timestamp(new Date().getTime()));
+                    pagoQuincena.setMonto(data.get(usuarios.indexOf(user))
+                            .getQuincenal());
+                    pagoQuincena.setInicioMes(inicio);
+                    pagoQuincena.setFinMes(fin);
+                    new PagoQuincenaDAO().save(pagoQuincena);
+                    pagosQuincenal.add(pagoQuincena);
+
+                    // Registro para auditar
+                    String detalles = "hizo el adelanto quincenal nro: " 
+                            + pagoQuincena.getId() 
+                            + " del lapso " + getFechaConMes(inicio)+ " a " 
+                            + getFechaConMes(fin) + " para el empleado " 
+                            + user.getNombre() + " " + user.getApellido();
+                    aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                }
+            }
+            setTableInfo();
+            
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    closeDialogMode();
+                    dialogoGenerarAdelantoCompletado();
+                }
+            });
+        }
+        
+        public void imprimir(File file, Boolean enviarCorreo) {
+        
+            for (PagoQuincena pagoQuincena: pagosQuincenal) {
+                
+                Usuario user = pagoQuincena.getUsuario();
+
+                ReporteRolDePagoQuincenal datasource = new ReporteRolDePagoQuincenal();
+                datasource.add(pagoQuincena);
+                
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        loadingModeUpdate(pagosQuincenal.indexOf(pagoQuincena)
+                                +1,pagosQuincenal.size());
+                    }
+                });
+
+                try {
+                    InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_ADELANTO_QUINCENAL);
+
+                    Map<String, String> parametros = new HashMap();
+                    parametros.put("empleado", user.getNombre() + " " + user.getApellido());
+                    parametros.put("cedula", user.getCedula());
+                    parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
+                    parametros.put("empresa", user.getDetallesEmpleado().getEmpresa().getNombre());
+                    parametros.put("numero", pagoQuincena.getId().toString()); 
+                    parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+                    parametros.put("total", round(pagoQuincena.getMonto()).toString());
+
+                    JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+                    JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+
+                    String filename = "pago_quincenal_" + pagoQuincena.getId();
+
+                    if (file != null) {
+                        JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+                    } 
+                    if (enviarCorreo) {
+                        File pdf = File.createTempFile(filename, ".pdf");
+                        JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
+                        CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
+                                user.getEmail(), Const.ASUNTO_ADELANTO_QUINCENAL, 
+                                "Recibo de adelanto quincenal del mes que empieza el " 
+                                        + getFechaConMes(inicio) 
+                                        + " y termina el " 
+                                        + getFechaConMes(fin), 
+                                pdf.getPath(), filename + ".pdf");
+                    }
+
+                } catch (JRException | IOException ex) {
+                    Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            pagosQuincenal.clear();
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    closeDialogMode();
+                    dialogoCompletado();
+                }
+            });
+        }
+    }
 }

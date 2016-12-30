@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.Bonos;
+import java.sql.Date;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -68,7 +69,7 @@ public class BonosDAO extends BaseHibernateDAO {
             return (Bonos) result;
         }
         
-        public List<Bonos> findAllByClienteIdAndEmpresaId(Integer clienteId, Integer empresaId) {
+        public List<Bonos> findAllByClienteIdAndEmpresaId(Integer clienteId, Integer empresaId, Date fecha) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM bonos "
                             + "JOIN usuario "
@@ -77,15 +78,16 @@ public class BonosDAO extends BaseHibernateDAO {
                             + "ON detalles_empleado.id = usuario.detalles_empleado_id "
                             + "where cliente_id = :cliente_id "
                             + "and empresa_id = :empresa_id "
-                            + "and pagado = false")
+                            + "and inicio_mes = :fecha")
                     .addEntity(Bonos.class)
                     .setParameter("cliente_id", clienteId)
-                    .setParameter("empresa_id", empresaId);
+                    .setParameter("empresa_id", empresaId)
+                    .setParameter("fecha", fecha);
             Object result = query.list();
             return (List<Bonos>) result;
         }
         
-        public List<Bonos> findAllByClienteNullAndEmpresaId(Integer empresaId) {
+        public List<Bonos> findAllByClienteNullAndEmpresaId(Integer empresaId, Date fecha) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM bonos "
                             + "JOIN usuario "
@@ -94,19 +96,19 @@ public class BonosDAO extends BaseHibernateDAO {
                             + "ON detalles_empleado.id = usuario.detalles_empleado_id "
                             + "where cliente_id IS NULL "
                             + "and empresa_id = :empresa_id "
-                            + "and pagado = false")
+                            + "and inicio_mes = :fecha")
                     .addEntity(Bonos.class)
-                    .setParameter("empresa_id", empresaId);
+                    .setParameter("empresa_id", empresaId)
+                    .setParameter("fecha", fecha);
             Object result = query.list();
             return (List<Bonos>) result;
         }
         
-        public List<Bonos> findAllPagadoByClienteIdAndEmpleadoId(Integer clienteId, Integer empleadoId) {
+        public List<Bonos> findAllByClienteIdAndEmpleadoId(Integer clienteId, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM bonos "
                             + "where usuario_id = :usuario_id "
-                            + "and cliente_id = :cliente_id "
-                            + "and pagado = true")
+                            + "and cliente_id = :cliente_id")
                     .addEntity(Bonos.class)
                     .setParameter("cliente_id", clienteId)
                     .setParameter("usuario_id", empleadoId);
@@ -114,39 +116,40 @@ public class BonosDAO extends BaseHibernateDAO {
             return (List<Bonos>) result;
         }
         
-        public Bonos findByClienteIdAndEmpleadoId(Integer clienteId, Integer empleadoId) {
+        public Bonos findByClienteIdAndEmpleadoId(Integer clienteId, Integer empleadoId, Date fecha) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM bonos "
                             + "where usuario_id = :usuario_id "
                             + "and cliente_id = :cliente_id "
-                            + "and pagado = false")
+                            + "and inicio_mes = :fecha")
                     .addEntity(Bonos.class)
                     .setParameter("cliente_id", clienteId)
-                    .setParameter("usuario_id", empleadoId);
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("fecha", fecha);
             Object result = query.uniqueResult();
             return (Bonos) result;
         }
         
-        public List<Bonos> findAllPagadoByClienteNullAndEmpleadoId(Integer empleadoId) {
+        public List<Bonos> findAllByClienteNullAndEmpleadoId(Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM bonos "
                             + "where usuario_id = :usuario_id "
-                            + "and cliente_id is NULL "
-                            + "and pagado = true")
+                            + "and cliente_id is NULL")
                     .addEntity(Bonos.class)
                     .setParameter("usuario_id", empleadoId);
             Object result = query.list();
             return (List<Bonos>) result;
         }
         
-        public Bonos findByClienteNullAndEmpleadoId(Integer empleadoId) {
+        public Bonos findByClienteNullAndEmpleadoId(Integer empleadoId, Date fecha) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM bonos "
                             + "where usuario_id = :usuario_id "
                             + "and cliente_id is NULL "
-                            + "and pagado = false")
+                            + "and inicio_mes = :fecha")
                     .addEntity(Bonos.class)
-                    .setParameter("usuario_id", empleadoId);
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("fecha", fecha);
             Object result = query.uniqueResult();
             return (Bonos) result;
         }

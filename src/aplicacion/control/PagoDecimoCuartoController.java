@@ -10,8 +10,6 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.PagoDecimoDAO;
 import hibernate.dao.RolIndividualDAO;
@@ -75,28 +73,20 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javafx.application.Platform;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Color;
+import javafx.stage.StageStyle;
 
 /**
  *
@@ -154,6 +144,10 @@ public class PagoDecimoCuartoController implements Initializable {
     private Empresa empresa;
     
     Stage dialogLoading;
+    
+    Dialog<Void> dialog;
+    
+    Label loader;
     
     ArrayList<List<RolIndividual>> rolesEmpleados;
     ArrayList<List<RolIndividual>> rolesParaImprimir;
@@ -226,59 +220,13 @@ public class PagoDecimoCuartoController implements Initializable {
     
     public void imprimir(File file, Boolean enviarCorreo) {
         
-        dialogWait();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new PagoDecimoCuartoController.DataBaseThread(1, file, enviarCorreo);
+        executor.execute(worker);
+        executor.shutdown();
+
+        loadingModeImprimir();
         
-        for (PagoDecimo pagoDecimo: pagosDecimo) {
-            Usuario user = pagoDecimo.getUsuario();
-            
-            List<RolIndividual> roles = rolesParaImprimir
-                        .get(pagosDecimo.indexOf(pagoDecimo));
-            
-            ReporteRolDePagoDecimo datasource = new ReporteRolDePagoDecimo();
-            datasource.add(pagoDecimo);
-
-            try {
-                InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_DECIMO_CUARTO);
-
-                Map<String, String> parametros = new HashMap();
-                parametros.put("empleado", user.getApellido()+ " " + user.getNombre());
-                parametros.put("cedula", user.getCedula());
-                parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
-                parametros.put("empresa", user.getDetallesEmpleado().getEmpresa().getNombre());
-                parametros.put("numero", pagoDecimo.getId().toString()); 
-                parametros.put("lapso", getFechaConMes(roles.get(0).getInicio()) 
-                        + " al " + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()));
-                parametros.put("total", round(pagoDecimo.getMonto()).toString());
-                parametros.put("fecha_recibo", Fechas.getFechaConMes(pagoDecimo.getFecha()));
-
-                JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
-                JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
-
-                String filename = "pago_decimo_cuarto_" + pagoDecimo.getId();
-
-                if (file != null) {
-                    JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
-                } 
-                if (enviarCorreo) {
-                    File pdf = File.createTempFile(filename, ".pdf");
-                    JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
-                    CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
-                            user.getEmail(), Const.ASUNTO_PAGO_DECIMO_CUARTO, 
-                            "Recibo del pago del decimo cuarto acumulado desde el " 
-                                    + getFechaConMes(roles.get(0).getInicio()) 
-                                    + " hasta el "
-                                    + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()), 
-                            pdf.getPath(), filename + ".pdf");
-                }
-
-            } catch (JRException | IOException ex) {
-                Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
-            } 
-        }
-        pagosDecimo.clear();
-        dialogLoading.close();
-        dialogoCompletado();
     }
     
     public File seleccionarDirectorio() {
@@ -303,44 +251,12 @@ public class PagoDecimoCuartoController implements Initializable {
     
     public void hacerPago() {
         
-        dialogWait();
-        
-        pagosDecimo = new ArrayList<>();
-        rolesParaImprimir = new ArrayList<>();
-        
-        for (Usuario user: usuarios) {
-            if (data.get(usuarios.indexOf(user)).getPagar()) {
-                PagoDecimo pagoDecimo = new PagoDecimo();
-                pagoDecimo.setUsuario(user);
-                pagoDecimo.setFecha(new Timestamp(new Date().getTime()));
-                pagoDecimo.setMonto(data.get(usuarios.indexOf(user))
-                        .getDecimo4());
-                pagoDecimo.setDecimo(Const.DECIMO_CUARTO);
-                new PagoDecimoDAO().save(pagoDecimo);
-                pagosDecimo.add(pagoDecimo);
-                
-                List<RolIndividual> roles = rolesEmpleados
-                        .get(usuarios.indexOf(user));
-                
-                for (RolIndividual rolIndividual: roles) {
-                    rolIndividual.setPagoDecimoCuarto(pagoDecimo);
-                }
-                rolesParaImprimir.add(roles);
-                HibernateSessionFactory.getSession().flush();
-                
-                // Registro para auditar
-                String detalles = "hizo el pago de decimos acumulados nro: " 
-                        + pagoDecimo.getId() 
-                        + " del lapso " + getFechaConMes(roles.get(0).getInicio())+ " a " 
-                        + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()) + " para el empleado " 
-                        + user.getApellido()+ " " + user.getNombre();
-                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
-            }
-        }
-        setTableInfo();
-        
-        dialogLoading.close();
-        dialogoPagoDecimosCompletado();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new PagoDecimoCuartoController.DataBaseThread(0);
+        executor.execute(worker);
+        executor.shutdown();
+
+        loadingMode();
     }
     
     public void dialogoPagoDecimosCompletado() {
@@ -579,6 +495,58 @@ public class PagoDecimoCuartoController implements Initializable {
         });
     } 
     
+    private void loadingMode(){
+        dialog = new Dialog<>();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(stagePrincipal);//stage here is the stage of your webview
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        Label loader = new Label("   Cargando, por favor espere...");
+        loader.setContentDisplay(ContentDisplay.LEFT);
+        loader.setGraphic(new ProgressIndicator());
+        dialog.getDialogPane().setGraphic(loader);
+        dialog.getDialogPane().setStyle("-fx-background-color: #E0E0E0;");
+        dialog.getDialogPane().setPrefSize(250, 75);
+        DropShadow ds = new DropShadow();
+        ds.setOffsetX(1.3); 
+        ds.setOffsetY(1.3); 
+        ds.setColor(Color.DARKGRAY);
+        dialog.getDialogPane().setEffect(ds);
+        dialog.show();
+    }
+    
+    private void loadingModeImprimir(){
+        dialog = new Dialog<>();
+        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initOwner(stagePrincipal);//stage here is the stage of your webview
+        dialog.initStyle(StageStyle.TRANSPARENT);
+        loader = new Label("   Imprimiendo, por favor espere...");
+        loader.setContentDisplay(ContentDisplay.LEFT);
+        loader.setGraphic(new ProgressIndicator());
+        dialog.getDialogPane().setGraphic(loader);
+        dialog.getDialogPane().setStyle("-fx-background-color: #E0E0E0;");
+        dialog.getDialogPane().setPrefSize(250, 75);
+        DropShadow ds = new DropShadow();
+        ds.setOffsetX(1.3); 
+        ds.setOffsetY(1.3); 
+        ds.setColor(Color.DARKGRAY);
+        dialog.getDialogPane().setEffect(ds);
+        dialog.show();
+    }
+    
+    private void loadingModeUpdate(int current, int total){
+        loader.setText("   Imprimiendo "+current+"/"+total+", espere...");
+    }
+    
+    public void closeDialogMode() {
+        if (dialog != null) {
+           Stage toClose = (Stage) dialog.getDialogPane()
+                   .getScene().getWindow();
+           toClose.close();
+           dialog.close();
+           dialog = null;
+        }
+    }
+    
     // Login items
     @FXML
     public Button login;
@@ -589,6 +557,155 @@ public class PagoDecimoCuartoController implements Initializable {
     @FXML
     public void onClickLoginButton(ActionEvent event) {
         aplicacionControl.login(login, usuarioLogin);
+    }
+    
+    public class DataBaseThread implements Runnable {
+        
+        public final Integer GUARDAR = 0;
+        public final Integer IMPRIMIR = 1;
+        public final Integer BORRAR = 2;
+        
+        Integer opcion;
+        File file;
+        Boolean enviarCorreo;
+        
+        public DataBaseThread(Integer opcion){
+            this.opcion = opcion;
+        }
+        
+        public DataBaseThread(Integer opcion, File file, Boolean enviarCorreo){
+            this.opcion = opcion;
+            this.file = file;
+            this.enviarCorreo = enviarCorreo;
+        }
+
+        @Override
+        public void run() {
+    
+            new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        cancel();
+                        try {
+                            if (Objects.equals(opcion, GUARDAR)) {
+                                hacerPago();
+                            } else if (Objects.equals(opcion, IMPRIMIR)) {
+                                imprimir(file, Boolean.TRUE);
+                            } 
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            closeDialogMode();
+                        }
+                    }
+             }, 1000, 1000);
+            
+        }
+        
+        public void hacerPago() {
+
+            pagosDecimo = new ArrayList<>();
+            rolesParaImprimir = new ArrayList<>();
+
+            for (Usuario user: usuarios) {
+                if (data.get(usuarios.indexOf(user)).getPagar()) {
+                    PagoDecimo pagoDecimo = new PagoDecimo();
+                    pagoDecimo.setUsuario(user);
+                    pagoDecimo.setFecha(new Timestamp(new Date().getTime()));
+                    pagoDecimo.setMonto(data.get(usuarios.indexOf(user))
+                            .getDecimo4());
+                    pagoDecimo.setDecimo(Const.DECIMO_CUARTO);
+                    new PagoDecimoDAO().save(pagoDecimo);
+                    pagosDecimo.add(pagoDecimo);
+
+                    List<RolIndividual> roles = rolesEmpleados
+                            .get(usuarios.indexOf(user));
+
+                    for (RolIndividual rolIndividual: roles) {
+                        RolIndividual rolSearch = new RolIndividualDAO().findById(rolIndividual.getId());
+                        rolSearch.setPagoDecimoCuarto(pagoDecimo);
+                    }
+                    rolesParaImprimir.add(roles);
+                    HibernateSessionFactory.getSession().flush();
+
+                    // Registro para auditar
+                    String detalles = "hizo el pago de decimos acumulados nro: " 
+                            + pagoDecimo.getId() 
+                            + " del lapso " + getFechaConMes(roles.get(0).getInicio())+ " a " 
+                            + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()) + " para el empleado " 
+                            + user.getApellido()+ " " + user.getNombre();
+                    aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                }
+            }
+            setTableInfo();
+
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    closeDialogMode();
+                    dialogoPagoDecimosCompletado();
+                }
+            });
+        }
+        
+        public void imprimir(File file, Boolean enviarCorreo) {
+        
+            for (PagoDecimo pagoDecimo: pagosDecimo) {
+                Usuario user = pagoDecimo.getUsuario();
+
+                List<RolIndividual> roles = rolesParaImprimir
+                            .get(pagosDecimo.indexOf(pagoDecimo));
+
+                ReporteRolDePagoDecimo datasource = new ReporteRolDePagoDecimo();
+                datasource.add(pagoDecimo);
+
+                try {
+                    InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_DECIMO_CUARTO);
+
+                    Map<String, String> parametros = new HashMap();
+                    parametros.put("empleado", user.getApellido()+ " " + user.getNombre());
+                    parametros.put("cedula", user.getCedula());
+                    parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
+                    parametros.put("empresa", user.getDetallesEmpleado().getEmpresa().getNombre());
+                    parametros.put("numero", pagoDecimo.getId().toString()); 
+                    parametros.put("lapso", getFechaConMes(roles.get(0).getInicio()) 
+                            + " al " + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()));
+                    parametros.put("total", round(pagoDecimo.getMonto()).toString());
+                    parametros.put("fecha_recibo", Fechas.getFechaConMes(pagoDecimo.getFecha()));
+
+                    JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+                    JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+
+                    String filename = "pago_decimo_cuarto_" + pagoDecimo.getId();
+
+                    if (file != null) {
+                        JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+                    } 
+                    if (enviarCorreo) {
+                        File pdf = File.createTempFile(filename, ".pdf");
+                        JasperExportManager.exportReportToPdfStream(jasperPrint, new FileOutputStream(pdf));  
+                        CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
+                                user.getEmail(), Const.ASUNTO_PAGO_DECIMO_CUARTO, 
+                                "Recibo del pago del decimo cuarto acumulado desde el " 
+                                        + getFechaConMes(roles.get(0).getInicio()) 
+                                        + " hasta el "
+                                        + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()), 
+                                pdf.getPath(), filename + ".pdf");
+                    }
+
+                } catch (JRException | IOException ex) {
+                    Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
+                } 
+            }
+            pagosDecimo.clear();
+            Platform.runLater(new Runnable() {
+                @Override public void run() {
+                    closeDialogMode();
+                    dialogoCompletado();
+                }
+            });
+        }
+        
     }
     
 }

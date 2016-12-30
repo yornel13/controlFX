@@ -35,6 +35,7 @@ public class Const {
     
     // Reportes
     public static final String REPORTE_ROL_PAGO_INDIVIDUAL = "report/rol_pago_individual.jrxml";
+    public static final String REPORTE_HORAS_TRABAJADAS = "report/historico_dias.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADO = "report/deudas_empleado.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADOS = "report/deudas_varios.jrxml";
     public static final String REPORTE_ADELANTO_QUINCENAL_EMPLEADOS = "report/adelanto_quincenal_varios.jrxml";
@@ -78,6 +79,7 @@ public class Const {
     /************* Correo **************/
     // Asunto
     public static final String ASUNTO_ROL_INDIVIDUAL = "Pago Mensual";
+    public static final String ASUNTO_HORAS = "Horas Trabajadas en el mes";
     public static final String ASUNTO_ADELANTO_QUINCENAL = "Adelanto Quincenal";
     public static final String ASUNTO_DEUDAS = "Deudas pendientes";
     public static final String ASUNTO_PAGO_DECIMO_TERCERO = "Pago Decimo Tercero";

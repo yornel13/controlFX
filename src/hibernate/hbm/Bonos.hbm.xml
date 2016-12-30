@@ -21,14 +21,14 @@
         <property name="transporte" type="java.lang.Double">
             <column name="transporte" precision="8" not-null="true" />
         </property>
-    <property name="pagado" type="java.lang.Boolean">
-      <column name="pagado" not-null="true"/>
-    </property>
     <property name="fecha" type="java.sql.Timestamp">
       <column length="19" name="fecha" not-null="true"/>
     </property>
-    <many-to-one class="hibernate.model.RolCliente" fetch="select" name="rolCliente">
-      <column name="rol_cliente_id" />
-    </many-to-one>
+    <property name="inicioMes" type="java.sql.Date">
+            <column name="inicio_mes" length="10" />
+        </property>
+        <property name="finMes" type="java.sql.Date">
+            <column name="fin_mes" length="10" />
+        </property>
   </class>
 </hibernate-mapping>

@@ -907,38 +907,6 @@ public class AplicacionControl extends Application {
        }
     }
     
-    public void mostrarRegistrarEmpleado(Empresa empresa) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-            if (permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.CREAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRegistrarEmpleado.fxml"));
-                    TabPane ventanaRegistrarEmpleado = (TabPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle("Nuevo empleado");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_crear.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaRegistrarEmpleado);
-                    ventana.setScene(scene);
-                    RegistrarEmpleadoController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
-                    ventana.show();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-              noPermitido();
-            }
-        }
-    }
-    
     public void mostrarEmpleado(Usuario empleado) {
         if (permisos == null) {
            noLogeado();

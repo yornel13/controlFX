@@ -11,7 +11,6 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Roboto;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
@@ -73,19 +72,6 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 
@@ -211,85 +197,6 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         children(new Text("Cargando espere...")).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         dialogLoading.show();
-    }
-    
-    public void imprimir(File file) {
-        /*
-        Double pagado3 = 0d;
-        Double pagado4 = 0d;
-        Double pagado;
-        Double retenido3 = 0d;
-        Double retenido4 = 0d;
-        Double retenido;
-        Double total3 = 0d;
-        Double total4 = 0d;
-        Double total;
-        
-        dialogWait();
-        
-        List<EmpleadoTable> empleadosImprimir = (List<EmpleadoTable>) empleadosTableView.getItems();
-        
-        ReporteAcumulacionDecimosVarios datasource = new ReporteAcumulacionDecimosVarios();
-        datasource.addAll(empleadosImprimir);
-        
-        for (EmpleadoTable empleadoTable: empleadosImprimir) {
-            total3 += empleadoTable.getDecimo3();
-            total4 += empleadoTable.getDecimo4();
-            if (empleadoTable.getDetalles().equalsIgnoreCase(PAGADO)) {
-                pagado3 += empleadoTable.getDecimo3();
-                pagado4 += empleadoTable.getDecimo4();
-            } else if (empleadoTable.getDetalles().equalsIgnoreCase(RETENIDO)) {
-                retenido3 += empleadoTable.getDecimo3();
-                retenido4 += empleadoTable.getDecimo4();
-            }
-        }
-        
-        pagado = pagado3 + pagado4;
-        retenido = retenido3 + retenido4;
-        total = total3 + total4;
-        
-        try {
-            InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMOS_ACUMULADOS_POR_MES);
-        
-            Map<String, String> parametros = new HashMap();
-            parametros.put("empresa", empresa.getNombre());
-            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
-            parametros.put("pagado3", round(pagado3).toString());
-            parametros.put("pagado4", round(pagado4).toString());
-            parametros.put("pagado", round(pagado).toString());
-            parametros.put("retenido3", round(retenido3).toString());
-            parametros.put("retenido4", round(retenido4).toString());
-            parametros.put("retenido", round(retenido).toString());
-            parametros.put("total3", round(total3).toString());
-            parametros.put("total4", round(total4).toString());
-            parametros.put("total", round(total).toString());
-            
-            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
-            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint;
-            if(empleadosImprimir.isEmpty())
-                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
-            else 
-                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
-            
-            String filename = "acumulado_decimos_mensual_" + System.currentTimeMillis();
-            
-            if (file != null) {
-                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
-            } 
-            
-            // Registro para auditar
-            String detalles = "genero el recibo general de acumulacion de decimos de todos los empleado";
-            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
-            
-            dialogoCompletado();
-            
-            
-        } catch (JRException | IOException ex) {
-            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            dialogLoading.close();
-        }*/
     }
     
     public void imprimirDecimoTercero(File file) {
@@ -684,6 +591,31 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
+    }
+    
+    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+        filteredData.setPredicate(empleado -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
+
+            if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } 
+            return false; // Does not match.
+        });
     }
     
     public void mostrarDecimosGenerados(Usuario empleado, EmpleadoTable empleadoTable) {

@@ -123,9 +123,14 @@ public class RegistrarEmpleadoController implements Initializable {
     
     @FXML 
     private DatePicker datePickerContratacion;
+    private EmpleadosController empleadosController;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
+    }
+    
+    public void setEmpleadosController(EmpleadosController empleadosController) {
+        this.empleadosController = empleadosController;
     }
     
     public void setProgramaPrincipal(AplicacionControl aplicacionControl) {
@@ -240,6 +245,8 @@ public class RegistrarEmpleadoController implements Initializable {
                         + empresa.getNombre() ;
                 aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
 
+                empleadosController.setEmpresa(empresa);
+                
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
                 dialogStage.setResizable(false);
