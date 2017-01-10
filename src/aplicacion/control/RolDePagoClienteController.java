@@ -92,14 +92,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Years;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.BonosDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.model.Bonos;
 import hibernate.model.DiasVacaciones;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Numeros.round;
 
 /**
@@ -903,6 +899,7 @@ public class RolDePagoClienteController implements Initializable {
         Double normales = 0d;
         Double sobreTiempo = 0d;
         Double suplementarias = 0d;
+        Integer medioDias = 0;
         
         int descansosMedicos = 0;
 
@@ -918,27 +915,24 @@ public class RolDePagoClienteController implements Initializable {
                     && cliente.getId().equals(uControl.getCliente().getId())
                     || cliente == null && uControl.getCliente() == null) {
                     
+                    if (uControl.getMedioDia()) {
+                        medioDias++;
+                    }
+                    
                     if (uControl.getCaso().equalsIgnoreCase(Const.TRABAJO)
                             || uControl.getCaso().equalsIgnoreCase(Const.LIBRE)
+                            || uControl.getCaso().equalsIgnoreCase(Const.VACACIONES)
                             || uControl.getCaso().equalsIgnoreCase(Const.CM)) {
 
-                        if (uControl.getMedioDia())
-                            dias += 0.5; 
-                        else
-                            dias += 1;
-
-                        normales += uControl.getNormales();
+                        dias += 1;
+                        normales = uControl.getMedioDia()? normales+4 : normales+8;
                         sobreTiempo += uControl.getSobretiempo();
                         suplementarias += uControl.getRecargo();
 
                     } else if (uControl.getCaso().equalsIgnoreCase(Const.DM)) {
                         if (descansosMedicos <= 3) {
-                            if (uControl.getMedioDia())
-                                dias += 0.5; 
-                            else
-                                dias += 1;
-
-                            normales += uControl.getNormales();
+                            dias += 1;
+                            normales = uControl.getMedioDia()? normales+4 : normales+8;
                         }
                     }
                     
@@ -949,10 +943,7 @@ public class RolDePagoClienteController implements Initializable {
                             || uControl.getCaso().equalsIgnoreCase(Const.CM)
                             || uControl.getCaso().equalsIgnoreCase(Const.DM)) {
 
-                        if (uControl.getMedioDia())
-                            diasJubilacion += 0.5; 
-                        else
-                            diasJubilacion += 1;
+                        diasJubilacion += 1;
 
                     } 
                     
@@ -962,10 +953,7 @@ public class RolDePagoClienteController implements Initializable {
                             || uControl.getCaso().equalsIgnoreCase(Const.CM)
                             || uControl.getCaso().equalsIgnoreCase(Const.DM)) {
 
-                        if (uControl.getMedioDia())
-                            diasDecimo4to += 0.5; 
-                        else
-                            diasDecimo4to += 1;
+                        diasDecimo4to += 1;
 
                     } 
                 }
@@ -973,7 +961,7 @@ public class RolDePagoClienteController implements Initializable {
         }
 
         indicacion1.setText("");
-        calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, false);
+        calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, false, medioDias);
     }
     
     public void setEmpleado(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) throws ParseException {
@@ -1001,6 +989,7 @@ public class RolDePagoClienteController implements Initializable {
         Double normales = 0d;
         Double sobreTiempo = 0d;
         Double suplementarias = 0d;
+        Integer medioDias = 0;
         
         DateTime fechaInicial = new DateTime(inicio.getTime());
         DateTime fechaFinal = new DateTime(fin.getTime());
@@ -1063,31 +1052,26 @@ public class RolDePagoClienteController implements Initializable {
                     if (cliente == null && control.getCliente() == null ||
                             cliente != null && control.getCliente() != null && cliente.getId().equals(control.getCliente().getId())) {
                         
+                        if (control.getMedioDia()) {
+                            medioDias++;
+                        }
+                        
                         if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                 || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
                                 || control.getCaso().equalsIgnoreCase(Const.CM)) {
                             
-                            if (control.getMedioDia()) {
-                                dias += 0.5; 
-                                normales += 4;
-                            } else {
-                                dias += 1;
-                                normales += 8;
-                            }
+                            dias += 1;
+                            normales = control.getMedioDia()? normales+4 : normales+8;
                             sobreTiempo += control.getSobretiempo();
                             suplementarias += control.getRecargo();
                             
                         } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                             if (descansosMedicos <= 3) {
-                                if (control.getMedioDia()) {
-                                    dias += 0.5; 
-                                    normales += 4;
-                                } else {
-                                    dias += 1;
-                                    normales += 8;
-                                }
+                                dias += 1;
+                                normales = control.getMedioDia()? normales+4 : normales+8;
                             }
-                        }
+                        } 
                         
                         if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                 || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
@@ -1096,10 +1080,7 @@ public class RolDePagoClienteController implements Initializable {
                                 || control.getCaso().equalsIgnoreCase(Const.CM)
                                 || control.getCaso().equalsIgnoreCase(Const.DM)) {
                             
-                            if (control.getMedioDia())
-                                diasJubilacion += 0.5; 
-                            else
-                                diasJubilacion += 1;
+                            diasJubilacion += 1;
                             
                         } 
                         
@@ -1109,10 +1090,7 @@ public class RolDePagoClienteController implements Initializable {
                                 || control.getCaso().equalsIgnoreCase(Const.CM)
                                 || control.getCaso().equalsIgnoreCase(Const.DM)) {
                             
-                            if (control.getMedioDia())
-                                diasDecimo4to += 0.5; 
-                            else
-                                diasDecimo4to += 1;
+                            diasDecimo4to += 1;
                             
                         } 
                         
@@ -1128,17 +1106,22 @@ public class RolDePagoClienteController implements Initializable {
         empleadosTableView.setItems(data);
         
         
-        calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, true); 
+        calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, true, medioDias); 
     }
     
     public void calcularPago(Double dias, Double diasDecimo4to, Double diasJubilacion, Double normales, Double sobreTiempo, 
-            Double suplementarias, Boolean searchRol) {
+            Double suplementarias, Boolean searchRol, Integer medioDias) {
         
         pago = null;
         int days = controlesDiarios.size();
         if (days != 30) {
             dias = (30d/days) * dias;
-            normales = (240d/(days*8d)) * normales;
+            dias = roundInt(dias).doubleValue();
+            diasDecimo4to = (30d/days) * diasDecimo4to;
+            diasDecimo4to = roundInt(diasDecimo4to).doubleValue();
+            diasJubilacion = (30d/days) * diasJubilacion;
+            diasJubilacion = roundInt(diasJubilacion).doubleValue();
+            normales = (dias*8d) - (medioDias*4d);
         }
         
         Double sueldoDia = empleado.getDetallesEmpleado().getSueldo() / 30d;
@@ -1148,17 +1131,14 @@ public class RolDePagoClienteController implements Initializable {
         sobreTiempo = round(sobreTiempo);
         suplementarias = round(suplementarias);
         
-        if (days != 30) 
-            totalDias.setText(roundInt(dias).toString());
-        else
-            totalDias.setText(dias.toString());
+        totalDias.setText(dias.intValue()+"");
         totalHorasN.setText(normales.toString());
         totalHorasRC.setText(suplementarias.toString());
         totalHorasST.setText(sobreTiempo.toString());
         totalHorasExtras.setText(round(sobreTiempo + suplementarias).toString());
         
         // Salario
-        Double totalSalarioDouble = round(sueldoDia * dias);
+        Double totalSalarioDouble = round(sueldoHoras * normales);
         totalSalario.setText(totalSalarioDouble.toString());
         Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
         totalSobreTiempo.setText(totalSobreTiempoDouble.toString());

@@ -55,7 +55,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -75,7 +74,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
@@ -91,15 +89,12 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.joda.time.Years;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.BonosDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.model.Bonos;
 import hibernate.model.DiasVacaciones;
 import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.roundInt;
 
 /**
  *
@@ -537,7 +532,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         suplementarias = round(suplementarias);
         
         // Salario
-        Double totalSalarioDouble = round(sueldoDia * dias);
+        Double totalSalarioDouble = round(sueldoHoras * normales);
         Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
         Double totalRecargoDouble = round(sueldoHoras * suplementarias);
         Double totalBonoDouble = getBono(empleado);
@@ -612,7 +607,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         Double suplementarias = rolCliente.getHorasSuplementarias();
         
         // Salario
-        Double totalSalarioDouble = round(sueldoDia * dias);
+        Double totalSalarioDouble = round(sueldoHoras * normales);
         Double totalSobreTiempoDouble = round(sueldoHoras * sobreTiempo);
         Double totalRecargoDouble = round(sueldoHoras * suplementarias);
         Double totalBonoDouble = round(bono);
@@ -995,6 +990,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                 Double normales = 0d;
                 Double sobreTiempo = 0d;
                 Double suplementarias = 0d;
+                Integer medioDias = 0;
                 
                 int descansosMedicos = 0;
                 for (ControlEmpleado control: controlEmpleados) {
@@ -1003,37 +999,32 @@ public class HorasEmpleadosClienteController implements Initializable {
                         if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                             descansosMedicos++;
                         } 
+                        if (control.getMedioDia()) {
+                            medioDias++;
+                        }
                         
                         if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                 || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
                                 || control.getCaso().equalsIgnoreCase(Const.CM)) {
                             
-                            if (control.getMedioDia()) {
-                                dias += 0.5; 
-                                normales += 4;
-                            } else {
-                                dias += 1;
-                                normales += 8;
-                            }
+                            dias += 1;
+                            normales = control.getMedioDia()? normales+4 : normales+8;
                             sobreTiempo += control.getSobretiempo();
                             suplementarias += control.getRecargo();
                             
                         } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                             if (descansosMedicos <= 3) {
-                                if (control.getMedioDia()) {
-                                    dias += 0.5; 
-                                    normales += 4;
-                                } else {
-                                    dias += 1;
-                                    normales += 8;
-                                }
+                                dias += 1;
+                                normales = control.getMedioDia()? normales+4 : normales+8;
                             }
                         }
                     }
                 }
                 if (days != 30) {
                     dias = (30d/days) * dias;
-                    normales = (240d/(days*8d)) * normales;
+                    dias = roundInt(dias).doubleValue();
+                    normales = (dias*8d) - (medioDias*4d);
                 }
                 EmpleadoTable empleado = new EmpleadoTable();
                 empleado.setId(user.getId());
@@ -1592,6 +1583,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                     Double normales = 0d;
                     Double sobreTiempo = 0d;
                     Double suplementarias = 0d;
+                    Integer medioDias = 0;
                     Usuario usuario = null;
 
                     int descansosMedicos = 0;
@@ -1602,30 +1594,25 @@ public class HorasEmpleadosClienteController implements Initializable {
                             if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                                 descansosMedicos++;
                             } 
+                            
+                            if (control.getMedioDia()) {
+                                medioDias++;
+                            }
 
                             if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
                                     || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
                                     || control.getCaso().equalsIgnoreCase(Const.CM)) {
 
-                                if (control.getMedioDia()) {
-                                    dias += 0.5; 
-                                    normales += 4;
-                                } else {
-                                    dias += 1;
-                                    normales += 8;
-                                }
+                                dias += 1;
+                                normales = control.getMedioDia()? normales+4 : normales+8;
                                 sobreTiempo += control.getSobretiempo();
                                 suplementarias += control.getRecargo();
 
                             } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                                 if (descansosMedicos <= 3) {
-                                    if (control.getMedioDia()) {
-                                        dias += 0.5; 
-                                        normales += 4;
-                                    } else {
-                                        dias += 1;
-                                        normales += 8;
-                                    }
+                                    dias += 1;
+                                    normales = control.getMedioDia()? normales+4 : normales+8;
                                 }
                             }
                             
@@ -1636,10 +1623,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                                     || control.getCaso().equalsIgnoreCase(Const.CM)
                                     || control.getCaso().equalsIgnoreCase(Const.DM)) {
 
-                                if (control.getMedioDia())
-                                    diasJubilacion += 0.5; 
-                                else
-                                    diasJubilacion += 1;
+                                diasJubilacion += 1;
 
                             } 
                             
@@ -1649,10 +1633,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                                     || control.getCaso().equalsIgnoreCase(Const.CM)
                                     || control.getCaso().equalsIgnoreCase(Const.DM)) {
 
-                                if (control.getMedioDia())
-                                    diasDecimo4to += 0.5; 
-                                else
-                                    diasDecimo4to += 1;
+                                diasDecimo4to += 1;
 
                             } 
                         }
@@ -1665,7 +1646,12 @@ public class HorasEmpleadosClienteController implements Initializable {
                     ///////////////////////////////////////////////////////////////
                     if (days != 30) {
                         dias = (30d/days) * dias;
-                        normales = (240d/(days*8d)) * normales;
+                        dias = roundInt(dias).doubleValue();
+                        diasDecimo4to = (30d/days) * diasDecimo4to;
+                        diasDecimo4to = roundInt(diasDecimo4to).doubleValue();
+                        diasJubilacion = (30d/days) * diasJubilacion;
+                        diasJubilacion = roundInt(diasJubilacion).doubleValue();
+                        normales = (dias*8d) - (medioDias*4d);
                     }
                     Actuariales actuariales = new ActuarialesDAO().findByEmpleadoId(empleadoTable.getId());
                     empleadoTable.setActuariales(actuariales);
