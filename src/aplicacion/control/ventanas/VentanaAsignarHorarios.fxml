@@ -19,8 +19,6 @@
         </columns>
       </TableView>
       <Accordion layoutX="61.0" layoutY="166.0" />
-      <DatePicker fx:id="pickerHasta" layoutX="297.0" layoutY="157.0" promptText="fin" />
-      <DatePicker fx:id="pickerDe" layoutX="63.0" layoutY="157.0" promptText="inicio" />
       <Label layoutX="19.0" layoutY="160.0" text="Desde" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
@@ -60,5 +58,11 @@
       </Label>
       <Line endX="80.0" layoutX="599.0" layoutY="180.0" startX="-100.0" />
       <Button fx:id="buttonBorrar" alignment="BASELINE_LEFT" layoutX="564.0" layoutY="184.0" mnemonicParsing="false" onAction="#onRemoveTurno" style="-fx-background-color: white;" text="Borrar" textFill="#070000" />
+      <ChoiceBox fx:id="selectorAnoDe" layoutX="147.0" layoutY="158.0" prefHeight="25.0" prefWidth="60.0" />
+      <ChoiceBox fx:id="selectorMesDe" layoutX="107.0" layoutY="158.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorDiaDe" layoutX="67.0" layoutY="158.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorDiaHa" layoutX="304.0" layoutY="158.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorMesHa" layoutX="344.0" layoutY="158.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorAnoHa" layoutX="384.0" layoutY="158.0" prefHeight="25.0" prefWidth="60.0" />
     </children>
 </AnchorPane>

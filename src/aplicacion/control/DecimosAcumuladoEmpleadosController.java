@@ -5,10 +5,10 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteAcumulacionDecimosVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Roboto;
@@ -74,6 +74,8 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getToday;
+import javafx.scene.control.ChoiceBox;
 
 /**
  *
@@ -131,13 +133,25 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
     private Button buttonSiguiente;
     
     @FXML
-    private DatePicker pickerDe;
+    private ChoiceBox selectorDiaDe;
     
-    @FXML 
-    private DatePicker pickerHasta;
+    @FXML
+    private ChoiceBox selectorMesDe;
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -165,19 +179,23 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
     
     @FXML
     public void onClickMore(ActionEvent event) throws ParseException {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());   
+        inicio = inicio.plusMonths(1);
+        fin = fin.plusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
+        
         setTableInfo();
     }
     
     @FXML
     public void onClickLess(ActionEvent event) throws ParseException  {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio = inicio.minusMonths(1);
+        fin = fin.minusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
+        
         setTableInfo();
     }
     
@@ -485,20 +503,12 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
        
-        DateTime dateTime = new DateTime(getToday().getTime());
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
+           
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
        
        setTableInfo();
     }
@@ -528,7 +538,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
             
             RolIndividualDAO rolDao = new RolIndividualDAO();
             
-            RolIndividual rolIndividual = rolDao.findByFechaAndEmpleadoIdAndDetalles(inicio, 
+            RolIndividual rolIndividual = rolDao.findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), 
                     user.getId(), Const.ROL_PAGO_INDIVIDUAL);
             
             if (rolIndividual != null) {
@@ -741,6 +751,20 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
             buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     // Login items

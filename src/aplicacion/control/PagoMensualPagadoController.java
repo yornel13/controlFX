@@ -10,6 +10,7 @@ import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
@@ -94,8 +95,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.model.ControlEmpleado;
+import hibernate.dao.ControlDiarioDAO;
+import hibernate.model.ControlDiario;
 import java.util.List;
 
 /**
@@ -311,8 +312,8 @@ public class PagoMensualPagadoController implements Initializable {
     private Double aPercibirValor;
     
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    public Fecha inicio;
+    public Fecha fin;
     
     private Empresa empresa;
     public Usuario empleado;
@@ -377,10 +378,10 @@ public class PagoMensualPagadoController implements Initializable {
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
         datasource.addAll(pagoMesItems);
         
-        List<ControlEmpleado> controlEmpleado = new ControlEmpleadoDAO()
-                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio, fin);
+        List<ControlDiario> controlEmpleado = new ControlDiarioDAO()
+                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio.minusDays(7).getFecha(), fin.getFecha());
                 
-        ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas();
+        ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas(inicio, fin);
         horasSource.addAll(controlEmpleado);
         
         try {
@@ -633,7 +634,7 @@ public class PagoMensualPagadoController implements Initializable {
     }
     
     public void setPago(RolIndividual pago, 
-            Timestamp inicio, Timestamp fin) throws ParseException {
+            Fecha inicio, Fecha fin) throws ParseException {
         this.rolIndividual = pago;
         this.empleado = pago.getUsuario();
         this.empresa = pago.getUsuario().getDetallesEmpleado().getEmpresa();
@@ -647,9 +648,9 @@ public class PagoMensualPagadoController implements Initializable {
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, empleadoId));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), empleadoId));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, empleadoId));
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio.getFecha(), empleadoId));
         
         pagoMesItems = new ArrayList<>();
         deudasAPagar = new ArrayList<>();

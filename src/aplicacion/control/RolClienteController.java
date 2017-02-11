@@ -5,13 +5,12 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolCliente;
-import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
+import static aplicacion.control.util.Fechas.getToday;
 import aplicacion.control.util.Numeros;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.RolClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Empresa;
@@ -71,6 +70,7 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
+import javafx.scene.control.ChoiceBox;
 
 /**
  *
@@ -200,14 +200,26 @@ public class RolClienteController implements Initializable {
     @FXML
     private Button buttonSiguiente;
     
+     @FXML
+    private ChoiceBox selectorDiaDe;
+    
     @FXML
-    private DatePicker pickerDe;
+    private ChoiceBox selectorMesDe;
     
-    @FXML 
-    private DatePicker pickerHasta;
+    @FXML
+    private ChoiceBox selectorAnoDe;
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
     
     @FXML
     private TextField filterField;
@@ -250,20 +262,22 @@ public class RolClienteController implements Initializable {
     
     @FXML
     public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+         inicio = inicio.plusMonths(1);
+        fin = fin.plusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
         setTableInfo(inicio, fin);
         
     }
     
     @FXML
     public void onClickLess(ActionEvent event)  {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio = inicio.minusMonths(1);
+        fin = fin.minusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
         setTableInfo(inicio, fin);
         
     }
@@ -382,37 +396,27 @@ public class RolClienteController implements Initializable {
         this.empresa = empresa;
         this.cliente = cliente;
         
-        DateTime dateTime;
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
+           
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
         
-        dateTime = new DateTime(getToday().getTime());
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
-
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
         setTableInfo(inicio, fin);
     }
     
-    public void setTableInfo(Timestamp inicio, Timestamp fin) {
+    public void setTableInfo(Fecha inicio, Fecha fin) {
         this.inicio = inicio;
         this.fin = fin;
         
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         if (cliente != null)
-            pagos.addAll(pagoDAO.findAllByFechaAndClienteIdAndEmpresaId(inicio, 
+            pagos.addAll(pagoDAO.findAllByFechaAndClienteIdAndEmpresaId(inicio.getFecha(), 
                     cliente.getId(), empresa.getId())); 
         else
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpresaIdSinCliente(inicio, 
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpresaIdSinCliente(inicio.getFecha(), 
                     empresa.getId())); 
         
         sueldoTotalTextValor = 0d;
@@ -693,9 +697,6 @@ public class RolClienteController implements Initializable {
             return row ;
         });
         
-        pickerDe.setEditable(false);
-        pickerHasta.setEditable(false);
-        
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {
             buttonAtras.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/atras.png'); "
@@ -745,6 +746,20 @@ public class RolClienteController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     // Login items

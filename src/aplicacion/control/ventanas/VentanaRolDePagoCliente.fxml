@@ -245,7 +245,7 @@
       <TableView fx:id="empleadosTableView" layoutX="10.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="240.0" prefWidth="592.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="fechaColumna" prefWidth="75.0" text="Fecha" />
-          <TableColumn fx:id="diaColumna" prefWidth="75.0" text="Dia" />
+          <TableColumn fx:id="diaColumna" prefWidth="75.0" text="Mes" />
             <TableColumn fx:id="clienteColumna" prefWidth="160.0" text="Cliente" />
             <TableColumn fx:id="normalesColumna" prefWidth="40.0" text="Nr" />
             <TableColumn fx:id="sobreTiempoColumna" prefWidth="40.0" text="ST" />
@@ -254,15 +254,13 @@
             <TableColumn fx:id="marcarColumna" prefWidth="30.0" style="-fx-alignment: center;" text="*" />
         </columns>
       </TableView>
-      <Accordion layoutX="40.0" layoutY="25.0" />
-      <DatePicker fx:id="pickerHasta" layoutX="265.0" layoutY="16.0" promptText="fin" />
-      <DatePicker fx:id="pickerDe" layoutX="35.0" layoutY="16.0" promptText="inicio" />
+      <Accordion layoutX="40.0" layoutY="26.0" />
       <Label layoutX="10.0" layoutY="21.0" text="De" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="219.0" layoutY="21.0" text="Hasta" textFill="#fffbfb">
+      <Label layoutX="219.0" layoutY="22.0" text="Hasta" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
          </font>
@@ -293,7 +291,7 @@
             </Label>
          </children>
       </GridPane>
-      <Button fx:id="buttonAnterior" layoutX="183.0" layoutY="13.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+      <Button fx:id="buttonAnterior" layoutX="183.0" layoutY="14.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -319,5 +317,11 @@
       <Button fx:id="leyenda3" layoutX="155.0" layoutY="545.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: #ffffff; -fx-border-color: #000000;" />
       <Button fx:id="leyenda2" layoutX="125.0" layoutY="545.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: #dddddd7; -fx-border-color: #000000;" />
       <Button fx:id="leyenda1" layoutX="95.0" layoutY="545.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="15.0" prefWidth="15.0" style="-fx-background-color: lightcoral; -fx-border-color: #000000;" />
+      <ChoiceBox fx:id="selectorAnoHa" layoutX="349.0" layoutY="18.0" prefHeight="25.0" prefWidth="60.0" />
+      <ChoiceBox fx:id="selectorMesHa" layoutX="309.0" layoutY="18.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorDiaHa" layoutX="269.0" layoutY="18.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorDiaDe" layoutX="37.0" layoutY="18.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorMesDe" layoutX="77.0" layoutY="18.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorAnoDe" layoutX="117.0" layoutY="18.0" prefHeight="25.0" prefWidth="60.0" />
     </children>
 </AnchorPane>

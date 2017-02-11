@@ -10,6 +10,7 @@ import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -94,8 +95,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.model.ControlEmpleado;
+import hibernate.dao.ControlDiarioDAO;
+import hibernate.model.ControlDiario;
 import java.util.List;
 
 /**
@@ -311,8 +312,8 @@ public class PagoMensualDetallesController implements Initializable {
     private Double aPercibirValor;
     
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    public Fecha inicio;
+    public Fecha fin;
     
     private Empresa empresa;
     public Usuario empleado;
@@ -416,10 +417,10 @@ public class PagoMensualDetallesController implements Initializable {
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
         datasource.addAll(pagoMesItems);
         
-        List<ControlEmpleado> controlEmpleado = new ControlEmpleadoDAO()
-                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio, fin);
+        List<ControlDiario> controlEmpleado = new ControlDiarioDAO()
+                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio.minusDays(7).getFecha(), fin.getFecha());
                 
-        ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas();
+        ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas(inicio, fin);
         horasSource.addAll(controlEmpleado);
         
         try {
@@ -494,8 +495,8 @@ public class PagoMensualDetallesController implements Initializable {
         
         PagoMes pagoMes = new PagoMes();
         pagoMes.setFecha(new Timestamp(new Date().getTime()));
-        pagoMes.setInicioMes(inicio);
-        pagoMes.setFinMes(fin);
+        pagoMes.setInicioMes(inicio.getFecha());
+        pagoMes.setFinMes(fin.getFecha());
         pagoMes.setMonto(round(aPercibirValor));
         pagoMes.setUsuario(empleado);
         pagoMes.setRolIndividual(pagoRol);
@@ -625,7 +626,7 @@ public class PagoMensualDetallesController implements Initializable {
         
         if (empleado != null) {
 
-            if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
+            if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) == null) {
 
                 Stage dialogStage = new Stage();
                 dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -704,7 +705,7 @@ public class PagoMensualDetallesController implements Initializable {
     }
     
     public void setEmpleado(Usuario empleado, 
-            Timestamp inicio, Timestamp fin) throws ParseException {
+            Fecha inicio, Fecha fin) throws ParseException {
         this.empleado = empleado;
         this.empresa = empleado.getDetallesEmpleado().getEmpresa();
         this.inicio = inicio;
@@ -713,20 +714,20 @@ public class PagoMensualDetallesController implements Initializable {
         setTableInfo(inicio, fin, this.empleado.getId());
     }
     
-    public void setInfoEditada(Timestamp inicio, Timestamp fin, Integer empleadoId) {
+    public void setInfoEditada(Fecha inicio, Fecha fin, Integer empleadoId) {
         pagoMensualController.empleadoEditado(empleado);
         setTableInfo(inicio, fin, empleadoId);
     }
     
-    public void setTableInfo(Timestamp inicio, Timestamp fin, Integer empleadoId) {
+    public void setTableInfo(Fecha inicio, Fecha fin, Integer empleadoId) {
         this.inicio = inicio;
         this.fin = fin;
         RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, empleadoId));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), empleadoId));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, empleadoId));
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio.getFecha(), empleadoId));
         
         pagoMesItems = new ArrayList<>();
         deudasAPagar = new ArrayList<>();
@@ -880,7 +881,7 @@ public class PagoMensualDetallesController implements Initializable {
                 pagoMesItems.add(rol);
             }
         }
-        ieesValor = (ingresoValor/100d) * getIess();  // TODO, sacar de data base
+        ieesValor = ((sueldoTotalTextValor + extraTextValor + bonosTextValor)/100d) * getIess();  // TODO, sacar de data base
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion(iessPorcentaje.getText());
@@ -888,7 +889,7 @@ public class PagoMensualDetallesController implements Initializable {
             rol.setClave(Const.IP_IESS);
             pagoMesItems.add(rol);
         }
-        PagoQuincena pagoQuincena = new PagoQuincenaDAO().findInDeterminateTimeByUsuarioId(inicio, empleado.getId());
+        PagoQuincena pagoQuincena = new PagoQuincenaDAO().findInDeterminateTimeByUsuarioId(inicio.getFecha(), empleado.getId());
         if (pagoQuincena != null) {
             quincenaValor = pagoQuincena.getMonto();
             {
@@ -914,8 +915,8 @@ public class PagoMensualDetallesController implements Initializable {
             pagoRol = new RolIndividual();
             pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
             pagoRol.setFecha(new Timestamp(new Date().getTime()));
-            pagoRol.setInicio(inicio);
-            pagoRol.setFinalizo(fin);
+            pagoRol.setInicio(inicio.getFecha());
+            pagoRol.setFinalizo(fin.getFecha());
             pagoRol.setDias(diasTextValor);
             pagoRol.setHorasNormales(normalesTextValor);
             pagoRol.setHorasSuplementarias(suplementariasTextValor);  // RC
@@ -947,7 +948,7 @@ public class PagoMensualDetallesController implements Initializable {
                 pagoRol.setDecimosPagado(Boolean.TRUE);
         }
         
-        if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
+        if (new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), empleado.getId(), Const.ROL_PAGO_INDIVIDUAL) != null) {
             textError.setTextFill(Color.YELLOW);
             textError.setText("Ya se creo el rol de pago individual de este mes");
         } else {

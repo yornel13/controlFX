@@ -5,12 +5,12 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteHorasTrabajadas;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.AbonoDeudaDAO;
@@ -63,7 +63,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -91,23 +90,22 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import hibernate.dao.ControlEmpleadoDAO;
-import hibernate.model.ControlEmpleado;
+import hibernate.dao.ControlDiarioDAO;
+import hibernate.model.ControlDiario;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Platform;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
-import org.hibernate.sql.Update;
 
 /**
  *
@@ -165,13 +163,25 @@ public class PagoMensualController implements Initializable {
     private Button buttonSiguiente;
     
     @FXML
-    private DatePicker pickerDe;
+    private ChoiceBox selectorDiaDe;
     
-    @FXML 
-    private DatePicker pickerHasta;
+    @FXML
+    private ChoiceBox selectorMesDe;
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -209,10 +219,11 @@ public class PagoMensualController implements Initializable {
     
     @FXML
     public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        inicio = inicio.plusMonths(1);
+        fin = fin.plusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);   
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Runnable worker = new PagoMensualController.DataBaseThread(99);
@@ -224,10 +235,11 @@ public class PagoMensualController implements Initializable {
     
     @FXML
     public void onClickLess(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio = inicio.minusMonths(1);
+        fin = fin.minusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Runnable worker = new PagoMensualController.DataBaseThread(99);
@@ -398,20 +410,13 @@ public class PagoMensualController implements Initializable {
     
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
-        DateTime dateTime = new DateTime(getToday().getTime());
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
+        
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
+           
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
         Runnable worker = new PagoMensualController.DataBaseThread(88);
@@ -428,7 +433,7 @@ public class PagoMensualController implements Initializable {
         
         pagosQuincena = new ArrayList<>();
         pagosQuincena.addAll(new PagoQuincenaDAO()
-                .findAllInDeterminateTime(inicio));
+                .findAllInDeterminateTime(inicio.getFecha()));
         usuarios = new ArrayList<>();
         usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivo(empresa.getId()));
         data = FXCollections.observableArrayList(); 
@@ -499,10 +504,10 @@ public class PagoMensualController implements Initializable {
         ArrayList<RolCliente> pagos = new ArrayList<>();
         ArrayList<PagoMesItem> pagoMesItems = new ArrayList<>();
         ArrayList<Deuda> deudasAPagar = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, 
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), 
                 empleadoTable.getId()));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, 
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio.getFecha(), 
                     empleadoTable.getId()));
         if (pagos.isEmpty()) 
             empleadoTable.setSinRoles(Boolean.TRUE);
@@ -605,7 +610,7 @@ public class PagoMensualController implements Initializable {
                 pagoMesItems.add(rol);
             }
         }
-        ieesValor = (ingresoValor/100d) * getIess(); 
+        ieesValor = ((sueldoTotalTextValor + extraTextValor + bonosTextValor)/100d) * getIess(); 
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion(iessText);
@@ -631,15 +636,15 @@ public class PagoMensualController implements Initializable {
         aPercibirValor = ingresoValor - deduccionesValor;
         
         RolIndividual pagoRol;
-        pagoRol = new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio, 
+        pagoRol = new RolIndividualDAO().findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), 
                 empleado.getId(), Const.ROL_PAGO_INDIVIDUAL);
         
         if (pagoRol == null) {
             pagoRol = new RolIndividual();
             pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
             pagoRol.setFecha(new Timestamp(new Date().getTime()));
-            pagoRol.setInicio(inicio);
-            pagoRol.setFinalizo(fin);
+            pagoRol.setInicio(inicio.getFecha());
+            pagoRol.setFinalizo(fin.getFecha());
             pagoRol.setDias(diasTextValor);
             pagoRol.setHorasNormales(normalesTextValor);
             pagoRol.setHorasSuplementarias(suplementariasTextValor);  // RC
@@ -677,7 +682,7 @@ public class PagoMensualController implements Initializable {
            empleadoTable.setPagado("Si");
            empleadoTable.setPagar(false);
            PagoMes pagoMes = new PagoMesDAO()
-                   .findInDeterminateTimeByUsuarioId(inicio, empleado.getId());
+                   .findInDeterminateTimeByUsuarioId(inicio.getFecha(), empleado.getId());
            aPercibirValor = pagoMes.getMonto();
         }
         
@@ -787,7 +792,8 @@ public class PagoMensualController implements Initializable {
             controller.setStagePrincipal(ventana);
             controller.setProgramaPrincipal(aplicacionControl);
             controller.setPagoMensualController(this);
-            controller.setPago(rolIndividual, rolIndividual.getInicio(), rolIndividual.getFinalizo());
+            controller.setPago(rolIndividual, new Fecha(rolIndividual.getInicio()), 
+                    new Fecha(rolIndividual.getFinalizo()));
             ventana.show();
 
         } catch (Exception e) {
@@ -918,6 +924,20 @@ public class PagoMensualController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     public double getIess() {
@@ -1070,8 +1090,8 @@ public class PagoMensualController implements Initializable {
 
                     PagoMes pagoMes = new PagoMes();
                     pagoMes.setFecha(new Timestamp(new Date().getTime()));
-                    pagoMes.setInicioMes(inicio);
-                    pagoMes.setFinMes(fin);
+                    pagoMes.setInicioMes(inicio.getFecha());
+                    pagoMes.setFinMes(fin.getFecha());
                     pagoMes.setMonto(round(empleadoTable.getSueldo()));
                     pagoMes.setUsuario(user);
                     pagoMes.setRolIndividual(empleadoTable.getRolIndividual());
@@ -1144,10 +1164,10 @@ public class PagoMensualController implements Initializable {
                 ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
                 datasource.addAll(empleadoTable.getPagoMesItems());
                 
-                List<ControlEmpleado> controlEmpleado = new ControlEmpleadoDAO()
-                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio, fin);
+                List<ControlDiario> controlEmpleado = new ControlDiarioDAO()
+                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio.minusDays(7).getFecha(), fin.getFecha());
                 
-                ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas();
+                ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas(inicio, fin);
                 horasSource.addAll(controlEmpleado);
 
                 Platform.runLater(new Runnable() {

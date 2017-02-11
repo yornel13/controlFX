@@ -23,7 +23,7 @@ public class Cliente implements java.io.Serializable {
 	private Boolean activo;
 	private Timestamp creacion;
 	private Timestamp ultimaModificacion;
-	private Set controlEmpleados = new HashSet(0);
+        private Set controlDiarios = new HashSet(0);
         private Set rolClientes = new HashSet(0);
         private Set seguros = new HashSet(0);
         private Set uniformes = new HashSet(0);
@@ -47,22 +47,6 @@ public class Cliente implements java.io.Serializable {
 		this.activo = activo;
 		this.creacion = creacion;
 		this.ultimaModificacion = ultimaModificacion;
-	}
-
-	/** full constructor */
-	public Cliente(String nombre, String detalles, String ruc,
-			String direccion, String telefono, Boolean activo,
-			Timestamp creacion, Timestamp ultimaModificacion,
-			Set controlEmpleados) {
-		this.nombre = nombre;
-		this.detalles = detalles;
-		this.ruc = ruc;
-		this.direccion = direccion;
-		this.telefono = telefono;
-		this.activo = activo;
-		this.creacion = creacion;
-		this.ultimaModificacion = ultimaModificacion;
-		this.controlEmpleados = controlEmpleados;
 	}
 
 	// Property accessors
@@ -139,14 +123,6 @@ public class Cliente implements java.io.Serializable {
 		this.ultimaModificacion = ultimaModificacion;
 	}
 
-	public Set getControlEmpleados() {
-		return this.controlEmpleados;
-	}
-
-	public void setControlEmpleados(Set controlEmpleados) {
-		this.controlEmpleados = controlEmpleados;
-	}
-
         public Set getRolClientes() {
             return rolClientes;
         }
@@ -178,6 +154,14 @@ public class Cliente implements java.io.Serializable {
     public void setBonos(Set bonos) {
         this.bonos = bonos;
     }
+
+    public Set getControlDiarios() {
+        return controlDiarios;
+    }
+
+    public void setControlDiarios(Set controlDiarios) {
+        this.controlDiarios = controlDiarios;
+    }
         
-        
+     
 }

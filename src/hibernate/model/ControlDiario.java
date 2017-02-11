@@ -2,21 +2,20 @@ package hibernate.model;
 
 // default package
 
-import java.sql.Date;
 import java.sql.Time;
 
 /**
  * ControlEmpleado entity. @author MyEclipse Persistence Tools
  */
 
-public class ControlEmpleado implements java.io.Serializable {
+public class ControlDiario implements java.io.Serializable {
 
 	// Fields
 
-	private Integer id;
+	private Long id;
 	private Usuario usuario;
 	private Cliente cliente;
-	private Date fecha;
+	private String fecha;
 	private Double normales;
         private Double recargo;
 	private Double sobretiempo;
@@ -35,29 +34,16 @@ public class ControlEmpleado implements java.io.Serializable {
 	// Constructors
 
 	/** default constructor */
-	public ControlEmpleado() {
-	}
-
-	/** minimal constructor */
-	public ControlEmpleado(Usuario usuario, Date fecha) {
-		this.usuario = usuario;
-		this.fecha = fecha;
-	}
-
-	/** full constructor */
-	public ControlEmpleado(Usuario usuario, Cliente cliente, Date fecha) {
-		this.usuario = usuario;
-		this.cliente = cliente;
-		this.fecha = fecha;
+	public ControlDiario() {
 	}
 
 	// Property accessors
 
-	public Integer getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -77,11 +63,11 @@ public class ControlEmpleado implements java.io.Serializable {
 		this.cliente = cliente;
 	}
 
-	public Date getFecha() {
+	public String getFecha() {
 		return this.fecha;
 	}
 
-	public void setFecha(Date fecha) {
+	public void setFecha(String fecha) {
 		this.fecha = fecha;
 	}
 
@@ -142,9 +128,9 @@ public class ControlEmpleado implements java.io.Serializable {
         }
 
         @Override
-        public ControlEmpleado clone() {
+        public ControlDiario clone() {
 
-            ControlEmpleado newControl = new ControlEmpleado();
+            ControlDiario newControl = new ControlDiario();
             newControl.setId(id);
             newControl.setUsuario(usuario);
             newControl.setCliente(cliente);

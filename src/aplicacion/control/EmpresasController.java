@@ -10,6 +10,7 @@ import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.EmpresaDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.Cliente;
 import hibernate.model.Empresa;
 import java.net.URL;
 import java.util.ArrayList;
@@ -30,8 +31,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -59,8 +62,32 @@ public class EmpresasController implements Initializable {
     @FXML
     private Button homeButton;
     
+     @FXML
+    private TableColumn numeracionColumna;
+    
+    @FXML
+    private TableColumn siglasColumna;
+    
+    @FXML
+    private TableColumn nombreColumna;
+    
+    @FXML
+    private TableColumn tipoColumna;
+    
+    @FXML
+    private TableColumn creadoColumna;
+    
+    @FXML
+    private TableColumn<EmpresaTable, EmpresaTable> borrarColumna;
+    
     @FXML
     private TableView empresasTableView;
+    
+    @FXML
+    private Button buttonAgregar;
+    
+    @FXML
+    private Button buttonAtras;
     
     private ObservableList<EmpresaTable> data;
     
@@ -75,7 +102,7 @@ public class EmpresasController implements Initializable {
     }
     
     @FXML
-    private void goHome(ActionEvent event) {
+    private void returnConfiguracion(ActionEvent event) {
         aplicacionControl.mostrarConfiguracion();
         stagePrincipal.close();
     }
@@ -84,12 +111,6 @@ public class EmpresasController implements Initializable {
     private void agregarEmpresa(ActionEvent event) {
         aplicacionControl.mostrarRegistrarEmpresa();
     }
-    
-    @FXML
-    private void returnEmpresa(ActionEvent event) {
-        aplicacionControl.mostrarConfiguracion();
-        stagePrincipal.close();
-    } 
     
     public void deleteEmpresa(EmpresaTable empresaTable) {
         if (aplicacionControl.permisos == null) {
@@ -158,7 +179,6 @@ public class EmpresasController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
         empresasTableView.setEditable(Boolean.FALSE);
-        empresasTableView.getColumns().clear(); 
         
         EmpresaDAO empresaDAO = new EmpresaDAO();
         empresas = new ArrayList<>();
@@ -184,34 +204,18 @@ public class EmpresasController implements Initializable {
            empresasTableView.setItems(data);
         }
         
-        TableColumn numeracion = new TableColumn("Numeracion");
-        numeracion.setMinWidth(100);
-        numeracion.setCellValueFactory(new PropertyValueFactory<>("numeracion"));
+        numeracionColumna.setCellValueFactory(new PropertyValueFactory<>("numeracion"));
         
-        TableColumn siglas = new TableColumn("Siglas");
-        siglas.setMinWidth(100);
-        siglas.setCellValueFactory(new PropertyValueFactory<>("siglas"));
+        siglasColumna.setCellValueFactory(new PropertyValueFactory<>("siglas"));
         
-        TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(200);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-     
-        TableColumn diaCortePago = new TableColumn("Dia de corte");
-        diaCortePago.setMinWidth(100);
-        diaCortePago.setCellValueFactory(new PropertyValueFactory<>("diaCortePago"));
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
-        TableColumn tipo = new TableColumn("Tipo");
-        tipo.setMinWidth(100);
-        tipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
+        tipoColumna.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         
-        TableColumn fecha = new TableColumn("Creada");
-        fecha.setMinWidth(120);
-        fecha.setCellValueFactory(new PropertyValueFactory<>("creacion"));
+        creadoColumna.setCellValueFactory(new PropertyValueFactory<>("creacion"));
         
-        TableColumn<EmpresaTable, EmpresaTable> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(40);
-        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        delete.setCellFactory(param -> new TableCell<EmpresaTable, EmpresaTable>() {
+        borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        borrarColumna.setCellFactory(param -> new TableCell<EmpresaTable, EmpresaTable>() {
             private final Button deleteButton = new Button("Borrar");
 
             @Override
@@ -230,8 +234,6 @@ public class EmpresasController implements Initializable {
             }
         });
         
-        empresasTableView.getColumns().addAll(numeracion, siglas, nombre, diaCortePago, tipo, fecha, delete);
-        
         empresasTableView.setRowFactory( (Object tv) -> {
             TableRow<EmpresaTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -241,6 +243,38 @@ public class EmpresasController implements Initializable {
                 }
             });
             return row ;
+        });
+        
+         buttonAgregar.setTooltip(
+            new Tooltip("Agregar nuevo cliente")
+        );
+        buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAgregar.setOnMouseExited((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
         });
     }   
     

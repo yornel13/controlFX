@@ -9,7 +9,7 @@ import aplicacion.control.util.Permisos;
 import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
-import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.ControlDiarioDAO;
 import hibernate.model.Cliente;
 import java.net.URL;
 import java.util.ArrayList;
@@ -124,7 +124,7 @@ public class ClientesController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.CLIENTES, Permisos.Nivel.ELIMINAR)) {
                 
-                if (new ControlEmpleadoDAO().findAllByClienteId(cliente.getId()).isEmpty()) { 
+                if (new ControlDiarioDAO().findAllByClienteId(cliente.getId()).isEmpty()) { 
                     
                     Stage dialogStage = new Stage();
                     dialogStage.initModality(Modality.APPLICATION_MODAL);

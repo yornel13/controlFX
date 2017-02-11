@@ -106,7 +106,29 @@ public class PagoQuincenaDAO extends BaseHibernateDAO {
                 return (List<PagoQuincena>) result;
 	}
         
+        public List<PagoQuincena> findAllInDeterminateTime(String fecha) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_quincena "
+                            + "WHERE inicio_mes = :fecha")
+                    .addEntity(PagoQuincena.class)
+                    .setParameter("fecha", fecha);
+                Object result = query.list();
+                return (List<PagoQuincena>) result;
+	}
+        
         public PagoQuincena findInDeterminateTimeByUsuarioId(Timestamp fecha, Integer usuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_quincena "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and inicio_mes = :fecha")
+                    .addEntity(PagoQuincena.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("fecha", fecha);
+                Object result = query.uniqueResult();
+                return (PagoQuincena) result;
+	}
+        
+        public PagoQuincena findInDeterminateTimeByUsuarioId(String fecha, Integer usuarioId) {
 		Query query = getSession().
                     createSQLQuery("SELECT * FROM pago_quincena "
                             + "WHERE usuario_id = :usuario_id "

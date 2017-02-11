@@ -9,7 +9,7 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.FotoDAO;
 import hibernate.dao.PagoQuincenaDAO;
@@ -213,7 +213,7 @@ public class EmpleadosController implements Initializable {
                             .findAllByEmpleadoId(empleadoTable.getId()).isEmpty()) {
                         borrar = false;
                     }
-                    if (!new ControlEmpleadoDAO()  // Si no tiene horas trabajadas
+                    if (!new ControlDiarioDAO()  // Si no tiene horas trabajadas
                             .findAllByEmpleadoId(empleadoTable.getId()).isEmpty()) {
                         borrar = false;
                     }

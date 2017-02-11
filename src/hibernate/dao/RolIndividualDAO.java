@@ -5,7 +5,6 @@ package hibernate.dao;
 import hibernate.model.RolIndividual;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -102,7 +101,7 @@ public class RolIndividualDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public RolIndividual findByFechaAndEmpleadoIdAndDetalles(Timestamp fecha, Integer empleadoId, String detalles) {
+        public RolIndividual findByFechaAndEmpleadoIdAndDetalles(String fecha, Integer empleadoId, String detalles) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_individual "
                             + "where inicio = :fecha "
@@ -116,7 +115,7 @@ public class RolIndividualDAO extends BaseHibernateDAO {
             return (RolIndividual) result;
         }
         
-        public List<RolIndividual> findAllByFechaAndEmpresaId(Timestamp fecha, Integer empresaId) {
+        public List<RolIndividual> findAllByFechaAndEmpresaId(String fecha, Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_individual "
                             + "JOIN usuario "
@@ -143,8 +142,8 @@ public class RolIndividualDAO extends BaseHibernateDAO {
             return (List<RolIndividual>) result;
         }
         
-        public List<RolIndividual> findAllByRangoFechaAndEmpleadoId(Timestamp fechaInicio, 
-                Timestamp fechaFin, Integer empleadoId) {
+        public List<RolIndividual> findAllByRangoFechaAndEmpleadoId(String fechaInicio, 
+                String fechaFin, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_individual "
                             + "where inicio >= :fecha_inicio "
@@ -158,7 +157,7 @@ public class RolIndividualDAO extends BaseHibernateDAO {
             return (List<RolIndividual>) result;
         }
         
-        public List<RolIndividual> findAllByEntreFechaAndEmpresaId(Timestamp fecha, 
+        public List<RolIndividual> findAllByEntreFechaAndEmpresaId(String fecha, 
                 Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_individual "

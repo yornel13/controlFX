@@ -7,13 +7,14 @@ package aplicacion.control;
 
 import aplicacion.control.util.Const;
 import aplicacion.control.util.DiasSpinner;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.model.Cliente;
-import hibernate.model.ControlEmpleado;
+import hibernate.model.ControlDiario;
 import hibernate.model.Empresa;
 import hibernate.model.Horario;
 import hibernate.model.RolCliente;
@@ -21,7 +22,6 @@ import hibernate.model.Usuario;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -78,7 +78,7 @@ public class HorarioEmpleadoController implements Initializable {
     
     private ArrayList<Usuario> empleados;
     
-    private ArrayList<ControlEmpleado> controls;
+    private ArrayList<ControlDiario> controls;
     
     private Empresa empresa;
     
@@ -160,7 +160,7 @@ public class HorarioEmpleadoController implements Initializable {
     
     DiasSpinner spinnder;
     
-    ControlEmpleado controlEmpleadoToReturn;
+    ControlDiario controlEmpleadoToReturn;
     
     Stage stage;
     
@@ -170,10 +170,10 @@ public class HorarioEmpleadoController implements Initializable {
     Time entrada = new Time(6, 0, 0);
     Time salida = new Time(14, 0, 0);
     
-    private List<ControlEmpleado> ultimosRegistros;
+    private List<ControlDiario> ultimosRegistros;
     private HorasEmpleadosPorDiaController horasEmpleadosPorDiaController;
-    private ControlEmpleado controlEmpleado;
-    private Timestamp fecha;
+    private ControlDiario controlEmpleado;
+    private Fecha fecha;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -517,8 +517,8 @@ public class HorarioEmpleadoController implements Initializable {
         clienteButton.setText(cliente.getNombre());
     }
     
-    public void setEmpleado(Usuario empleado, ControlEmpleado controlEmpleado, 
-            Timestamp fecha, Boolean editable) {
+    public void setEmpleado(Usuario empleado, ControlDiario controlEmpleado, 
+            Fecha fecha, Boolean editable) {
         multiple = false;
         this.empresa = empleado.getDetallesEmpleado().getEmpresa();
         this.empleado = empleado;
@@ -563,17 +563,12 @@ public class HorarioEmpleadoController implements Initializable {
             }
         }
         
-        DateTime dateTime = new DateTime(fecha);
-        String dia = dateTime.toCalendar(Locale.getDefault())
-                            .getDisplayName(Calendar
-                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
-        String output = dia.substring(0, 1).toUpperCase() + dia.substring(1);
-        fechaLabel.setText(output + " " + Fechas.getFechaConMes(fecha));
+        fechaLabel.setText(Fechas.getFechaConMes(fecha));
         
         verificarDia();
     }
     
-    public void setEmpleados(ArrayList<Usuario> empleados, ArrayList<ControlEmpleado> controls, Timestamp fecha) {
+    public void setEmpleados(ArrayList<Usuario> empleados, ArrayList<ControlDiario> controls, Fecha fecha) {
         editable = true;
         multiple = true;
         empresa = empleados.get(0).getDetallesEmpleado().getEmpresa();
@@ -582,12 +577,8 @@ public class HorarioEmpleadoController implements Initializable {
         this.empleados.addAll(empleados);
         this.controls.addAll(controls);
         this.fecha = fecha;
-        DateTime dateTime = new DateTime(fecha);
-        String dia = dateTime.toCalendar(Locale.getDefault())
-                            .getDisplayName(Calendar
-                                    .DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
-        String output = dia.substring(0, 1).toUpperCase() + dia.substring(1);
-        fechaLabel.setText(output + " " + Fechas.getFechaConMes(fecha));
+        
+        fechaLabel.setText(Fechas.getFechaConMes(fecha));
     }
   
     @Override
@@ -797,8 +788,8 @@ public class HorarioEmpleadoController implements Initializable {
                 if (spinnder.getDias() == 1) {
                     
                     for (Usuario usuario: empleados) {
-                        ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                        controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
+                        ControlDiario controlEmpleadoNew = new ControlDiario();
+                        controlEmpleadoNew.setFecha(fecha.getFecha());
                         if (marcarTrabajo.isSelected()) {
                             controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                             controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -842,7 +833,7 @@ public class HorarioEmpleadoController implements Initializable {
                         controlEmpleadoNew.setCliente(cliente);
                         System.out.println("guardando control de: " 
                                 + controlEmpleadoNew.getUsuario().getApellido());
-                        new ControlEmpleadoDAO().save(controlEmpleadoNew);
+                        new ControlDiarioDAO().save(controlEmpleadoNew);
                         
                         // Registro para auditar
                         String detalles = "registro un horario para el empleado " 
@@ -852,10 +843,10 @@ public class HorarioEmpleadoController implements Initializable {
                                 .saveAgrego(detalles, horasEmpleadosPorDiaController
                                         .aplicacionControl.permisos.getUsuario());
                     }
-                    for (ControlEmpleado controlDelete: controls) {
+                    for (ControlDiario controlDelete: controls) {
                         System.out.println("Borrando control de: " 
                                 + controlDelete.getUsuario().getApellido());
-                        new ControlEmpleadoDAO().delete(controlDelete);
+                        new ControlDiarioDAO().delete(controlDelete);
                     }
                     HibernateSessionFactory.getSession().flush();
                     Platform.runLater(new Runnable() {
@@ -868,12 +859,11 @@ public class HorarioEmpleadoController implements Initializable {
                     Boolean cancelar = false;
                     ArrayList<Usuario> usuariosConRol = new ArrayList<>();
                     for (int i=0; i < (spinnder.getDias() - 1); i++) {
-                        Timestamp fechaAConsultar = new Timestamp((new DateTime(fecha
-                                .getTime()).plusDays(i+1)).getMillis());
+                        Fecha fechaAConsultar = fecha.plusDays(i+1);
                         RolClienteDAO rolClienteDAO = new RolClienteDAO();
                         
                         List<RolCliente> rolClientes;
-                        rolClientes = rolClienteDAO.findAllByEntreFechaAndEmpresaId(fechaAConsultar, empresa.getId());
+                        rolClientes = rolClienteDAO.findAllByEntreFechaAndEmpresaId(fechaAConsultar.getFecha(), empresa.getId());
                         if (!rolClientes.isEmpty()) {
                             for (RolCliente rol: rolClientes) {
                                 for (Usuario usuario: empleados) {
@@ -893,19 +883,19 @@ public class HorarioEmpleadoController implements Initializable {
                             }
                         });
                     } else {
-                        ArrayList<ControlEmpleado> controlsEncontrados = new ArrayList<>();
-                        DateTime fechaLimite = new DateTime(fecha.getTime());
-                        Timestamp fechaFin = new Timestamp(fechaLimite
-                                .plusDays((spinnder.getDias() - 1)).getMillis());
+                        ArrayList<ControlDiario> controlsEncontrados = new ArrayList<>();
+                        Fecha fechaLimite = new Fecha(fecha.getFecha());
+                        Fecha fechaFin = new Fecha(fechaLimite
+                                .plusDays((spinnder.getDias() - 1)).getFecha());
                         for (Usuario usuario: empleados) {
-                            controlsEncontrados.addAll(new ControlEmpleadoDAO()
+                            controlsEncontrados.addAll(new ControlDiarioDAO()
                                     .findAllByEmpleadoIdInDeterminateTime(usuario.getId()
-                                            ,fecha , fechaFin));
+                                            ,fecha.getFecha() , fechaFin.getFecha()));
                         }
                         for (int i=0; i<spinnder.getDias(); i++) {
                             for (Usuario usuario: empleados) {
-                                ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                                controlEmpleadoNew.setFecha(new Date((new DateTime(fecha.getTime()).plusDays(i)).getMillis()));
+                                ControlDiario controlEmpleadoNew = new ControlDiario();
+                                controlEmpleadoNew.setFecha(fecha.plusDays(i).getFecha());
                                 if (marcarTrabajo.isSelected()) {
                                     controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                                     controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -947,7 +937,7 @@ public class HorarioEmpleadoController implements Initializable {
                                 controlEmpleadoNew.setMedioDia(medioDia);
                                 controlEmpleadoNew.setUsuario(usuario);
                                 controlEmpleadoNew.setCliente(cliente);
-                                new ControlEmpleadoDAO().save(controlEmpleadoNew);
+                                new ControlDiarioDAO().save(controlEmpleadoNew);
                                 
                                 // Registro para auditar
                                 String detalles = "registro horarios para el empleado " 
@@ -959,8 +949,8 @@ public class HorarioEmpleadoController implements Initializable {
                                                 .aplicacionControl.permisos.getUsuario());
                             }
                         }
-                        for (ControlEmpleado controlEmpleadoDelete: controlsEncontrados) {
-                            new ControlEmpleadoDAO().delete(controlEmpleadoDelete);
+                        for (ControlDiario controlEmpleadoDelete: controlsEncontrados) {
+                            new ControlDiarioDAO().delete(controlEmpleadoDelete);
                         }
                         HibernateSessionFactory.getSession().flush();
                         Platform.runLater(new Runnable() {
@@ -985,8 +975,8 @@ public class HorarioEmpleadoController implements Initializable {
             System.out.println("Empezando guardado simple");
             try {
                 if (spinnder.getDias() == 1) {
-                    ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                    controlEmpleadoNew.setFecha(new Date(fecha.getTime()));
+                    ControlDiario controlEmpleadoNew = new ControlDiario();
+                    controlEmpleadoNew.setFecha(fecha.getFecha());
                     if (marcarTrabajo.isSelected()) {
                         controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                         controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -1028,10 +1018,10 @@ public class HorarioEmpleadoController implements Initializable {
                     controlEmpleadoNew.setMedioDia(medioDia);
                     controlEmpleadoNew.setUsuario(empleado);
                     controlEmpleadoNew.setCliente(cliente);
-                    new ControlEmpleadoDAO().save(controlEmpleadoNew);
+                    new ControlDiarioDAO().save(controlEmpleadoNew);
                     if (controlEmpleado != null && controlEmpleado.getFecha()
                             .equals(controlEmpleadoNew.getFecha())) {
-                        new ControlEmpleadoDAO().delete(controlEmpleado);
+                        new ControlDiarioDAO().delete(controlEmpleado);
                     }
                     HibernateSessionFactory.getSession().flush();
                     controlEmpleadoToReturn = controlEmpleadoNew;
@@ -1052,12 +1042,11 @@ public class HorarioEmpleadoController implements Initializable {
                 } else {
                     Boolean cancelar = false;
                     for (int i=0; i < (spinnder.getDias() - 1); i++) {
-                        Timestamp fechaAConsultar = new Timestamp((new DateTime(fecha
-                                .getTime()).plusDays(i+1)).getMillis());
+                        Fecha fechaAConsultar = new Fecha(fecha.plusDays(i+1).getFecha());
                         RolClienteDAO rolClienteDAO = new RolClienteDAO();
                         
                         List<RolCliente> rolClientes = rolClienteDAO
-                            .findAllByEntreFechaAndEmpresaIdAndEmpleadoId(fechaAConsultar, 
+                            .findAllByEntreFechaAndEmpresaIdAndEmpleadoId(fechaAConsultar.getFecha(), 
                                     empresa.getId(), empleado.getId());
                         if (!rolClientes.isEmpty()) {
                             cancelar = true;
@@ -1071,17 +1060,17 @@ public class HorarioEmpleadoController implements Initializable {
                             }
                         });
                     } else {
-                        controlEmpleadoToReturn = new ControlEmpleado();
-                        DateTime fechaLimite = new DateTime(fecha.getTime());
-                        Timestamp fechaFin = new Timestamp(fechaLimite
-                                .plusDays((spinnder.getDias() - 1)).getMillis());
-                        ArrayList<ControlEmpleado> controlsEncontrados = new ArrayList<>();
-                        controlsEncontrados.addAll(new ControlEmpleadoDAO()
+                        controlEmpleadoToReturn = new ControlDiario();
+                        Fecha fechaLimite = new Fecha(fecha.getFecha());
+                        Fecha fechaFin = new Fecha(fechaLimite
+                                .plusDays((spinnder.getDias() - 1)).getFecha());
+                        ArrayList<ControlDiario> controlsEncontrados = new ArrayList<>();
+                        controlsEncontrados.addAll(new ControlDiarioDAO()
                                 .findAllByEmpleadoIdInDeterminateTime(empleado.getId()
-                                        ,fecha , fechaFin));
+                                        ,fecha.getFecha() , fechaFin.getFecha()));
                         for (int i=0; i<spinnder.getDias(); i++) {
-                            ControlEmpleado controlEmpleadoNew = new ControlEmpleado();
-                            controlEmpleadoNew.setFecha(new Date((new DateTime(fecha.getTime()).plusDays(i)).getMillis()));
+                            ControlDiario controlEmpleadoNew = new ControlDiario();
+                            controlEmpleadoNew.setFecha(fecha.plusDays(i).getFecha());
                             if (marcarTrabajo.isSelected()) {
                                 controlEmpleadoNew.setNormales(Double.valueOf(normales.getText()));
                                 controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
@@ -1123,13 +1112,13 @@ public class HorarioEmpleadoController implements Initializable {
                             controlEmpleadoNew.setMedioDia(medioDia);
                             controlEmpleadoNew.setUsuario(empleado);
                             controlEmpleadoNew.setCliente(cliente);
-                            new ControlEmpleadoDAO().save(controlEmpleadoNew);
+                            new ControlDiarioDAO().save(controlEmpleadoNew);
                             if (i == 0) {
                                 controlEmpleadoToReturn = controlEmpleadoNew;
                             }
                         }
-                        for (ControlEmpleado controlEmpleadoDelete: controlsEncontrados) {
-                            new ControlEmpleadoDAO().delete(controlEmpleadoDelete);
+                        for (ControlDiario controlEmpleadoDelete: controlsEncontrados) {
+                            new ControlDiarioDAO().delete(controlEmpleadoDelete);
                         }
 
                         HibernateSessionFactory.getSession().flush();

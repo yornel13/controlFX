@@ -7,37 +7,32 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ClienteDAO;
-import hibernate.dao.ControlEmpleadoDAO;
+import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.HorarioDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Cliente;
-import hibernate.model.ControlEmpleado;
+import hibernate.model.ControlDiario;
 import hibernate.model.Empresa;
 import hibernate.model.Horario;
 import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -53,8 +48,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -105,12 +100,6 @@ public class AsignarHorariosController implements Initializable {
     private TableView empleadosTableView;
     
     @FXML
-    private DatePicker pickerDe;
-    
-    @FXML 
-    private DatePicker pickerHasta;
-    
-    @FXML
     private TableColumn empleadoColumna;
     
     @FXML
@@ -128,9 +117,27 @@ public class AsignarHorariosController implements Initializable {
     @FXML
     private TableColumn diasColumna;
     
+    @FXML
+    private ChoiceBox selectorDiaDe;
+    
+    @FXML
+    private ChoiceBox selectorMesDe;
+    
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
     private ObservableList<EmpleadoTable> data;
     
-    private ObservableList<ControlEmpleado> dataTurnos;
+    private ObservableList<ControlDiario> dataTurnos;
     
     private Stage ventanaSelectEmpleado;
     
@@ -140,14 +147,14 @@ public class AsignarHorariosController implements Initializable {
     private List<Horario> horarios;
     private List<Cliente> clientes;
     
-    private ControlEmpleado ultimoControl;
-    private Date inicio;
-    private Date fin;
+    private ControlDiario ultimoControl;
+    private Fecha inicio;
+    private Fecha fin;
     
     Stage stage;
     Dialog<Void> dialog;
     
-    private ArrayList<ControlEmpleado> rangoControls;
+    private ArrayList<ControlDiario> rangoControls;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -189,12 +196,14 @@ public class AsignarHorariosController implements Initializable {
     @FXML
     private void onDistribuir(ActionEvent event) {
         if (!canDistribute()) {  // comprueba si se pueden distribuir los turnos
-            return;
+           return;
         }
         
-        final long MILLSECS_PER_DAY = 24 * 60 * 60 * 1000; //Milisegundos al día
-        long diferenciaLong = (fin.getTime() - inicio.getTime())/MILLSECS_PER_DAY; 
-        Integer dias = (int) diferenciaLong; // cantidad que dias que hay en el rango de fechas
+        System.out.println("diferencia en anos "+inicio.yearsDifference(fin));
+        System.out.println("diferencia en meses "+inicio.monthsDifference(fin));
+        System.out.println("diferencia en dias "+inicio.daysDifference(fin));
+        
+        Integer dias = (int) inicio.daysDifference(fin); // cantidad que dias que hay en el rango de fechas
         dias++; // se le suma 1 a la cantidad de dias para que se cuente el dia desde el cual comienza
         
         int count = 0; 
@@ -210,7 +219,7 @@ public class AsignarHorariosController implements Initializable {
         while (dias > 0) {
             
             for (EmpleadoTable empleadoTable: data) {
-                ControlEmpleado control = rangoControls.get(count).clone();
+                ControlDiario control = rangoControls.get(count).clone();
                 control.setUsuario(empleadoTable.getUsuario());
                 empleadoTable.getTurnos().add(control);
             }
@@ -225,8 +234,8 @@ public class AsignarHorariosController implements Initializable {
     public void createArrayControles(Integer diasDelRango) {
         int cantidad = diasDelRango;
         
-        ArrayList<ControlEmpleado> controlesCrear = new ArrayList<>();   // control diarios que salen de turnosTableView (no tienen fecha)
-        for (ControlEmpleado ce: dataTurnos) {
+        ArrayList<ControlDiario> controlesCrear = new ArrayList<>();   // control diarios que salen de turnosTableView (no tienen fecha)
+        for (ControlDiario ce: dataTurnos) {
             Integer dias = Integer.valueOf(ce.getDias());
             while (dias > 0) {
                 controlesCrear.add(ce.clone());
@@ -234,13 +243,13 @@ public class AsignarHorariosController implements Initializable {
             }
         }
                             
-        DateTime fecha = new DateTime(inicio.getTime());
+        Fecha fecha = new Fecha(inicio.getFecha());
         rangoControls = new ArrayList<>();
         int count = 0;
         while (cantidad > 0) {           // se agregan los controles limitados por el rango de fecha
-            for (ControlEmpleado ce: controlesCrear) {    // y se le agrega la fecha correspondiente 
-                ControlEmpleado control = ce.clone();
-                control.setFecha(new Date(fecha.plusDays(count).getMillis()));
+            for (ControlDiario ce: controlesCrear) {    // y se le agrega la fecha correspondiente 
+                ControlDiario control = ce.clone();
+                control.setFecha(fecha.plusDays(count).getFecha());
                 rangoControls.add(control);
                 cantidad--;
                 count++;
@@ -330,10 +339,17 @@ public class AsignarHorariosController implements Initializable {
     }
     
     Boolean canDistribute() {
-        if (pickerDe.getValue() == null || pickerHasta.getValue() == null) {
+        
+        if (selectorDiaDe.getSelectionModel().isEmpty() ||
+                selectorMesDe.getSelectionModel().isEmpty() ||
+                selectorAnoDe.getSelectionModel().isEmpty() ||
+                selectorDiaHa.getSelectionModel().isEmpty() ||
+                selectorMesHa.getSelectionModel().isEmpty() ||
+                selectorAnoHa.getSelectionModel().isEmpty()) {
             errorFechas();
             return false;
         }
+        
         if (dataTurnos.size() < 1) {
             errorTurnos();
             return false;
@@ -342,14 +358,15 @@ public class AsignarHorariosController implements Initializable {
             errorEmpleados();
             return false;
         }
-        inicio = Date.valueOf(pickerDe.getValue());
-        fin = Date.valueOf(pickerHasta.getValue());
+        
+        inicio = new Fecha(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin = new Fecha(selectorAnoHa, selectorMesHa, selectorDiaHa);
         
         if (fin.before(inicio)) {
             errorFechas();
             return false;
         }
-        for (ControlEmpleado control: dataTurnos) {
+        for (ControlDiario control: dataTurnos) {
             String dias = control.getDias();
             try {
                 int diasInt = Integer.valueOf(dias);
@@ -366,13 +383,9 @@ public class AsignarHorariosController implements Initializable {
     }
     
     void addDaysColumns(int count) {
-        DateTime fecha = new DateTime(inicio.getTime());
+        Fecha fecha = new Fecha(inicio.getFecha());
         fecha = fecha.plusDays(count);
-        String day = fecha.toCalendar(Locale.getDefault())
-                    .getDisplayName(Calendar .DAY_OF_WEEK, Calendar.LONG, 
-                            Locale.getDefault());
-        TableColumn columna = new TableColumn(
-                day+" "+fecha.getDayOfMonth()+"/"+fecha.getMonthOfYear());
+        TableColumn columna = new TableColumn(fecha.getMonthNameCort()+" "+fecha.getDiaInt());
         columna.setPrefWidth(120);
         columna.setStyle("-fx-alignment: center;");
         columna.setCellValueFactory(new Callback<TableColumn
@@ -641,20 +654,20 @@ public class AsignarHorariosController implements Initializable {
         });
         
         turnoColumna.setCellValueFactory(new Callback<TableColumn
-                .CellDataFeatures<ControlEmpleado, String>, ObservableValue<String>>() {
+                .CellDataFeatures<ControlDiario, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn
-                    .CellDataFeatures<ControlEmpleado, String> data) {
+                    .CellDataFeatures<ControlDiario, String> data) {
                 
                 return new ReadOnlyStringWrapper(getTextHorario(data.getValue()));
             }
         });
         
         clienteColumna.setCellValueFactory(new Callback<TableColumn
-                .CellDataFeatures<ControlEmpleado, String>, ObservableValue<String>>() {
+                .CellDataFeatures<ControlDiario, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn
-                    .CellDataFeatures<ControlEmpleado, String> data) {
+                    .CellDataFeatures<ControlDiario, String> data) {
                 
                 if(data.getValue().getCliente() == null) 
                     return  null;
@@ -666,9 +679,9 @@ public class AsignarHorariosController implements Initializable {
         diasColumna.setCellValueFactory(new PropertyValueFactory<>("dias"));
         diasColumna.setCellFactory(TextFieldTableCell.forTableColumn());
         diasColumna.setOnEditCommit(
-            new EventHandler<TableColumn.CellEditEvent<ControlEmpleado, String>>() {
+            new EventHandler<TableColumn.CellEditEvent<ControlDiario, String>>() {
                 @Override
-                public void handle(TableColumn.CellEditEvent<ControlEmpleado, String> t) {
+                public void handle(TableColumn.CellEditEvent<ControlDiario, String> t) {
                     Integer newValue;
                     try {
                         newValue = Integer.valueOf(t.getNewValue());
@@ -680,7 +693,7 @@ public class AsignarHorariosController implements Initializable {
                         newValue = Integer.valueOf(t.getOldValue());
                         //dialogoErrorCuotas();
                     }
-                    ControlEmpleado controlEmpleado = ((ControlEmpleado) t.getTableView().getItems()
+                    ControlDiario controlEmpleado = ((ControlDiario) t.getTableView().getItems()
                             .get(t.getTablePosition().getRow()));     
                     
                     controlEmpleado.setDias(newValue.toString());
@@ -688,9 +701,19 @@ public class AsignarHorariosController implements Initializable {
                 }
             }
         );
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorAnoDe.getSelectionModel().select(String.valueOf(new DateTime().getYear()));
+        selectorAnoHa.getSelectionModel().select(String.valueOf(new DateTime().getYear()));
     }
     
-    public String getTextHorario(ControlEmpleado controlEmpleado) {
+    public String getTextHorario(ControlDiario controlEmpleado) {
         
         if (controlEmpleado.getCaso().equals(Const.LIBRE)) {
             return "Libre";
@@ -717,7 +740,7 @@ public class AsignarHorariosController implements Initializable {
         return lapso;
     }
     
-    void selecionarHorario(ControlEmpleado controlEmpleado) throws IOException {
+    void selecionarHorario(ControlDiario controlDiario) throws IOException {
         FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorarioEmpleadoCliente.fxml"));
         AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
         Stage ventana = new Stage();
@@ -732,7 +755,7 @@ public class AsignarHorariosController implements Initializable {
         controller.setStagePrincipal(ventana);
         controller.setAsignarHorarioController(this);
         controller.setStage(ventana);
-        controller.setEmpleado(horarios, clientes, controlEmpleado);
+        controller.setEmpleado(horarios, clientes, controlDiario);
         ventana.show();
     }
     
@@ -761,8 +784,8 @@ public class AsignarHorariosController implements Initializable {
             empleado.setUsuario(user);
             if (rangoControls != null) {
                 empleado.setTurnos(new ArrayList<>());
-                for (ControlEmpleado controlEmpleado: rangoControls) {
-                    ControlEmpleado control = controlEmpleado.clone();
+                for (ControlDiario controlDiario: rangoControls) {
+                    ControlDiario control = controlDiario.clone();
                     control.setUsuario(empleado.getUsuario());
                     empleado.getTurnos().add(control);
                 }
@@ -773,8 +796,8 @@ public class AsignarHorariosController implements Initializable {
         });
     }
 
-    void setHorarioToTurnos(ControlEmpleado controlEmpleado) {
-        dataTurnos.add(controlEmpleado);
+    void setHorarioToTurnos(ControlDiario controlDiario) {
+        dataTurnos.add(controlDiario);
     }
 
     public class DataBaseThread implements Runnable {
@@ -799,13 +822,12 @@ public class AsignarHorariosController implements Initializable {
         private void save() {
             ArrayList<Usuario> usuariosConRol = new ArrayList<>();
             for (int i=0; i < (rangoControls.size()); i++) {
-                Date fechaAConsultar = new Date((new DateTime(inicio
-                        .getTime()).plusDays(i)).getMillis());
+                Fecha fechaAConsultar = inicio.plusDays(i);
                 RolClienteDAO rolClienteDAO = new RolClienteDAO();
                 System.out.println(fechaAConsultar.toString());
                 List<RolCliente> rolClientes;
                 rolClientes = rolClienteDAO.findAllByEntreFechaAndEmpresaId(
-                        fechaAConsultar, empresa.getId());
+                        fechaAConsultar.getFecha(), empresa.getId());
                 if (!rolClientes.isEmpty()) {
                     for (RolCliente rol: rolClientes) {
                         for (EmpleadoTable usuario: data) {
@@ -837,22 +859,21 @@ public class AsignarHorariosController implements Initializable {
                 }); 
             } else {
                 
-                ArrayList<ControlEmpleado> controlsEncontrados = new ArrayList<>();   // turnos que deben borrarse
+                ArrayList<ControlDiario> controlsEncontrados = new ArrayList<>();   // turnos que deben borrarse
                 for (EmpleadoTable usuario: data) {            // buscando registro de turnos ya creados a cada empleados
-                    controlsEncontrados.addAll(new ControlEmpleadoDAO()
-                            .findAllByEmpleadoIdInDeterminateTime(usuario.getId()
-                                    ,inicio , fin));
+                    controlsEncontrados.addAll(new ControlDiarioDAO()
+                            .findAllByEmpleadoIdInDeterminateTime(usuario.getId(), inicio.getFecha() , fin.getFecha()));
                 }
                 System.out.println(controlsEncontrados.size());
                 
                 for (EmpleadoTable usuario: data) {
-                    for (ControlEmpleado control: usuario.getTurnos()) {
-                        new ControlEmpleadoDAO().save(control);         // guardando los turnos
+                    for (ControlDiario control: usuario.getTurnos()) {
+                        new ControlDiarioDAO().save(control);         // guardando los turnos
                     }
                 }
                 
-                for (ControlEmpleado controlEmpleadoDelete: controlsEncontrados) {    // borrando turnos viejos
-                    new ControlEmpleadoDAO().delete(controlEmpleadoDelete);
+                for (ControlDiario controlEmpleadoDelete: controlsEncontrados) {    // borrando turnos viejos
+                    new ControlDiarioDAO().delete(controlEmpleadoDelete);
                 }
                 HibernateSessionFactory.getSession().flush();
                 Platform.runLater(new Runnable() {

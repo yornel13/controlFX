@@ -10,8 +10,8 @@ import aplicacion.control.reports.ReporteDecimosTotalGenerado;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.MaterialDesignButton;
 import hibernate.model.Usuario;
 import java.io.File;
@@ -54,7 +54,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Roboto;
 import hibernate.dao.RolClienteDAO;
 import hibernate.dao.RolIndividualDAO;
@@ -68,18 +67,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import net.sf.jasperreports.engine.JREmptyDataSource;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
 
@@ -141,8 +128,8 @@ public class DecimosGeneradoController implements Initializable {
     private Label estadoD4Text;
     
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    public Fecha inicio;
+    public Fecha fin;
     
     public Usuario usuario;
     
@@ -180,9 +167,9 @@ public class DecimosGeneradoController implements Initializable {
         
         RolClienteDAO pagoDAO = new RolClienteDAO();
         ArrayList<RolCliente> pagos = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio, usuario.getId()));
+        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), usuario.getId()));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio, usuario.getId()));
+            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio.getFecha(), usuario.getId()));
         
         for (RolCliente rolCliente: pagos) {
             dias += rolCliente.getDias();
@@ -625,7 +612,7 @@ public class DecimosGeneradoController implements Initializable {
         dialogLoading.show();
     }
     
-    public void setEmpleado(Usuario empleado, Timestamp inicio, Timestamp fin, 
+    public void setEmpleado(Usuario empleado, Fecha inicio, Fecha fin, 
             EmpleadoTable empleadoTable) {
         this.usuario = empleado;
         this.inicio = inicio;

@@ -91,6 +91,18 @@ public class PagoMesDAO extends BaseHibernateDAO {
                 Object result = query.uniqueResult();
                 return (PagoMes) result;
 	}
+        
+        public PagoMes findInDeterminateTimeByUsuarioId(String fecha, Integer usuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and inicio_mes = :fecha")
+                    .addEntity(PagoMes.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("fecha", fecha);
+                Object result = query.uniqueResult();
+                return (PagoMes) result;
+	}
 
 	public List findByExample(PagoMes instance) {
 		log.debug("finding PagoMes instance by example");

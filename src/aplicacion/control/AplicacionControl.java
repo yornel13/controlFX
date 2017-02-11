@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Auditar;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -15,7 +16,6 @@ import hibernate.model.Identidad;
 import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.IOException;
-import java.sql.Timestamp;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -1482,51 +1482,6 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarHorasEmpleados(Empresa empresa, Stage stage) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
-                try {
-                    stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleados.fxml"));
-                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle("Rol de pago por empleado");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.setWidth(800);
-                    ventana.setHeight(628);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaEmpleados);
-                    ventana.setScene(scene);
-                    HorasEmpleadosController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
-                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
-                    Platform.setImplicitExit(false);
-                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent event) {
-                            cerrarWindows();
-                            event.consume();
-                        }
-                    });
-                    ventana.show();
-                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-              noPermitido();
-           }
-       } 
-    }
-    
     public void mostrarHorasEmpleadosCliente(Empresa empresa, Cliente cliente, Stage stage) {
         if (permisos == null) {
            noLogeado();
@@ -1621,79 +1576,7 @@ public class AplicacionControl extends Application {
        } 
     }
     
-    public void mostrarHorasEmpleadosSinCliente(Empresa empresa) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorasEmpleadosSinCliente.fxml"));
-                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle("Rol de pago");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.setWidth(708);
-                    ventana.setHeight(480);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaEmpleados);
-                    ventana.setScene(scene);
-                    HorasEmpleadosSinClienteController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
-                    ventana.show();
-                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-               noPermitido();
-           }
-       } 
-    }
-    
-    public void mostrarRolDePago(Usuario empleado, Timestamp inicio, Timestamp fin) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-            if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
-                try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePago.fxml"));
-                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getApellido()+ " " + empleado.getNombre());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaRolDePago);
-                    ventana.setScene(scene);
-                    RolDePagoController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpleado(empleado, inicio, fin);
-                    ventana.show();
-                    
-                    // Registro para auditar
-                    String detalles = "ingreso a rol de pago del empleado " 
-                            + empleado.getApellido()+ " " + empleado.getNombre();
-                    au.saveIngreso(detalles, permisos.getUsuario());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-              noPermitido();
-           } 
-       } 
-    }
-    
-    public void mostrarRolDePagoCliente(Usuario empleado, Cliente cliente, Timestamp inicio, Timestamp fin) {
+    public void mostrarRolDePagoCliente(Usuario empleado, Cliente cliente, Fecha inicio, Fecha fin) {
         if (permisos == null) {
            noLogeado();
         } else {
@@ -1719,45 +1602,6 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado, cliente, inicio, fin);
-                    ventana.show();
-                    
-                    // Registro para auditar
-                    String detalles = "ingreso a rol de pago del empleado " 
-                            + empleado.getApellido()+ " " + empleado.getNombre();
-                    au.saveIngreso(detalles, permisos.getUsuario());
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-              noPermitido();
-           }
-       } 
-    }
-    
-    public void mostrarRolDePagoSinCliente(Usuario empleado, Timestamp inicio, Timestamp fin) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.CREAR)) {
-               try {
-                    System.out.println("aplicacion.control.AplicacionControl.mostrarRolDePago()");
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaRolDePagoSinCliente.fxml"));
-                    AnchorPane ventanaRolDePago = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle("Empleado: " + empleado.getApellido()+ " " 
-                            + empleado.getNombre());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaRolDePago);
-                    ventana.setScene(scene);
-                    RolDePagoSinClienteController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpleado(empleado, inicio, fin);
                     ventana.show();
                     
                     // Registro para auditar
@@ -2051,52 +1895,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarTotalPagosEmpleados(Empresa empresa, Stage stage) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-            if (permisos.getPermiso(Permisos.PAGOS, Permisos.Nivel.VER)) {
-                try {
-                    stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPagosTotalEmpleado.fxml"));
-                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle("Pagos Totales");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.setWidth(800);
-                    ventana.setHeight(628);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaAuditar);
-                    ventana.setScene(scene);
-                    PagosTotalEmpleadoController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
-                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
-                    Platform.setImplicitExit(false);
-                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent event) {
-                            cerrarWindows();
-                            event.consume();
-                        }
-                    });
-                    ventana.show();
-                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-              noPermitido();
-            }
-        }
-    }
-    
-    public void mostrarRolCliente(Empresa empresa, Cliente cliente, Stage stage) {
+   public void mostrarRolCliente(Empresa empresa, Cliente cliente, Stage stage) {
         if (permisos == null) {
            noLogeado();
         } else {
@@ -2229,7 +2028,7 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarAignaHorarios(Empresa empresa) {
+    public void mostrarAsignaHorarios(Empresa empresa) {
         if (permisos == null) {
            noLogeado();
         } else {
@@ -2259,51 +2058,6 @@ public class AplicacionControl extends Application {
               noPermitido();
             }
         }
-    }
-    
-    public void mostrarHorarioSemanalEmpleados(Empresa empresa, Stage stage) {
-        if (permisos == null) {
-           noLogeado();
-        } else {
-           if (permisos.getPermiso(Permisos.HORAS, Permisos.Nivel.VER)) {
-                try {
-                    stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHorarioSemanalEmpleados.fxml"));
-                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle("Horario por semanas");
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    ventana.setWidth(800);
-                    ventana.setHeight(628);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaEmpleados);
-                    ventana.setScene(scene);
-                    HorarioSemanalEmpleadosController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(this);
-                    controller.setEmpresa(empresa);
-                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
-                    Platform.setImplicitExit(false);
-                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                        @Override
-                        public void handle(WindowEvent event) {
-                            cerrarWindows();
-                            event.consume();
-                        }
-                    });
-                    ventana.show();
-                    au.saveRegistro(au.INGRESO, au.HORARIOS_EMPLEADOS, permisos.getUsuario(), null);
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-           } else {
-              noPermitido();
-           }
-       } 
     }
     
     public void mostrarPagoQuincenal(Empresa empresa, Stage stage) {

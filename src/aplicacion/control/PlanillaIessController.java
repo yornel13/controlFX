@@ -5,10 +5,10 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
@@ -92,6 +92,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Fechas.getToday;
+import javafx.scene.control.ChoiceBox;
 
 /**
  *
@@ -158,17 +160,29 @@ public class PlanillaIessController implements Initializable {
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     
-    @FXML
-    private DatePicker pickerDe;
-    
-    @FXML 
-    private DatePicker pickerHasta;
-    
     @FXML 
     private Label contador;
     
-    public Timestamp inicio;
-    public Timestamp fin;
+     @FXML
+    private ChoiceBox selectorDiaDe;
+    
+    @FXML
+    private ChoiceBox selectorMesDe;
+    
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
     
     Stage dialogLoading;
     private Constante iess;
@@ -191,19 +205,21 @@ public class PlanillaIessController implements Initializable {
     
     @FXML
     public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        inicio = inicio.plusMonths(1);
+        fin = fin.plusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
         setTableInfo();
     }
     
     @FXML
     public void onClickLess(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio = inicio.minusMonths(1);
+        fin = fin.minusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
         setTableInfo();
     }
     
@@ -602,20 +618,12 @@ public class PlanillaIessController implements Initializable {
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
         
-        DateTime dateTime = new DateTime(getToday().getTime());
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
+           
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
        
         setTableInfo();
     }
@@ -627,11 +635,11 @@ public class PlanillaIessController implements Initializable {
         
         RolIndividualDAO rolIndividualDAO = new RolIndividualDAO();
         rolIndividuals = new ArrayList<>();
-        rolIndividuals.addAll(rolIndividualDAO.findAllByFechaAndEmpresaId(inicio, empresa.getId()));
+        rolIndividuals.addAll(rolIndividualDAO.findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId()));
         
         PlanillaIessDAO planillaIessDAO = new PlanillaIessDAO();
         planillaIesses = new ArrayList<>();
-        planillaIesses.addAll(planillaIessDAO.findAllByFechaAndEmpresaId(inicio, empresa.getId()));
+        planillaIesses.addAll(planillaIessDAO.findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId()));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
@@ -903,6 +911,20 @@ public class PlanillaIessController implements Initializable {
         iess = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.IESS);
         if (iess != null)
             iessColumna.setText(Const.IP_IESS + " (" + iess.getValor() + "%)");
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     public void contarSelecciones() {
@@ -995,8 +1017,8 @@ public class PlanillaIessController implements Initializable {
                 for (EmpleadoTable empleadoTable: empleadosMarcados) {
                     PlanillaIess planillaIess = new PlanillaIess();
                     planillaIess.setFecha(new Timestamp((new DateTime()).getMillis()));
-                    planillaIess.setInicioMes(inicio);
-                    planillaIess.setFinMes(fin);
+                    planillaIess.setInicioMes(inicio.getFecha());
+                    planillaIess.setFinMes(fin.getFecha());
                     planillaIess.setUsuario(empleadoTable.getUsuario());
                     planillaIess.setMonto(round(empleadoTable.getMonto()));
                     new PlanillaIessDAO().save(planillaIess);

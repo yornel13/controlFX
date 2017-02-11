@@ -201,7 +201,7 @@ public class AuditoriaController implements Initializable {
             
             
         } catch (JRException | IOException ex) {
-            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         } finally {
             dialogLoading.close();
         }

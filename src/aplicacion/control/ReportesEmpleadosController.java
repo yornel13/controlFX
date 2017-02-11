@@ -5,11 +5,11 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.DataSourceRolIndividual;
 import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import hibernate.dao.PagoMesItemDAO;
@@ -79,6 +79,7 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import javafx.scene.control.ChoiceBox;
 
 /**
  *
@@ -143,12 +144,6 @@ public class ReportesEmpleadosController implements Initializable {
     private Button buttonAnterior;
     
     @FXML
-    private DatePicker pickerDe;
-    
-    @FXML 
-    private DatePicker pickerHasta;
-    
-    @FXML
     private CheckBox checkBoxPermitir;
     
     @FXML
@@ -157,8 +152,26 @@ public class ReportesEmpleadosController implements Initializable {
     @FXML
     private Label contador;
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    @FXML
+    private ChoiceBox selectorDiaDe;
+    
+    @FXML
+    private ChoiceBox selectorMesDe;
+    
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -183,25 +196,25 @@ public class ReportesEmpleadosController implements Initializable {
     @FXML
     public void onClickMore(ActionEvent event) throws ParseException {
         if (checkBoxPermitir.isSelected()) {
-            pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));
+            fin = fin.plusMonths(1);
         } else {
-            pickerHasta.setValue(pickerHasta.getValue().plusMonths(1));  
-            pickerDe.setValue(pickerHasta.getValue().minusMonths(1).plusDays(1));
+            fin = fin.plusMonths(1);
+            inicio = fin.minusMonths(1).plusDays(1);
         }
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);  
     }
     
     @FXML
     public void onClickLess(ActionEvent event) throws ParseException  {
         if (checkBoxPermitir.isSelected()) {
-            pickerDe.setValue(pickerDe.getValue().minusMonths(1));
+            inicio = inicio.minusMonths(1);
         } else {
-            pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-            pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1)); 
+            inicio = inicio.minusMonths(1);
+            fin = inicio.plusMonths(1).minusDays(1);
         }
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);  
     }
     
     @FXML
@@ -286,7 +299,7 @@ public class ReportesEmpleadosController implements Initializable {
             Double aPercibirValor = 0d;
             
             List<RolIndividual> rolIndividuals = new RolIndividualDAO()
-                    .findAllByRangoFechaAndEmpleadoId(inicio, fin, empleadoTable.getId());
+                    .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleadoTable.getId());
             RolIndividual pagoRol = new RolIndividual();
             
             for (RolIndividual pago: rolIndividuals) {
@@ -318,8 +331,8 @@ public class ReportesEmpleadosController implements Initializable {
             
             pagoRol.setDetalles(Const.ROL_PAGO_INDIVIDUAL);
             pagoRol.setFecha(new Timestamp(new Date().getTime()));
-            pagoRol.setInicio(inicio);
-            pagoRol.setFinalizo(fin);
+            pagoRol.setInicio(inicio.getFecha());
+            pagoRol.setFinalizo(fin.getFecha());
             pagoRol.setDias(diasTextValor);
             pagoRol.setHorasNormales(normalesTextValor);
             pagoRol.setHorasSuplementarias(suplementariasTextValor);  // RC
@@ -466,7 +479,7 @@ public class ReportesEmpleadosController implements Initializable {
             
             for (PagoMesItem pagoMesItem: new PagoMesItemDAO()
                     .findAllByEmpleadoIdAndClaveAndRangoFecha(empleadoTable.getId(), 
-                            Const.IP_IESS, inicio, fin)){
+                            Const.IP_IESS, inicio.getFecha(), fin.getFecha())){
                 total += pagoMesItem.getDeduccion();
             }
             empleadoTable.setTotalIess(total);
@@ -663,20 +676,12 @@ public class ReportesEmpleadosController implements Initializable {
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
         
-        DateTime dateTime = new DateTime(getToday().getTime());
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
+           
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
@@ -831,6 +836,20 @@ public class ReportesEmpleadosController implements Initializable {
         buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
             buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     // Login items

@@ -17,8 +17,8 @@ public class RolCliente implements java.io.Serializable {
 
 	private Integer id;
 	private String detalles;
-	private Timestamp inicio;
-	private Timestamp finalizo;
+	private String inicio;
+	private String finalizo;
 	private Timestamp fecha;
 	private Double sueldo;
 	private Double dias;
@@ -57,90 +57,7 @@ public class RolCliente implements java.io.Serializable {
 	public RolCliente() {
 	}
 
-	/** minimal constructor */
-	public RolCliente(Timestamp inicio, Timestamp finalizo, Timestamp fecha,
-			Double sueldo, Double dias, Double horasNormales,
-			Double horasSuplementarias, Double horasSobreTiempo,
-			Double totalHorasExtras, Double salario,
-			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
-			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
-			Double decimoTercero, Double decimoCuarto,
-			Double jubilacionPatronal, Double aportePatronal, Double seguros,
-			Double uniformes, Double totalIngreso, String empleado,
-			String cedula, String empresa) {
-		this.inicio = inicio;
-		this.finalizo = finalizo;
-		this.fecha = fecha;
-		this.sueldo = sueldo;
-		this.dias = dias;
-		this.horasNormales = horasNormales;
-		this.horasSuplementarias = horasSuplementarias;
-		this.horasSobreTiempo = horasSobreTiempo;
-		this.totalHorasExtras = totalHorasExtras;
-		this.salario = salario;
-		this.montoHorasSuplementarias = montoHorasSuplementarias;
-		this.montoHorasSobreTiempo = montoHorasSobreTiempo;
-		this.bono = bono;
-		this.transporte = transporte;
-		this.totalBonos = totalBonos;
-                this.vacaciones = vacaciones;
-		this.subtotal = subtotal;
-		this.decimoTercero = decimoTercero;
-		this.decimoCuarto = decimoCuarto;
-		this.jubilacionPatronal = jubilacionPatronal;
-		this.aportePatronal = aportePatronal;
-		this.seguros = seguros;
-		this.uniformes = uniformes;
-		this.totalIngreso = totalIngreso;
-		this.empleado = empleado;
-		this.cedula = cedula;
-		this.empresa = empresa;
-	}
-
-	/** full constructor */
-	public RolCliente(String detalles, Timestamp inicio, Timestamp finalizo,
-			Timestamp fecha, Double sueldo, Double dias, Double horasNormales,
-			Double horasSuplementarias, Double horasSobreTiempo,
-			Double totalHorasExtras, Double salario,
-			Double montoHorasSuplementarias, Double montoHorasSobreTiempo,
-			Double bono, Double transporte, Double totalBonos, Double vacaciones, Double subtotal,
-			Double decimoTercero, Double decimoCuarto,
-			Double jubilacionPatronal, Double aportePatronal, Double seguros,
-			Double uniformes, Double totalIngreso, String empleado,
-			String cedula, String empresa, String clienteNombre) {
-		this.detalles = detalles;
-		this.inicio = inicio;
-		this.finalizo = finalizo;
-		this.fecha = fecha;
-		this.sueldo = sueldo;
-		this.dias = dias;
-		this.horasNormales = horasNormales;
-		this.horasSuplementarias = horasSuplementarias;
-		this.horasSobreTiempo = horasSobreTiempo;
-		this.totalHorasExtras = totalHorasExtras;
-		this.salario = salario;
-		this.montoHorasSuplementarias = montoHorasSuplementarias;
-		this.montoHorasSobreTiempo = montoHorasSobreTiempo;
-		this.bono = bono;
-		this.transporte = transporte;
-		this.totalBonos = totalBonos;
-		this.subtotal = subtotal;
-                this.vacaciones = vacaciones;
-		this.decimoTercero = decimoTercero;
-		this.decimoCuarto = decimoCuarto;
-		this.jubilacionPatronal = jubilacionPatronal;
-		this.aportePatronal = aportePatronal;
-		this.seguros = seguros;
-		this.uniformes = uniformes;
-		this.totalIngreso = totalIngreso;
-		this.empleado = empleado;
-		this.cedula = cedula;
-		this.empresa = empresa;
-		this.clienteNombre = clienteNombre;
-	}
-
 	// Property accessors
-
 	public Integer getId() {
 		return this.id;
 	}
@@ -157,19 +74,19 @@ public class RolCliente implements java.io.Serializable {
             this.detalles = detalles;
         }
         
-	public Timestamp getInicio() {
+	public String getInicio() {
 		return this.inicio;
 	}
 
-	public void setInicio(Timestamp inicio) {
+	public void setInicio(String inicio) {
 		this.inicio = inicio;
 	}
 
-	public Timestamp getFinalizo() {
+	public String getFinalizo() {
 		return this.finalizo;
 	}
 
-	public void setFinalizo(Timestamp finalizo) {
+	public void setFinalizo(String finalizo) {
 		this.finalizo = finalizo;
 	}
 

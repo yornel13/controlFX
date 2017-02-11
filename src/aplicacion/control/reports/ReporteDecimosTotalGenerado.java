@@ -7,8 +7,8 @@ package aplicacion.control.reports;
 
 import static aplicacion.control.DecimosAcumuladoEmpleadosController.PAGADO;
 import static aplicacion.control.DecimosAcumuladoEmpleadosController.RETENIDO;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.model.RolIndividual;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +33,8 @@ public class ReporteDecimosTotalGenerado implements JRDataSource {
 
     if( null != jrField.getName()) switch (jrField.getName()) {
             case "fecha":
-                valor = Fechas.getFechaConMes(lista.get(indiceActual).getInicio())
-                        + " al " + Fechas.getFechaConMes(lista.get(indiceActual).getFinalizo());
+                valor = Fechas.getFechaConMes(new Fecha(lista.get(indiceActual).getInicio()))
+                        + " al " + Fechas.getFechaConMes(new Fecha(lista.get(indiceActual).getFinalizo()));
                 break; 
             case "decimo3":
                 valor = round(lista.get(indiceActual).getDecimoTercero()).toString();

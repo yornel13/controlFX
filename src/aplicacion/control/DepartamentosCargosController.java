@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.util.Permisos;
+import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
 import hibernate.dao.DepartamentoDAO;
@@ -37,6 +38,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -60,6 +62,12 @@ public class DepartamentosCargosController implements Initializable {
     
     @FXML
     private TableView deudasTableView;
+    
+    @FXML
+    private Button buttonAtras;
+    
+    @FXML
+    private Label tituloLabel;
     
     private ObservableList<Departamento> dataDepartamentos;
     
@@ -212,7 +220,7 @@ public class DepartamentosCargosController implements Initializable {
     }
     
     @FXML
-    private void returnPrevius(ActionEvent event) {
+    private void returnConfiguracion(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarConfiguracion();
     } 
@@ -380,6 +388,23 @@ public class DepartamentosCargosController implements Initializable {
         setDepartamentoTable();
         setCargoTable();
         setDeudaTable();
+        
+        tituloLabel.setFont(Roboto.MEDIUM(22));
+        
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     }
     
     public void createDepartamentoTable () {

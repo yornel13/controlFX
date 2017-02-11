@@ -5,6 +5,8 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.util.Fecha;
+import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ConstanteDAO;
@@ -15,7 +17,6 @@ import hibernate.model.DiasVacaciones;
 import hibernate.model.Empresa;
 import java.io.IOException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
@@ -38,7 +39,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -185,10 +185,7 @@ public class PrincipalController implements Initializable {
         buttonGlobal.setVisible(false);
         login.setVisible(false);
         usuarioLogin.setVisible(false);
-        
-        
     }
-    
     
     // Login items
     @FXML

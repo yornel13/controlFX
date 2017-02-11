@@ -5,11 +5,11 @@
  */
 package aplicacion.control;
 
-import static aplicacion.control.PagosTotalEmpleadoController.getToday;
 import aplicacion.control.reports.ReporteRolDePagoQuincenal;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
@@ -50,7 +50,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -78,7 +77,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import java.util.Objects;
@@ -87,6 +85,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Platform;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.ProgressIndicator;
@@ -153,13 +152,25 @@ public class PagoQuincenalController implements Initializable {
     private Button buttonSiguiente;
     
     @FXML
-    private DatePicker pickerDe;
+    private ChoiceBox selectorDiaDe;
     
-    @FXML 
-    private DatePicker pickerHasta;
+    @FXML
+    private ChoiceBox selectorMesDe;
     
-    public Timestamp inicio;
-    public Timestamp fin;
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
     
     private ObservableList<EmpleadoTable> data;
     
@@ -190,19 +201,23 @@ public class PagoQuincenalController implements Initializable {
     
     @FXML
     public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());  
+        inicio = inicio.plusMonths(1);
+        fin = fin.plusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
+        
         setTableInfo();
     }
     
     @FXML
     public void onClickLess(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        inicio = inicio.minusMonths(1);
+        fin = fin.minusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa); 
+        
         setTableInfo();
     }
     
@@ -388,20 +403,13 @@ public class PagoQuincenalController implements Initializable {
     
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
-        DateTime dateTime = new DateTime(getToday().getTime());
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
+        
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
+           
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
         
         setTableInfo();
     }
@@ -431,7 +439,7 @@ public class PagoQuincenalController implements Initializable {
             empleado.setPagar(true);
             
             PagoQuincena pagoQuincena = new PagoQuincenaDAO()
-                    .findInDeterminateTimeByUsuarioId(inicio, empleado.getId());
+                    .findInDeterminateTimeByUsuarioId(inicio.getFecha(), empleado.getId());
             if (pagoQuincena != null) {
                 empleado.setQuincenal(pagoQuincena.getMonto());
                 empleado.setPagado("Si");
@@ -439,7 +447,7 @@ public class PagoQuincenalController implements Initializable {
                 empleado.setPagoQuincena(pagoQuincena);
             } else {
                 if (user.getDetallesEmpleado().getQuincena() != null) { 
-                    if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(inicio, 
+                    if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(inicio.getFecha(), 
                         empleado.getId()) == null) {
                         empleado.setQuincenal(user.getDetallesEmpleado().getQuincena());
                     } else {
@@ -599,10 +607,10 @@ public class PagoQuincenalController implements Initializable {
     }
     
     void borrarPago(int usuarioId) {
-        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(inicio, 
+        if (new PagoMesDAO().findInDeterminateTimeByUsuarioId(inicio.getFecha(), 
                         usuarioId) == null) {
            PagoQuincena pagoQuincena = new PagoQuincenaDAO()
-                    .findInDeterminateTimeByUsuarioId(inicio, usuarioId);
+                    .findInDeterminateTimeByUsuarioId(inicio.getFecha(), usuarioId);
             new PagoQuincenaDAO().delete(pagoQuincena);
             HibernateSessionFactory.getSession().flush();
             String detalles = "elemino el pago quincenal numero " + pagoQuincena.getId()
@@ -783,6 +791,20 @@ public class PagoQuincenalController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     public void mostrarPagoQuincenalPagado(PagoQuincena pagoQuincena) {
@@ -934,8 +956,8 @@ public class PagoQuincenalController implements Initializable {
                     pagoQuincena.setFecha(new Timestamp(new Date().getTime()));
                     pagoQuincena.setMonto(data.get(usuarios.indexOf(user))
                             .getQuincenal());
-                    pagoQuincena.setInicioMes(inicio);
-                    pagoQuincena.setFinMes(fin);
+                    pagoQuincena.setInicioMes(inicio.getFecha());
+                    pagoQuincena.setFinMes(fin.getFecha());
                     new PagoQuincenaDAO().save(pagoQuincena);
                     pagosQuincenal.add(pagoQuincena);
 

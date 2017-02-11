@@ -29,7 +29,7 @@ public class Usuario implements java.io.Serializable {
 	private String sexo;
         private Set pagos = new HashSet(0);
 	private Set identidads = new HashSet(0);
-	private Set controlEmpleados = new HashSet(0);
+        private Set controlDiarios = new HashSet(0);
 	private Set bonos = new HashSet(0);
         private Set diasVacaciones = new HashSet(0);
 	private Set registroAccioneses = new HashSet(0);
@@ -61,36 +61,6 @@ public class Usuario implements java.io.Serializable {
 		this.activo = activo;
 		this.nacimiento = nacimiento;
 	}
-
-	/** full constructor */
-	public Usuario(EstadoCivil estadoCivil, DetallesEmpleado detallesEmpleado,
-			String nombre, String apellido, String cedula, String email,
-			String direccion, String telefono, Timestamp creacion,
-			Timestamp ultimaModificacion, byte[] foto, Boolean activo,
-			Timestamp nacimiento, String sexo, Set pagos, Set identidads,
-			Set controlEmpleados, Set bonos, Set registroAccioneses, Set roleses) {
-		this.estadoCivil = estadoCivil;
-		this.detallesEmpleado = detallesEmpleado;
-		this.nombre = nombre;
-		this.apellido = apellido;
-		this.cedula = cedula;
-		this.email = email;
-		this.direccion = direccion;
-		this.telefono = telefono;
-		this.creacion = creacion;
-		this.ultimaModificacion = ultimaModificacion;
-		this.foto = foto;
-		this.activo = activo;
-		this.nacimiento = nacimiento;
-		this.sexo = sexo;
-                this.pagos = pagos;
-		this.identidads = identidads;
-		this.controlEmpleados = controlEmpleados;
-		this.bonos = bonos;
-		this.registroAccioneses = registroAccioneses;
-		this.roleses = roleses;
-	}
-
 	// Property accessors
 
 	public Integer getId() {
@@ -221,14 +191,6 @@ public class Usuario implements java.io.Serializable {
 		this.identidads = identidads;
 	}
 
-	public Set getControlEmpleados() {
-		return this.controlEmpleados;
-	}
-
-	public void setControlEmpleados(Set controlEmpleados) {
-		this.controlEmpleados = controlEmpleados;
-	}
-
 	public Set getBonos() {
 		return this.bonos;
 	}
@@ -315,6 +277,14 @@ public class Usuario implements java.io.Serializable {
 
     public void setDiasVacaciones(Set diasVacaciones) {
         this.diasVacaciones = diasVacaciones;
+    }
+
+    public Set getControlDiarios() {
+        return controlDiarios;
+    }
+
+    public void setControlDiarios(Set controlDiarios) {
+        this.controlDiarios = controlDiarios;
     }
       
         

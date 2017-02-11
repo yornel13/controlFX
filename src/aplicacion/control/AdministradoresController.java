@@ -32,8 +32,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
@@ -64,6 +66,33 @@ public class AdministradoresController implements Initializable {
     @FXML
     private TableView administradoresTable;
     
+    @FXML
+    private Button buttonAgregar;
+    
+    @FXML
+    private Button buttonAtras;
+    
+     @FXML 
+    private TableColumn cedulaColumna;
+    
+    @FXML 
+    private TableColumn nombreColumna;
+    
+    @FXML 
+    private TableColumn empresaColumna;
+    
+    @FXML 
+    private TableColumn usuarioColumna;
+    
+    @FXML 
+    private TableColumn permisoColumna;
+    
+    @FXML
+    private TableColumn<Administrador, Administrador>  editarColumna;
+    
+    @FXML
+    private TableColumn<Administrador, Administrador>  borrarColumna;
+    
     private ObservableList<Administrador> data;
     
     ArrayList<Administrador> administradores;
@@ -77,18 +106,12 @@ public class AdministradoresController implements Initializable {
     }
     
     @FXML
-    private void goHome(ActionEvent event) {
-        aplicacionControl.mostrarConfiguracion();
-        stagePrincipal.close();
-    }
-    
-    @FXML
     private void agregarAdministrador(ActionEvent event) {
         aplicacionControl.mostrarRegistrarAdministrador();
     }
     
     @FXML
-    private void returnEmpresa(ActionEvent event) {
+    private void returnConfiguracion(ActionEvent event) {
         aplicacionControl.mostrarConfiguracion();
         stagePrincipal.close();
     } 
@@ -172,7 +195,7 @@ public class AdministradoresController implements Initializable {
     
     public void administradorEditado(Identidad ide) {
         for (Administrador admin: data) {
-            if(admin.getId() == ide.getId()) {
+            if(admin.getId().equals(ide.getId())) {
                 Administrador administrador = new Administrador();
                 administrador.setId(ide.getId());
                 administrador.setUsuario(ide.getUsuario());
@@ -252,37 +275,20 @@ public class AdministradoresController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
-        administradoresTable.setEditable(Boolean.FALSE);
-        administradoresTable.getColumns().clear(); 
+        administradoresTable.setEditable(Boolean.FALSE); 
         
-        TableColumn nombre = new TableColumn("Nombre");
-        nombre.setMinWidth(100);
-        nombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         
-        TableColumn apellido = new TableColumn("Apellido");
-        apellido.setMinWidth(100);
-        apellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
+        empresaColumna.setCellValueFactory(new PropertyValueFactory<>("nombreEmpresa"));
         
-        TableColumn cedula = new TableColumn("Cedula");
-        cedula.setMinWidth(100);
-        cedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
+        cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
      
-        TableColumn nombreEmpresa = new TableColumn("Empresa");
-        nombreEmpresa.setMinWidth(100);
-        nombreEmpresa.setCellValueFactory(new PropertyValueFactory<>("nombreEmpresa"));
+        usuarioColumna.setCellValueFactory(new PropertyValueFactory<>("nombreUsuario"));
         
-        TableColumn nombreUsuario = new TableColumn("Usuario");
-        nombreUsuario.setMinWidth(100);
-        nombreUsuario.setCellValueFactory(new PropertyValueFactory<>("nombreUsuario"));
+        permisoColumna.setCellValueFactory(new PropertyValueFactory<>("permisos"));
         
-        TableColumn permisos = new TableColumn("Permisos");
-        permisos.setMinWidth(115);
-        permisos.setCellValueFactory(new PropertyValueFactory<>("permisos"));
-        
-        TableColumn<Administrador, Administrador> editar = new TableColumn<>("Editar");
-        editar.setMinWidth(35);
-        editar.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        editar.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
+        editarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        editarColumna.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
             private final Button editarButton = new Button("Editar");
 
             @Override
@@ -301,10 +307,8 @@ public class AdministradoresController implements Initializable {
             }
         });
         
-        TableColumn<Administrador, Administrador> delete = new TableColumn<>("Borrar");
-        delete.setMinWidth(30);
-        delete.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        delete.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
+        borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        borrarColumna.setCellFactory(param -> new TableCell<Administrador, Administrador>() {
             private final Button deleteButton = new Button("Borrar");
 
             @Override
@@ -323,8 +327,6 @@ public class AdministradoresController implements Initializable {
             }
         });
         
-        administradoresTable.getColumns().addAll(cedula, nombre, nombreEmpresa, nombreUsuario, permisos, editar, delete);
-        
         administradoresTable.setRowFactory( (Object tv) -> {
             TableRow<Administrador> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -337,6 +339,38 @@ public class AdministradoresController implements Initializable {
         });
         
         setAdministradores();
+        
+        buttonAgregar.setTooltip(
+            new Tooltip("Agregar nuevo administrador")
+        );
+        buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAgregar.setOnMouseExited((MouseEvent t) -> {
+            buttonAgregar.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonAtras.setOnMouseEntered((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonAtras.setOnMouseExited((MouseEvent t) -> {
+            buttonAtras.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/atras.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
     } 
     
     // Login items

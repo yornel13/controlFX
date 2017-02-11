@@ -5,15 +5,12 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.Const;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.ConstanteDAO;
 import hibernate.dao.SeguroDAO;
 import hibernate.dao.UniformeDAO;
 import hibernate.model.Cliente;
 import hibernate.model.Constante;
-import hibernate.model.Empresa;
 import hibernate.model.Seguro;
 import hibernate.model.Uniforme;
 import java.net.URL;

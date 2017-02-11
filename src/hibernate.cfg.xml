@@ -4,7 +4,7 @@
 <hibernate-configuration>
   <session-factory>
     <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
-    <property name="connection.url">jdbc:mysql://localhost:3306/control</property>
+    <property name="connection.url">jdbc:mysql://localhost:3306/dbcontrol</property>
     <property name="connection.username">root</property>
     <property name="connection.password">1234</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
@@ -20,7 +20,7 @@
     <mapping resource="hibernate/hbm/Bonos.hbm.xml"/>
     <mapping resource="hibernate/hbm/DiasVacaciones.hbm.xml"/>
     <mapping resource="hibernate/hbm/Constante.hbm.xml"/>
-    <mapping resource="hibernate/hbm/ControlEmpleado.hbm.xml"/>
+    <mapping resource="hibernate/hbm/ControlDiario.hbm.xml"/>
     <mapping resource="hibernate/hbm/RolCliente.hbm.xml"/>
     <mapping resource="hibernate/hbm/RegistroAcciones.hbm.xml"/>
     <mapping resource="hibernate/hbm/Cargo.hbm.xml"/>

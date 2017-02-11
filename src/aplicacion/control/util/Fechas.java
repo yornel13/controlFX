@@ -16,6 +16,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.joda.time.DateTime;
 
 /**
@@ -70,6 +72,21 @@ public class Fechas {
                 + getMonthName(dateTime.getMonthOfYear()) 
                 + " " + dateTime.getYear();
         return fecha;
+    }
+    
+    public static String getFechaConMes(Fecha fecha) {
+        String fechaString = fecha.getDiaInt()+" de " 
+                + fecha.getMonthName() 
+                + " " + fecha.getAnoInt();
+        return fechaString;
+    }
+    
+    public static String getFechaConMes(String fechaFecha) {
+        Fecha fecha = new Fecha(fechaFecha);
+        String fechaString = fecha.getDiaInt()+" de " 
+                + fecha.getMonthName() 
+                + " " + fecha.getAnoInt();
+        return fechaString;
     }
     
     public static String getFechaConMesYHora(DateTime dateTime) {
@@ -130,5 +147,93 @@ public class Fechas {
         java.util.Date todayWithZeroTime = formatter.parse(formatter.format(today));
         
         return new Timestamp(todayWithZeroTime.getTime());
+    }
+     
+    public static ObservableList<String> arraySpinnerDia() {
+        String[] items = new String[30];
+        items[0] = "01";
+        items[1] = "02";
+        items[2] = "03";
+        items[3] = "04";
+        items[4] = "05";
+        items[5] = "06";
+        items[6] = "07";
+        items[7] = "08";
+        items[8] = "09";
+        items[9] = "10";
+        items[10] = "11";
+        items[11] = "12";
+        items[12] = "13";
+        items[13] = "14";
+        items[14] = "15";
+        items[15] = "16";
+        items[16] = "17";
+        items[17] = "18";
+        items[18] = "19";
+        items[19] = "20";
+        items[20] = "21";
+        items[21] = "22";
+        items[22] = "23";
+        items[23] = "24";
+        items[24] = "25";
+        items[25] = "26";
+        items[26] = "27";
+        items[27] = "28";
+        items[28] = "29";
+        items[29] = "30";
+        return FXCollections.observableArrayList(items);
+    }
+    
+    public static ObservableList<String> arraySpinnerMes() {
+        String[] items = new String[12];
+        items[0] = "01";
+        items[1] = "02";
+        items[2] = "03";
+        items[3] = "04";
+        items[4] = "05";
+        items[5] = "06";
+        items[6] = "07";
+        items[7] = "08";
+        items[8] = "09";
+        items[9] = "10";
+        items[10] = "11";
+        items[11] = "12";
+        return FXCollections.observableArrayList(items);
+    }
+    
+    public static ObservableList<String> arraySpinnerAno() {
+        String[] items = new String[60];
+        Integer count = 0;
+        
+        Integer secuencia = (new DateTime().getYear()) - 30;
+        for (String number : items) {
+            items[count] = secuencia.toString();
+            secuencia++;
+            count++;
+        }
+        return FXCollections.observableArrayList(items);
+    }
+    
+    public static Fecha getFechaActual() {
+        
+        String dia;
+        String mes;
+        String ano;
+        ano = String.valueOf(new DateTime().getYear());
+        mes = String.valueOf(new DateTime().getMonthOfYear());
+        if (new DateTime().getDayOfMonth() > 30) {
+            dia = "30";
+        } else {
+            dia = String.valueOf(new DateTime().getDayOfMonth());
+        }
+        
+        if (mes.length() == 1) {
+            mes = "0"+mes;
+        }
+        if (dia.length() == 1) {
+            dia = "0"+dia;
+        }
+        
+        return new Fecha(ano+mes+dia);
     }
 }

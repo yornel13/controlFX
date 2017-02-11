@@ -3,8 +3,6 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.RolCliente;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -99,7 +97,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List<RolCliente> findAllByFechaAndEmpleadoId(Timestamp fecha, Integer empleadoId) {
+        public List<RolCliente> findAllByFechaAndEmpleadoId(String fecha, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -111,7 +109,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByFechaAndEmpleadoIdConCliente(Timestamp fecha, Integer empleadoId) {
+        public List<RolCliente> findAllByFechaAndEmpleadoIdConCliente(String fecha, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -124,7 +122,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
+        public List<RolCliente> findAllByFechaAndEmpleadoIdSinCliente(String fecha, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -137,7 +135,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public RolCliente findByFechaAndEmpleadoIdAndClienteId(Timestamp fecha, Integer empleadoId, Integer clienteId) {
+        public RolCliente findByFechaAndEmpleadoIdAndClienteId(String fecha, Integer empleadoId, Integer clienteId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -151,7 +149,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (RolCliente) result;
         }
         
-        public RolCliente findByFechaAndEmpleadoIdSinCliente(Timestamp fecha, Integer empleadoId) {
+        public RolCliente findByFechaAndEmpleadoIdSinCliente(String fecha, Integer empleadoId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -164,7 +162,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (RolCliente) result;
         }
         
-        public RolCliente findByFechaAndEmpleadoIdAndDetalles(Timestamp fecha, Integer empleadoId, String detalles) {
+        public RolCliente findByFechaAndEmpleadoIdAndDetalles(String fecha, Integer empleadoId, String detalles) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -179,7 +177,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (RolCliente) result;
         }
         
-        public List<RolCliente> findAllByFechaAndClienteId(Timestamp fechaInicio, Integer clienteId) {
+        public List<RolCliente> findAllByFechaAndClienteId(String fechaInicio, Integer clienteId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -191,7 +189,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByFechaSinCliente(Timestamp fechaInicio) {
+        public List<RolCliente> findAllByFechaSinCliente(String fechaInicio) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
                             + "where inicio = :fecha "
@@ -202,7 +200,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByFechaAndClienteIdAndEmpresaId(Timestamp fecha, 
+        public List<RolCliente> findAllByFechaAndClienteIdAndEmpresaId(String fecha, 
                 Integer clienteId, Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
@@ -221,7 +219,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByFechaAndEmpresaIdSinCliente(Timestamp fecha, 
+        public List<RolCliente> findAllByFechaAndEmpresaIdSinCliente(String fecha, 
                 Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
@@ -239,7 +237,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByEntreFechaAndEmpresaId(Timestamp fecha, 
+        public List<RolCliente> findAllByEntreFechaAndEmpresaId(String fecha, 
                 Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "
@@ -257,25 +255,7 @@ public class RolClienteDAO extends BaseHibernateDAO {
             return (List<RolCliente>) result;
         }
         
-        public List<RolCliente> findAllByEntreFechaAndEmpresaId(Date fecha, 
-                Integer empresaId) {
-            Query query = getSession().
-                    createSQLQuery("SELECT * FROM rol_cliente "
-                            + "JOIN usuario "
-                            + "ON usuario.id = rol_cliente.usuario_id "
-                            + "JOIN detalles_empleado "
-                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
-                            + "where inicio <= :fecha "
-                            + "and finalizo >= :fecha "
-                            + "and empresa_id = :empresa_id")
-                    .addEntity(RolCliente.class)
-                    .setParameter("fecha", fecha)
-                    .setParameter("empresa_id", empresaId);
-            Object result = query.list();
-            return (List<RolCliente>) result;
-        }
-        
-        public List<RolCliente> findAllByEntreFechaAndEmpresaIdAndEmpleadoId(Timestamp fecha, 
+        public List<RolCliente> findAllByEntreFechaAndEmpresaIdAndEmpleadoId(String fecha, 
                 Integer empresaId, Integer usuarioId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM rol_cliente "

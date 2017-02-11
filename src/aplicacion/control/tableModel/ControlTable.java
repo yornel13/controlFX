@@ -5,9 +5,9 @@
  */
 package aplicacion.control.tableModel;
 
-import hibernate.model.ControlEmpleado;
+import aplicacion.control.util.Fecha;
+import hibernate.model.ControlDiario;
 import hibernate.model.Usuario;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -15,7 +15,7 @@ import org.joda.time.DateTime;
  */
 public class ControlTable {
     
-    private Integer id;
+    private Long id;
     private Usuario usuario;
     private String cliente;
     private String fechaString;
@@ -24,8 +24,8 @@ public class ControlTable {
     private Double recargo;
     private String observacion;
     private String dia;
-    private ControlEmpleado controlEmpleado;
-    private DateTime fecha;
+    private ControlDiario controlDiario;
+    private Fecha fecha;
     private Boolean ajeno;
     public Boolean marcar;
 
@@ -34,11 +34,11 @@ public class ControlTable {
         marcar = false;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -98,12 +98,12 @@ public class ControlTable {
         this.dia = dia;
     }
 
-    public ControlEmpleado getControlEmpleado() {
-        return controlEmpleado;
+    public ControlDiario getControlDiario() {
+        return controlDiario;
     }
 
-    public void setControlEmpleado(ControlEmpleado controlEmpleado) {
-        this.controlEmpleado = controlEmpleado;
+    public void setControlEmpleado(ControlDiario controlDiario) {
+        this.controlDiario = controlDiario;
     }
 
     public String getFechaString() {
@@ -114,11 +114,11 @@ public class ControlTable {
         this.fechaString = fechaString;
     }
 
-    public DateTime getFecha() {
+    public Fecha getFecha() {
         return fecha;
     }
 
-    public void setFecha(DateTime fecha) {
+    public void setFecha(Fecha fecha) {
         this.fecha = fecha;
     }
 

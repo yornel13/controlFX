@@ -122,6 +122,26 @@ public class PagoMesItemDAO extends BaseHibernateDAO {
             Object result = query.list();
             return (List<PagoMesItem>) result;
         }
+        
+        public List<PagoMesItem> findAllByEmpleadoIdAndClaveAndRangoFecha(
+                Integer empleadoId, String clave, String fechaInicio, 
+                String fechaFin) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes_item "
+                            + "JOIN pago_mes "
+                            + "ON pago_mes.id = pago_mes_item.pago_mes_id "
+                            + "where usuario_id = :usuario_id "
+                            + "and inicio_mes >= :fecha_inicio "
+                            + "and inicio_mes < :fecha_fin "
+                            + "and clave = :clave")
+                    .addEntity(PagoMesItem.class)
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("fecha_inicio", fechaInicio)
+                    .setParameter("fecha_fin", fechaFin)
+                    .setParameter("clave", clave);
+            Object result = query.list();
+            return (List<PagoMesItem>) result;
+        }
 
 	public List findByExample(PagoMesItem instance) {
 		log.debug("finding PagoMesItem instance by example");

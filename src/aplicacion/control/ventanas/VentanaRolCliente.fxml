@@ -16,11 +16,7 @@
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnClientes" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="643.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
-            <Button layoutX="591.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" text="&gt;" />
-            <Button layoutX="361.0" layoutY="15.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" text="&lt;" />
             <Accordion layoutX="216.0" layoutY="24.0" />
-            <DatePicker fx:id="pickerHasta" layoutX="441.0" layoutY="15.0" promptText="fin" />
-            <DatePicker fx:id="pickerDe" layoutX="211.0" layoutY="15.0" promptText="inicio" />
             <Label layoutX="186.0" layoutY="20.0" text="De" textFill="#fffbfb">
                <font>
                   <Font size="14.0" />
@@ -234,5 +230,11 @@
             <TableColumn fx:id="columnaTotal" minWidth="0.0" resizable="false" text="Total" />
          </columns>
       </TableView>
+      <ChoiceBox fx:id="selectorAnoDe" layoutX="298.0" layoutY="15.0" prefHeight="25.0" prefWidth="60.0" />
+      <ChoiceBox fx:id="selectorMesDe" layoutX="258.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorDiaDe" layoutX="218.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorDiaHa" layoutX="450.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorMesHa" layoutX="490.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
+      <ChoiceBox fx:id="selectorAnoHa" layoutX="530.0" layoutY="15.0" prefHeight="25.0" prefWidth="60.0" />
     </children>
 </AnchorPane>

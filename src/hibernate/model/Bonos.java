@@ -2,7 +2,6 @@ package hibernate.model;
 
 // default package
 
-import java.sql.Date;
 import java.sql.Timestamp;
 
 /**
@@ -19,8 +18,8 @@ public class Bonos implements java.io.Serializable {
 	private Double bono;
 	private Double transporte;
 	private Timestamp fecha;
-	private Date inicioMes;
-	private Date finMes;
+	private String inicioMes;
+	private String finMes;
 
 	// Constructors
 
@@ -78,19 +77,19 @@ public class Bonos implements java.io.Serializable {
         this.fecha = fecha;
     }
 
-    public Date getInicioMes() {
+    public String getInicioMes() {
         return inicioMes;
     }
 
-    public void setInicioMes(Date inicioMes) {
+    public void setInicioMes(String inicioMes) {
         this.inicioMes = inicioMes;
     }
 
-    public Date getFinMes() {
+    public String getFinMes() {
         return finMes;
     }
 
-    public void setFinMes(Date finMes) {
+    public void setFinMes(String finMes) {
         this.finMes = finMes;
     }
 

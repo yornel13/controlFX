@@ -70,7 +70,7 @@ public class PlanillaIessDAO extends BaseHibernateDAO {
             return (List<PlanillaIess>) result;
         }
         
-        public PlanillaIess findInDeterminateTimeByUsuarioId(Timestamp fecha, Integer usuarioId) {
+        public PlanillaIess findInDeterminateTimeByUsuarioId(String fecha, Integer usuarioId) {
 		Query query = getSession().
                     createSQLQuery("SELECT * FROM planilla_iess "
                             + "WHERE usuario_id = :usuario_id "
@@ -82,7 +82,7 @@ public class PlanillaIessDAO extends BaseHibernateDAO {
                 return (PlanillaIess) result;
 	}
         
-        public List<PlanillaIess> findAllByFechaAndEmpresaId(Timestamp fecha, Integer empresaId) {
+        public List<PlanillaIess> findAllByFechaAndEmpresaId(String fecha, Integer empresaId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM planilla_iess "
                             + "JOIN usuario "

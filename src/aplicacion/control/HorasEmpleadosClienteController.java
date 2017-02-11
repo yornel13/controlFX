@@ -7,14 +7,13 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import aplicacion.control.util.Numeros;
-import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.ConstanteDAO;
-import hibernate.dao.ControlEmpleadoDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.SeguroDAO;
@@ -23,7 +22,6 @@ import hibernate.dao.UsuarioDAO;
 import hibernate.model.Actuariales;
 import hibernate.model.Cliente;
 import hibernate.model.Constante;
-import hibernate.model.ControlEmpleado;
 import hibernate.model.Empresa;
 import hibernate.model.RolCliente;
 import hibernate.model.RolIndividual;
@@ -63,7 +61,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -87,14 +84,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
 import hibernate.dao.BonosDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.model.Bonos;
 import hibernate.model.DiasVacaciones;
 import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.roundInt;
+import aplicacion.control.util.Permisos;
+import hibernate.dao.ControlDiarioDAO;
+import hibernate.model.ControlDiario;
+import javafx.scene.control.ChoiceBox;
 
 /**
  *
@@ -138,12 +136,6 @@ public class HorasEmpleadosClienteController implements Initializable {
     private Button buttonSiguiente;
     
     @FXML
-    private DatePicker pickerDe;
-    
-    @FXML 
-    private DatePicker pickerHasta;
-    
-    @FXML
     private TableView empleadosTableView;
     
     @FXML
@@ -170,10 +162,31 @@ public class HorasEmpleadosClienteController implements Initializable {
     @FXML
     private Button buttonGuardar;
     
+    @FXML
+    private ChoiceBox selectorDiaDe;
+    
+    @FXML
+    private ChoiceBox selectorMesDe;
+    
+    @FXML
+    private ChoiceBox selectorAnoDe;
+    
+    @FXML
+    private ChoiceBox selectorDiaHa;
+    
+    @FXML
+    private ChoiceBox selectorMesHa;
+    
+    @FXML
+    private ChoiceBox selectorAnoHa;
+    
+    private Fecha inicio;
+    private Fecha fin;
+    
+    @FXML
+    private Label fechaLabel;
+    
     private List<EmpleadoTable> empleadosRol;
-        
-    private Timestamp inicio;
-    private Timestamp fin;
     
     private TableColumn bonoColumna;
     
@@ -191,7 +204,7 @@ public class HorasEmpleadosClienteController implements Initializable {
     
     private Uniforme uniforme;
     private Seguro seguro;
-    private Constante decimoCuarto;
+    private Constante constDecimoCuarto;
     private Boolean rolesMultiples = false;
     
     private ArrayList<Bonos> bonos;
@@ -213,10 +226,14 @@ public class HorasEmpleadosClienteController implements Initializable {
     
     @FXML
     public void onClickMore(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().plusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());   
+        
+        inicio = inicio.plusMonths(1);
+        fin = fin.plusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);  
+        fechaLabel.setText(inicio.getMonthName());
+        
         setTableInfo(empresa, inicio, fin);
         
         checkBoxTodos.setSelected(false);
@@ -240,10 +257,14 @@ public class HorasEmpleadosClienteController implements Initializable {
     
     @FXML
     public void onClickLess(ActionEvent event) {
-        pickerDe.setValue(pickerDe.getValue().minusMonths(1));
-        pickerHasta.setValue(pickerDe.getValue().plusMonths(1).minusDays(1));
-        inicio = Timestamp.valueOf(pickerDe.getValue().atStartOfDay());
-        fin = Timestamp.valueOf(pickerHasta.getValue().atStartOfDay());
+        
+        inicio = inicio.minusMonths(1);
+        fin = fin.minusMonths(1);
+        
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);  
+        fechaLabel.setText(inicio.getMonthName());
+        
         setTableInfo(empresa, inicio, fin);
         
         checkBoxTodos.setSelected(false);
@@ -556,8 +577,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         pago = new RolCliente();
         pago.setFecha(new Timestamp(new Date().getTime()));
-        pago.setInicio(inicio);
-        pago.setFinalizo(fin);
+        pago.setInicio(inicio.getFecha());       
+        pago.setFinalizo(fin.getFecha());
         pago.setDias(dias);
         pago.setHorasNormales(normales);
         pago.setHorasSuplementarias(suplementarias);  // RC
@@ -632,8 +653,8 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         pago = new RolCliente();
         pago.setFecha(new Timestamp(new Date().getTime()));
-        pago.setInicio(inicio);
-        pago.setFinalizo(fin);
+        pago.setInicio(inicio.getFecha());         
+        pago.setFinalizo(fin.getFecha());
         pago.setDias(dias);
         pago.setHorasNormales(normales);
         pago.setHorasSuplementarias(suplementarias);  // RC
@@ -688,12 +709,12 @@ public class HorasEmpleadosClienteController implements Initializable {
     }
     
     public Double getDecimoCuarto() {
-        if (decimoCuarto == null)
-            decimoCuarto = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO);
-        if (decimoCuarto == null) {
+        if (constDecimoCuarto == null)
+            constDecimoCuarto = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.DECIMO_CUARTO);
+        if (constDecimoCuarto == null) {
             return 30.5d;
         } else {
-            return Double.valueOf(decimoCuarto.getValor());
+            return Double.valueOf(constDecimoCuarto.getValor());
         }
     }
     
@@ -911,23 +932,13 @@ public class HorasEmpleadosClienteController implements Initializable {
         this.empresa = empresa;
         this.cliente = cliente;
         
-        DateTime dateTime = new DateTime(getToday().getTime());
-        
-        if (dateTime.getDayOfMonth() >= empresa.getComienzoMes() ) {
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).getMillis());
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .plusMonths(1).minusDays(1).getMillis());
-        } else {
-            fin = new Timestamp(dateTime.withDayOfMonth(empresa.getComienzoMes())
-                    .minusDays(1).getMillis());
-            inicio = new Timestamp(dateTime.withDayOfMonth(empresa
-                    .getComienzoMes()).minusMonths(1).getMillis());
-        }
+        inicio = Fechas.getFechaActual();
+        inicio.setDia("01");
+        fin = inicio.plusMonths(1).minusDays(1);
            
-        
-        pickerDe.setValue(Fechas.getLocalFromTimestamp(inicio));
-        pickerHasta.setValue(Fechas.getLocalFromTimestamp(fin));
+        inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
+        fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
+        fechaLabel.setText(inicio.getMonthName());
         
         setTableInfo(empresa, inicio, fin);
         
@@ -952,7 +963,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         } 
     }
     
-    public void setTableInfo(Empresa empresa, Timestamp inicio, Timestamp fin) {
+    public void setTableInfo(Empresa empresa, Fecha inicio, Fecha fin) {
         this.inicio = inicio;
         this.fin = fin;
         
@@ -962,28 +973,26 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         data = FXCollections.observableArrayList();
         
+        Fecha fechaInicial = new Fecha(inicio.getFecha()).minusDays(7); // dias anteriores de horas extras 
+        Fecha fechaFinal = new Fecha(fin.getFecha());
+        
         if (!usuarios.isEmpty()) {
             
-            ControlEmpleadoDAO controlDAO = new ControlEmpleadoDAO();
+            ControlDiarioDAO controlDAO = new ControlDiarioDAO();
             
-            List<ControlEmpleado> controlEmpleados;
+            List<ControlDiario> controlesDiarios;
             if (cliente != null) {
-                controlEmpleados = controlDAO
-                        .findAllByClienteIdInDeterminateTime(cliente.getId(), inicio, fin);
+                controlesDiarios = controlDAO
+                        .findAllByClienteIdInDeterminateTime(cliente.getId(), fechaInicial.getFecha(), fechaFinal.getFecha());
                 rolesCliente = new RolClienteDAO()
-                   .findAllByFechaAndClienteIdAndEmpresaId(inicio, cliente.getId(), empresa.getId());
+                   .findAllByFechaAndClienteIdAndEmpresaId(fechaInicial.getFecha(), cliente.getId(), empresa.getId());
             } else {
-                controlEmpleados = controlDAO
-                        .findAllBySinClienteInDeterminateTime(inicio, fin);
+                controlesDiarios = controlDAO
+                        .findAllBySinClienteInDeterminateTime(fechaInicial.getFecha(), fechaFinal.getFecha());
                 rolesCliente = new RolClienteDAO()
-                   .findAllByFechaAndEmpresaIdSinCliente(inicio, empresa.getId());
+                   .findAllByFechaAndEmpresaIdSinCliente(fechaInicial.getFecha(), empresa.getId());
             }
             
-            ///////////////// Calculando dias del mes ///////////////////////
-            DateTime fechaInicial = new DateTime(inicio.getTime());
-            DateTime fechaFinal = new DateTime(fin.getTime());
-            final int days = Days.daysBetween(fechaInicial.withTimeAtStartOfDay(), 
-                fechaFinal.withTimeAtStartOfDay()).getDays() + 1;
             ///////////////////////////////////////////////////////////////
             usuarios.stream().map((user) -> {
                 Double dias = 0d;
@@ -993,39 +1002,48 @@ public class HorasEmpleadosClienteController implements Initializable {
                 Integer medioDias = 0;
                 
                 int descansosMedicos = 0;
-                for (ControlEmpleado control: controlEmpleados) {
+                for (ControlDiario control: controlesDiarios) {
                     if (Objects.equals(user.getId(), control.getUsuario().getId())) {
                         
-                        if (control.getCaso().equalsIgnoreCase(Const.DM)) {
-                            descansosMedicos++;
-                        } 
-                        if (control.getMedioDia()) {
-                            medioDias++;
-                        }
+                        if (new Fecha(control.getFecha()).afterEquals(inicio)) {
+                            System.out.println("before equals "+control.getFecha());
                         
-                        if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
-                                || control.getCaso().equalsIgnoreCase(Const.CM)) {
-                            
-                            dias += 1;
-                            normales = control.getMedioDia()? normales+4 : normales+8;
-                            sobreTiempo += control.getSobretiempo();
-                            suplementarias += control.getRecargo();
-                            
-                        } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
-                            if (descansosMedicos <= 3) {
+                            if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                                descansosMedicos++;
+                            } 
+                            if (control.getMedioDia()) {
+                                medioDias++;
+                            }
+
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)) {
+
                                 dias += 1;
                                 normales = control.getMedioDia()? normales+4 : normales+8;
+                                //sobreTiempo += control.getSobretiempo();
+                                //suplementarias += control.getRecargo();
+
+                            } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                                if (descansosMedicos <= 3) {
+                                    dias += 1;
+                                    normales = control.getMedioDia()? normales+4 : normales+8;
+                                }
                             }
                         }
+                        if (new Fecha(control.getFecha()).before(fin.minusDays(6))) {
+                            System.out.println("after "+control.getFecha());
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)) {
+
+                                sobreTiempo += control.getSobretiempo();
+                                suplementarias += control.getRecargo();
+                            } 
+                        } 
                     }
                 }
-                if (days != 30) {
-                    dias = (30d/days) * dias;
-                    dias = roundInt(dias).doubleValue();
-                    normales = (dias*8d) - (medioDias*4d);
-                }
+                
                 EmpleadoTable empleado = new EmpleadoTable();
                 empleado.setId(user.getId());
                 empleado.setNombre(user.getNombre());
@@ -1122,9 +1140,6 @@ public class HorasEmpleadosClienteController implements Initializable {
         buttonGuardar.setVisible(false);
         buttonBorrar.setVisible(true);
         buttonPagar.setVisible(true);
-        
-        pickerDe.setEditable(false);
-        pickerHasta.setEditable(false);
         
         buttonAnterior.setTooltip(
             new Tooltip("Mes Anterior")
@@ -1287,12 +1302,27 @@ public class HorasEmpleadosClienteController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (!row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
-                    if (!rolesMultiples)
+                    if (!rolesMultiples) {
                         rolDePagoPorCliente(rowData);
+                    }
                 }
             });
             return row ;
         });
+        
+        selectorDiaDe.setItems(Fechas.arraySpinnerDia());
+        selectorMesDe.setItems(Fechas.arraySpinnerMes());
+        selectorAnoDe.setItems(Fechas.arraySpinnerAno());
+        selectorDiaHa.setItems(Fechas.arraySpinnerDia());
+        selectorMesHa.setItems(Fechas.arraySpinnerMes());
+        selectorAnoHa.setItems(Fechas.arraySpinnerAno());
+        
+        selectorDiaDe.setDisable(true);
+        selectorMesDe.setDisable(true);
+        selectorAnoDe.setDisable(true);
+        selectorDiaHa.setDisable(true);
+        selectorMesHa.setDisable(true);
+        selectorAnoHa.setDisable(true);
     } 
     
     public void contarSelecciones() {
@@ -1427,7 +1457,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                 System.out.println(empleadosRol.size() + " empleados marcados");
                 ///////////// Removiendo empleado que tenga rol individual//////////////
                 List<RolIndividual> rolIndividuales = new RolIndividualDAO()
-                        .findAllByFechaAndEmpresaId(inicio, empresa.getId());
+                        .findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId());
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolIndividual rolIndividual: rolIndividuales) {
                         if (empleadoTable.getId().equals(rolIndividual.getUsuario().getId())) {
@@ -1443,10 +1473,10 @@ public class HorasEmpleadosClienteController implements Initializable {
                 List<RolCliente> rolesCliente;
                 if (cliente != null)
                     rolesCliente = new RolClienteDAO()
-                        .findAllByFechaAndClienteId(inicio, cliente.getId());
+                        .findAllByFechaAndClienteId(inicio.getFecha(), cliente.getId());
                 else 
                     rolesCliente = new RolClienteDAO()
-                        .findAllByFechaSinCliente(inicio);
+                        .findAllByFechaSinCliente(inicio.getFecha());
 
                 System.out.println(rolesCliente.size()+" encontrados en db");
                 List<RolCliente> rolesClienteDelete = new ArrayList<>();
@@ -1494,7 +1524,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                 }
                 System.out.println(empleadosRol.size() + " empleados marcados");
                 List<RolIndividual> rolIndividuales = new RolIndividualDAO()
-                        .findAllByFechaAndEmpresaId(inicio, empresa.getId());
+                        .findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId());
 
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolIndividual rolIndividual: rolIndividuales) {
@@ -1510,10 +1540,10 @@ public class HorasEmpleadosClienteController implements Initializable {
                 List<RolCliente> rolesCliente;
                 if (cliente != null)
                     rolesCliente = new RolClienteDAO()
-                        .findAllByFechaAndClienteId(inicio, cliente.getId());
+                        .findAllByFechaAndClienteId(inicio.getFecha(), cliente.getId());
                 else 
                     rolesCliente = new RolClienteDAO()
-                        .findAllByFechaSinCliente(inicio);
+                        .findAllByFechaSinCliente(inicio.getFecha());
 
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolCliente rolCliente: rolesCliente) {
@@ -1524,17 +1554,20 @@ public class HorasEmpleadosClienteController implements Initializable {
                 }
                 empleadosRol.removeAll(empleadosParaRemover);
                 empleadosParaRemover = new ArrayList<>();
+                
+                Fecha fechaInicial = new Fecha(inicio.getFecha()).minusDays(7); // dias anteriores de horas extras 
+                Fecha fechaFinal = new Fecha(fin.getFecha());
 
-                List<ControlEmpleado> controlesEmpleados;
+                List<ControlDiario> controlesEmpleados;
                 if (cliente != null)
-                    controlesEmpleados = new ControlEmpleadoDAO()
-                            .findAllByClienteIdInDeterminateTime(cliente.getId(), inicio, fin);
+                    controlesEmpleados = new ControlDiarioDAO()
+                            .findAllByClienteIdInDeterminateTime(cliente.getId(), fechaInicial.getFecha(), fechaFinal.getFecha()); 
                 else
-                    controlesEmpleados = new ControlEmpleadoDAO()
-                            .findAllBySinClienteInDeterminateTime(inicio, fin);
+                    controlesEmpleados = new ControlDiarioDAO()
+                            .findAllBySinClienteInDeterminateTime(fechaInicial.getFecha(), fechaFinal.getFecha());
 
                 List<Usuario> usuariosRol = new ArrayList<>();
-                for (ControlEmpleado controlEmpleado: controlesEmpleados) {
+                for (ControlDiario controlEmpleado: controlesEmpleados) {
                     Boolean agregar = true;
                     for (Usuario usuario: usuariosRol) {
                         if (usuario.getId().equals(controlEmpleado.getUsuario().getId())) {
@@ -1566,10 +1599,10 @@ public class HorasEmpleadosClienteController implements Initializable {
                 bonos = new ArrayList<>();
                 if (cliente != null) {
                     bonos.addAll((ArrayList<Bonos>) new BonosDAO()
-                            .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId(), new java.sql.Date(inicio.getTime())));
+                            .findAllByClienteIdAndEmpresaId(cliente.getId(), empresa.getId(), inicio.getFecha()));
                 } else {
                     bonos.addAll((ArrayList<Bonos>) new BonosDAO()
-                            .findAllByClienteNullAndEmpresaId(empresa.getId(), new java.sql.Date(inicio.getTime())));
+                            .findAllByClienteNullAndEmpresaId(empresa.getId(), inicio.getFecha()));
                 }
                 ///////////////////////// Obteniendo los actuariales de todos los empleados
                 actuariales = new ArrayList<>();
@@ -1587,72 +1620,69 @@ public class HorasEmpleadosClienteController implements Initializable {
                     Usuario usuario = null;
 
                     int descansosMedicos = 0;
-                    for (ControlEmpleado control: controlesEmpleados) {
+                    for (ControlDiario control: controlesEmpleados) {
                         if (Objects.equals(empleadoTable.getId(), control.getUsuario().getId())) {
                             usuario = control.getUsuario();
-
-                            if (control.getCaso().equalsIgnoreCase(Const.DM)) {
-                                descansosMedicos++;
-                            } 
                             
-                            if (control.getMedioDia()) {
-                                medioDias++;
-                            }
+                            if (new Fecha(control.getFecha()).afterEquals(inicio)) {
 
-                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
-                                    || control.getCaso().equalsIgnoreCase(Const.CM)) {
+                                if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                                    descansosMedicos++;
+                                } 
 
-                                dias += 1;
-                                normales = control.getMedioDia()? normales+4 : normales+8;
-                                sobreTiempo += control.getSobretiempo();
-                                suplementarias += control.getRecargo();
+                                if (control.getMedioDia()) {
+                                    medioDias++;
+                                }
 
-                            } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
-                                if (descansosMedicos <= 3) {
+                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                        || control.getCaso().equalsIgnoreCase(Const.CM)) {
+
                                     dias += 1;
                                     normales = control.getMedioDia()? normales+4 : normales+8;
+                                    //sobreTiempo += control.getSobretiempo();
+                                    //suplementarias += control.getRecargo();
+
+                                } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                                    if (descansosMedicos <= 3) {
+                                        dias += 1;
+                                        normales = control.getMedioDia()? normales+4 : normales+8;
+                                    }
                                 }
+
+                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                        || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                        || control.getCaso().equalsIgnoreCase(Const.PERMISO)
+                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                        || control.getCaso().equalsIgnoreCase(Const.CM)
+                                        || control.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                                    diasJubilacion += 1;
+
+                                } 
+
+                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                        || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                        || control.getCaso().equalsIgnoreCase(Const.CM)
+                                        || control.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                                    diasDecimo4to += 1;
+
+                                } 
                             }
-                            
-                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
-                                    || control.getCaso().equalsIgnoreCase(Const.PERMISO)
-                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                    || control.getCaso().equalsIgnoreCase(Const.CM)
-                                    || control.getCaso().equalsIgnoreCase(Const.DM)) {
+                            if (new Fecha(control.getFecha()).before(fin.minusDays(6))) {
+                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                        || control.getCaso().equalsIgnoreCase(Const.CM)) {
 
-                                diasJubilacion += 1;
-
-                            } 
-                            
-                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
-                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                    || control.getCaso().equalsIgnoreCase(Const.CM)
-                                    || control.getCaso().equalsIgnoreCase(Const.DM)) {
-
-                                diasDecimo4to += 1;
-
+                                    sobreTiempo += control.getSobretiempo();
+                                    suplementarias += control.getRecargo();
+                                } 
                             } 
                         }
                     }
-                    ///////////////// Calculando dias del mes ///////////////////////
-                    DateTime fechaInicial = new DateTime(inicio.getTime());
-                    DateTime fechaFinal = new DateTime(fin.getTime());
-                    final int days = Days.daysBetween(fechaInicial.withTimeAtStartOfDay(), 
-                        fechaFinal.withTimeAtStartOfDay()).getDays() + 1;
-                    ///////////////////////////////////////////////////////////////
-                    if (days != 30) {
-                        dias = (30d/days) * dias;
-                        dias = roundInt(dias).doubleValue();
-                        diasDecimo4to = (30d/days) * diasDecimo4to;
-                        diasDecimo4to = roundInt(diasDecimo4to).doubleValue();
-                        diasJubilacion = (30d/days) * diasJubilacion;
-                        diasJubilacion = roundInt(diasJubilacion).doubleValue();
-                        normales = (dias*8d) - (medioDias*4d);
-                    }
+                    
                     Actuariales actuariales = new ActuarialesDAO().findByEmpleadoId(empleadoTable.getId());
                     empleadoTable.setActuariales(actuariales);
                     RolCliente rolCliente = calcularPago(dias, diasDecimo4to, diasJubilacion, normales, sobreTiempo, suplementarias, usuario);

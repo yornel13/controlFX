@@ -20,8 +20,8 @@ public class PagoMes implements java.io.Serializable {
         private RolIndividual rolIndividual;
 	private Double monto;
 	private Timestamp fecha;
-	private Timestamp inicioMes;
-	private Timestamp finMes;
+	private String inicioMes;
+	private String finMes;
 	private Set abonoDeudas = new HashSet(0);
         private Set pagoMesItems = new HashSet(0);
 
@@ -29,27 +29,6 @@ public class PagoMes implements java.io.Serializable {
 
 	/** default constructor */
 	public PagoMes() {
-	}
-
-	/** minimal constructor */
-	public PagoMes(Usuario usuario, Double monto, Timestamp fecha,
-			Timestamp inicioMes, Timestamp finMes) {
-		this.usuario = usuario;
-		this.monto = monto;
-		this.fecha = fecha;
-		this.inicioMes = inicioMes;
-		this.finMes = finMes;
-	}
-
-	/** full constructor */
-	public PagoMes(Usuario usuario, Double monto, Timestamp fecha,
-			Timestamp inicioMes, Timestamp finMes, Set abonoDeudas) {
-		this.usuario = usuario;
-		this.monto = monto;
-		this.fecha = fecha;
-		this.inicioMes = inicioMes;
-		this.finMes = finMes;
-		this.abonoDeudas = abonoDeudas;
 	}
 
 	// Property accessors
@@ -94,19 +73,19 @@ public class PagoMes implements java.io.Serializable {
 		this.fecha = fecha;
 	}
 
-	public Timestamp getInicioMes() {
+	public String getInicioMes() {
 		return this.inicioMes;
 	}
 
-	public void setInicioMes(Timestamp inicioMes) {
+	public void setInicioMes(String inicioMes) {
 		this.inicioMes = inicioMes;
 	}
 
-	public Timestamp getFinMes() {
+	public String getFinMes() {
 		return this.finMes;
 	}
 
-	public void setFinMes(Timestamp finMes) {
+	public void setFinMes(String finMes) {
 		this.finMes = finMes;
 	}
 

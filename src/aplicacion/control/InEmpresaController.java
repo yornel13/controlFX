@@ -145,8 +145,6 @@ public class InEmpresaController implements Initializable {
             buttonHoras.getItems().clear();
             MenuItem menuAsignar = new MenuItem("Asignar Horarios");
             buttonHoras.getItems().add(menuAsignar);
-            MenuItem menuSemanal = new MenuItem("Por Semana");
-            buttonHoras.getItems().add(menuSemanal);
             MenuItem menuItemEmpleado = new MenuItem("Por Empleado");
             buttonHoras.getItems().add(menuItemEmpleado);
             MenuItem menuItemCliente = new MenuItem("Por Cliente");
@@ -160,12 +158,7 @@ public class InEmpresaController implements Initializable {
                 aplicacionControl.mostrarClientesEmpresa(empresa, stagePrincipal);
             });
             menuAsignar.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarAignaHorarios(empresa);
-                // no esta en uso
-            });
-            menuSemanal.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarHorarioSemanalEmpleados(empresa, stagePrincipal);
-                // no esta en uso
+                aplicacionControl.mostrarAsignaHorarios(empresa);
             });
             menuItemHorarios.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarHorarios(empresa, stagePrincipal);

@@ -2,9 +2,8 @@ package hibernate.dao;
 
 // default package
 
-import hibernate.model.ControlEmpleado;
+import hibernate.model.ControlDiario;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -14,25 +13,25 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A data access object (DAO) providing persistence and search support for
- * ControlEmpleado entities. Transaction control of the save(), update() and
+ * ControlDiario entities. Transaction control of the save(), update() and
  * delete() operations can directly support Spring container-managed
  * transactions or they can be augmented to handle user-managed Spring
  * transactions. Each of these methods provides additional information for how
  * to configure it for the desired type of transaction control.
  * 
- * @see .ControlEmpleado
+ * @see .ControlDiario
  * @author MyEclipse Persistence Tools
  */
-public class ControlEmpleadoDAO extends BaseHibernateDAO {
+public class ControlDiarioDAO extends BaseHibernateDAO {
 	private static final Logger log = LoggerFactory
-			.getLogger(ControlEmpleadoDAO.class);
+			.getLogger(ControlDiarioDAO.class);
 	// property constants
         public static final String NORMALES = "normales";
 	public static final String SOBRETIEMPO = "sobretiempo";
 	public static final String RECARGO = "recargo";
 
-	public void save(ControlEmpleado transientInstance) {
-		log.debug("saving ControlEmpleado instance");
+	public void save(ControlDiario transientInstance) {
+		log.debug("saving ControlDiario instance");
 		try {
 			getSession().save(transientInstance);
 			log.debug("save successful");
@@ -42,8 +41,8 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void delete(ControlEmpleado persistentInstance) {
-		log.debug("deleting ControlEmpleado instance");
+	public void delete(ControlDiario persistentInstance) {
+		log.debug("deleting ControlDiario instance");
 		try {
 			getSession().delete(persistentInstance);
 			log.debug("delete successful");
@@ -53,11 +52,11 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public ControlEmpleado findById(java.lang.Integer id) {
-		log.debug("getting ControlEmpleado instance with id: " + id);
+	public ControlDiario findById(java.lang.Long id) {
+		log.debug("getting ControlDiario instance with id: " + id);
 		try {
-			ControlEmpleado instance = (ControlEmpleado) getSession().get(
-					"hibernate.model.ControlEmpleado", id);
+			ControlDiario instance = (ControlDiario) getSession().get(
+					"hibernate.model.ControlDiario", id);
 			return instance;
 		} catch (RuntimeException re) {
 			log.error("get failed", re);
@@ -65,184 +64,151 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
         
-        public List<ControlEmpleado> findAllByEmpleadoId(Integer usuarioId) {
+        public List<ControlDiario> findAllByEmpleadoId(Integer usuarioId) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "WHERE usuario_id = :usuario_id")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("usuario_id", usuarioId);
                 Object result = query.list();
-                return (List<ControlEmpleado>) result;
+                return (List<ControlDiario>) result;
 	}
         
-        public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(
-                Integer usuarioId, Timestamp inicio, Timestamp fin) {
+        public List<ControlDiario> findAllByEmpleadoIdInDeterminateTime(
+                Integer usuarioId, String inicio, String fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "WHERE usuario_id = :usuario_id "
                             + "and fecha >= :inicio "
                             + "and fecha <= :fin "
                             + "order by fecha")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("inicio", inicio)
                     .setParameter("fin", fin);
                 Object result = query.list();
-                return (List<ControlEmpleado>) result;
+                return (List<ControlDiario>) result;
 	}
         
-        public List<ControlEmpleado> findAllByEmpleadoIdInDeterminateTime(
-                Integer usuarioId, Date inicio, Date fin) {
+        public List<ControlDiario> findAllByClienteId(Integer clienteId) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
-                            + "WHERE usuario_id = :usuario_id "
-                            + "and fecha >= :inicio "
-                            + "and fecha <= :fin "
-                            + "order by fecha")
-                    .addEntity(ControlEmpleado.class)
-                    .setParameter("usuario_id", usuarioId)
-                    .setParameter("inicio", inicio)
-                    .setParameter("fin", fin);
-                Object result = query.list();
-                return (List<ControlEmpleado>) result;
-	}
-        
-        public List<ControlEmpleado> findAllByClienteId(Integer clienteId) {
-		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "WHERE cliente_id = :cliente_id")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("cliente_id", clienteId);
                 Object result = query.list();
-                return (List<ControlEmpleado>) result;
+                return (List<ControlDiario>) result;
 	}
         
-        public List<ControlEmpleado> findAllByEmpleadoIdClienteIdInDeterminateTime(
-                Integer usuarioId, Integer clienteId, Timestamp inicio, Timestamp fin) {
+        public List<ControlDiario> findAllByEmpleadoIdClienteIdInDeterminateTime(
+                Integer usuarioId, Integer clienteId, String inicio, String fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "WHERE usuario_id = :usuario_id "
                             + "and cliente_id = :cliente_id "
                             + "and fecha >= :inicio "
                             + "and fecha <= :fin "
                             + "order by fecha")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("cliente_id", clienteId)
                     .setParameter("inicio", inicio)
                     .setParameter("fin", fin);
                 Object result = query.list();
-                return (List<ControlEmpleado>) result;
+                return (List<ControlDiario>) result;
 	}
         
-        public List<ControlEmpleado> findAllByClienteIdInDeterminateTime(
-                Integer clienteId, Timestamp inicio, Timestamp fin) {
+        public List<ControlDiario> findAllByClienteIdInDeterminateTime(
+                Integer clienteId, String inicio, String fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "WHERE cliente_id = :cliente_id "
                             + "and fecha >= :inicio "
                             + "and fecha <= :fin "
                             + "order by fecha")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("cliente_id", clienteId)
                     .setParameter("inicio", inicio)
                     .setParameter("fin", fin);
                 Object result = query.list();
-                return (List<ControlEmpleado>) result;
+                return (List<ControlDiario>) result;
 	}
         
-        public List<ControlEmpleado> findAllBySinClienteInDeterminateTime(
-                Timestamp inicio, Timestamp fin) {
+        public List<ControlDiario> findAllBySinClienteInDeterminateTime(
+                String inicio, String fin) {
             Query query = getSession().
-                createSQLQuery("SELECT * FROM control_empleado "
+                createSQLQuery("SELECT * FROM control_diario "
                         + "WHERE cliente_id is null "
                         + "and fecha >= :inicio "
                         + "and fecha <= :fin "
                         + "order by fecha")
-                .addEntity(ControlEmpleado.class)
+                .addEntity(ControlDiario.class)
                 .setParameter("inicio", inicio)
                 .setParameter("fin", fin);
             Object result = query.list();
-            return (List<ControlEmpleado>) result;
+            return (List<ControlDiario>) result;
 	}
         
-        public List<ControlEmpleado> findAllByEmpleadoIdSinClienteInDeterminateTime(
-                Integer usuarioId, Timestamp inicio, Timestamp fin) {
+        public List<ControlDiario> findAllByEmpleadoIdSinClienteInDeterminateTime(
+                Integer usuarioId, String inicio, String fin) {
 		Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "WHERE usuario_id = :usuario_id "
                             + "and cliente_id is null "
                             + "and fecha >= :inicio "
                             + "and fecha <= :fin "
                             + "order by fecha")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("usuario_id", usuarioId)
                     .setParameter("inicio", inicio)
                     .setParameter("fin", fin);
                 Object result = query.list();
-                return (List<ControlEmpleado>) result;
+                return (List<ControlDiario>) result;
 	}
         
-        public ControlEmpleado findByFecha(Timestamp fecha, Integer usuarioId) {
+        public ControlDiario findByFecha(String fecha, Integer usuarioId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "where fecha = :fecha "
                             + "and usuario_id = :usuario_id")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("fecha", fecha)
                     .setParameter("usuario_id", usuarioId);
             Object result = query.uniqueResult();
-            return (ControlEmpleado) result;
+            return (ControlDiario) result;
         }
         
-        public List<ControlEmpleado> findAllByFechaAndEmpresaId(Timestamp fecha, 
+        public List<ControlDiario> findAllByFechaAndEmpresaId(String fecha, 
                 Integer empresaId) {
             Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
+                    createSQLQuery("SELECT * FROM control_diario "
                             + "JOIN usuario "
-                            + "ON usuario.id = control_empleado.usuario_id "
+                            + "ON usuario.id = control_diario.usuario_id "
                             + "JOIN detalles_empleado "
                             + "ON detalles_empleado.id = usuario.detalles_empleado_id "
                             + "where fecha = :fecha "
                             + "and empresa_id = :empresa_id")
-                    .addEntity(ControlEmpleado.class)
+                    .addEntity(ControlDiario.class)
                     .setParameter("fecha", fecha)
                     .setParameter("empresa_id", empresaId);
             Object result = query.list();
-            return (List<ControlEmpleado>) result;
+            return (List<ControlDiario>) result;
         }
         
-        public List<ControlEmpleado> findAllByFechaAndEmpresaId(Date fecha, 
-                Integer empresaId) {
-            Query query = getSession().
-                    createSQLQuery("SELECT * FROM control_empleado "
-                            + "JOIN usuario "
-                            + "ON usuario.id = control_empleado.usuario_id "
-                            + "JOIN detalles_empleado "
-                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
-                            + "where fecha = :fecha "
-                            + "and empresa_id = :empresa_id")
-                    .addEntity(ControlEmpleado.class)
-                    .setParameter("fecha", fecha)
-                    .setParameter("empresa_id", empresaId);
-            Object result = query.list();
-            return (List<ControlEmpleado>) result;
-        }
-        
-        public List<ControlEmpleado> findAllByUltimosRegistros() {
+        public List<ControlDiario> findAllByUltimosRegistros() {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM "
-                            + "(SELECT distinct * FROM control_empleado ORDER BY id DESC) "
+                            + "(SELECT distinct * FROM control_diario ORDER BY id DESC) "
                             + "AS t1 group by usuario_id")
-                    .addEntity(ControlEmpleado.class);
+                    .addEntity(ControlDiario.class);
             Object result = query.list();
-            return (List<ControlEmpleado>) result;
+            return (List<ControlDiario>) result;
         }
 
-	public List findByExample(ControlEmpleado instance) {
-		log.debug("finding ControlEmpleado instance by example");
+	public List findByExample(ControlDiario instance) {
+		log.debug("finding ControlDiario instance by example");
 		try {
-			List results = getSession().createCriteria("hibernate.model.ControlEmpleado")
+			List results = getSession().createCriteria("hibernate.model.ControlDiario")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());
@@ -254,10 +220,10 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 	}
 
 	public List findByProperty(String propertyName, Object value) {
-		log.debug("finding ControlEmpleado instance with property: "
+		log.debug("finding ControlDiario instance with property: "
 				+ propertyName + ", value: " + value);
 		try {
-			String queryString = "from ControlEmpleado as model where model."
+			String queryString = "from ControlDiario as model where model."
 					+ propertyName + "= ?";
 			Query queryObject = getSession().createQuery(queryString);
 			queryObject.setParameter(0, value);
@@ -277,9 +243,9 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 	}
 
 	public List findAll() {
-		log.debug("finding all ControlEmpleado instances");
+		log.debug("finding all ControlDiario instances");
 		try {
-			String queryString = "from ControlEmpleado";
+			String queryString = "from ControlDiario";
 			Query queryObject = getSession().createQuery(queryString);
 			return queryObject.list();
 		} catch (RuntimeException re) {
@@ -288,10 +254,10 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public ControlEmpleado merge(ControlEmpleado detachedInstance) {
-		log.debug("merging ControlEmpleado instance");
+	public ControlDiario merge(ControlDiario detachedInstance) {
+		log.debug("merging ControlDiario instance");
 		try {
-			ControlEmpleado result = (ControlEmpleado) getSession().merge(
+			ControlDiario result = (ControlDiario) getSession().merge(
 					detachedInstance);
 			log.debug("merge successful");
 			return result;
@@ -301,8 +267,8 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachDirty(ControlEmpleado instance) {
-		log.debug("attaching dirty ControlEmpleado instance");
+	public void attachDirty(ControlDiario instance) {
+		log.debug("attaching dirty ControlDiario instance");
 		try {
 			getSession().saveOrUpdate(instance);
 			log.debug("attach successful");
@@ -312,8 +278,8 @@ public class ControlEmpleadoDAO extends BaseHibernateDAO {
 		}
 	}
 
-	public void attachClean(ControlEmpleado instance) {
-		log.debug("attaching clean ControlEmpleado instance");
+	public void attachClean(ControlDiario instance) {
+		log.debug("attaching clean ControlDiario instance");
 		try {
 			getSession().buildLockRequest(LockOptions.NONE).lock(instance);
 			log.debug("attach successful");
