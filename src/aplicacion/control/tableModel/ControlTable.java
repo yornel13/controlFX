@@ -7,7 +7,9 @@ package aplicacion.control.tableModel;
 
 import aplicacion.control.util.Fecha;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import hibernate.model.Usuario;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -25,6 +27,8 @@ public class ControlTable {
     private String observacion;
     private String dia;
     private ControlDiario controlDiario;
+    private ControlExtras controlExtras;
+    private DateTime fechaExtra;
     private Fecha fecha;
     private Boolean ajeno;
     public Boolean marcar;
@@ -136,6 +140,22 @@ public class ControlTable {
 
     public void setMarcar(Boolean marcar) {
         this.marcar = marcar;
+    }
+
+    public DateTime getFechaExtra() {
+        return fechaExtra;
+    }
+
+    public void setFechaExtra(DateTime fechaExtra) {
+        this.fechaExtra = fechaExtra;
+    }
+
+    public ControlExtras getControlExtras() {
+        return controlExtras;
+    }
+
+    public void setControlExtras(ControlExtras controlExtras) {
+        this.controlExtras = controlExtras;
     }
 
     

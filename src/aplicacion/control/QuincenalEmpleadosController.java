@@ -11,6 +11,7 @@ import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Numeros;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
@@ -898,6 +899,13 @@ public class QuincenalEmpleadosController implements Initializable {
         ReporteAdelantoQuincenalVarios datasource = new ReporteAdelantoQuincenalVarios();
         datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
         
+        Double total = 0d;
+        
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            total += empleadoTable.getQuincenal();
+        }
+        
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ADELANTO_QUINCENAL_EMPLEADOS);
         
@@ -909,6 +917,7 @@ public class QuincenalEmpleadosController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
+            parametros.put("total", round(total).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

@@ -5,7 +5,9 @@
  */
 package aplicacion.control.util;
 
+import java.sql.Date;
 import javafx.scene.control.ChoiceBox;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -388,4 +390,11 @@ public class Fecha {
          selectorDia.getSelectionModel().select(this.getDia());
     }
     
+    public Date getDate() {
+        DateTime dateTime = new DateTime(getAnoInt(), getMesInt(), getDiaInt(), 0, 0, 0);
+        //dateTime = dateTime.withYear(getAnoInt());
+        //dateTime = dateTime.withMonthOfYear(getMesInt());
+        //dateTime = dateTime.withDayOfMonth(getDiaInt());
+        return new Date(dateTime.getMillis());
+    }
 }

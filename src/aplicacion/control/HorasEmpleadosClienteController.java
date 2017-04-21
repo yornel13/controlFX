@@ -91,7 +91,9 @@ import hibernate.model.DiasVacaciones;
 import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.dao.ControlDiarioDAO;
+import hibernate.dao.ControlExtrasDAO;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import javafx.scene.control.ChoiceBox;
 
 /**
@@ -973,24 +975,33 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         data = FXCollections.observableArrayList();
         
-        Fecha fechaInicial = new Fecha(inicio.getFecha()).minusDays(7); // dias anteriores de horas extras 
+        Fecha fechaInicial = new Fecha(inicio.getFecha()); // dias anteriores de horas extras 
         Fecha fechaFinal = new Fecha(fin.getFecha());
+        
+        java.sql.Date fechaInicialExtra = fechaInicial.minusDays(7).getDate(); // dias anteriores de horas extras 
+        java.sql.Date fechaFinalExtra = fechaFinal.minusDays(7).getDate();
         
         if (!usuarios.isEmpty()) {
             
             ControlDiarioDAO controlDAO = new ControlDiarioDAO();
+            ControlExtrasDAO extrasDAO = new ControlExtrasDAO();
             
             List<ControlDiario> controlesDiarios;
+            List<ControlExtras> controlesExtrases;
             if (cliente != null) {
                 controlesDiarios = controlDAO
                         .findAllByClienteIdInDeterminateTime(cliente.getId(), fechaInicial.getFecha(), fechaFinal.getFecha());
+                controlesExtrases = extrasDAO
+                        .findAllByClienteIdInDeterminateTime(cliente.getId(), fechaInicialExtra, fechaFinalExtra);
                 rolesCliente = new RolClienteDAO()
-                   .findAllByFechaAndClienteIdAndEmpresaId(fechaInicial.getFecha(), cliente.getId(), empresa.getId());
+                   .findAllByFechaAndClienteIdAndEmpresaId(inicio.getFecha(), cliente.getId(), empresa.getId());
             } else {
                 controlesDiarios = controlDAO
                         .findAllBySinClienteInDeterminateTime(fechaInicial.getFecha(), fechaFinal.getFecha());
+                controlesExtrases = extrasDAO
+                        .findAllBySinClienteInDeterminateTime(fechaInicialExtra, fechaFinalExtra);
                 rolesCliente = new RolClienteDAO()
-                   .findAllByFechaAndEmpresaIdSinCliente(fechaInicial.getFecha(), empresa.getId());
+                   .findAllByFechaAndEmpresaIdSinCliente(inicio.getFecha(), empresa.getId());
             }
             
             ///////////////////////////////////////////////////////////////
@@ -1006,11 +1017,12 @@ public class HorasEmpleadosClienteController implements Initializable {
                     if (Objects.equals(user.getId(), control.getUsuario().getId())) {
                         
                         if (new Fecha(control.getFecha()).afterEquals(inicio)) {
-                            System.out.println("before equals "+control.getFecha());
                         
                             if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                                 descansosMedicos++;
-                            } 
+                            } else {
+                                descansosMedicos = 0;
+                            }
                             if (control.getMedioDia()) {
                                 medioDias++;
                             }
@@ -1021,8 +1033,6 @@ public class HorasEmpleadosClienteController implements Initializable {
 
                                 dias += 1;
                                 normales = control.getMedioDia()? normales+4 : normales+8;
-                                //sobreTiempo += control.getSobretiempo();
-                                //suplementarias += control.getRecargo();
 
                             } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
                                 if (descansosMedicos <= 3) {
@@ -1031,15 +1041,18 @@ public class HorasEmpleadosClienteController implements Initializable {
                                 }
                             }
                         }
-                        if (new Fecha(control.getFecha()).before(fin.minusDays(6))) {
-                            System.out.println("after "+control.getFecha());
-                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                    || control.getCaso().equalsIgnoreCase(Const.CM)) {
+                    }
+                }
+                for (ControlExtras controlExtra: controlesExtrases) {
+            
+                    if (Objects.equals(user.getId(), controlExtra.getUsuario().getId())) {
 
-                                sobreTiempo += control.getSobretiempo();
-                                suplementarias += control.getRecargo();
-                            } 
+                        if (controlExtra.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                || controlExtra.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                || controlExtra.getCaso().equalsIgnoreCase(Const.CM)) {
+
+                            sobreTiempo += controlExtra.getSobretiempo();
+                            suplementarias += controlExtra.getRecargo();
                         } 
                     }
                 }
@@ -1479,6 +1492,7 @@ public class HorasEmpleadosClienteController implements Initializable {
                         .findAllByFechaSinCliente(inicio.getFecha());
 
                 System.out.println(rolesCliente.size()+" encontrados en db");
+                
                 List<RolCliente> rolesClienteDelete = new ArrayList<>();
                 for (EmpleadoTable empleadoTable: empleadosRol) {
                     for (RolCliente rolCliente: rolesCliente) {
@@ -1555,17 +1569,27 @@ public class HorasEmpleadosClienteController implements Initializable {
                 empleadosRol.removeAll(empleadosParaRemover);
                 empleadosParaRemover = new ArrayList<>();
                 
-                Fecha fechaInicial = new Fecha(inicio.getFecha()).minusDays(7); // dias anteriores de horas extras 
+                Fecha fechaInicial = new Fecha(inicio.getFecha()); 
                 Fecha fechaFinal = new Fecha(fin.getFecha());
+                
+                java.sql.Date fechaInicialExtra = fechaInicial.minusDays(7).getDate(); // dias anteriores de horas extras 
+                java.sql.Date fechaFinalExtra = fechaFinal.minusDays(7).getDate();
+        
 
                 List<ControlDiario> controlesEmpleados;
-                if (cliente != null)
+                List<ControlExtras> controlesExtras;
+                if (cliente != null) {
                     controlesEmpleados = new ControlDiarioDAO()
                             .findAllByClienteIdInDeterminateTime(cliente.getId(), fechaInicial.getFecha(), fechaFinal.getFecha()); 
-                else
+                    controlesExtras = new ControlExtrasDAO()
+                        .findAllByClienteIdInDeterminateTime(cliente.getId(), fechaInicialExtra, fechaFinalExtra);
+                }
+                else {
                     controlesEmpleados = new ControlDiarioDAO()
                             .findAllBySinClienteInDeterminateTime(fechaInicial.getFecha(), fechaFinal.getFecha());
-
+                    controlesExtras = new ControlExtrasDAO()
+                        .findAllBySinClienteInDeterminateTime(fechaInicialExtra, fechaFinalExtra);
+                }
                 List<Usuario> usuariosRol = new ArrayList<>();
                 for (ControlDiario controlEmpleado: controlesEmpleados) {
                     Boolean agregar = true;
@@ -1623,63 +1647,67 @@ public class HorasEmpleadosClienteController implements Initializable {
                     for (ControlDiario control: controlesEmpleados) {
                         if (Objects.equals(empleadoTable.getId(), control.getUsuario().getId())) {
                             usuario = control.getUsuario();
-                            
-                            if (new Fecha(control.getFecha()).afterEquals(inicio)) {
 
-                                if (control.getCaso().equalsIgnoreCase(Const.DM)) {
-                                    descansosMedicos++;
-                                } 
+                            if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                                descansosMedicos++;
+                            } else {
+                                descansosMedicos = 0;
+                            }
 
-                                if (control.getMedioDia()) {
-                                    medioDias++;
-                                }
+                            if (control.getMedioDia()) {
+                                medioDias++;
+                            }
 
-                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                        || control.getCaso().equalsIgnoreCase(Const.CM)) {
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)) {
 
+                                dias += 1;
+                                normales = control.getMedioDia()? normales+4 : normales+8;
+                                //sobreTiempo += control.getSobretiempo();
+                                //suplementarias += control.getRecargo();
+
+                            } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
+                                if (descansosMedicos <= 3) {
                                     dias += 1;
                                     normales = control.getMedioDia()? normales+4 : normales+8;
-                                    //sobreTiempo += control.getSobretiempo();
-                                    //suplementarias += control.getRecargo();
-
-                                } else if (control.getCaso().equalsIgnoreCase(Const.DM)) {
-                                    if (descansosMedicos <= 3) {
-                                        dias += 1;
-                                        normales = control.getMedioDia()? normales+4 : normales+8;
-                                    }
                                 }
-
-                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                        || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
-                                        || control.getCaso().equalsIgnoreCase(Const.PERMISO)
-                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                        || control.getCaso().equalsIgnoreCase(Const.CM)
-                                        || control.getCaso().equalsIgnoreCase(Const.DM)) {
-
-                                    diasJubilacion += 1;
-
-                                } 
-
-                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                        || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
-                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                        || control.getCaso().equalsIgnoreCase(Const.CM)
-                                        || control.getCaso().equalsIgnoreCase(Const.DM)) {
-
-                                    diasDecimo4to += 1;
-
-                                } 
                             }
-                            if (new Fecha(control.getFecha()).before(fin.minusDays(6))) {
-                                if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
-                                        || control.getCaso().equalsIgnoreCase(Const.LIBRE)
-                                        || control.getCaso().equalsIgnoreCase(Const.CM)) {
 
-                                    sobreTiempo += control.getSobretiempo();
-                                    suplementarias += control.getRecargo();
-                                } 
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                    || control.getCaso().equalsIgnoreCase(Const.PERMISO)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)
+                                    || control.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                                diasJubilacion += 1;
+
                             } 
+
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.VACACIONES)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)
+                                    || control.getCaso().equalsIgnoreCase(Const.DM)) {
+
+                                diasDecimo4to += 1;
+
+                            } 
+                        }
+                    }
+                    
+                    for (ControlExtras control: controlesExtras) {
+                        if (Objects.equals(empleadoTable.getId(), control.getUsuario().getId())) {
+
+                            if (control.getCaso().equalsIgnoreCase(Const.TRABAJO)
+                                    || control.getCaso().equalsIgnoreCase(Const.LIBRE)
+                                    || control.getCaso().equalsIgnoreCase(Const.CM)) {
+
+                                sobreTiempo += control.getSobretiempo();
+                                suplementarias += control.getRecargo();
+                            } 
+                            
                         }
                     }
                     

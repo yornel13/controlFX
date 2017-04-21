@@ -87,17 +87,31 @@ public class PagoMesItemDAO extends BaseHibernateDAO {
             return (List<PagoMesItem>) result;
         }
         
-        public List<PagoMesItem> findByEmpleadoIdAndClaveAndFecha(Integer empleadoId, String clave, Timestamp fin) {
+        public List<PagoMesItem> findByEmpleadoIdAndClaveAndFecha(Integer empleadoId, String clave, String inicio) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago_mes_item "
                             + "JOIN pago_mes "
                             + "ON pago_mes.id = pago_mes_item.pago_mes_id "
                             + "where usuario_id = :usuario_id "
-                            + "and fin_mes = :fin_mes "
+                            + "and inicio_mes = :inicio_mes "
                             + "and clave = :clave")
                     .addEntity(PagoMesItem.class)
                     .setParameter("usuario_id", empleadoId)
-                    .setParameter("fin_mes", fin)
+                    .setParameter("inicio_mes", inicio)
+                    .setParameter("clave", clave);
+            Object result = query.list();
+            return (List<PagoMesItem>) result;
+        }
+        
+        public List<PagoMesItem> findByClaveAndFecha(String clave, String fechaInicio) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes_item "
+                            + "JOIN pago_mes "
+                            + "ON pago_mes.id = pago_mes_item.pago_mes_id "
+                            + "where inicio_mes = :fecha_inicio "
+                            + "and clave = :clave order by descripcion")
+                    .addEntity(PagoMesItem.class)
+                    .setParameter("fecha_inicio", fechaInicio)
                     .setParameter("clave", clave);
             Object result = query.list();
             return (List<PagoMesItem>) result;

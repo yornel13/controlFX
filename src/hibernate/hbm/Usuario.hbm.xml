@@ -69,6 +69,12 @@
       </key>
       <one-to-many class="hibernate.model.ControlDiario"/>
     </set>
+    <set inverse="true" name="controlExtrases">
+      <key>
+        <column name="usuario_id" not-null="true"/>
+      </key>
+      <one-to-many class="hibernate.model.ControlExtras"/>
+    </set>
     <set inverse="true" name="bonos">
       <key>
         <column name="usuario_id" not-null="true"/>

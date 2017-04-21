@@ -96,7 +96,9 @@ import javafx.util.Callback;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import hibernate.dao.ControlDiarioDAO;
+import hibernate.dao.ControlExtrasDAO;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import java.util.List;
 
 /**
@@ -378,9 +380,19 @@ public class PagoMensualPagadoController implements Initializable {
         ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
         datasource.addAll(pagoMesItems);
         
-        List<ControlDiario> controlEmpleado = new ControlDiarioDAO()
-                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio.minusDays(7).getFecha(), fin.getFecha());
-                
+        List<ControlExtras> controlEmpleado = new ControlExtrasDAO()
+                        .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), inicio.minusDays(7).getDate(), fin.minusDays(7).getDate());
+
+        String horasDetallado = "";
+        
+        for (RolCliente rolCliente: pagos) {
+            horasDetallado += "Cliente "+rolCliente.getClienteNombre()
+                    +":\n               Dias                     "+rolCliente.getDias()
+                    +"\n               H. Normales        "+rolCliente.getHorasNormales()
+                    +"\n               H. Recargo          "+rolCliente.getHorasSuplementarias()
+                    +"\n               H. Sobretiempo   "+rolCliente.getHorasSobreTiempo()+"\n\n";
+        }
+        
         ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas(inicio, fin);
         horasSource.addAll(controlEmpleado);
         
@@ -397,6 +409,7 @@ public class PagoMensualPagadoController implements Initializable {
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
             parametros.put("total", round(aPercibirValor).toString());
             parametros.put("fecha_recibo", Fechas.getFechaConMes(rolIndividual.getFecha()));
+            parametros.put("horas_detallado", horasDetallado);
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -531,6 +544,7 @@ public class PagoMensualPagadoController implements Initializable {
         stagePrincipal.close();
         dialogLoading.close();
         dialogoBorradoCompletado();
+        pagoMensualController.setTableInfo(); 
     }
     
     @FXML
@@ -984,11 +998,6 @@ public class PagoMensualPagadoController implements Initializable {
             } catch (Exception e) {
                 System.out.println("error");
             }
-            Platform.runLater(new Runnable() {
-                @Override public void run() {
-                    pagoMensualController.setTableInfo(); 
-                }
-            });
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     borradoTerminado();  

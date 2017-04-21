@@ -5,13 +5,12 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.reports.ReporteIessVarios;
-import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.reports.ReporteDescuentosVarios;
+import aplicacion.control.tableModel.DescuentoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.dao.PagoMesItemDAO;
-import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.PagoMesItem;
 import hibernate.model.Usuario;
@@ -20,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +38,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -64,17 +61,15 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
-import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getToday;
+import static aplicacion.control.util.Numeros.round;
 import javafx.scene.control.ChoiceBox;
 
 /**
  *
  * @author Yornel
  */
-public class IessEmpleadosController implements Initializable {
+public class DescuentosEmpleadosController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -93,16 +88,13 @@ public class IessEmpleadosController implements Initializable {
     private TableColumn nombreColumna;
     
     @FXML 
-    private TableColumn apellidoColumna;
+    private TableColumn tipoColumna;
     
     @FXML 
-    private TableColumn departamentoColumna;
+    private TableColumn valorColumna;
     
     @FXML 
-    private TableColumn cargoColumna;
-    
-    @FXML 
-    private TableColumn iessColumna;
+    private TableColumn facturaColumna;
     
     @FXML
     private Button buttonAtras;
@@ -116,12 +108,12 @@ public class IessEmpleadosController implements Initializable {
     @FXML
     private Button buttonSiguiente;
     
-    private ObservableList<EmpleadoTable> data;
+    private ObservableList<DescuentoTable> data;
     
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     
-     @FXML
+    @FXML
     private ChoiceBox selectorDiaDe;
     
     @FXML
@@ -141,6 +133,7 @@ public class IessEmpleadosController implements Initializable {
     
     private Fecha inicio;
     private Fecha fin;
+    
     Stage dialogLoading;
     
     public void setStagePrincipal(Stage stagePrincipal) {
@@ -211,18 +204,65 @@ public class IessEmpleadosController implements Initializable {
         
         dialogWait();
         
-        ReporteIessVarios datasource = new ReporteIessVarios();
-        datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
+        ReporteDescuentosVarios datasource = new ReporteDescuentosVarios();
         
+        
+        List<DescuentoTable> descuentos = new ArrayList<>();
+        String tipo = "";
+        int count = 0;
         Double total = 0d;
+        int fullCount = 0;
+        Double fullTotal = 0d;
         
-        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+        for (DescuentoTable descuentoTable: (List<DescuentoTable>) 
                 empleadosTableView.getItems()) {
-            total += empleadoTable.getTotalIess();
+            
+            fullCount ++;
+            fullTotal += descuentoTable.getValor();
+            
+            if (tipo.equalsIgnoreCase(descuentoTable.getTipo())) {
+                count++;
+                total += descuentoTable.getValor();
+            } else {
+                if (count > 0) {
+                    DescuentoTable title = new DescuentoTable();
+                    title.setNombres("TOTAL POR CUENTA:     "+count);
+                    title.setCedula("");
+                    title.setValor(total);
+                    descuentos.add(title);
+                    
+                    DescuentoTable espacio = new DescuentoTable();
+                    espacio.setNombres("");
+                    espacio.setCedula("");
+                    descuentos.add(espacio);
+                    count = 0;
+                    total = 0d;
+                }
+                count++;
+                total += descuentoTable.getValor();
+                
+                DescuentoTable title = new DescuentoTable();
+                title.setNombres(descuentoTable.getTipo());
+                title.setCedula("");
+                descuentos.add(title);
+            }
+            tipo = descuentoTable.getTipo();
+            
+            descuentos.add(descuentoTable);
         }
         
+        if (descuentos.size() > 1) {
+            DescuentoTable title = new DescuentoTable();
+            title.setNombres("TOTAL POR CUENTA:     "+count);
+            title.setCedula("");
+            title.setValor(total);
+            descuentos.add(title);
+        }
+        
+        datasource.addAll(descuentos);
+        
         try {
-            InputStream inputStream = new FileInputStream(Const.REPORTE_IESS_EMPLEADOS);
+            InputStream inputStream = new FileInputStream(Const.REPORTE_DESCUENTOS_EMPLEADOS);
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
@@ -233,20 +273,21 @@ public class IessEmpleadosController implements Initializable {
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
             parametros.put("lapso", getFechaConMes(inicio)  + " al " + getFechaConMes(fin));
-            parametros.put("total", round(total).toString());
+            parametros.put("total", round(fullTotal).toString());
+            parametros.put("desc", String.valueOf(fullCount));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
-            String filename = "iess_abonado_" + System.currentTimeMillis();
+            String filename = "descuentos_" + System.currentTimeMillis();
             
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
             } 
             
             // Registro para auditar
-            String detalles = "genero el recibo mensual de IESS total abonado de todos los empleado";
+            String detalles = "genero el recibo de descuentos mensual de todos los empleado";
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();
@@ -291,7 +332,7 @@ public class IessEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir IESS");
+        dialogStage.setTitle("Imprimir Descuentos");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Seleccionar ruta");
@@ -328,37 +369,33 @@ public class IessEmpleadosController implements Initializable {
     
     public void setTableInfo() {
         
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
         
         data = FXCollections.observableArrayList(); 
-        usuarios.stream().map((user) -> {
-            EmpleadoTable empleado = new EmpleadoTable();
-            empleado.setId(user.getId());
-            empleado.setNombre(user.getNombre());
-            empleado.setApellido(user.getApellido());
-            empleado.setCedula(user.getCedula());
-            empleado.setEmpresa(user.getDetallesEmpleado()
-                    .getEmpresa().getNombre());
-            empleado.setTelefono(user.getTelefono());
-            empleado.setDepartamento(user.getDetallesEmpleado()
-                    .getDepartamento().getNombre());
-            empleado.setCargo(user.getDetallesEmpleado()
-                    .getCargo().getNombre());
-            Double totalIess = 0d; 
-            for (PagoMesItem pagoMesItem: new PagoMesItemDAO()
-                    .findByEmpleadoIdAndClaveAndFecha(user.getId(), Const.IP_IESS, inicio.getFecha())){
-                totalIess = pagoMesItem.getDeduccion();
+        
+        List<PagoMesItem> pagoMesItems = new PagoMesItemDAO().findByClaveAndFecha(Const.IP_DEUDA, inicio.getFecha());
+        
+        List<DescuentoTable> descuentos = new ArrayList<>(); 
+                
+        for (PagoMesItem pagoMesItem: pagoMesItems) {
+            if (pagoMesItem.getPagoMes().getUsuario().getDetallesEmpleado()
+                    .getEmpresa().getId().equals(empresa.getId())) {
+                System.out.println("hay un descuento");
+                DescuentoTable descuento = new DescuentoTable();
+                descuento.setNombre(pagoMesItem.getPagoMes().getUsuario().getNombre());
+                descuento.setApellido(pagoMesItem.getPagoMes().getUsuario().getApellido());
+                descuento.setNombres(pagoMesItem.getPagoMes().getUsuario().getApellido()
+                        +" "+pagoMesItem.getPagoMes().getUsuario().getNombre());
+                descuento.setCedula(pagoMesItem.getPagoMes().getUsuario().getCedula());
+                descuento.setEmpleado(pagoMesItem.getPagoMes().getUsuario());
+                descuento.setValor(pagoMesItem.getDeduccion());
+                descuento.setTipo(pagoMesItem.getDescripcion().substring(8));
+                descuentos.add(descuento);
             }
-            empleado.setTotalIess(totalIess);
-            return empleado;
-        }).forEach((empleado) -> {
-            data.add(empleado);
-        });
+        }
+        data.addAll(descuentos);
         empleadosTableView.setItems(data);
 
-        FilteredList<EmpleadoTable> filteredData = new FilteredList<>(data, p -> true);
+        FilteredList<DescuentoTable> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empleado -> {
                 // If filter text is empty, display all persons.
@@ -384,13 +421,13 @@ public class IessEmpleadosController implements Initializable {
             });
         });
         
-        SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
+        SortedList<DescuentoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
         chequearFiltro(filteredData);
     }
     
-    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+    void chequearFiltro(FilteredList<DescuentoTable> filteredData) {
         filteredData.setPredicate(empleado -> {
             // If filter text is empty, display all persons.
             if (filterField.getText() == null || filterField.getText().isEmpty()) {
@@ -420,22 +457,20 @@ public class IessEmpleadosController implements Initializable {
         
         cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
-        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombres"));
        
-        apellidoColumna.setCellValueFactory(new PropertyValueFactory<>("apellido"));
+        tipoColumna.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         
-        departamentoColumna.setCellValueFactory(new PropertyValueFactory<>("departamento"));
+        valorColumna.setCellValueFactory(new PropertyValueFactory<>("valor"));
         
-        cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
-        
-        iessColumna.setCellValueFactory(new PropertyValueFactory<>("totalIess"));
+        facturaColumna.setCellValueFactory(new PropertyValueFactory<>("factura"));
         
         empleadosTableView.setRowFactory( (Object tv) -> {
-            TableRow<EmpleadoTable> row = new TableRow<>();
+            TableRow<DescuentoTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    EmpleadoTable rowData = row.getItem();
-                    //mostrarEditarQuincenal(new UsuarioDAO().findById(rowData.getId()));
+                    DescuentoTable rowData = row.getItem();
+                    // nothing to do
                 }
             });
             return row ;

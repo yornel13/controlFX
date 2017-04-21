@@ -44,6 +44,7 @@ public class Const {
     public static final String REPORTE_DECIMOS_ACUMULADOS_POR_MES = "report/decimos_acumulados_por_mes.jrxml";
     public static final String REPORTE_ACTUARIALES_EMPLEADOS = "report/actuariales_varios.jrxml";
     public static final String REPORTE_IESS_EMPLEADOS = "report/iess_varios.jrxml";
+    public static final String REPORTE_DESCUENTOS_EMPLEADOS = "report/descuentos_varios.jrxml";
     public static final String REPORTE_AUDITORIA = "report/auditoria.jrxml";
     public static final String REPORTE_ROL_CLIENTE = "report/rol_cliente.jrxml";
     public static final String REPORTE_ROL_INDIVIDUAL = "report/rol_individual.jrxml";

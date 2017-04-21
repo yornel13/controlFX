@@ -29,17 +29,17 @@
             <TextField fx:id="sobreTiempo" alignment="CENTER" maxWidth="50.0" prefHeight="25.0" prefWidth="50.0" promptText="ST" text="0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <TextField fx:id="normales" alignment="CENTER" maxWidth="50.0" prefHeight="25.0" prefWidth="50.0" promptText="Normales" text="0" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <TextField fx:id="suplementarias" alignment="CENTER" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" promptText="RC" text="0" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <Label alignment="CENTER" text="Normales" textFill="WHITE" GridPane.halignment="CENTER">
+            <Label fx:id="normalesLabel" alignment="CENTER" text="Normales" textFill="WHITE" GridPane.halignment="CENTER">
                <font>
                   <Font name="Arial Rounded MT Bold" size="12.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" text="Sobretiempo" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER">
+            <Label fx:id="sobretiempoLabel" alignment="CENTER" text="Sobretiempo" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER">
                <font>
                   <Font name="Arial Rounded MT Bold" size="12.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" text="Recargo" textFill="WHITE" GridPane.columnIndex="2" GridPane.halignment="CENTER">
+            <Label fx:id="recargoLabel" alignment="CENTER" text="Recargo" textFill="WHITE" GridPane.columnIndex="2" GridPane.halignment="CENTER">
                <font>
                   <Font name="Arial Rounded MT Bold" size="12.0" />
                </font>

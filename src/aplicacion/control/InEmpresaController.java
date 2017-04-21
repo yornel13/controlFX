@@ -143,11 +143,13 @@ public class InEmpresaController implements Initializable {
             buttonHoras.setGraphic(imageView);
             buttonHoras.setFont(Roboto.MEDIUM(15));
             buttonHoras.getItems().clear();
-            MenuItem menuAsignar = new MenuItem("Asignar Horarios");
+            MenuItem menuAsignar = new MenuItem("Asignar Horario");
             buttonHoras.getItems().add(menuAsignar);
+            MenuItem menuAsignarExtras = new MenuItem("Asignar Horas Extras");
+            buttonHoras.getItems().add(menuAsignarExtras);
             MenuItem menuItemEmpleado = new MenuItem("Por Empleado");
             buttonHoras.getItems().add(menuItemEmpleado);
-            MenuItem menuItemCliente = new MenuItem("Por Cliente");
+            MenuItem menuItemCliente = new MenuItem("Rol Cliente");
             buttonHoras.getItems().add(menuItemCliente);
             MenuItem menuItemHorarios = new MenuItem("Horarios");
             buttonHoras.getItems().add(menuItemHorarios);
@@ -159,6 +161,9 @@ public class InEmpresaController implements Initializable {
             });
             menuAsignar.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarAsignaHorarios(empresa);
+            });
+            menuAsignarExtras.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarAsignaHorasExtras(empresa);
             });
             menuItemHorarios.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarHorarios(empresa, stagePrincipal);
@@ -251,6 +256,8 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemVacaciones);
             MenuItem menuItemBonos = new MenuItem("Bono y Transporte");
             buttonEdicion.getItems().add(menuItemBonos);
+            MenuItem menuItemDescuentos = new MenuItem("Descuentos");
+            buttonEdicion.getItems().add(menuItemDescuentos);
             menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
             });
@@ -277,6 +284,9 @@ public class InEmpresaController implements Initializable {
             });
             menuItemBonos.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesParaBonos(empresa, stagePrincipal);     
+            });
+            menuItemDescuentos.setOnAction((ActionEvent actionEvent) -> {
+                 aplicacionControl.mostrarDescuentosEmpleados(empresa, stagePrincipal);    
             });
             buttonEdicion.setOnMouseEntered((MouseEvent t) -> {
                 buttonEdicion.setStyle("-fx-background-color: #E0E0E0;");

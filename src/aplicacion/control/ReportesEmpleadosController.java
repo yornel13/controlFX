@@ -432,7 +432,11 @@ public class ReportesEmpleadosController implements Initializable {
         
             Map<String, String> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
-            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            if (reporte == REPORTE_HORAS) {
+                parametros.put("lapso", getFechaConMes(inicio.minusDays(7)) + " al " + getFechaConMes(fin.minusDays(7)));
+            } else {
+                parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            }
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

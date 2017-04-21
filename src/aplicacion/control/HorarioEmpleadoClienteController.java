@@ -13,15 +13,18 @@ import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ControlDiarioDAO;
+import hibernate.dao.ControlExtrasDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.model.Cliente;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import hibernate.model.Empresa;
 import hibernate.model.Horario;
 import hibernate.model.RolCliente;
 import hibernate.model.Usuario;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +64,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -140,11 +144,25 @@ public class HorarioEmpleadoClienteController implements Initializable {
     @FXML
     private Button buttonBorrarCliente;
     
+    @FXML
+    private Label sobrecargoLabel;
+    
+    @FXML
+    private Label sobretiempoLabel;
+    
+    @FXML
+    private Label recargoLabel;
+    
+    @FXML
+    private Label normalesLabel;
+    
     private Boolean editable;
     
     public Boolean multiple;
     
     ControlDiario controlEmpleadoToReturn;
+    
+    ControlExtras controlExtraToReturn;
     
     Stage stage;
     
@@ -156,6 +174,7 @@ public class HorarioEmpleadoClienteController implements Initializable {
     
     private ControlDiario controlDiario;
     private Fecha fecha;
+    private DateTime fechaExtras;
     private RolDePagoClienteController rolDePagoClienteController;
     private ArrayList<ControlTable> controlsTables;
     private Fecha fechaInicio;
@@ -163,6 +182,9 @@ public class HorarioEmpleadoClienteController implements Initializable {
     private AsignarHorariosController asignarHorariosController;
     private String dia;
     private EmpleadoTable empleadoTable;
+    private ControlExtras controlExtras;
+    private AsignarHorasExtrasController asignarHorasExtrasController;
+    private boolean changeExtras;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -337,7 +359,7 @@ public class HorarioEmpleadoClienteController implements Initializable {
                 && !marcarDM.isSelected()) {
             // Nothing to do
         } else {
-            if (asignarHorariosController == null) {
+            if (asignarHorariosController == null && asignarHorasExtrasController == null) {
             
                 if (multiple) {
                     ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -422,7 +444,10 @@ public class HorarioEmpleadoClienteController implements Initializable {
                 controlDiarioNew.setMedioDia(medioDia);
                 controlDiarioNew.setCliente(cliente);
                 stage.close();
-                asignarHorariosController.setHorarioToTurnos(controlDiarioNew);
+                if (asignarHorasExtrasController != null)
+                    asignarHorasExtrasController.setHorarioToTurnos(new ControlExtras(controlDiarioNew));
+                else
+                    asignarHorariosController.setHorarioToTurnos(controlDiarioNew);
             }
         }
     }
@@ -568,9 +593,39 @@ public class HorarioEmpleadoClienteController implements Initializable {
         
         setControlInfo();
         
+        this.changeExtras = false;
+        
         fechaLabel.setText(Fechas.getFechaConMes(fecha));
         
         verificarDia();
+        
+        sobreTiempo.setVisible(false);
+        suplementarias.setVisible(false);
+        sobretiempoLabel.setVisible(false);
+        recargoLabel.setVisible(false);
+    }
+    
+    public void setEmpleado(Usuario empleado, ControlExtras controlExtras, 
+            DateTime fecha, Boolean editable, Fecha fechaInicio) {
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin; ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        multiple = false;
+        this.empresa = empleado.getDetallesEmpleado().getEmpresa();
+        this.empleado = empleado;
+        this.controlExtras = controlExtras;
+        this.fechaExtras = fecha;
+        this.editable = editable;
+        
+        setControlInfo();
+        
+        this.changeExtras = true;
+        
+        fechaLabel.setText(Fechas.getFechaConMes(fecha));
+        
+        verificarDia();
+        
+        normales.setVisible(false);
+        normalesLabel.setVisible(false);
     }
     
     void setControlInfo() {
@@ -610,7 +665,40 @@ public class HorarioEmpleadoClienteController implements Initializable {
                 cliente = controlDiario.getCliente();
                 clienteButton.setText(cliente.getNombre());
             }
-        } 
+        } else if (controlExtras != null) {
+            entrada = controlExtras.getEntrada();
+            salida = controlExtras.getSalida();
+            
+            suplementarias.setText(controlExtras.getRecargo().toString());
+            sobreTiempo.setText(controlExtras.getSobretiempo().toString());
+            
+            if (controlExtras.getCaso().equals(Const.LIBRE)) {
+                marcarLibre.setSelected(true);
+                checkLibre(null);
+            } else if (controlExtras.getCaso().equals(Const.FALTA)) {
+                marcarFalta.setSelected(true);
+                checkFalta(null);
+            } else if (controlExtras.getCaso().equals(Const.PERMISO)) {
+                marcarPermiso.setSelected(true);
+                checkPermiso(null);
+            } else if (controlExtras.getCaso().equals(Const.VACACIONES)) {
+                marcarVacaciones.setSelected(true);
+                checkVacaciones(null);
+            } else if (controlExtras.getCaso().equals(Const.CM)) {
+                marcarCM.setSelected(true);
+                checkCM(null);
+            } else if (controlExtras.getCaso().equals(Const.DM)) {
+                marcarDM.setSelected(true);
+                checkDM(null);
+            } else {
+                horarioButton.setText(getLapso(controlExtras.getEntrada(), controlExtras.getSalida()));
+            }
+            
+            if (controlExtras.getCliente() != null) {
+                cliente = controlExtras.getCliente();
+                clienteButton.setText(cliente.getNombre());
+            }
+        }
     }
     
     public void setEmpleadoMultiplesDias(Usuario empleado, ArrayList<ControlTable> controls, Fecha fechaInicio, Fecha fechaFin) {
@@ -624,6 +712,31 @@ public class HorarioEmpleadoClienteController implements Initializable {
         this.controlsTables = controls;
         this.fecha = fecha;
         fechaLabel.setText("Multiples Dias");
+        
+        this.changeExtras = false;
+        
+        sobreTiempo.setVisible(false);
+        suplementarias.setVisible(false);
+        sobretiempoLabel.setVisible(false);
+        recargoLabel.setVisible(false);
+    }
+    
+    public void setEmpleadoMultiplesDiasExtras(Usuario empleado, ArrayList<ControlTable> controls, Fecha fechaInicio, Fecha fechaFin) {
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        editable = true;
+        multiple = true;
+        this.empresa = empleado.getDetallesEmpleado().getEmpresa();
+        this.empleado = empleado;
+        this.controlDiario = controlDiario;     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        this.controlsTables = controls;
+        this.fecha = fecha;
+        fechaLabel.setText("Multiples Dias");
+        
+        this.changeExtras = true;
+        
+        normales.setVisible(false);
+        normalesLabel.setVisible(false);
     }
     
     @Override
@@ -675,6 +788,13 @@ public class HorarioEmpleadoClienteController implements Initializable {
     public void updateWindows() {
         closeDialogMode();
         rolDePagoClienteController.cambiarControlEmpleado(controlEmpleadoToReturn);
+        stagePrincipal.close();
+        dialogoCompletado();
+    }
+    
+    public void updateWindowsExtras() {
+        closeDialogMode();
+        rolDePagoClienteController.cambiarControlExtras(controlExtraToReturn);
         stagePrincipal.close();
         dialogoCompletado();
     }
@@ -802,9 +922,23 @@ public class HorarioEmpleadoClienteController implements Initializable {
         setControlInfo();
         verificarDia();
     }
+    
+    void setEmpleado(List<Horario> horarios, 
+            List<Cliente> clientes, ControlExtras controlExtras) {
+        this.clientes = clientes;
+        this.horarios = horarios;
+        fechaLabel.setText("");
+        this.controlExtras = controlExtras;
+        setControlInfo();
+        verificarDia();
+    }
 
     void setAsignarHorarioController(AsignarHorariosController asignarHorariosController) {
         this.asignarHorariosController = asignarHorariosController;
+    }
+    
+    void setAsignarHorarioController(AsignarHorasExtrasController asignarHorasExtrasController) {
+        this.asignarHorasExtrasController = asignarHorasExtrasController;
     }
     
     public class DataBaseThread implements Runnable {
@@ -821,9 +955,15 @@ public class HorarioEmpleadoClienteController implements Initializable {
                     public void run() {
                         cancel();
                         if (multiple) 
-                           saveMultiple();
+                            if (changeExtras)
+                                saveMultipleExtras();
+                            else
+                                saveMultiple();
                         else 
-                           saveSingle();
+                            if (changeExtras)
+                                saveSingleExtras();
+                            else
+                                saveSingle();
                     }
              }, 1000, 1000);
             
@@ -917,6 +1057,105 @@ public class HorarioEmpleadoClienteController implements Initializable {
                         new ControlDiarioDAO().save(controlEmpleadoNew);
                         if (controlEmpleadoToDelete != null) {
                             new ControlDiarioDAO().delete(controlEmpleadoToDelete);
+                        }
+                        HibernateSessionFactory.getSession().flush();
+                    }
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            updateWindowsMultiple();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        error();
+                    }
+                });
+            }
+        }
+        
+        public void saveMultipleExtras() {
+            try {
+                Boolean cancelar = false;
+                List<RolCliente> rolClientes = new RolClienteDAO()
+                        .findAllByFechaAndEmpleadoId(fechaInicio.getFecha(), empleado.getId());
+                for (ControlTable controlTable: controlsTables) {
+                    ControlExtras controlExtras = controlTable.getControlExtras();
+                    if (controlExtras != null) {
+                        for (RolCliente rolCliente: rolClientes) {
+                            if (rolCliente.getCliente() != null && controlExtras.getCliente() != null) {
+                                if (controlExtras.getCliente().getId().equals(rolCliente.getCliente().getId())) {
+                                    cancelar = true;  
+                                }
+                            } else if (rolCliente.getCliente() == null && controlExtras.getCliente() == null) {
+                                cancelar = true;
+                            }
+                        }
+                    }
+                    
+                }
+                
+                for (RolCliente rolCliente: rolClientes) {
+                    if (rolCliente.getCliente() != null && cliente != null) {
+                        if (cliente.getId().equals(rolCliente.getCliente().getId())) {
+                            cancelar = true;  
+                        }
+                    } else if (rolCliente.getCliente() == null && cliente == null) {
+                        cancelar = true;
+                    }
+                }
+                
+                if (cancelar) {
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            hayRolCliente();
+                        }
+                    });
+                } else {
+                    for (ControlTable controlTable: controlsTables) {
+                        ControlExtras controlEmpleadoToDelete = controlTable.getControlExtras();
+                        DateTime fechaParaGuardar = controlTable
+                                .getFechaExtra();
+                        ControlExtras controlEmpleadoNew = new ControlExtras();
+                        controlEmpleadoNew.setFecha(new Date(fechaParaGuardar.getMillis()));
+                        if (marcarTrabajo.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
+                            controlEmpleadoNew.setRecargo(Double.valueOf(suplementarias.getText()));
+                            controlEmpleadoNew.setCaso(Const.TRABAJO);
+                        } else if (marcarLibre.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(0d);
+                            controlEmpleadoNew.setRecargo(0d);
+                            controlEmpleadoNew.setCaso(Const.LIBRE);
+                        } else if (marcarFalta.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(0d);
+                            controlEmpleadoNew.setRecargo(0d);
+                            controlEmpleadoNew.setCaso(Const.FALTA);
+                        } else if (marcarPermiso.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(0d);
+                            controlEmpleadoNew.setRecargo(0d);
+                            controlEmpleadoNew.setCaso(Const.PERMISO);
+                        } else if (marcarVacaciones.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(0d);
+                            controlEmpleadoNew.setRecargo(0d);
+                            controlEmpleadoNew.setCaso(Const.VACACIONES);
+                        } else if (marcarCM.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(0d);
+                            controlEmpleadoNew.setRecargo(0d);
+                            controlEmpleadoNew.setCaso(Const.CM);
+                        } else if (marcarDM.isSelected()) {
+                            controlEmpleadoNew.setSobretiempo(0d);
+                            controlEmpleadoNew.setRecargo(0d);
+                            controlEmpleadoNew.setCaso(Const.DM);
+                        } 
+                        controlEmpleadoNew.setEntrada(entrada);
+                        controlEmpleadoNew.setSalida(salida);
+                        controlEmpleadoNew.setUsuario(empleado);
+                        controlEmpleadoNew.setCliente(cliente);
+                        new ControlExtrasDAO().save(controlEmpleadoNew);
+                        if (controlEmpleadoToDelete != null) {
+                            new ControlExtrasDAO().delete(controlEmpleadoToDelete);
                         }
                         HibernateSessionFactory.getSession().flush();
                     }
@@ -1043,6 +1282,119 @@ public class HorarioEmpleadoClienteController implements Initializable {
                     Platform.runLater(new Runnable() {
                         @Override public void run() {
                             updateWindows();
+                        }
+                    });
+                }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(new Runnable() {
+                    @Override public void run() {
+                        error();
+                    }
+                });
+            }
+        }
+        
+        public void saveSingleExtras() {
+            try {
+                Boolean cancelar = false;
+                List<RolCliente> rolesCliente;
+                rolesCliente = new RolClienteDAO().findAllByFechaAndEmpleadoId(fechaInicio.getFecha(), empleado.getId());
+                System.out.println("roles " + rolesCliente.size());
+                for (RolCliente rolCliente: rolesCliente) {
+                    if (rolCliente.getCliente() == null && cliente == null) {
+                        System.out.println("mismo cliente null");
+                        cancelar = true;
+                    } else if(rolCliente.getCliente() == null && cliente != null) {
+                        // nothing to do
+                    } else if(cliente == null && rolCliente.getCliente() != null) {
+                        // nothing to do
+                    } else if (rolCliente.getCliente().getId().equals(cliente.getId())) {
+                        System.out.println("mismo id cliente");
+                        cancelar = true;
+                    } 
+                    
+                    if (controlExtras != null) {
+                        if (controlExtras.getFecha().getTime() == fechaExtras.getMillis()) {
+                            
+                            if (controlExtras.getCliente() == null) {
+                                if (rolCliente.getCliente() == null) {
+                                    cancelar = true;
+                                } 
+                            } else {
+                                if (rolCliente.getCliente() != null) {
+                                    if (rolCliente.getCliente().getId()
+                                            .equals(controlExtras.getCliente().getId())) {
+                                        cancelar = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (cancelar) {
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            hayRolCliente();
+                        }
+                    });
+                } else {
+                    ControlExtras controlEmpleadoNew = new ControlExtras();
+                    controlEmpleadoNew.setFecha(new Date(fechaExtras.getMillis()));
+                    if (marcarTrabajo.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(Double.valueOf(sobreTiempo.getText()));
+                        controlEmpleadoNew.setRecargo(Double.valueOf(suplementarias.getText()));
+                        controlEmpleadoNew.setCaso(Const.TRABAJO);
+                    } else if (marcarLibre.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(0d);
+                        controlEmpleadoNew.setRecargo(0d);
+                        controlEmpleadoNew.setCaso(Const.LIBRE);
+                    } else if (marcarFalta.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(0d);
+                        controlEmpleadoNew.setRecargo(0d);
+                        controlEmpleadoNew.setCaso(Const.FALTA);
+                    } else if (marcarPermiso.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(0d);
+                        controlEmpleadoNew.setRecargo(0d);
+                        controlEmpleadoNew.setCaso(Const.PERMISO);
+                    } else if (marcarVacaciones.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(0d);
+                        controlEmpleadoNew.setRecargo(0d);
+                        controlEmpleadoNew.setCaso(Const.VACACIONES);
+                    } else if (marcarCM.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(0d);
+                        controlEmpleadoNew.setRecargo(0d);
+                        controlEmpleadoNew.setCaso(Const.CM);
+                    } else if (marcarDM.isSelected()) {
+                        controlEmpleadoNew.setSobretiempo(0d);
+                        controlEmpleadoNew.setRecargo(0d);
+                        controlEmpleadoNew.setCaso(Const.DM);
+                    } 
+                    controlEmpleadoNew.setEntrada(entrada);
+                    controlEmpleadoNew.setSalida(salida);
+                    controlEmpleadoNew.setUsuario(empleado);
+                    controlEmpleadoNew.setCliente(cliente);
+                    new ControlExtrasDAO().save(controlEmpleadoNew);
+                    if (controlExtras != null && controlExtras.getFecha().getTime() ==
+                            controlEmpleadoNew.getFecha().getTime()) {
+                        new ControlExtrasDAO().delete(controlExtras);
+                    }
+                    HibernateSessionFactory.getSession().flush();
+                    controlExtraToReturn= controlEmpleadoNew;
+
+                    // Registro para auditar
+                    String detalles = "registro horas extras para el empleado " 
+                            + empleado.getApellido() + " " + empleado.getNombre()
+                            + " del dia " + Fechas.getFechaConMes(fechaExtras);
+                    rolDePagoClienteController.aplicacionControl.au
+                            .saveAgrego(detalles, rolDePagoClienteController
+                                    .aplicacionControl.permisos.getUsuario());
+
+                    Platform.runLater(new Runnable() {
+                        @Override public void run() {
+                            updateWindowsExtras();
                         }
                     });
                 }

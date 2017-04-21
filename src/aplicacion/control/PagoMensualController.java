@@ -93,7 +93,9 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import hibernate.dao.ControlDiarioDAO;
+import hibernate.dao.ControlExtrasDAO;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -539,6 +541,8 @@ public class PagoMensualController implements Initializable {
         Double deduccionesValor = 0d;
         Double aPercibirValor = 0d;
         
+        empleadoTable.setPagos(pagos);
+        
         for (RolCliente pago: pagos) {
             
             diasTextValor += pago.getDias();
@@ -565,6 +569,12 @@ public class PagoMensualController implements Initializable {
             montoAportePatronalTextValor += pago.getAportePatronal(); 
             montoSegurosTextValor += pago.getSeguros(); 
             montoUniformasTextValor += pago.getUniformes(); 
+            
+             if (!empleado.getDetallesEmpleado().getAcumulaDecimos()) {
+                decimoTerceroTotalTextValor -= pago.getVacaciones()/12;
+                decimosTotalTextValor -= pago.getVacaciones()/12;
+                totalTextValor -= pago.getVacaciones()/12;
+            }
         }
         {
             PagoMesItem rol = new PagoMesItem();
@@ -575,6 +585,7 @@ public class PagoMensualController implements Initializable {
             rol.setClave(Const.IP_SUELDO);
             pagoMesItems.add(rol);
         }
+        subTotalTextValor -= vacacionesTextValor;
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
@@ -1101,8 +1112,9 @@ public class PagoMensualController implements Initializable {
                         pago.setPagoMes(pagoMes);
                         new PagoMesItemDAO().save(pago);
                     }
-
-                    for (Deuda deuda: empleadoTable.getDeudas()) {
+                    System.out.println("Deudas:" +empleadoTable.getDeudas().size());
+                    for (Deuda deudaTable: empleadoTable.getDeudas()) {
+                        Deuda deuda = new DeudaDAO().findById(deudaTable.getId());
                         Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas());
                         Integer newCuotas = deuda.getCuotas() - 1;
                         if (newCuotas == 0) {
@@ -1164,8 +1176,18 @@ public class PagoMensualController implements Initializable {
                 ReporteRolDePagoIndividual datasource = new ReporteRolDePagoIndividual();
                 datasource.addAll(empleadoTable.getPagoMesItems());
                 
-                List<ControlDiario> controlEmpleado = new ControlDiarioDAO()
-                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio.minusDays(7).getFecha(), fin.getFecha());
+                List<ControlExtras> controlEmpleado = new ControlExtrasDAO()
+                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio.minusDays(7).getDate(), fin.minusDays(7).getDate());
+                
+                String horasDetallado = "";
+        
+                for (RolCliente rolCliente: empleadoTable.getPagos()) {
+                    horasDetallado += "Cliente "+rolCliente.getClienteNombre()
+                            +":\n               Dias                     "+rolCliente.getDias()
+                            +"\n               H. Normales        "+rolCliente.getHorasNormales()
+                            +"\n               H. Recargo          "+rolCliente.getHorasSuplementarias()
+                            +"\n               H. Sobretiempo   "+rolCliente.getHorasSobreTiempo()+"\n\n";
+                }
                 
                 ReporteHorasTrabajadas horasSource = new ReporteHorasTrabajadas(inicio, fin);
                 horasSource.addAll(controlEmpleado);
@@ -1190,6 +1212,7 @@ public class PagoMensualController implements Initializable {
                     parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
                     parametros.put("total", round(empleadoTable.getSueldo()).toString());
                     parametros.put("fecha_recibo", Fechas.getFechaConMes(empleadoTable.getRolIndividual().getFecha()));
+                    parametros.put("horas_detallado", horasDetallado);
                     ////////////////////// Rol mensual
                     JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
                     JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

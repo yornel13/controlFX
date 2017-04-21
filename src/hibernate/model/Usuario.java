@@ -30,6 +30,7 @@ public class Usuario implements java.io.Serializable {
         private Set pagos = new HashSet(0);
 	private Set identidads = new HashSet(0);
         private Set controlDiarios = new HashSet(0);
+        private Set controlExtrases = new HashSet(0);
 	private Set bonos = new HashSet(0);
         private Set diasVacaciones = new HashSet(0);
 	private Set registroAccioneses = new HashSet(0);
@@ -285,6 +286,14 @@ public class Usuario implements java.io.Serializable {
 
     public void setControlDiarios(Set controlDiarios) {
         this.controlDiarios = controlDiarios;
+    }
+
+    public Set getControlExtrases() {
+        return controlExtrases;
+    }
+
+    public void setControlExtrases(Set controlExtrases) {
+        this.controlExtrases = controlExtrases;
     }
       
         

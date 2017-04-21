@@ -11,6 +11,7 @@
 	<parameter name="lapso" class="java.lang.String"/>
 	<parameter name="total" class="java.lang.String"/>
 	<parameter name="fecha_recibo" class="java.lang.String"/>
+	<parameter name="horas_detallado" class="java.lang.String"/>
 	<field name="dia" class="java.lang.String"/>
 	<field name="cliente" class="java.lang.String"/>
 	<field name="normales" class="java.lang.String"/>
@@ -117,7 +118,7 @@
 				<text><![CDATA[Horas ST]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Transparent" x="85" y="0" width="220" height="20"/>
+				<reportElement mode="Transparent" x="85" y="0" width="270" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -129,20 +130,6 @@
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Cliente]]></text>
-			</staticText>
-			<staticText>
-				<reportElement mode="Transparent" x="305" y="0" width="50" height="20"/>
-				<box>
-					<pen lineWidth="1.0"/>
-					<topPen lineWidth="1.0"/>
-					<leftPen lineWidth="1.0"/>
-					<bottomPen lineWidth="1.0"/>
-					<rightPen lineWidth="1.0"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Horas N]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Transparent" x="455" y="0" width="100" height="20"/>
@@ -177,18 +164,11 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{recargo}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="85" y="0" width="220" height="20"/>
+				<reportElement mode="Transparent" x="85" y="0" width="270" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cliente}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement mode="Transparent" x="305" y="0" width="50" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isItalic="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{normales}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00" isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="355" y="0" width="50" height="20"/>
@@ -224,6 +204,22 @@
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="10" splitType="Stretch"/>
+		<band height="329" splitType="Stretch">
+			<textField>
+				<reportElement mode="Transparent" x="10" y="31" width="539" height="298"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{horas_detallado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="11" y="5" width="274" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTALES]]></text>
+			</staticText>
+			<line>
+				<reportElement mode="Opaque" x="11" y="25" width="344" height="1"/>
+			</line>
+		</band>
 	</summary>
 </jasperReport>

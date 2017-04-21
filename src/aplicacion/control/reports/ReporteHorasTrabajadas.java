@@ -7,12 +7,15 @@ package aplicacion.control.reports;
 
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
+import aplicacion.control.util.Fechas;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -20,7 +23,7 @@ import net.sf.jasperreports.engine.JRField;
  */
 public class ReporteHorasTrabajadas implements JRDataSource {
     
-    private final List<ControlDiario> lista = new ArrayList<>();
+    private final List<ControlExtras> lista = new ArrayList<>();
     private int indiceActual = -1;
     
     private Fecha inicio;
@@ -38,36 +41,21 @@ public class ReporteHorasTrabajadas implements JRDataSource {
 
     if( null != jrField.getName()) switch (jrField.getName()) {
             case "dia":
-                Fecha fecha = new Fecha(lista.get(indiceActual).getFecha());
-                valor = fecha.getDiaInt() + " " + fecha.getMonthName();
+                DateTime dateTime = new DateTime(lista.get(indiceActual).getFecha().getTime());
+                valor = Fechas.getFechaConMesSinAno(dateTime);
                 break; 
             case "cliente":
                 if (lista.get(indiceActual).getCliente() != null)
                     valor = lista.get(indiceActual).getCliente().getNombre();
                 break;
-            case "normales":
-                if (new Fecha(lista.get(indiceActual).getFecha()).afterEquals(inicio)) {
-                    valor = lista.get(indiceActual).getNormales().toString();
-                } else {
-                    valor = "";
-                }
-                break;
             case "sobretiempo":
-                if (new Fecha(lista.get(indiceActual).getFecha()).before(fin.minusDays(6))) {
-                    valor = lista.get(indiceActual).getSobretiempo().toString();
-                } else {
-                    valor = "";
-                }
+                valor = lista.get(indiceActual).getSobretiempo().toString();
                 break;
             case "recargo":
-                if (new Fecha(lista.get(indiceActual).getFecha()).before(fin.minusDays(6))) {
                     valor = lista.get(indiceActual).getRecargo().toString();
-                } else {
-                    valor = "";
-                }
                 break;
             case "observacion":
-                ControlDiario control = lista.get(indiceActual);
+                ControlExtras control = lista.get(indiceActual);
                 if (control.getCaso().equals(Const.LIBRE)) {
                    valor = "Libre"; 
                 } else if (control.getCaso().equals(Const.FALTA)) {
@@ -80,9 +68,7 @@ public class ReporteHorasTrabajadas implements JRDataSource {
                     valor = "D. Medico"; 
                 } else if (control.getCaso().equals(Const.CM)) {
                    valor = "C. Medica"; 
-                } else if (control.getMedioDia()) {
-                    valor = "1/2 Dia"; 
-                }
+                } 
                 break;
             default:
                 break; 
@@ -96,11 +82,11 @@ public class ReporteHorasTrabajadas implements JRDataSource {
         return ++indiceActual < lista.size(); 
     }
     
-    public void add(ControlDiario rol) {
+    public void add(ControlExtras rol) {
         this.lista.add(rol);
     }
 
-    public void addAll(List<ControlDiario> rol) {
+    public void addAll(List<ControlExtras> rol) {
         this.lista.addAll(rol);
     }
 }

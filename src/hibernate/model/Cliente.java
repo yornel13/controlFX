@@ -24,6 +24,7 @@ public class Cliente implements java.io.Serializable {
 	private Timestamp creacion;
 	private Timestamp ultimaModificacion;
         private Set controlDiarios = new HashSet(0);
+        private Set controlExtrases = new HashSet(0);
         private Set rolClientes = new HashSet(0);
         private Set seguros = new HashSet(0);
         private Set uniformes = new HashSet(0);
@@ -161,6 +162,14 @@ public class Cliente implements java.io.Serializable {
 
     public void setControlDiarios(Set controlDiarios) {
         this.controlDiarios = controlDiarios;
+    }
+
+    public Set getControlExtrases() {
+        return controlExtrases;
+    }
+
+    public void setControlExtrases(Set controlExtrases) {
+        this.controlExtrases = controlExtrases;
     }
         
      

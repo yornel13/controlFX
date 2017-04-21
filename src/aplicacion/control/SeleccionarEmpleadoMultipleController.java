@@ -80,6 +80,7 @@ public class SeleccionarEmpleadoMultipleController implements Initializable {
     
     private RegistrarAdministradorController registrarAdministradorController;
     private AsignarHorariosController asignarHorariosController;
+    private AsignarHorasExtrasController asignarHorasExtrasController;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -93,6 +94,10 @@ public class SeleccionarEmpleadoMultipleController implements Initializable {
         this.asignarHorariosController = asignarHorariosController;
     }
     
+    void setParentController(AsignarHorasExtrasController asignarHorasExtrasController) {
+        this.asignarHorasExtrasController = asignarHorasExtrasController;
+    }
+    
     @FXML
     public void onSave(ActionEvent event) {
         stagePrincipal.close();
@@ -102,7 +107,10 @@ public class SeleccionarEmpleadoMultipleController implements Initializable {
             if (empleado.getAgregar())
                 empleados.add(empleado.getUsuario());
         }
-        asignarHorariosController.setEmpleado(empleados);
+        if (asignarHorasExtrasController != null)
+            asignarHorasExtrasController.setEmpleado(empleados);
+        else
+            asignarHorariosController.setEmpleado(empleados);
     }
     
     public void setUsuarios(List<Usuario> usuarios) {

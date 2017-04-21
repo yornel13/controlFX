@@ -21,6 +21,7 @@
     <mapping resource="hibernate/hbm/DiasVacaciones.hbm.xml"/>
     <mapping resource="hibernate/hbm/Constante.hbm.xml"/>
     <mapping resource="hibernate/hbm/ControlDiario.hbm.xml"/>
+    <mapping resource="hibernate/hbm/ControlExtras.hbm.xml"/>
     <mapping resource="hibernate/hbm/RolCliente.hbm.xml"/>
     <mapping resource="hibernate/hbm/RegistroAcciones.hbm.xml"/>
     <mapping resource="hibernate/hbm/Cargo.hbm.xml"/>

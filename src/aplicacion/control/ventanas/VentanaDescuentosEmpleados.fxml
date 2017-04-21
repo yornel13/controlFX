@@ -9,7 +9,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.IessEmpleadosController">
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.DescuentosEmpleadosController">
     <children>
       <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
          <children>
@@ -22,11 +22,10 @@
       <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
         <columns>
           <TableColumn fx:id="cedulaColumna" text="Cedula" />
-          <TableColumn fx:id="apellidoColumna" prefWidth="150.0" text="Apellido" />
-            <TableColumn fx:id="nombreColumna" prefWidth="150.0" text="Nombre" />
-            <TableColumn fx:id="departamentoColumna" prefWidth="120.0" text="Departamento" />
-            <TableColumn fx:id="cargoColumna" prefWidth="140.0" text="Cargo" />
-            <TableColumn fx:id="iessColumna" prefWidth="120.0" style="-fx-alignment: CENTER;" text="IESS" />
+          <TableColumn fx:id="nombreColumna" prefWidth="270.0" text="Apellidos y Nombres" />
+            <TableColumn fx:id="tipoColumna" prefWidth="200.0" text="Tipo de Descuento" />
+            <TableColumn fx:id="valorColumna" prefWidth="110.0" text="Valor" />
+            <TableColumn fx:id="facturaColumna" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Nro. Factura" />
         </columns>
       </TableView>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">

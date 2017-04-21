@@ -8,6 +8,7 @@ package aplicacion.control.tableModel;
 import hibernate.model.Actuariales;
 import hibernate.model.Bonos;
 import hibernate.model.ControlDiario;
+import hibernate.model.ControlExtras;
 import hibernate.model.Deuda;
 import hibernate.model.DiasVacaciones;
 import hibernate.model.RolCliente;
@@ -74,6 +75,7 @@ public class EmpleadoTable {
     private Actuariales actuariales;
     private Integer diasInt;
     private ArrayList<ControlDiario> turnos;
+    private ArrayList<ControlExtras> extras;
     private ControlDiario lunes;
     private ControlDiario martes;
     private ControlDiario miercoles;
@@ -591,6 +593,14 @@ public class EmpleadoTable {
 
     public void setBonos(Bonos bonos) {
         this.bonos = bonos;
+    }
+
+    public ArrayList<ControlExtras> getExtras() {
+        return extras;
+    }
+
+    public void setExtras(ArrayList<ControlExtras> extras) {
+        this.extras = extras;
     }
     
     

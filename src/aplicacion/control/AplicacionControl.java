@@ -727,6 +727,51 @@ public class AplicacionControl extends Application {
         }
     }
     
+    public void mostrarDescuentosEmpleados(Empresa empresa, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
+                try {
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDescuentosEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Descuentos");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    DescuentosEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
     public void mostrarPlanillaIess(Empresa empresa, Stage stage) {
         if (permisos == null) {
            noLogeado();
@@ -2045,6 +2090,38 @@ public class AplicacionControl extends Application {
                     Scene scene = new Scene(ventanaAuditar);
                     ventana.setScene(scene);
                     AsignarHorariosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setEmpresa(empresa);
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.ROL_DE_PAGO, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
+    public void mostrarAsignaHorasExtras(Empresa empresa) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.ROLES, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaAsignarHorasExtras.fxml"));
+                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Asignar Horas Extras");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaAuditar);
+                    ventana.setScene(scene);
+                    AsignarHorasExtrasController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
                     controller.setEmpresa(empresa);
                     ventana.show();

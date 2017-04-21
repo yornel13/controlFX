@@ -16,6 +16,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.joda.time.DateTime;
@@ -55,6 +57,12 @@ public class Fechas {
         String fecha = dateTime.getDayOfMonth() + " de " 
                 + getMonthName(dateTime.getMonthOfYear()) 
                 + " " + dateTime.getYear();
+        return fecha;
+    }
+    
+    public static String getFechaConMesSinAno(DateTime dateTime) {
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear());
         return fecha;
     }
     
@@ -138,13 +146,18 @@ public class Fechas {
         return time;
     }
     
-     public static Timestamp getToday() throws ParseException {
+    public static Timestamp getToday() {
         
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
         java.util.Date today = new java.util.Date();
 
-        java.util.Date todayWithZeroTime = formatter.parse(formatter.format(today));
+        java.util.Date todayWithZeroTime = null;
+        try {
+            todayWithZeroTime = formatter.parse(formatter.format(today));
+        } catch (ParseException ex) {
+            Logger.getLogger(Fechas.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         return new Timestamp(todayWithZeroTime.getTime());
     }

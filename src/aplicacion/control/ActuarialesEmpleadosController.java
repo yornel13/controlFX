@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteActuarialesVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.dao.ActuarialesDAO;
 import hibernate.dao.UsuarioDAO;
@@ -183,6 +184,15 @@ public class ActuarialesEmpleadosController implements Initializable {
         ReporteActuarialesVarios datasource = new ReporteActuarialesVarios();
         datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
         
+        Double total1 = 0d;
+        Double total2 = 0d;
+        
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            total1 += empleadoTable.getActuarial1();
+            total2 += empleadoTable.getActuarial2();
+        }
+        
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ACTUARIALES_EMPLEADOS);
         
@@ -194,6 +204,8 @@ public class ActuarialesEmpleadosController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
+            parametros.put("total1", round(total1).toString());
+            parametros.put("total2", round(total2).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

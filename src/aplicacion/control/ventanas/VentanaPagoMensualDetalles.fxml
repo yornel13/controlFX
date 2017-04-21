@@ -253,7 +253,7 @@
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="vacacionesText1" text="Vacaciones" textFill="#fffbfb" GridPane.columnIndex="7" GridPane.halignment="CENTER">
+            <Label fx:id="vacacionesText1" text="Vacaciones" textFill="#fffbfb" visible="false" GridPane.columnIndex="7" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>
@@ -462,5 +462,6 @@
       <Label fx:id="textError" layoutX="25.0" layoutY="463.0" text="Al creal el rol de pago individual los roles asociados (clientes o administrativos) no podran ser borrados" underline="true" />
       <Button fx:id="buttonPagar" layoutX="691.0" layoutY="386.0" mnemonicParsing="false" onAction="#onClickGenerarRecibo" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
       <Button fx:id="buttonDeudas" layoutX="610.0" layoutY="386.0" mnemonicParsing="false" onAction="#onClickGestionarDeudas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/deudas.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Pane layoutX="481.0" layoutY="287.0" prefHeight="75.0" prefWidth="70.0" style="-fx-background-color: #039BE5;" />
     </children>
 </AnchorPane>

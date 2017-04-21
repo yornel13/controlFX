@@ -11,6 +11,7 @@ import aplicacion.control.reports.ReporteSueldoVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Numeros;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.CargoDAO;
@@ -894,6 +895,13 @@ public class SueldoEmpleadosController implements Initializable {
         ReporteSueldoVarios datasource = new ReporteSueldoVarios();
         datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
         
+        Double total = 0d;
+        
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            total += empleadoTable.getSueldo();
+        }
+        
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_SUELDO_EMPLEADOS);
         
@@ -905,6 +913,7 @@ public class SueldoEmpleadosController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
+            parametros.put("total", round(total).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
