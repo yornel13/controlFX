@@ -95,9 +95,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.ControlExtrasDAO;
-import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import java.util.List;
 
@@ -343,6 +341,14 @@ public class PagoMensualPagadoController implements Initializable {
     @FXML
     private Button buttonBorrar;
     
+    DeudaDAO deudaDAO = new DeudaDAO();
+    ConstanteDAO constanteDAO = new ConstanteDAO();
+    AbonoDeudaDAO abonoDeudaDAO = new AbonoDeudaDAO();
+    PagoMesDAO pagoMesDAO = new PagoMesDAO();
+    RolClienteDAO rolClienteDAO = new RolClienteDAO();
+    RolIndividualDAO rolIndividualDAO = new RolIndividualDAO();
+    PagoMesItemDAO pagoMesItemDAO = new PagoMesItemDAO();
+    
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
     }
@@ -537,9 +543,9 @@ public class PagoMensualPagadoController implements Initializable {
     }
     
     public void borradoTerminado() {
-        for (Deuda deuda: new DeudaDAO()
+        for (Deuda deuda: deudaDAO
                 .findAllByEmpleadoId(pagoMes.getUsuario().getId())) {
-            new DeudaDAO().getSession().refresh(deuda);
+            HibernateSessionFactory.getSession().update(deuda);
         }
         stagePrincipal.close();
         dialogLoading.close();
@@ -659,12 +665,11 @@ public class PagoMensualPagadoController implements Initializable {
     }
     
     public void setTableInfo(Integer empleadoId) {
-        RolClienteDAO pagoDAO = new RolClienteDAO();
         pagos = new ArrayList<>();
         pagosTable = new ArrayList<>();
-        pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), empleadoId));
+        pagos.addAll(rolClienteDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), empleadoId));
         if (pagos.isEmpty())
-            pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio.getFecha(), empleadoId));
+            pagos.addAll(rolClienteDAO.findAllByFechaAndEmpleadoIdSinCliente(inicio.getFecha(), empleadoId));
         
         pagoMesItems = new ArrayList<>();
         deudasAPagar = new ArrayList<>();
@@ -774,8 +779,8 @@ public class PagoMensualPagadoController implements Initializable {
                 + " + " + String.format( "%.2f", rolIndividual.getDecimoCuarto()));
         totalText.setText(String.format( "%.2f", rolIndividual.getTotalIngreso()));
         
-        pagoMes = new PagoMesDAO().findByRolIndividual(rolIndividual.getId());
-        pagoMesItems.addAll(new PagoMesItemDAO().findByPagoMesId(pagoMes.getId()));
+        pagoMes = pagoMesDAO.findByRolIndividual(rolIndividual.getId());
+        pagoMesItems.addAll(pagoMesItemDAO.findByPagoMesId(pagoMes.getId()));
         for (PagoMesItem pagoMesItem: pagoMesItems) {
             if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_IESS)) {
                 ieesValor = pagoMesItem.getDeduccion();
@@ -855,7 +860,7 @@ public class PagoMensualPagadoController implements Initializable {
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     PagosTable rowData = row.getItem();
-                    aplicacionControl.mostrarRolClienteEmpleado(new RolClienteDAO()
+                    aplicacionControl.mostrarRolClienteEmpleado(rolClienteDAO
                             .findById(rowData.getId()));
                 }
             });
@@ -911,9 +916,8 @@ public class PagoMensualPagadoController implements Initializable {
     }
     
     public double getIess() {
-        ConstanteDAO constanteDao = new ConstanteDAO();
         Constante constante;
-        constante = (Constante) constanteDao.findUniqueResultByNombre(Const.IESS);
+        constante = (Constante) constanteDAO.findUniqueResultByNombre(Const.IESS);
         if (constante == null) {
             iessPorcentaje.setText("IESS (0.0%)");
             return 0.0;
@@ -926,7 +930,7 @@ public class PagoMensualPagadoController implements Initializable {
     public Double getDeudas() {
         Double monto = 0d;
         ArrayList<Deuda> deudas = new ArrayList<>();
-        deudas.addAll(new DeudaDAO().findAllByUsuarioIdNoPagadaSinAplazar(empleado
+        deudas.addAll(deudaDAO.findAllByUsuarioIdNoPagadaSinAplazar(empleado
                 .getId()));
         deudasAPagar.addAll(deudas);
         for (Deuda deuda: deudas) {
@@ -976,18 +980,18 @@ public class PagoMensualPagadoController implements Initializable {
             try {
                 int pagoId = pagoMes.getId();
         
-                for (AbonoDeuda abonoDeuda: new AbonoDeudaDAO().findAllByPagoId(pagoId)) {
+                for (AbonoDeuda abonoDeuda: abonoDeudaDAO.findAllByPagoId(pagoId)) {
                     Deuda deuda = abonoDeuda.getDeuda();
                     deuda.setRestante(deuda.getRestante() + abonoDeuda.getMonto());
                     deuda.setCuotas(deuda.getCuotas() + 1);
                     deuda.setPagada(Boolean.FALSE);
-                    new AbonoDeudaDAO().delete(abonoDeuda);
+                    abonoDeudaDAO.delete(abonoDeuda);
                 }
                 for (PagoMesItem pagoMesItem: pagoMesItems) {
-                    new PagoMesItemDAO().delete(pagoMesItem);
+                    pagoMesItemDAO.delete(pagoMesItem);
                 }
-                new PagoMesDAO().delete(new PagoMesDAO().findById(pagoId));
-                new RolIndividualDAO().delete(new RolIndividualDAO()
+                pagoMesDAO.delete(pagoMesDAO.findById(pagoId));
+                rolIndividualDAO.delete(rolIndividualDAO
                         .findById(rolIndividual.getId()));
                 HibernateSessionFactory.getSession().flush();
                 String detalles = "elemino el pago mensual numero " + pagoId 

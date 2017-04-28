@@ -13,6 +13,7 @@ import aplicacion.control.util.Const;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Numeros;
 import aplicacion.control.util.Permisos;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
 import hibernate.dao.UsuarioDAO;
@@ -874,6 +875,9 @@ public class DeudasEmpleadosController implements Initializable {
     public void setEmpresa(Empresa empresa) {
         this.empresa = empresa;
         
+        HibernateSessionFactory.getSession().clear();
+        HibernateSessionFactory.getSession().flush();
+        
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         
@@ -903,6 +907,7 @@ public class DeudasEmpleadosController implements Initializable {
             Double montoDeuda = 0d;
             Integer cantidad = 0;
             for (Deuda deuda: deudas) {
+                
                 montoDeuda += deuda.getRestante();
                 if (!deuda.getPagada()) {
                    cantidad ++;

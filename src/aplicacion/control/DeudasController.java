@@ -610,6 +610,7 @@ public class DeudasController implements Initializable {
             deudaTable.setFecha(Fechas.getFechaConMes(deuda.getCreacion()));
             data.add(deudaTable);
         }
+        
         deudasTableView.setItems(data);
     }
     

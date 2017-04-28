@@ -92,9 +92,7 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.ControlExtrasDAO;
-import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -204,6 +202,12 @@ public class PagoMensualController implements Initializable {
     String iessText = "IESS (0.0%)";
     
     ArrayList<PagoQuincena> pagosQuincena;
+    
+    DeudaDAO deudaDAO = new DeudaDAO();
+    ConstanteDAO constanteDAO = new ConstanteDAO();
+    AbonoDeudaDAO abonoDeudaDAO = new AbonoDeudaDAO();
+    PagoMesDAO pagoMesDAO = new PagoMesDAO();
+   
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -356,6 +360,7 @@ public class PagoMensualController implements Initializable {
     }
     
     public void dialogoGenerarRolCompletado() {
+        
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -408,6 +413,10 @@ public class PagoMensualController implements Initializable {
             dialogStage.close();
         });
         dialogStage.showAndWait();
+        
+        
+        HibernateSessionFactory.getSession().clear();
+        HibernateSessionFactory.getSession().flush();
     }
     
     public void setEmpresa(Empresa empresa) throws ParseException {
@@ -427,9 +436,11 @@ public class PagoMensualController implements Initializable {
     }
     
     public void setTableInfo() {
+        HibernateSessionFactory.getSession().clear();
+        HibernateSessionFactory.getSession().flush();
         checkBoxPagarTodos.setSelected(false);
         
-        iess = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.IESS);
+        iess = (Constante) constanteDAO.findUniqueResultByNombre(Const.IESS);
         if (iess != null) 
             iessText = Const.IP_IESS + " (" + iess.getValor() + "%)";
         
@@ -505,7 +516,6 @@ public class PagoMensualController implements Initializable {
         RolClienteDAO pagoDAO = new RolClienteDAO();
         ArrayList<RolCliente> pagos = new ArrayList<>();
         ArrayList<PagoMesItem> pagoMesItems = new ArrayList<>();
-        ArrayList<Deuda> deudasAPagar = new ArrayList<>();
         pagos.addAll(pagoDAO.findAllByFechaAndEmpleadoIdConCliente(inicio.getFecha(), 
                 empleadoTable.getId()));
         if (pagos.isEmpty())
@@ -586,6 +596,7 @@ public class PagoMensualController implements Initializable {
             pagoMesItems.add(rol);
         }
         subTotalTextValor -= vacacionesTextValor;
+        decimoTerceroTotalTextValor = round(subTotalTextValor / 12);
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
@@ -642,7 +653,7 @@ public class PagoMensualController implements Initializable {
                 break;
             }
         }
-        deudasValor = getDeudas(deudasAPagar, empleadoTable, pagoMesItems);
+        deudasValor = getDeudas(empleadoTable, pagoMesItems);
         deduccionesValor = ieesValor + quincenaValor + deudasValor;
         aPercibirValor = ingresoValor - deduccionesValor;
         
@@ -698,7 +709,6 @@ public class PagoMensualController implements Initializable {
         }
         
         empleadoTable.setSueldo(round(aPercibirValor));
-        empleadoTable.setDeudas(deudasAPagar);
         empleadoTable.setPagoMesItems(pagoMesItems);
         empleadoTable.setRolIndividual(pagoRol);
     }
@@ -959,10 +969,11 @@ public class PagoMensualController implements Initializable {
         }
     }
     
-    public Double getDeudas(ArrayList<Deuda> deudasAPagar, 
-            EmpleadoTable empleadoTable, ArrayList<PagoMesItem> pagoMesItems) {
+    public Double getDeudas(EmpleadoTable empleadoTable, ArrayList<PagoMesItem> pagoMesItems) {
+        
+        ArrayList<Deuda> deudasAPagar = new ArrayList<>();
         Double monto = 0d;
-        deudasAPagar.addAll(new DeudaDAO()
+        deudasAPagar.addAll(deudaDAO
                 .findAllByUsuarioIdNoPagadaSinAplazar(empleadoTable.getId()));
         for (Deuda deuda: deudasAPagar) {
             monto += (deuda.getRestante() / deuda.getCuotas());
@@ -974,6 +985,7 @@ public class PagoMensualController implements Initializable {
                 pagoMesItems.add(rol);
             }
         }
+        empleadoTable.setDeudas(deudasAPagar);
         return monto;
     }
     
@@ -1106,37 +1118,38 @@ public class PagoMensualController implements Initializable {
                     pagoMes.setMonto(round(empleadoTable.getSueldo()));
                     pagoMes.setUsuario(user);
                     pagoMes.setRolIndividual(empleadoTable.getRolIndividual());
-                    new PagoMesDAO().save(pagoMes);
+                    pagoMesDAO.save(pagoMes);
 
                     for (PagoMesItem pago: empleadoTable.getPagoMesItems()) {
                         pago.setPagoMes(pagoMes);
                         new PagoMesItemDAO().save(pago);
                     }
                     System.out.println("Deudas:" +empleadoTable.getDeudas().size());
-                    for (Deuda deudaTable: empleadoTable.getDeudas()) {
-                        Deuda deuda = new DeudaDAO().findById(deudaTable.getId());
-                        Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas());
-                        Integer newCuotas = deuda.getCuotas() - 1;
-                        if (newCuotas == 0) {
-                            deuda.setPagada(Boolean.TRUE);
-                            deuda.setRestante(0d);  
-                            deuda.setCuotas(newCuotas);
-                        } else {
-                            deuda.setPagada(Boolean.FALSE);
-                            deuda.setRestante(round(deuda.getRestante() - montoAPagar));
-                            deuda.setCuotas(newCuotas);
-                        }
-                        deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
-                        HibernateSessionFactory.getSession().flush();
+                    
+                    if (!empleadoTable.getDeudas().isEmpty()) 
+                        for (Deuda deudaTable: empleadoTable.getDeudas()) {
+                            Deuda deuda = deudaDAO.findById(deudaTable.getId());
+                            Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas());
+                            Integer newCuotas = deuda.getCuotas() - 1;
+                            if (newCuotas == 0) {
+                                deuda.setPagada(Boolean.TRUE);
+                                deuda.setRestante(0d);  
+                                deuda.setCuotas(newCuotas);
+                            } else {
+                                deuda.setPagada(Boolean.FALSE);
+                                deuda.setRestante(round(deuda.getRestante() - montoAPagar));
+                                deuda.setCuotas(newCuotas);
+                            }
+                            deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
 
-                        AbonoDeuda abonoDeuda = new AbonoDeuda();
-                        abonoDeuda.setDeuda(deuda);
-                        abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
-                        abonoDeuda.setMonto(montoAPagar);
-                        abonoDeuda.setRestante(deuda.getRestante());
-                        abonoDeuda.setPagoMes(pagoMes);
-                        new AbonoDeudaDAO().save(abonoDeuda);  
-                    }
+                            AbonoDeuda abonoDeuda = new AbonoDeuda();
+                            abonoDeuda.setDeuda(deuda);
+                            abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
+                            abonoDeuda.setMonto(montoAPagar);
+                            abonoDeuda.setRestante(deuda.getRestante());
+                            abonoDeuda.setPagoMes(pagoMes);
+                            abonoDeudaDAO.save(abonoDeuda);  
+                        }
 
                     // Registro para auditar
                     String detalles = "genero el rol individual nro: " 
@@ -1147,6 +1160,7 @@ public class PagoMensualController implements Initializable {
                     aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
                 }
             }
+            HibernateSessionFactory.getSession().flush();
             setTableInfo();
             
             Platform.runLater(new Runnable() {

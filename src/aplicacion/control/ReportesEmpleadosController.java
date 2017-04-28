@@ -48,7 +48,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -74,10 +73,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import javafx.scene.control.ChoiceBox;
 
@@ -219,7 +214,10 @@ public class ReportesEmpleadosController implements Initializable {
     
     @FXML
     public void permitirAmpliar(ActionEvent event) {
-        
+        if (!checkBoxPermitir.isSelected()) {
+            fin = inicio.plusMonths(1).minusDays(1);
+            fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);  
+        }
     }
     
     @FXML
@@ -297,6 +295,9 @@ public class ReportesEmpleadosController implements Initializable {
             Double deudasValor = 0d;
             Double deduccionesValor = 0d;
             Double aPercibirValor = 0d;
+            
+            System.out.println("fecha inicio "+inicio.getFecha());
+            System.out.println("fecha fin "+fin.getFecha());
             
             List<RolIndividual> rolIndividuals = new RolIndividualDAO()
                     .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleadoTable.getId());
@@ -376,7 +377,7 @@ public class ReportesEmpleadosController implements Initializable {
         dialogWait();
         
         ArrayList<RolIndividual> roles = getRoles();
-        
+        System.out.println("roles: "+roles.size());
         DataSourceRolIndividual datasource = new DataSourceRolIndividual();
         datasource.addAll(roles);
         

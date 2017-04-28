@@ -829,6 +829,7 @@ public class PagoMensualDetallesController implements Initializable {
         });
         
         subTotalTextValor -= vacacionesTextValor;
+        decimoTerceroTotalTextValor = round(subTotalTextValor / 12);
         
         data = FXCollections.observableArrayList(); 
         data.addAll(pagosTable);
