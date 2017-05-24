@@ -79,11 +79,14 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.Numeros;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContentDisplay;
@@ -146,6 +149,9 @@ public class PagoQuincenalController implements Initializable {
     private Button buttonPagar;
     
     @FXML
+    private Button buttonBank;
+    
+    @FXML
     private Button buttonAnterior;
     
     @FXML
@@ -175,6 +181,8 @@ public class PagoQuincenalController implements Initializable {
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<PagoQuincena> pagosQuincenal;
+    private ArrayList<String> textosDAT;
+    private ArrayList<String> textosTXT;
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     Dialog<Void> dialog;
@@ -303,6 +311,25 @@ public class PagoQuincenalController implements Initializable {
         return false;
     }
     
+    @FXML
+    public void generarBank(ActionEvent event) {
+        
+        textosDAT = new ArrayList<>();
+        textosTXT = new ArrayList<>();
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (empleadoTable.getPagado().equalsIgnoreCase("Si") && empleadoTable.getQuincenal() > 0d) {
+                    textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getQuincenal()));
+                    textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getQuincenal()));
+            }
+        }
+        if (textosDAT.size() > 0 && textosTXT.size() > 0) {
+            dialogoGenerarDatTxt();
+        } else {
+            dialogoErrorBizBank();
+        }
+    }
+    
     public void imprimir(File file, Boolean enviarCorreo) {
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -346,6 +373,54 @@ public class PagoQuincenalController implements Initializable {
         
     }
     
+    public void dialogoErrorBizBank() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Generador de archivos");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("No se pueden generar los archivos porque no hay empleados\n"
+                + "con pagos hechos, o sus pagos son menores a 0."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void dialogoGenerarDatTxt() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Roles Individuales");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Seleccionar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Seleccione donde guardar los archivos .TXT y .DAT"), 
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                new GuardarText().saveFile(textosDAT, getFileNameDat(file));
+                new GuardarText().saveFile(textosTXT, getFileNameTXT(file));
+                dialogoCompletado();
+            }
+        });
+        dialogStage.show();
+        
+    }
+    
     public void dialogoGenerarAdelantoCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -357,8 +432,8 @@ public class PagoQuincenalController implements Initializable {
         Button buttonNoDocumento = new Button("No Guardar");
         CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se generaron los pagos adelanto quincenal con exito, \n"
-                + " ¿Desea guardar los documento de pago?."), 
+        children(new Text("Se generaron los pagos quincenales con exito, \n"
+                + " ¿Desea ahora guardar los documento de pago quincenal?."), 
                 buttonSiDocumento, buttonNoDocumento, enviarCorreo).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonSiDocumento.setOnAction((ActionEvent e) -> {
@@ -384,12 +459,12 @@ public class PagoQuincenalController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Pago de Adelantos Quincenal");
+        dialogStage.setTitle("Pago Quincenal");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Pagos de adelanto quincenal hecho con exito."), buttonOk).
+        children(new Text("Completado."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -424,6 +499,7 @@ public class PagoQuincenalController implements Initializable {
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
+            empleado.setUsuario(user);
             empleado.setId(user.getId());
             empleado.setNombre(user.getNombre());
             empleado.setApellido(user.getApellido());
@@ -791,6 +867,23 @@ public class PagoQuincenalController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonBank.setTooltip(
+            new Tooltip("Generar .DAT y .TXT")
+        );
+        buttonBank.setOnMouseEntered((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBank.setOnMouseExited((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         
         selectorDiaDe.setItems(Fechas.arraySpinnerDia());
         selectorMesDe.setItems(Fechas.arraySpinnerMes());
@@ -1040,6 +1133,88 @@ public class PagoQuincenalController implements Initializable {
                     dialogoCompletado();
                 }
             });
+        }
+    }
+    
+    String crearLineaDAT(Usuario user, Double quincenal) {
+        String monto = Numeros.roundToString(quincenal);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "           ";
+                break;
+            case 1:
+                espacios = "          ";
+                break;
+            case 2:
+                espacios = "         ";
+                break;
+            case 3:
+                espacios = "        ";
+                break;
+            case 4:
+                espacios = "       ";
+                break;
+            case 5:
+                espacios = "      ";
+                break;
+        }
+        String text = user.getDetallesEmpleado()
+                            .getEmpresa().getNumeracion()+";0001;"+inicio.getAno()
+                            +";"+inicio.getMes()+";INS;"+user.getCedula()
+                            +";"+espacios+monto+";0";
+        return text;
+    }
+    
+    String getFileNameDat(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".DAT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".DAT";
+        }
+    }
+    
+    String crearLineaTXT(Usuario user, Double quincenal) {
+        String monto = Numeros.roundToString(quincenal);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        String partDecimal = parts[1];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "0000000000000";
+                break;
+            case 1:
+                espacios = "000000000000";
+                break;
+            case 2:
+                espacios = "00000000000";
+                break;
+            case 3:
+                espacios = "0000000000";
+                break;
+            case 4:
+                espacios = "000000000";
+                break;
+            case 5:
+                espacios = "00000000";
+                break;
+        }
+        String text = "10CPRP"+user.getDetallesEmpleado().getNroCuenta()
+                +espacios+partEntera+partDecimal+"ROL QUINCENAL  "
+                +user.getDetallesEmpleado().getEmpresa().getNombre()+"CUUSD";
+        return text;
+    }
+    
+    String getFileNameTXT(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".TXT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".TXT";
         }
     }
 }

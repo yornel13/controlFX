@@ -77,5 +77,6 @@
       <ChoiceBox fx:id="selectorDiaDe" layoutX="218.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
       <ChoiceBox fx:id="selectorMesDe" layoutX="258.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
       <ChoiceBox fx:id="selectorAnoDe" layoutX="298.0" layoutY="15.0" prefHeight="25.0" prefWidth="60.0" />
+      <Button fx:id="buttonBank" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#generarBank" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/bank.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

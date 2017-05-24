@@ -15,7 +15,7 @@
          <children>
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
-            <TextField fx:id="filterField" layoutX="70.0" layoutY="51.0" prefHeight="25.0" prefWidth="654.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="51.0" prefHeight="25.0" prefWidth="654.0" promptText="Escriba para filtrar (cedula, nombre, apellido, tipo de descuento)." />
             <Accordion layoutX="208.0" layoutY="21.0" />
          </children>
       </Pane>
@@ -26,6 +26,7 @@
             <TableColumn fx:id="tipoColumna" prefWidth="200.0" text="Tipo de Descuento" />
             <TableColumn fx:id="valorColumna" prefWidth="110.0" text="Valor" />
             <TableColumn fx:id="facturaColumna" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Nro. Factura" />
+            <TableColumn fx:id="agregarColumna" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" style="-fx-alignment: CENTER;" text="agregar" />
         </columns>
       </TableView>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
@@ -66,6 +67,11 @@
       <Label layoutX="395.0" layoutY="20.0" text="Hasta" textFill="#fffbfb">
          <font>
             <Font size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="totalText" alignment="TOP_RIGHT" contentDisplay="RIGHT" layoutX="520.0" layoutY="552.0" prefHeight="17.0" prefWidth="150.0" textAlignment="CENTER">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="14.0" />
          </font>
       </Label>
     </children>

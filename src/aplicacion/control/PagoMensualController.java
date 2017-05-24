@@ -90,14 +90,15 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.Numeros;
 import hibernate.dao.ControlExtrasDAO;
 import hibernate.model.ControlExtras;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContentDisplay;
@@ -106,6 +107,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -157,6 +160,9 @@ public class PagoMensualController implements Initializable {
     private Button buttonPagar;
     
     @FXML
+    private Button buttonBank;
+    
+    @FXML
     private Button buttonAnterior;
     
     @FXML
@@ -187,6 +193,8 @@ public class PagoMensualController implements Initializable {
     
     private ArrayList<EmpleadoTable> empleadosParaImprimir;
     private ArrayList<Usuario> usuariosParaImprimir;
+    private ArrayList<String> textosDAT;
+    private ArrayList<String> textosTXT;
     
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
@@ -329,6 +337,25 @@ public class PagoMensualController implements Initializable {
         }
     }
     
+    @FXML
+    public void generarBank(ActionEvent event) {
+        
+        textosDAT = new ArrayList<>();
+        textosTXT = new ArrayList<>();
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (empleadoTable.getPagado().equalsIgnoreCase("Si") && empleadoTable.getSueldo() > 0d) {
+                    textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getSueldo()));
+                    textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getSueldo()));
+            }
+        }
+        if (textosDAT.size() > 0 && textosTXT.size() > 0) {
+            dialogoGenerarDatTxt();
+        } else {
+            dialogoErrorBizBank();
+        }
+    }
+    
     public File seleccionarDirectorio() {
         DirectoryChooser fileChooser = new DirectoryChooser();
         fileChooser.setTitle("Selecciona un directorio para guardar el recibo");
@@ -356,6 +383,53 @@ public class PagoMensualController implements Initializable {
 
         loadingMode();
         
+    }
+    
+    public void dialogoErrorBizBank() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Generador de archivos");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("No se pueden generar los archivos porque no hay empleados\n"
+                + "con pagos hechos, o sus pagos son menores a 0."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void dialogoGenerarDatTxt() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Roles Individuales");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Seleccionar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Seleccione donde guardar los archivos .TXT y .DAT"), 
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                new GuardarText().saveFile(textosDAT, getFileNameDat(file));
+                new GuardarText().saveFile(textosTXT, getFileNameTXT(file));
+                dialogoCompletado();
+            }
+        });
+        dialogStage.show();
         
     }
     
@@ -372,7 +446,7 @@ public class PagoMensualController implements Initializable {
         CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
         children(new Text("Se generaron los roles de pago individual con exito, \n"
-                + " ¿Desea guardar los documento de pago?."), 
+                + " ¿Desea guardar los documento de pagos individuales (.PDF)?."), 
                 buttonSiDocumento, buttonNoDocumento, enviarCorreo).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonSiDocumento.setOnAction((ActionEvent e) -> {
@@ -398,7 +472,7 @@ public class PagoMensualController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Roles Individuales");
+        dialogStage.setTitle("Roles");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
@@ -408,6 +482,7 @@ public class PagoMensualController implements Initializable {
         buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
+            
         });
         buttonOk.setOnKeyPressed((KeyEvent event1) -> {
             dialogStage.close();
@@ -945,6 +1020,23 @@ public class PagoMensualController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonBank.setTooltip(
+            new Tooltip("Generar .DAT y .TXT")
+        );
+        buttonBank.setOnMouseEntered((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBank.setOnMouseExited((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         
         selectorDiaDe.setItems(Fechas.arraySpinnerDia());
         selectorMesDe.setItems(Fechas.arraySpinnerMes());
@@ -1094,7 +1186,12 @@ public class PagoMensualController implements Initializable {
                                 updateWindowsStart();
                             }
                         } catch (Exception ex) {
-                            closeDialogMode();
+                            ex.printStackTrace();
+                            Platform.runLater(new Runnable() {
+                                @Override public void run() {
+                                    closeDialogMode(); 
+                                }
+                            });
                         }
                 }
             }, 1000, 1000);
@@ -1158,6 +1255,7 @@ public class PagoMensualController implements Initializable {
                             + getFechaConMes(fin) + " para el empleado " 
                             + empleadoTable.getNombre() + " " + empleadoTable.getApellido();
                     aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    
                 }
             }
             HibernateSessionFactory.getSession().flush();
@@ -1303,6 +1401,88 @@ public class PagoMensualController implements Initializable {
             });
         }
         
+    }
+    
+    String crearLineaDAT(Usuario user, Double sueldo) {
+        String monto = Numeros.roundToString(sueldo);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "           ";
+                break;
+            case 1:
+                espacios = "          ";
+                break;
+            case 2:
+                espacios = "         ";
+                break;
+            case 3:
+                espacios = "        ";
+                break;
+            case 4:
+                espacios = "       ";
+                break;
+            case 5:
+                espacios = "      ";
+                break;
+        }
+        String text = user.getDetallesEmpleado()
+                            .getEmpresa().getNumeracion()+";0001;"+inicio.getAno()
+                            +";"+inicio.getMes()+";INS;"+user.getCedula()
+                            +";"+espacios+monto+";0";
+        return text;
+    }
+    
+    String getFileNameDat(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".DAT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".DAT";
+        }
+    }
+    
+    String crearLineaTXT(Usuario user, Double sueldo) {
+        String monto = Numeros.roundToString(sueldo);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        String partDecimal = parts[1];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "0000000000000";
+                break;
+            case 1:
+                espacios = "000000000000";
+                break;
+            case 2:
+                espacios = "00000000000";
+                break;
+            case 3:
+                espacios = "0000000000";
+                break;
+            case 4:
+                espacios = "000000000";
+                break;
+            case 5:
+                espacios = "00000000";
+                break;
+        }
+        String text = "10CPRP"+user.getDetallesEmpleado().getNroCuenta()
+                +espacios+partEntera+partDecimal+"ROL MENSUAL    "
+                +user.getDetallesEmpleado().getEmpresa().getNombre()+"CUUSD";
+        return text;
+    }
+    
+    String getFileNameTXT(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".TXT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".TXT";
+        }
     }
     
 }

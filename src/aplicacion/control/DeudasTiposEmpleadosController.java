@@ -68,7 +68,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
@@ -90,7 +89,7 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
  *
  * @author Yornel
  */
-public class DeudasEmpleadosController implements Initializable {
+public class DeudasTiposEmpleadosController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -112,10 +111,10 @@ public class DeudasEmpleadosController implements Initializable {
     private TableColumn apellidoColumna;
     
     @FXML 
-    private TableColumn departamentoColumna;
+    private TableColumn cargoColumna;
     
     @FXML 
-    private TableColumn cargoColumna;
+    private TableColumn siguienteColumna;
     
     @FXML 
     private TableColumn deudasColumna;
@@ -140,9 +139,6 @@ public class DeudasEmpleadosController implements Initializable {
     
     @FXML
     private Label tipoText;
-    
-    @FXML
-    private Label totalText;
     
     TableColumn cuotasColumna;
     
@@ -230,8 +226,8 @@ public class DeudasEmpleadosController implements Initializable {
         deudasColumna.setMinWidth(100);
         deudasColumna.setStyle("-fx-alignment: center;");
         
-        empleadosTableView.getColumns().addAll(departamentoColumna, 
-                cargoColumna, deudasColumna);
+        /*empleadosTableView.getColumns().addAll(departamentoColumna, 
+                cargoColumna, deudasColumna);*/
         
         empleadosTableView.setEditable(false);
         
@@ -242,7 +238,6 @@ public class DeudasEmpleadosController implements Initializable {
         dialogLoading.close();
         
         tipoText.setText("");
-        totalText.setText("");
         
         dialogoDeudasMultiplesCompletado();
     }
@@ -553,8 +548,6 @@ public class DeudasEmpleadosController implements Initializable {
             empleadoTable.setMonto(deuda.getMonto().toString());
         });
         
-        empleadosTableView.getColumns().remove(departamentoColumna);
-        
         empleadosTableView.setEditable(true);
        
         
@@ -582,7 +575,6 @@ public class DeudasEmpleadosController implements Initializable {
                         empleadoTable.setAgregar(false);
                     }
                     data.set(data.indexOf(empleadoTable), empleadoTable);
-                    sumarTotal();
                 }
             }
         );
@@ -638,38 +630,16 @@ public class DeudasEmpleadosController implements Initializable {
                     checkBoxAgregar.setSelected(empleadoTable.getAgregar());
                 }
                 checkBoxAgregar.setOnAction(event -> {
-                    if (Double.valueOf(empleadoTable.getMonto()) > 0d) {
-                        empleadoTable.setAgregar(checkBoxAgregar.isSelected());
-                        sumarTotal();
-                    } else {
-                        empleadoTable.setAgregar(false);
-                        checkBoxAgregar.setSelected(false);
-                    }
+                    empleadoTable.setAgregar(checkBoxAgregar.isSelected());
+                     
                 });
             } 
         });
         empleadosTableView.getColumns().addAll(cuotasColumna, agregarColumna);
         
-        totalText.setText("Total:  $0");
-        
         enDeudaMultiple = true;
         
         dialogoInformacion();
-    }
-    
-    void sumarTotal() {
-        
-        Double monto = 0d;
-        
-        for (EmpleadoTable empleadoTable: 
-                (List<EmpleadoTable>) data) {
-            if (empleadoTable.getAgregar() 
-                    && Double.valueOf(empleadoTable.getMonto()) > 0d) {
-                monto += Double.valueOf(empleadoTable.getMonto());
-            } 
-        }
-        
-        totalText.setText("Total:  $"+Numeros.round(monto).toString());
     }
     
     public void dialogoErrorMonto() {
@@ -736,40 +706,6 @@ public class DeudasEmpleadosController implements Initializable {
             dialogStage.close();
         });
         dialogStage.show();
-    }
-    
-    public void mostrarDeudas(Usuario empleado) {
-        if (aplicacionControl.permisos == null) {
-           aplicacionControl.noLogeado();
-        } else {
-            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
-                try {
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudas.fxml"));
-                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
-                    Stage ventana = new Stage();
-                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
-                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
-                    ventana.getIcons().add(new Image(stageIcon));
-                    ventana.setResizable(false);
-                    //ventana.setMaxWidth(608);
-                    ventana.initOwner(stagePrincipal);
-                    Scene scene = new Scene(ventanaDeudas);
-                    ventana.setScene(scene);
-                    DeudasController controller = loader.getController();
-                    controller.setStagePrincipal(ventana);
-                    controller.setProgramaPrincipal(aplicacionControl);
-                    controller.setProgramaDeudas(this);
-                    controller.setEmpleado(empleado);
-                    ventana.show();
- 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    //tratar la excepción
-                }
-            } else {
-                aplicacionControl.noPermitido();
-            }
-        }
     }
     
     public void empleadoEditado(Usuario user) {
@@ -989,9 +925,9 @@ public class DeudasEmpleadosController implements Initializable {
        
         apellidoColumna.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         
-        departamentoColumna.setCellValueFactory(new PropertyValueFactory<>("departamento"));
-        
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
+        
+        siguienteColumna.setCellValueFactory(new PropertyValueFactory<>("departamento"));
         
         deudasColumna.setCellValueFactory(new PropertyValueFactory<>("totalMontoDeudas"));
         
@@ -1001,7 +937,7 @@ public class DeudasEmpleadosController implements Initializable {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     EmpleadoTable rowData = row.getItem();
                     if (!enDeudaMultiple) {
-                        mostrarDeudas(new UsuarioDAO().findById(rowData.getId()));
+                        //mostrarDeudas(new UsuarioDAO().findById(rowData.getId()));
                     }
                 }
             });

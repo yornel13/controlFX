@@ -5,6 +5,9 @@
  */
 package aplicacion.control.util;
 
+import java.util.Arrays;
+import java.util.regex.Pattern;
+
 /**
  *
  * @author Yornel
@@ -19,6 +22,23 @@ public class Numeros {
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
+    }
+    
+     public static String roundToString(double value) {
+        int places = 2;
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        Double rounded = (double) tmp / factor;
+        String roundedString = rounded.toString();
+        String[] parts = roundedString.split(Pattern.quote("."));
+        String partDecimal = parts[1];
+        if (partDecimal.length() == 1) {
+            roundedString += "0";
+        }
+        return roundedString;
     }
     
     public static Double round(String valueString) {

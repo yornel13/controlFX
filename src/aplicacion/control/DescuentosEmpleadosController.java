@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.reports.ReporteDescuentosVarios;
 import aplicacion.control.tableModel.DescuentoTable;
+import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
@@ -62,8 +63,12 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
+import javafx.collections.ListChangeListener;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableCell;
 
 /**
  *
@@ -107,6 +112,9 @@ public class DescuentosEmpleadosController implements Initializable {
     
     @FXML
     private Button buttonSiguiente;
+    
+    @FXML
+    private Label totalText;
     
     private ObservableList<DescuentoTable> data;
     
@@ -412,11 +420,9 @@ public class DescuentosEmpleadosController implements Initializable {
                     return true; // Filter matches last name.
                 } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
-                } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                } else if (empleado.getTipo().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
-                } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
-                }
+                } 
                 return false; // Does not match.
             });
         });
@@ -425,6 +431,16 @@ public class DescuentosEmpleadosController implements Initializable {
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
         chequearFiltro(filteredData);
+        sumarTotal();
+        
+        empleadosTableView.getItems().addListener(new ListChangeListener<DescuentoTable>() {
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends DescuentoTable> c) {
+                sumarTotal();
+            }
+        });
+
+    
     }
     
     void chequearFiltro(FilteredList<DescuentoTable> filteredData) {
@@ -437,18 +453,28 @@ public class DescuentosEmpleadosController implements Initializable {
             String lowerCaseFilter = filterField.getText().toLowerCase();
 
             if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
-                return true; // Filter matches first name.
-            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
-                return true; // Filter matches last name.
-            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
-                return true; // Filter matches last name.
-            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
-                return true; // Filter matches last name.
-            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
-                return true; // Filter matches last name.
-            } 
+                    return true; // Filter matches first name.
+                } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                } else if (empleado.getTipo().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                }  
             return false; // Does not match.
         });
+    }
+    
+    void sumarTotal() {
+        System.out.println("call");
+        Double monto = 0d;
+        
+         for (DescuentoTable descuentoTable: (List<DescuentoTable>) 
+                    empleadosTableView.getItems()) {
+                monto += descuentoTable.getValor();
+        }
+        
+        totalText.setText("Total:  $"+Numeros.round(monto).toString());
     }
     
     @Override
@@ -473,8 +499,9 @@ public class DescuentosEmpleadosController implements Initializable {
                     // nothing to do
                 }
             });
-            return row ;
+            return row;
         });
+        
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {
             buttonAtras.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/atras.png'); "

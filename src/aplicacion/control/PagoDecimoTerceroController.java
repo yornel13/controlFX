@@ -9,6 +9,7 @@ import aplicacion.control.reports.ReporteRolDePagoDecimo;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.PagoDecimoDAO;
@@ -75,11 +76,14 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.Numeros;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Dialog;
@@ -152,6 +156,8 @@ public class PagoDecimoTerceroController implements Initializable {
     
     ArrayList<List<RolIndividual>> rolesEmpleados;
     ArrayList<List<RolIndividual>> rolesParaImprimir;
+    private ArrayList<String> textosDAT;
+    private ArrayList<String> textosTXT;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -260,6 +266,32 @@ public class PagoDecimoTerceroController implements Initializable {
         dialogLoading.show();
     }
     
+    public void dialogoGenerarDatTxt() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Roles Individuales");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Seleccionar");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Se generaron los pagos de decimo tercero con exito, \n"
+                +"Seleccione ahora donde guardar los archivos .TXT y .DAT"), 
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                new GuardarText().saveFile(textosDAT, getFileNameDat(file));
+                new GuardarText().saveFile(textosTXT, getFileNameTXT(file));
+                dialogoPagoDecimosCompletado();
+            }
+        });
+        dialogStage.show();
+        
+    }
+    
     public void dialogoPagoDecimosCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -271,7 +303,7 @@ public class PagoDecimoTerceroController implements Initializable {
         Button buttonNoDocumento = new Button("No Guardar");
         CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se generaron los pagos de decimo tercero con exito, \n"
+        children(new Text("Se generaron los archivos DAT y TXT con exito, \n"
                 + " ¿Desea guardar los documento de pago?."), 
                 buttonSiDocumento, buttonNoDocumento, enviarCorreo).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
@@ -363,7 +395,7 @@ public class PagoDecimoTerceroController implements Initializable {
 
             rolesEmpleados.add(rolesDelParaPagar);
             
-            empleado.setDecimo3(monto);
+            empleado.setDecimo3(round(monto));
             empleado.setPagar(false);
             
             return empleado;
@@ -607,6 +639,8 @@ public class PagoDecimoTerceroController implements Initializable {
         
             pagosDecimo = new ArrayList<>();
             rolesParaImprimir = new ArrayList<>();
+            textosDAT = new ArrayList<>();
+            textosTXT = new ArrayList<>();
 
             for (Usuario user: usuarios) {
                 if (data.get(usuarios.indexOf(user)).getPagar()) {
@@ -636,13 +670,16 @@ public class PagoDecimoTerceroController implements Initializable {
                             + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()) + " para el empleado " 
                             + user.getApellido()+ " " + user.getNombre();
                     aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+                    
+                    textosDAT.add(crearLineaDAT(user, pagoDecimo, roles.get(roles.size() - 1)));
+                    textosTXT.add(crearLineaTXT(user, pagoDecimo));
                 }
             }
             setTableInfo();
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     closeDialogMode();
-                    dialogoPagoDecimosCompletado();
+                    dialogoGenerarDatTxt();
                 }
             });
         }
@@ -707,4 +744,86 @@ public class PagoDecimoTerceroController implements Initializable {
         }
     }
     
+    String crearLineaDAT(Usuario user, PagoDecimo pagoDecimo, RolIndividual rolIndividual) {
+        String monto = Numeros.roundToString(pagoDecimo.getMonto());
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "           ";
+                break;
+            case 1:
+                espacios = "          ";
+                break;
+            case 2:
+                espacios = "         ";
+                break;
+            case 3:
+                espacios = "        ";
+                break;
+            case 4:
+                espacios = "       ";
+                break;
+            case 5:
+                espacios = "      ";
+                break;
+        }
+        String text = user.getDetallesEmpleado()
+                            .getEmpresa().getNumeracion()+";0001;"+new Fecha(rolIndividual.getFinalizo()).getAno()
+                            +";"+new Fecha(rolIndividual.getFinalizo()).getMes()+";INS;"+user.getCedula()
+                            +";"+espacios+monto+";0";
+        return text;
+    }
+    
+    String getFileNameDat(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".DAT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".DAT";
+        }
+    }
+    
+    String crearLineaTXT(Usuario user, PagoDecimo pagoDecimo) {
+        String monto = Numeros.roundToString(pagoDecimo.getMonto());
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        String partDecimal = parts[1];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "0000000000000";
+                break;
+            case 1:
+                espacios = "000000000000";
+                break;
+            case 2:
+                espacios = "00000000000";
+                break;
+            case 3:
+                espacios = "0000000000";
+                break;
+            case 4:
+                espacios = "000000000";
+                break;
+            case 5:
+                espacios = "00000000";
+                break;
+        }
+        String text = "10CPRP"+user.getDetallesEmpleado().getNroCuenta()
+                +espacios+partEntera+partDecimal+"DECIMO TERCERO "
+                +user.getDetallesEmpleado().getEmpresa().getNombre()+"CUUSD";
+        return text;
+    }
+    
+    String getFileNameTXT(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".TXT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".TXT";
+        }
+    }
+ 
 }
