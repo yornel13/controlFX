@@ -135,5 +135,11 @@
       </key>
       <one-to-many class="hibernate.model.PlanillaIess"/>
     </set>
+    <set inverse="true" name="pagoVacacioneses">
+      <key>
+        <column name="usuario_id" not-null="true"/>
+      </key>
+      <one-to-many class="hibernate.model.PagoVacaciones"/>
+    </set>
   </class>
 </hibernate-mapping>

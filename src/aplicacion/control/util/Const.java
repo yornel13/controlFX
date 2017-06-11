@@ -35,6 +35,7 @@ public class Const {
     
     // Reportes
     public static final String REPORTE_ROL_PAGO_INDIVIDUAL = "report/rol_pago_individual.jrxml";
+    public static final String REPORTE_ROL_GENERAL_MENSUAL= "report/rol_general_mensual.jrxml";
     public static final String REPORTE_HORAS_TRABAJADAS = "report/historico_dias.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADO = "report/deudas_empleado.jrxml";
     public static final String REPORTE_DEUDAS_EMPLEADOS = "report/deudas_varios.jrxml";
@@ -48,6 +49,7 @@ public class Const {
     public static final String REPORTE_AUDITORIA = "report/auditoria.jrxml";
     public static final String REPORTE_ROL_CLIENTE = "report/rol_cliente.jrxml";
     public static final String REPORTE_ROL_INDIVIDUAL = "report/rol_individual.jrxml";
+    public static final String REPORTE_ROL_VACACIONES = "report/rol_vacaciones.jrxml";
     public static final String REPORTE_ROL_UNITARIO = "report/rol_unitario.jrxml";
     public static final String REPORTE_PAGO_ADELANTO_QUINCENAL = "report/adelanto_quincenal_individual.jrxml";
     public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL = "report/deuda_empleado_individual.jrxml";
@@ -83,6 +85,7 @@ public class Const {
     public static final String ASUNTO_HORAS = "Horas Trabajadas en el mes";
     public static final String ASUNTO_ADELANTO_QUINCENAL = "Adelanto Quincenal";
     public static final String ASUNTO_DEUDAS = "Deudas pendientes";
+    public static final String ASUNTO_VACACIONES = "Liquidacion de Vacaciones";
     public static final String ASUNTO_PAGO_DECIMO_TERCERO = "Pago Decimo Tercero";
     public static final String ASUNTO_PAGO_DECIMO_CUARTO = "Pago Decimo Cuarto";
     public static final String ASUNTO_DECIMOS_GENERADO = "Decimos Generados";

@@ -137,6 +137,11 @@ public class Fechas {
         return dateTime.toString("dd/MM/yyyy");
     }
     
+    public static String getFechaCorta(Date date) {
+        DateTime dateTime = new DateTime(date.getTime());
+        return dateTime.toString("dd/MM/yyyy");
+    }
+    
     public static String getFechaCorta(DateTime dateTime) {
         return dateTime.toString("dd/MM/yyyy");
     }

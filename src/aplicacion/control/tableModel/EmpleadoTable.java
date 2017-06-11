@@ -11,9 +11,11 @@ import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import hibernate.model.Deuda;
 import hibernate.model.DiasVacaciones;
+import hibernate.model.PagoMes;
 import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
 import hibernate.model.PagoQuincena;
+import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.util.ArrayList;
@@ -51,10 +53,13 @@ public class EmpleadoTable {
     private Boolean sinRoles;
     public ArrayList<Deuda> deudas;
     public ArrayList<PagoMesItem> pagoMesItems;
+     public ArrayList<PagoMes> pagosMensuales;
     public ArrayList<RolCliente> pagos;
+    public ArrayList<RolIndividual> rolesVac;
     public RolIndividual rolIndividual;
     public Boolean problem;
     public PagoQuincena pagoQuincena;
+    public PagoMes pagoMes;
     private Boolean activo;
     private Boolean agregar;
     private String monto;
@@ -87,6 +92,9 @@ public class EmpleadoTable {
     private DiasVacaciones objectVacaciones;
     private Boolean editado;
     private Bonos bonos;
+    private String vacaciones;
+    private PagoVacaciones pagoVacaciones;
+    private String periodo;
 
     public EmpleadoTable() {
         problem = false;
@@ -139,6 +147,14 @@ public class EmpleadoTable {
 
     public String getDepartamento() {
         return departamento;
+    }
+
+    public ArrayList<RolIndividual> getRolesVac() {
+        return rolesVac;
+    }
+
+    public void setRolesVac(ArrayList<RolIndividual> rolesVac) {
+        this.rolesVac = rolesVac;
     }
 
     public void setDepartamento(String departamento) {
@@ -602,7 +618,45 @@ public class EmpleadoTable {
     public void setExtras(ArrayList<ControlExtras> extras) {
         this.extras = extras;
     }
-    
-    
 
+    public ArrayList<PagoMes> getPagosMensuales() {
+        return pagosMensuales;
+    }
+
+    public void setPagosMensuales(ArrayList<PagoMes> pagosMensuales) {
+        this.pagosMensuales = pagosMensuales;
+    }
+
+    public String getVacaciones() {
+        return vacaciones;
+    }
+
+    public void setVacaciones(String vacaciones) {
+        this.vacaciones = vacaciones;
+    }
+
+    public PagoVacaciones getPagoVacaciones() {
+        return pagoVacaciones;
+    }
+
+    public void setPagoVacaciones(PagoVacaciones pagoVacaciones) {
+        this.pagoVacaciones = pagoVacaciones;
+    }
+
+    public String getPeriodo() {
+        return periodo;
+    }
+
+    public void setPeriodo(String periodo) {
+        this.periodo = periodo;
+    }
+
+    public PagoMes getPagoMes() {
+        return pagoMes;
+    }
+
+    public void setPagoMes(PagoMes pagoMes) {
+        this.pagoMes = pagoMes;
+    }
+    
 }

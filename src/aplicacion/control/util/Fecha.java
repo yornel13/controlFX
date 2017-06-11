@@ -34,6 +34,13 @@ public class Fecha {
         this.fecha = ano+mes+dia;
     }
     
+    public Fecha(String dia, String mes, String anio) {
+        this.dia = dia;
+        this.mes = mes;
+        this.ano = anio;
+        this.fecha = anio+mes+dia;
+    }
+    
     public String getFecha() {
         return fecha;
     }

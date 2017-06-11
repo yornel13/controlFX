@@ -7,6 +7,8 @@ package aplicacion.control;
 
 import aplicacion.control.reports.ReporteHorasTrabajadas;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
+import aplicacion.control.reports.ReporteRolGeneralMensual;
+import aplicacion.control.reports.ReporteRolVacaciones;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
@@ -109,6 +111,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.MaterialDesignButton;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -161,6 +165,9 @@ public class PagoMensualController implements Initializable {
     
     @FXML
     private Button buttonBank;
+    
+    @FXML
+    private Button buttonImprimir;
     
     @FXML
     private Button buttonAnterior;
@@ -280,6 +287,124 @@ public class PagoMensualController implements Initializable {
             }
             data.set(data.indexOf(empleadoTable), empleadoTable);
         }
+    }
+    
+     public void imprimir(File file) {
+        
+        dialogWait();
+        Double dias = 0d;
+        Double salario = 0d;
+        Double sobretiempo = 0d;
+        Double recargo = 0d;
+        Double transporte = 0d;
+        Double subtotal = 0d;
+        Double tercero = 0d;
+        Double cuarto = 0d;
+        Double ingresos = 0d;
+        Double anticipo = 0d;
+        Double iess = 0d;
+        Double descuentos = 0d;
+        Double neto = 0d;
+        
+        List<EmpleadoTable> lista = new ArrayList<>();
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                lista.add(empleadoTable);
+                dias += empleadoTable.getRolIndividual().getDias();
+                salario += empleadoTable.getRolIndividual().getSalario();
+                sobretiempo += empleadoTable.getRolIndividual().getMontoHorasSobreTiempo();
+                recargo += empleadoTable.getRolIndividual().getMontoHorasSuplementarias();
+                transporte += empleadoTable.getRolIndividual().getTransporte();
+                subtotal += empleadoTable.getRolIndividual().getSubtotal();
+                for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
+                    if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_DECIMO_TERCERO)) {
+                        tercero += pagoMesItem.getIngreso();
+                    }
+                }
+                for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
+                    if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_DECIMO_CUARTO)) {
+                        cuarto += pagoMesItem.getIngreso();
+                    }
+                }
+                for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
+                    if (pagoMesItem.getIngreso() != null) {
+                        ingresos += pagoMesItem.getIngreso();
+                    }
+                }
+                for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
+                    if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_ADELANTO_QUINCENAL)) {
+                        anticipo += pagoMesItem.getDeduccion();
+                    }
+                }
+                for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
+                    if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_IESS)) {
+                        iess += pagoMesItem.getDeduccion();
+                    }
+                }
+                for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
+                    if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_DEUDA)) {
+                        descuentos += pagoMesItem.getDeduccion();
+                    }
+                }
+                neto += empleadoTable.getPagoMes().getMonto();
+            } 
+        }
+        
+        ReporteRolGeneralMensual datasource = new ReporteRolGeneralMensual();
+        datasource.addAll(lista);
+        
+        try {
+            InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_GENERAL_MENSUAL);
+        
+            Map<String, String> parametros = new HashMap();
+            parametros.put("fecha", Fechas.getFechaConMes(new DateTime()));
+            parametros.put("empresa", empresa.getNombre());
+            parametros.put("siglas", empresa.getSiglas());
+            parametros.put("correo", "Correo: " + empresa.getEmail());
+            parametros.put("detalles", 
+                         "Ruc: " + empresa.getNumeracion() 
+                    + " - Direccion: " + empresa.getDireccion() 
+                    + " - Tel: " + empresa.getTelefono1());
+            parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
+            parametros.put("dias", round(dias).toString());
+            parametros.put("salario", round(salario).toString());
+            parametros.put("sobretiempo", round(sobretiempo).toString());
+            parametros.put("recargo", round(recargo).toString());
+            parametros.put("transporte", round(transporte).toString());
+            parametros.put("subtotal", round(subtotal).toString());
+            parametros.put("tercero", round(tercero).toString());
+            parametros.put("cuarto", round(cuarto).toString());
+            parametros.put("ingresos", round(ingresos).toString());
+            parametros.put("anticipo", round(anticipo).toString());
+            parametros.put("iess", round(iess).toString());
+            parametros.put("descuentos", round(descuentos).toString());
+            parametros.put("neto", round(neto).toString());
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = "reporte_general_"+(new DateTime()).getMillis();
+            
+            if (file != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            
+            // Registro para auditar
+            String detalles = "genero el recibo general de pagos mensuales";
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
+        }
+        
     }
     
     @FXML
@@ -552,6 +677,53 @@ public class PagoMensualController implements Initializable {
         filtro();
     }
     
+     public void dialogWait() {
+        dialogLoading = new Stage();
+        dialogLoading.initModality(Modality.APPLICATION_MODAL);
+        dialogLoading.setResizable(false);
+        dialogLoading.setTitle("Cargando...");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_loading.png").toExternalForm();
+        dialogLoading.getIcons().add(new Image(stageIcon));
+        dialogLoading.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Cargando espere...")).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        dialogLoading.show();
+    }
+    
+    @FXML
+    public void imprimirGeneral(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Rol de pagos");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        MaterialDesignButton buttonOk = new MaterialDesignButton("Si");
+        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonOk, buttonNo)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Desea imprimir el rol general de pagos?"), 
+                hBox).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonOk.setMinWidth(50);
+        buttonNo.setMinWidth(50);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            File file = seleccionarDirectorio();
+            imprimir(file);
+        });
+        buttonNo.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
     public void empleadoEditado(Usuario user) {
         for (EmpleadoTable empleadoTable: data) {
             if(Objects.equals(empleadoTable.getId(), user.getId())) {
@@ -780,7 +952,10 @@ public class PagoMensualController implements Initializable {
            empleadoTable.setPagar(false);
            PagoMes pagoMes = new PagoMesDAO()
                    .findInDeterminateTimeByUsuarioId(inicio.getFecha(), empleado.getId());
+           pagoMesItems = new ArrayList<>();
+           pagoMesItems.addAll(new PagoMesItemDAO().findByPagoMesId(pagoMes.getId()));
            aPercibirValor = pagoMes.getMonto();
+           empleadoTable.setPagoMes(pagoMes);
         }
         
         empleadoTable.setSueldo(round(aPercibirValor));
@@ -1033,6 +1208,23 @@ public class PagoMensualController implements Initializable {
         buttonBank.setOnMouseExited((MouseEvent t) -> {
             buttonBank.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");

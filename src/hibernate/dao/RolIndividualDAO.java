@@ -148,7 +148,8 @@ public class RolIndividualDAO extends BaseHibernateDAO {
                     createSQLQuery("SELECT * FROM rol_individual "
                             + "where inicio >= :fecha_inicio "
                             + "and inicio < :fecha_fin "
-                            + "and usuario_id = :usuario_id")
+                            + "and usuario_id = :usuario_id "
+                            + "order by inicio")
                     .addEntity(RolIndividual.class)
                     .setParameter("fecha_inicio", fechaInicio)
                     .setParameter("fecha_fin", fechaFin)

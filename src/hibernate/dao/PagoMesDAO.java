@@ -103,6 +103,22 @@ public class PagoMesDAO extends BaseHibernateDAO {
                 Object result = query.uniqueResult();
                 return (PagoMes) result;
 	}
+        
+        public List<PagoMes> findAllByRangoFechaAndEmpleadoId(String fechaInicio, 
+                String fechaFin, Integer empleadoId) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes "
+                            + "where inicio_mes >= :fecha_inicio "
+                            + "and fin_mes < :fecha_fin "
+                            + "and usuario_id = :usuario_id "
+                            + "order by inicio_mes")
+                    .addEntity(PagoMes.class)
+                    .setParameter("fecha_inicio", fechaInicio)
+                    .setParameter("fecha_fin", fechaFin)
+                    .setParameter("usuario_id", empleadoId);
+            Object result = query.list();
+            return (List<PagoMes>) result;
+        }
 
 	public List findByExample(PagoMes instance) {
 		log.debug("finding PagoMes instance by example");

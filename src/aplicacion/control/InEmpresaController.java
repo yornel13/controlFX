@@ -187,6 +187,8 @@ public class InEmpresaController implements Initializable {
             buttonPagos.getItems().add(menuItemQuincenal);
             MenuItem menuItemMensual = new MenuItem("Mensual");
             buttonPagos.getItems().add(menuItemMensual);
+            MenuItem menuItemVacaciones = new MenuItem("Vacaciones");
+            buttonPagos.getItems().add(menuItemVacaciones);
             MenuItem menuItemDecimos = new MenuItem("Decimos");
             buttonPagos.getItems().add(menuItemDecimos);
             menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
@@ -197,6 +199,9 @@ public class InEmpresaController implements Initializable {
             });
             menuItemDecimos.setOnAction((ActionEvent actionEvent) -> {
                 mostrarDecimos();
+            });
+            menuItemVacaciones.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarPagoVacaciones(empresa, stagePrincipal);
             });
             buttonPagos.setOnMouseEntered((MouseEvent t) -> {
                 buttonPagos.setStyle("-fx-background-color: #E0E0E0;");
