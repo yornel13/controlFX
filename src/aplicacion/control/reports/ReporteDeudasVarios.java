@@ -5,15 +5,12 @@
  */
 package aplicacion.control.reports;
 
-import static aplicacion.control.EmpleadoController.getMonthName;
 import aplicacion.control.tableModel.EmpleadoTable;
-import hibernate.model.Deuda;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRField;
-import org.joda.time.DateTime;
 
 /**
  *

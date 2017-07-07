@@ -78,6 +78,9 @@ public class InEmpresaController implements Initializable {
     private Button buttonReportes;
     
     @FXML
+    private MenuButton buttonAjustes;
+    
+    @FXML
     private Button buttonAtras;
     
     @FXML
@@ -312,6 +315,36 @@ public class InEmpresaController implements Initializable {
             });
             buttonReportes.setOnMouseExited((MouseEvent t) -> {
                 buttonReportes.setStyle("-fx-background-color: #039BE5;");
+            });
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_variables.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonAjustes.setGraphic(imageView);
+            buttonAjustes.setFont(Roboto.MEDIUM(15));
+            buttonAjustes.getItems().clear();
+            MenuItem menuItem1 = new MenuItem("Decimo Tercero");
+            buttonAjustes.getItems().add(menuItem1);
+            menuItem1.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarAjusteTerceroEmpleados(empresa, stagePrincipal);
+            });
+            MenuItem menuItem2 = new MenuItem("Decimo Cuarto");
+            buttonAjustes.getItems().add(menuItem2);
+            menuItem2.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarAjusteCuartoEmpleados(empresa, stagePrincipal);
+            });
+            MenuItem menuItem3 = new MenuItem("Fondo de Reserva");
+            buttonAjustes.getItems().add(menuItem3);
+            menuItem3.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarAjusteReservaEmpleados(empresa, stagePrincipal);
+            });
+            buttonAjustes.setOnMouseEntered((MouseEvent t) -> {
+                buttonAjustes.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonAjustes.setOnMouseExited((MouseEvent t) -> {
+                buttonAjustes.setStyle("-fx-background-color: #039BE5;");
             });
         }
         

@@ -67,7 +67,7 @@ public class DataSourceRolIndividual implements JRDataSource {
                 break;
             case "monto_reserva":
                 valor = round(lista.get(indiceActual)
-                        .getDecimoTercero());
+                        .getReserva());
                 break;
             case "monto_vacaciones":
                 valor = round(lista.get(indiceActual)

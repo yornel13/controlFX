@@ -2038,7 +2038,7 @@ public class RolDePagoClienteController implements Initializable {
                                 // Registro para auditar
                                 String detalles = "elimino el horario del empleado " 
                                         + empleado.getApellido() + " " + empleado.getNombre()
-                                        + "del dia " + Fechas.getFechaConMes(new Fecha(controlEmpleadoDelete.getFecha()));
+                                        + " del dia " + Fechas.getFechaConMes(new Fecha(controlEmpleadoDelete.getFecha()));
                                 aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                             }
                         }
@@ -2105,7 +2105,7 @@ public class RolDePagoClienteController implements Initializable {
                                 // Registro para auditar
                                 String detalles = "elimino las horas extras del empleado " 
                                         + empleado.getApellido() + " " + empleado.getNombre()
-                                        + "del dia " + Fechas.getFechaConMes(controlEmpleadoDelete.getFecha());
+                                        + " del dia " + Fechas.getFechaConMes(controlEmpleadoDelete.getFecha());
                                 aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
                             }
                         }

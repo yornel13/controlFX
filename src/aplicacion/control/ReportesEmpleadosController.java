@@ -280,6 +280,7 @@ public class ReportesEmpleadosController implements Initializable {
             Double decimosTotalTextValor = 0d;
             Double decimoTerceroTotalTextValor = 0d;
             Double decimoCuartoTotalTextValor = 0d;
+            Double reservaTotalTextValor = 0d;
             Double totalTextValor = 0d;
             Double montoSumplementariasTextValor = 0d;
             Double montoSobreTiempoTextValor = 0d;
@@ -318,6 +319,7 @@ public class ReportesEmpleadosController implements Initializable {
                         + pago.getDecimoTercero());
                 decimoTerceroTotalTextValor += pago.getDecimoTercero();
                 decimoCuartoTotalTextValor += pago.getDecimoCuarto();
+                reservaTotalTextValor += pago.getReserva();
                 totalTextValor += pago.getTotalIngreso();
 
                 montoSumplementariasTextValor += pago.getMontoHorasSuplementarias();
@@ -350,6 +352,7 @@ public class ReportesEmpleadosController implements Initializable {
             pagoRol.setSubtotal(subTotalTextValor);
             pagoRol.setDecimoTercero(decimoTerceroTotalTextValor);
             pagoRol.setDecimoCuarto(decimoCuartoTotalTextValor);
+            pagoRol.setReserva(reservaTotalTextValor);
             pagoRol.setJubilacionPatronal(montoJubilacionTextValor);
             pagoRol.setAportePatronal(montoAportePatronalTextValor);
             pagoRol.setSeguros(montoSegurosTextValor);

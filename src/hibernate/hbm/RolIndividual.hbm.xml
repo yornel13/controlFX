@@ -72,6 +72,9 @@
     <property name="decimoCuarto" type="java.lang.Double">
       <column name="decimo_cuarto" not-null="true" precision="8"/>
     </property>
+    <property name="reserva" type="java.lang.Double">
+      <column name="reserva" not-null="true" precision="8"/>
+    </property>
     <property name="jubilacionPatronal" type="java.lang.Double">
       <column name="jubilacion_patronal" not-null="true" precision="8"/>
     </property>

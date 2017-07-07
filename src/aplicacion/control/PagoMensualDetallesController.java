@@ -962,6 +962,7 @@ public class PagoMensualDetallesController implements Initializable {
             pagoRol.setSubtotal(subTotalTextValor);
             pagoRol.setDecimoTercero(decimoTerceroTotalTextValor);
             pagoRol.setDecimoCuarto(decimoCuartoTotalTextValor);
+            pagoRol.setReserva(decimoTerceroTotalTextValor);
             pagoRol.setJubilacionPatronal(montoJubilacionTextValor);
             pagoRol.setAportePatronal(montoAportePatronalTextValor);
             pagoRol.setSeguros(montoSegurosTextValor);

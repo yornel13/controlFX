@@ -66,6 +66,7 @@ public class EmpleadoTable {
     private String cuotas;
     private Double decimo3;
     private Double decimo4;
+    private Double reserva;
     private String detallesD3;
     private String detallesD4;
     private String cliente;
@@ -658,5 +659,14 @@ public class EmpleadoTable {
     public void setPagoMes(PagoMes pagoMes) {
         this.pagoMes = pagoMes;
     }
+
+    public Double getReserva() {
+        return reserva;
+    }
+
+    public void setReserva(Double reserva) {
+        this.reserva = reserva;
+    }
+    
     
 }

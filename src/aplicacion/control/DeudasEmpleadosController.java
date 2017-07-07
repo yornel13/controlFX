@@ -790,10 +790,16 @@ public class DeudasEmpleadosController implements Initializable {
                ArrayList<Deuda> deudas = new ArrayList<>();
                deudas.addAll(new DeudaDAO().findAllByEmpleadoId(user.getId()));
                Double montoDeuda = 0d;
+               Integer cantidad = 0;
                for (Deuda deuda: deudas) {
-                   montoDeuda += deuda.getRestante();
+                    montoDeuda += deuda.getRestante();
+                    if (!deuda.getPagada()) {
+                        cantidad++;
+                    }
                }
                empleado.setTotalMontoDeudas(montoDeuda);
+               empleado.setTotalDeudas(cantidad);
+                empleado.setTotalMontoDeudas(Numeros.round(montoDeuda));
                data.set(data.indexOf(empleadoTable), empleado);
                return;
             }
@@ -806,6 +812,11 @@ public class DeudasEmpleadosController implements Initializable {
         
         ReporteDeudasVarios datasource = new ReporteDeudasVarios();
         datasource.addAll((List<EmpleadoTable>) empleadosTableView.getItems());
+        Double total = 0d;
+        for (EmpleadoTable empleadoTable: (List<EmpleadoTable>) 
+                empleadosTableView.getItems()) {
+            total += empleadoTable.getTotalMontoDeudas();
+        }
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DEUDAS_EMPLEADOS);
@@ -818,6 +829,7 @@ public class DeudasEmpleadosController implements Initializable {
                          "Ruc: " + empresa.getNumeracion() 
                     + " - Direccion: " + empresa.getDireccion() 
                     + " - Tel: " + empresa.getTelefono1());
+            parametros.put("total", Numeros.round(total).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);

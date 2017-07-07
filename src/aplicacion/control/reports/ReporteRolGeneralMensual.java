@@ -31,7 +31,10 @@ public class ReporteRolGeneralMensual implements JRDataSource {
 
     if( null != jrField.getName()) switch (jrField.getName()) {
             case "nombre":
-                valor = lista.get(indiceActual).getUsuario().getApellido()
+                String extra = "";
+                if (lista.get(indiceActual).getPagoMes() == null) 
+                    extra = "(NP) ";
+                valor = extra+lista.get(indiceActual).getUsuario().getApellido()
                         +" "+lista.get(indiceActual).getUsuario().getNombre();
                 break;
             case "dias":
@@ -117,7 +120,10 @@ public class ReporteRolGeneralMensual implements JRDataSource {
                 valor = Numeros.round(descuentos).toString();
                 break;
             case "neto":
-                valor = Numeros.round(lista.get(indiceActual).getPagoMes().getMonto()).toString();
+                String extraFin = "";
+                if (lista.get(indiceActual).getPagoMes() == null) 
+                    extraFin = " (NP)";
+                valor = Numeros.round(lista.get(indiceActual).getSueldo()).toString()+extraFin;
                 break;
             default:
                 break; 

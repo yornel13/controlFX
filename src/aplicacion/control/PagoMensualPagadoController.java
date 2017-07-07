@@ -449,7 +449,7 @@ public class PagoMensualPagadoController implements Initializable {
                 JasperExportManager.exportReportToPdfStream(jasperPrintHoras, new FileOutputStream(pdfHoras));  
                 CorreoUtil.mandarCorreo(empleado.getDetallesEmpleado().getEmpresa().getNombre(), 
                         empleado.getEmail(), Const.ASUNTO_HORAS, 
-                        "Recibo de horas trabajadas en el mes que comienza " 
+                        "Recibo de horas trabajadas en el mes que comienza el " 
                                 + getFechaConMes(inicio) 
                                 + " y termina el " 
                                 + getFechaConMes(fin), 

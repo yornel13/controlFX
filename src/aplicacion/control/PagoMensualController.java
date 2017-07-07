@@ -8,7 +8,6 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteHorasTrabajadas;
 import aplicacion.control.reports.ReporteRolDePagoIndividual;
 import aplicacion.control.reports.ReporteRolGeneralMensual;
-import aplicacion.control.reports.ReporteRolVacaciones;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
@@ -154,8 +153,14 @@ public class PagoMensualController implements Initializable {
     @FXML
     private CheckBox checkBoxPagarTodos;
     
+    @FXML
+    private CheckBox checkBoxPagarTodos1;
+    
     @FXML 
     private TableColumn<EmpleadoTable, EmpleadoTable> pagarColumna;
+    
+    @FXML 
+    private TableColumn<EmpleadoTable, EmpleadoTable> imprimirColumna;
     
     @FXML
     private Button buttonAtras;
@@ -289,6 +294,17 @@ public class PagoMensualController implements Initializable {
         }
     }
     
+    @FXML
+    private void pagarATodos1(ActionEvent event) throws ParseException {
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            
+            empleadoTable.setAgregar(checkBoxPagarTodos1.isSelected());
+            
+            data.set(data.indexOf(empleadoTable), empleadoTable);
+        }
+    }
+    
      public void imprimir(File file) {
         
         dialogWait();
@@ -308,8 +324,8 @@ public class PagoMensualController implements Initializable {
         
         List<EmpleadoTable> lista = new ArrayList<>();
         for (EmpleadoTable empleadoTable: 
-                (List<EmpleadoTable>) empleadosTableView.getItems()) {
-            if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                (List<EmpleadoTable>) data) {
+            if (empleadoTable.getAgregar()) {
                 lista.add(empleadoTable);
                 dias += empleadoTable.getRolIndividual().getDias();
                 salario += empleadoTable.getRolIndividual().getSalario();
@@ -347,7 +363,9 @@ public class PagoMensualController implements Initializable {
                         descuentos += pagoMesItem.getDeduccion();
                     }
                 }
-                neto += empleadoTable.getPagoMes().getMonto();
+                
+                neto += empleadoTable.getSueldo();
+                
             } 
         }
         
@@ -468,8 +486,8 @@ public class PagoMensualController implements Initializable {
         textosDAT = new ArrayList<>();
         textosTXT = new ArrayList<>();
         for (EmpleadoTable empleadoTable: 
-                (List<EmpleadoTable>) empleadosTableView.getItems()) {
-            if (empleadoTable.getPagado().equalsIgnoreCase("Si") && empleadoTable.getSueldo() > 0d) {
+                (List<EmpleadoTable>) data) {
+            if (empleadoTable.getAgregar() && empleadoTable.getPagado().equalsIgnoreCase("Si") && empleadoTable.getSueldo() > 0d) {
                     textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getSueldo()));
                     textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getSueldo()));
             }
@@ -542,7 +560,8 @@ public class PagoMensualController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Seleccionar");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Seleccione donde guardar los archivos .TXT y .DAT"), 
+        children(new Text("Seleccione donde guardar los archivos .TXT y .DAT"),
+                new Text("Solo los empleados marcados que ya tenga rol generado quedaran incluidos."), 
                 buttonSiDocumento).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonSiDocumento.setOnAction((ActionEvent e) -> {
@@ -708,7 +727,8 @@ public class PagoMensualController implements Initializable {
                 .build();
         hBox.maxWidth(120);
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Desea imprimir el rol general de pagos?"), 
+        children(new Text("¿Desea imprimir el rol general de pagos"),
+                new Text("De los empleados seleccionados?"),
                 hBox).
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
         buttonOk.setMinWidth(50);
@@ -930,6 +950,7 @@ public class PagoMensualController implements Initializable {
             pagoRol.setSubtotal(subTotalTextValor);
             pagoRol.setDecimoTercero(decimoTerceroTotalTextValor);
             pagoRol.setDecimoCuarto(decimoCuartoTotalTextValor);
+            pagoRol.setReserva(decimoTerceroTotalTextValor);
             pagoRol.setJubilacionPatronal(montoJubilacionTextValor);
             pagoRol.setAportePatronal(montoAportePatronalTextValor);
             pagoRol.setSeguros(montoSegurosTextValor);
@@ -1146,6 +1167,31 @@ public class PagoMensualController implements Initializable {
             } 
         });
         
+        imprimirColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        imprimirColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
+            private final CheckBox checkBoxImp = new CheckBox();
+
+            @Override
+            protected void updateItem(EmpleadoTable empleadoTable, boolean empty) {
+                super.updateItem(empleadoTable, empty);
+
+                if (empleadoTable == null) {
+                    setGraphic(null);
+                    getTableRow().setStyle("");
+                    return;
+                }
+                
+                setGraphic(checkBoxImp);
+                if (checkBoxImp != null) {
+                    checkBoxImp.setSelected(empleadoTable.getAgregar());
+                }
+                
+                checkBoxImp.setOnAction(event -> {
+                     empleadoTable.setAgregar(checkBoxImp.isSelected());
+                });
+            } 
+        });
+        
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {
             buttonAtras.setStyle("-fx-background-image: "
                     + "url('aplicacion/control/imagenes/atras.png'); "
@@ -1179,7 +1225,7 @@ public class PagoMensualController implements Initializable {
             buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
         buttonPagar.setTooltip(
-            new Tooltip("Pagar a seleccionados")
+            new Tooltip("Pagar \n(Selecionados en \"Pagar\")")
         );
         buttonPagar.setOnMouseEntered((MouseEvent t) -> {
             buttonPagar.setStyle("-fx-background-image: "
@@ -1196,7 +1242,7 @@ public class PagoMensualController implements Initializable {
                     + "-fx-background-color: transparent;");
         });
         buttonBank.setTooltip(
-            new Tooltip("Generar .DAT y .TXT")
+            new Tooltip("Generar .DAT y .TXT \n(Selecionados en \"Imp.\")")
         );
         buttonBank.setOnMouseEntered((MouseEvent t) -> {
             buttonBank.setStyle("-fx-background-image: "
@@ -1213,7 +1259,7 @@ public class PagoMensualController implements Initializable {
                     + "-fx-background-color: transparent;");
         });
         buttonImprimir.setTooltip(
-            new Tooltip("Imprimir")
+            new Tooltip("Imprimir \n(Selecionados en \"Imp.\")")
         );
         buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
             buttonImprimir.setStyle("-fx-background-image: "

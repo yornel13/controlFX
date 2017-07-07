@@ -15,7 +15,7 @@
          <children>
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonPagar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#pagarAdelanto" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
-            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="600.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="558.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
             <Accordion layoutX="216.0" layoutY="24.0" />
             <Label layoutX="186.0" layoutY="20.0" text="De" textFill="#fffbfb">
                <font>
@@ -27,12 +27,12 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Label layoutX="692.0" layoutY="62.0" text="Todos" textFill="#fffbfb">
+            <Label layoutX="645.0" layoutY="61.0" text="Todos:" textFill="#fffbfb">
                <font>
                   <Font size="14.0" />
                </font>
             </Label>
-            <CheckBox fx:id="checkBoxPagarTodos" layoutX="740.0" layoutY="62.0" mnemonicParsing="false" onAction="#pagarATodos" />
+            <CheckBox fx:id="checkBoxPagarTodos" layoutX="700.0" layoutY="63.0" mnemonicParsing="false" onAction="#pagarATodos" />
             <Button fx:id="buttonSiguiente" layoutX="591.0" layoutY="12.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
                <font>
                   <Font size="14.0" />
@@ -53,9 +53,10 @@
             <TableColumn fx:id="nombreColumna" prefWidth="130.0" text="Nombre" />
             <TableColumn fx:id="departamentoColumna" prefWidth="110.0" text="Departamento" />
             <TableColumn fx:id="cargoColumna" prefWidth="100.0" text="Cargo" />
-            <TableColumn fx:id="sueldoColumna" prefWidth="100.0" style="-fx-alignment: CENTER;" text="Sueldo" />
-            <TableColumn fx:id="pagadoColumna" prefWidth="60.0" style="-fx-alignment: CENTER;" text="Pagado" />
+            <TableColumn fx:id="sueldoColumna" prefWidth="70.0" style="-fx-alignment: CENTER;" text="Sueldo" />
+            <TableColumn fx:id="pagadoColumna" prefWidth="50.0" style="-fx-alignment: CENTER;" text="Pagado" />
             <TableColumn fx:id="pagarColumna" prefWidth="50.0" style="-fx-alignment: CENTER;" text="Pagar" />
+            <TableColumn fx:id="imprimirColumna" prefWidth="40.0" style="-fx-alignment: CENTER;" text="Imp." />
         </columns>
       </TableView>
         <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
@@ -79,5 +80,6 @@
       <ChoiceBox fx:id="selectorMesDe" layoutX="258.0" layoutY="15.0" prefHeight="25.0" prefWidth="40.0" />
       <ChoiceBox fx:id="selectorAnoDe" layoutX="298.0" layoutY="15.0" prefHeight="25.0" prefWidth="60.0" />
       <Button fx:id="buttonBank" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#generarBank" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/bank.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <CheckBox fx:id="checkBoxPagarTodos1" layoutX="743.0" layoutY="63.0" mnemonicParsing="false" onAction="#pagarATodos1" />
     </children>
 </AnchorPane>

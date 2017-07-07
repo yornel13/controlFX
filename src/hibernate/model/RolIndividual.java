@@ -36,6 +36,7 @@ public class RolIndividual implements java.io.Serializable {
 	private Double subtotal;
 	private Double decimoTercero;
 	private Double decimoCuarto;
+        private Double reserva;
 	private Double jubilacionPatronal;
 	private Double aportePatronal;
 	private Double seguros;
@@ -336,6 +337,14 @@ public class RolIndividual implements java.io.Serializable {
         public void setPagoDecimoCuarto(PagoDecimo PagoDecimoCuarto) {
             this.PagoDecimoCuarto = PagoDecimoCuarto;
         }
+
+    public Double getReserva() {
+        return reserva;
+    }
+
+    public void setReserva(Double reserva) {
+        this.reserva = reserva;
+    }
 
         
 }

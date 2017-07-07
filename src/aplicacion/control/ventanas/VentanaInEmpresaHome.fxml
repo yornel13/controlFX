@@ -14,8 +14,8 @@
       <AnchorPane layoutY="150.0" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" />
       <Pane layoutX="90.0" layoutY="100.0" prefHeight="500.0" prefWidth="620.0" style="-fx-background-color: white;">
          <children>
-              <Button fx:id="buttonEmpleados" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="160.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="EMPLEADOS" textFill="WHITE" />
-            <MenuButton fx:id="buttonEdicion" layoutX="35.0" layoutY="250.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" GESTIÓN" textAlignment="CENTER" textFill="WHITE">
+              <Button fx:id="buttonEmpleados" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="120.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verEmpleados" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="EMPLEADOS" textFill="WHITE" />
+            <MenuButton fx:id="buttonEdicion" layoutX="35.0" layoutY="210.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" GESTIÓN" textAlignment="CENTER" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" text="Action 1" />
                   <MenuItem mnemonicParsing="false" text="Action 2" />
@@ -64,7 +64,13 @@
                   <Font size="14.0" />
                </font>
             </Label>
-            <Button fx:id="buttonReportes" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="340.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verReportes" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="REPORTES" textFill="WHITE" />
+            <Button fx:id="buttonReportes" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="390.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verReportes" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="REPORTES" textFill="WHITE" />
+            <MenuButton fx:id="buttonAjustes" layoutX="35.0" layoutY="300.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" AJUSTES" textAlignment="CENTER" textFill="WHITE">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
          </children>
       </Pane>
         <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
