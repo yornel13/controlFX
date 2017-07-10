@@ -14,17 +14,18 @@
     <children>
       <TableView fx:id="deudasTableView" layoutX="6.0" layoutY="121.0" maxHeight="200.0" maxWidth="548.0" minHeight="200.0" minWidth="548.0" prefHeight="200.0" prefWidth="548.0" style="-fx-background-color: white;">
         <columns>
-          <TableColumn fx:id="fechaColumna" prefWidth="144.0" text="Fecha De Abono" />
-          <TableColumn fx:id="numeroColumna" prefWidth="126.0" text="Numero de Pago" />
-            <TableColumn fx:id="montoColumna" minWidth="0.0" prefWidth="156.0" text="Monto Abonado" />
-            <TableColumn fx:id="restanteColumna" prefWidth="120.0" text="Monto Restante" />
+          <TableColumn fx:id="fechaColumna" prefWidth="140.0" text="Fecha de Pago" />
+          <TableColumn fx:id="numeroColumna" text="Nro. Pago" />
+            <TableColumn fx:id="montoColumna" minWidth="0.0" style="-fx-alignment: center;" text="Valor ($)" />
+            <TableColumn fx:id="observacionColumna" prefWidth="270.0" text="Observación" />
+            <TableColumn fx:id="marcarColumna" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" />
         </columns>
       </TableView>
       <Button fx:id="buttonImprimir" layoutX="500.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
-      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="354.0" layoutY="342.0" prefHeight="25.0" prefWidth="194.0">
+      <GridPane fx:id="gridPaneTotal" gridLinesVisible="true" layoutX="350.0" layoutY="348.0" prefHeight="25.0" prefWidth="194.0">
          <children>
             <Pane prefHeight="25.0" prefWidth="105.0" style="-fx-background-color: #eea82f;" />
-            <Label prefHeight="20.0" prefWidth="92.0" text="Debe" textFill="#0d0707" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+            <Label prefHeight="20.0" prefWidth="92.0" text="Por Pagar" textFill="#0d0707" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <font>
                   <Font size="14.0" />
                </font>
@@ -66,7 +67,7 @@
             <Font name="System Bold" size="12.0" />
          </font>
       </Label>
-      <Label fx:id="estadoText" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="409.0" layoutY="93.0" prefHeight="17.0" prefWidth="134.0" textAlignment="RIGHT" textFill="WHITE">
+      <Label fx:id="estadoText" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="355.0" layoutY="93.0" prefHeight="17.0" prefWidth="188.0" textAlignment="RIGHT" textFill="WHITE">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -77,5 +78,31 @@
          </font>
       </Label>
       <Button fx:id="buttonCambiar" layoutX="440.0" layoutY="10.0" mnemonicParsing="false" onAction="#cambiarCuotas" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/cambiar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Label fx:id="labelSugerencia" layoutX="9.0" layoutY="323.0" text="Si haces doble click sobre alguna cuota podras modificar la fecha y/o observación" textFill="#d5ff04" />
+      <GridPane fx:id="gridPaneTotal1" gridLinesVisible="true" layoutX="40.0" layoutY="348.0" prefHeight="25.0" prefWidth="194.0">
+         <children>
+            <Pane prefHeight="25.0" prefWidth="105.0" style="-fx-background-color: lightgreen;" />
+            <Label prefHeight="20.0" prefWidth="92.0" text="Pagado" textFill="#0d0707" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="pagadoText" text="0.00" textFill="#fffbfb" GridPane.columnIndex="1" GridPane.halignment="RIGHT">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </Label>
+         </children>
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="114.0" minWidth="10.0" prefWidth="104.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="92.0" minWidth="10.0" prefWidth="90.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+      </GridPane>
     </children>
 </AnchorPane>

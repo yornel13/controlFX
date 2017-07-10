@@ -68,6 +68,9 @@ public class InEmpresaController implements Initializable {
     @FXML
     private MenuButton buttonHoras;
     
+     @FXML
+    private MenuButton buttonDeudas;
+    
     @FXML
     private MenuButton buttonPagos;
     
@@ -254,8 +257,6 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemDecimos);
             MenuItem menuItemActuariales = new MenuItem("Actuariales");
             buttonEdicion.getItems().add(menuItemActuariales);
-            MenuItem menuItemDeudas = new MenuItem("Deudas");
-            buttonEdicion.getItems().add(menuItemDeudas);
             MenuItem menuItemIess = new MenuItem("IESS Acumulado");
             buttonEdicion.getItems().add(menuItemIess);
             MenuItem menuItemPlantilla = new MenuItem("Planilla IESS");
@@ -264,8 +265,7 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemVacaciones);
             MenuItem menuItemBonos = new MenuItem("Bono y Transporte");
             buttonEdicion.getItems().add(menuItemBonos);
-            MenuItem menuItemDescuentos = new MenuItem("Descuentos");
-            buttonEdicion.getItems().add(menuItemDescuentos);
+            
             menuItemQuincenal.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarQuincenalEmpleados(empresa, stagePrincipal);
             });
@@ -278,9 +278,6 @@ public class InEmpresaController implements Initializable {
             menuItemActuariales.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarActuarialesEmpleados(empresa, stagePrincipal);
             });
-            menuItemDeudas.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarDeudasEmpleados(empresa, stagePrincipal);
-            });
             menuItemIess.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
             });
@@ -292,9 +289,6 @@ public class InEmpresaController implements Initializable {
             });
             menuItemBonos.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarClientesParaBonos(empresa, stagePrincipal);     
-            });
-            menuItemDescuentos.setOnAction((ActionEvent actionEvent) -> {
-                 aplicacionControl.mostrarDescuentosEmpleados(empresa, stagePrincipal);    
             });
             buttonEdicion.setOnMouseEntered((MouseEvent t) -> {
                 buttonEdicion.setStyle("-fx-background-color: #E0E0E0;");
@@ -315,6 +309,36 @@ public class InEmpresaController implements Initializable {
             });
             buttonReportes.setOnMouseExited((MouseEvent t) -> {
                 buttonReportes.setStyle("-fx-background-color: #039BE5;");
+            });
+        }
+        {
+            Image imageGuardia = new Image(getClass().getResourceAsStream("imagenes/bt_deuda.png"));
+            ImageView imageView = new ImageView(imageGuardia);
+            imageView.setFitHeight(50);
+            imageView.setFitWidth(50);
+            buttonDeudas.setGraphic(imageView);
+            buttonDeudas.setFont(Roboto.MEDIUM(15));
+            buttonDeudas.getItems().clear();
+            MenuItem menuItemEmpleado = new MenuItem("Por empleado");
+            buttonDeudas.getItems().add(menuItemEmpleado);
+            menuItemEmpleado.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarDeudasEmpleados(empresa, stagePrincipal);
+            });
+            MenuItem menuItemCuenta = new MenuItem("Por cuenta");
+            buttonDeudas.getItems().add(menuItemCuenta);
+            menuItemCuenta.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarDescuentosTodosEmpleados(empresa, stagePrincipal);
+            });
+            MenuItem menuItemDescuentos = new MenuItem("Efectuadas");
+            buttonDeudas.getItems().add(menuItemDescuentos);
+            menuItemDescuentos.setOnAction((ActionEvent actionEvent) -> {
+                 aplicacionControl.mostrarDescuentosEmpleados(empresa, stagePrincipal);    
+            });
+            buttonDeudas.setOnMouseEntered((MouseEvent t) -> {
+                buttonDeudas.setStyle("-fx-background-color: #E0E0E0;");
+            });
+            buttonDeudas.setOnMouseExited((MouseEvent t) -> {
+                buttonDeudas.setStyle("-fx-background-color: #039BE5;");
             });
         }
         {

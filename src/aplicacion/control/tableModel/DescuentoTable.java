@@ -5,6 +5,8 @@
  */
 package aplicacion.control.tableModel;
 
+import hibernate.model.DeudaTipo;
+import hibernate.model.PagoMes;
 import hibernate.model.PagoMesItem;
 import hibernate.model.Usuario;
 
@@ -23,7 +25,10 @@ public class DescuentoTable {
     private String cargo;
     private Double valor;
     private String tipo;
+    private DeudaTipo tipoDeuda;
+    private String estado;
     private PagoMesItem pagoMesItem;
+    private PagoMes pagoMes;
     private Usuario empleado;
     
     public String getNombres() {
@@ -112,6 +117,30 @@ public class DescuentoTable {
 
     public void setEmpleado(Usuario empleado) {
         this.empleado = empleado;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public PagoMes getPagoMes() {
+        return pagoMes;
+    }
+
+    public void setPagoMes(PagoMes pagoMes) {
+        this.pagoMes = pagoMes;
+    }
+
+    public DeudaTipo getTipoDeuda() {
+        return tipoDeuda;
+    }
+
+    public void setTipoDeuda(DeudaTipo tipoDeuda) {
+        this.tipoDeuda = tipoDeuda;
     }
     
     

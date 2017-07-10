@@ -14,17 +14,19 @@
       <Accordion layoutX="40.0" layoutY="14.0" />
       <TableView fx:id="deudasTableView" layoutX="10.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="600.0" minHeight="-Infinity" minWidth="590.0" prefHeight="350.0" prefWidth="600.0" style="-fx-background-color: white;">
         <columns>
-          <TableColumn fx:id="fechaColumna" prefWidth="114.0" text="Fecha" />
-          <TableColumn fx:id="detallesColumna" prefWidth="156.0" text="Detalles" />
-            <TableColumn fx:id="montoColumna" minWidth="0.0" prefWidth="58.0" text="Monto" />
-            <TableColumn fx:id="restanteColumna" minWidth="0.0" prefWidth="54.0" text="Restante" />
-            <TableColumn fx:id="cuotasColumna" minWidth="5.0" prefWidth="47.0" text="Cuotas" />
-            <TableColumn fx:id="tipoColumna" prefWidth="101.0" text="Tipo" />
-            <TableColumn fx:id="borrarColumna" prefWidth="59.0" text="Borrar" />
+          <TableColumn fx:id="fechaColumna" prefWidth="120.0" text="Fecha" />
+          <TableColumn fx:id="tipoColumna" prefWidth="210.0" text="Tipo de Cuenta" />
+            <TableColumn fx:id="montoColumna" minWidth="0.0" prefWidth="70.0" text="Monto ($)" />
+            <TableColumn fx:id="restanteColumna" minWidth="0.0" text="Restante ($)" />
+            <TableColumn fx:id="cuotasColumna" minWidth="5.0" prefWidth="45.0" text="Cuotas" />
+            <TableColumn fx:id="detallesColumna" maxWidth="0.0" minWidth="0.0" prefWidth="0.0" text="Detalles" />
+            <TableColumn fx:id="borrarColumna" prefWidth="60.0" text="Borrar" />
         </columns>
       </TableView>
       <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
       <Button fx:id="buttonAgregar" layoutX="570.0" layoutY="10.0" mnemonicParsing="false" onAction="#agregarDeuda" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/agregar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
       <Button fx:id="buttonImprimir" layoutX="510.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <ChoiceBox fx:id="choiceBoxCuenta" layoutX="104.0" layoutY="18.0" prefHeight="25.0" prefWidth="345.0" />
+      <Label layoutX="14.0" layoutY="22.0" text="Tipo De Cuenta" textFill="WHITE" />
     </children>
 </AnchorPane>

@@ -34,6 +34,13 @@ public class Fecha {
         this.fecha = ano+mes+dia;
     }
     
+    public Fecha(ChoiceBox selectorAno, ChoiceBox selectorMes, String dia) {
+        this.dia = dia;
+        this.mes = (String) selectorMes.getSelectionModel().getSelectedItem();
+        this.ano = (String) selectorAno.getSelectionModel().getSelectedItem();
+        this.fecha = ano+mes+dia;
+    }
+    
     public Fecha(String dia, String mes, String anio) {
         this.dia = dia;
         this.mes = mes;

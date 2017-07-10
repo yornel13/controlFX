@@ -9,6 +9,7 @@ import hibernate.model.Actuariales;
 import hibernate.model.Bonos;
 import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
+import hibernate.model.CuotaDeuda;
 import hibernate.model.Deuda;
 import hibernate.model.DiasVacaciones;
 import hibernate.model.PagoMes;
@@ -51,7 +52,7 @@ public class EmpleadoTable {
     private Boolean pagar; 
     private String pagado;
     private Boolean sinRoles;
-    public ArrayList<Deuda> deudas;
+    public ArrayList<CuotaDeuda> deudas;
     public ArrayList<PagoMesItem> pagoMesItems;
      public ArrayList<PagoMes> pagosMensuales;
     public ArrayList<RolCliente> pagos;
@@ -306,11 +307,11 @@ public class EmpleadoTable {
         this.pagado = pagado;
     }
 
-    public ArrayList<Deuda> getDeudas() {
+    public ArrayList<CuotaDeuda> getDeudas() {
         return deudas;
     }
 
-    public void setDeudas(ArrayList<Deuda> deudas) {
+    public void setDeudas(ArrayList<CuotaDeuda> deudas) {
         this.deudas = deudas;
     }
 

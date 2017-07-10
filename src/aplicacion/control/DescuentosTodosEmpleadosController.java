@@ -10,9 +10,7 @@ import aplicacion.control.tableModel.DescuentoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import hibernate.dao.PagoMesItemDAO;
 import hibernate.model.Empresa;
-import hibernate.model.PagoMesItem;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,15 +63,21 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.CuotaDeudaDAO;
+import hibernate.dao.DeudaTipoDAO;
 import hibernate.model.CuotaDeuda;
+import hibernate.model.DeudaTipo;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TableCell;
 
 /**
  *
  * @author Yornel
  */
-public class DescuentosEmpleadosController implements Initializable {
+public class DescuentosTodosEmpleadosController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -98,7 +102,10 @@ public class DescuentosEmpleadosController implements Initializable {
     private TableColumn valorColumna;
     
     @FXML 
-    private TableColumn facturaColumna;
+    private TableColumn estadoColumna;
+    
+    @FXML
+    private TableColumn<DescuentoTable, DescuentoTable> marcarColumna;
     
     @FXML
     private Button buttonAtras;
@@ -137,6 +144,15 @@ public class DescuentosEmpleadosController implements Initializable {
     
     @FXML
     private ChoiceBox selectorAnoHa;
+    
+    @FXML
+    private ChoiceBox choiceBoxCuenta;
+    
+    ArrayList<DeudaTipo> tiposDeudas;
+    
+    List<CuotaDeuda> cuotasDeuda;
+        
+    List<DescuentoTable> descuentos;
     
     private Fecha inicio;
     private Fecha fin;
@@ -379,32 +395,17 @@ public class DescuentosEmpleadosController implements Initializable {
         
         data = FXCollections.observableArrayList(); 
         
-        List<CuotaDeuda> cuotasDeuda = new CuotaDeudaDAO().findAllByFecha(fin.getFecha());
+        cuotasDeuda = new CuotaDeudaDAO().findAllByFecha(fin.getFecha());
         
-        List<DescuentoTable> descuentos = new ArrayList<>(); 
+        descuentos = new ArrayList<>(); 
                 
-        for (CuotaDeuda cuotaDeuda: cuotasDeuda) {
-            if (cuotaDeuda.getDeuda().getUsuario().getDetallesEmpleado()
-                    .getEmpresa().getId().equals(empresa.getId())) {
-                if (cuotaDeuda.getPagoMes() != null) {
-                    DescuentoTable descuento = new DescuentoTable();
-                    descuento.setNombre(cuotaDeuda.getDeuda().getUsuario().getNombre());
-                    descuento.setApellido(cuotaDeuda.getDeuda().getUsuario().getApellido());
-                    descuento.setNombres(cuotaDeuda.getDeuda().getUsuario().getApellido()
-                            +" "+cuotaDeuda.getDeuda().getUsuario().getNombre());
-                    descuento.setCedula(cuotaDeuda.getDeuda().getUsuario().getCedula());
-                    descuento.setEmpleado(cuotaDeuda.getDeuda().getUsuario());
-                    descuento.setValor(cuotaDeuda.getMonto());
-                    descuento.setTipo(cuotaDeuda.getDeuda().getTipoDeuda().getNombre());
-                    descuento.setTipoDeuda(cuotaDeuda.getDeuda().getTipoDeuda());
-                    descuento.setEstado("N-"+cuotaDeuda.getPagoMes().getId());
-                    data.add(descuento);
-                }
-            }
-        }
-        data.addAll(descuentos);
-        empleadosTableView.setItems(data);
+        filterCuenta();
 
+        callFilter();
+
+    }
+    
+    void callFilter() {
         FilteredList<DescuentoTable> filteredData = new FilteredList<>(data, p -> true);
         filterField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(empleado -> {
@@ -424,8 +425,6 @@ public class DescuentosEmpleadosController implements Initializable {
                     return true; // Filter matches last name.
                 } else if (empleado.getTipo().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
-                } else if (empleado.getEstado().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
                 } 
                 return false; // Does not match.
             });
@@ -443,9 +442,49 @@ public class DescuentosEmpleadosController implements Initializable {
                 sumarTotal();
             }
         });
-
-    
     }
+    
+    void filterCuenta() {
+        
+        data = FXCollections.observableArrayList(); 
+        
+        boolean all = choiceBoxCuenta.getSelectionModel().getSelectedIndex() == 0;
+        
+        for (CuotaDeuda cuotaDeuda: cuotasDeuda) {
+            if (cuotaDeuda.getDeuda().getUsuario().getDetallesEmpleado()
+                    .getEmpresa().getId().equals(empresa.getId())) {
+                
+                DescuentoTable descuento = new DescuentoTable();
+                descuento.setNombre(cuotaDeuda.getDeuda().getUsuario().getNombre());
+                descuento.setApellido(cuotaDeuda.getDeuda().getUsuario().getApellido());
+                descuento.setNombres(cuotaDeuda.getDeuda().getUsuario().getApellido()
+                        +" "+cuotaDeuda.getDeuda().getUsuario().getNombre());
+                descuento.setCedula(cuotaDeuda.getDeuda().getUsuario().getCedula());
+                descuento.setEmpleado(cuotaDeuda.getDeuda().getUsuario());
+                descuento.setValor(cuotaDeuda.getMonto());
+                descuento.setTipo(cuotaDeuda.getDeuda().getTipoDeuda().getNombre());
+                descuento.setTipoDeuda(cuotaDeuda.getDeuda().getTipoDeuda());
+                if (cuotaDeuda.getPagoMes() == null)
+                    descuento.setEstado("Pendiente");
+                else
+                    descuento.setEstado("Pagado");
+                descuento.setPagoMes(cuotaDeuda.getPagoMes());
+            
+                if (all)
+                    data.add(descuento); 
+                else {
+                    DeudaTipo deudaTipo = tiposDeudas.get(choiceBoxCuenta
+                            .getSelectionModel().getSelectedIndex()-1);
+                    if (deudaTipo.getId().equals(descuento.getTipoDeuda().getId())) {
+                        data.add(descuento); 
+                    }
+                }
+            }
+        }
+        empleadosTableView.setItems(data);
+        callFilter();
+    }
+    
     
     void chequearFiltro(FilteredList<DescuentoTable> filteredData) {
         filteredData.setPredicate(empleado -> {
@@ -461,16 +500,20 @@ public class DescuentosEmpleadosController implements Initializable {
                 } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
                     return true; // Filter matches last name.
                 } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
-                } else if (empleado.getTipo().toLowerCase().contains(lowerCaseFilter)) {
-                    return true; // Filter matches last name.
-                }  
+                    return true; // Filter matches cedula.
+                } else if (empleado.getEmpleado().getDetallesEmpleado().getCargo()
+                        .getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches cargo.
+                } else if (empleado.getEmpleado().getDetallesEmpleado().getDepartamento()
+                        .getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches departamento.
+                } 
             return false; // Does not match.
         });
     }
     
     void sumarTotal() {
-        System.out.println("Calculando total deudas");
+        System.out.println("calculando total deudas");
         Double monto = 0d;
         
          for (DescuentoTable descuentoTable: (List<DescuentoTable>) 
@@ -493,7 +536,28 @@ public class DescuentosEmpleadosController implements Initializable {
         
         valorColumna.setCellValueFactory(new PropertyValueFactory<>("valor"));
         
-        facturaColumna.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        estadoColumna.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        
+        marcarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        marcarColumna.setCellFactory(param -> new TableCell<DescuentoTable, DescuentoTable>() {
+
+            @Override
+            protected void updateItem(DescuentoTable descuentoTable, boolean empty) {
+                super.updateItem(descuentoTable, empty);
+
+                if (descuentoTable == null) {
+                    setGraphic(null);
+                    getTableRow().setStyle("");
+                    return;
+                }
+                
+                if (descuentoTable.getPagoMes() != null) {
+                    getTableRow().setStyle("-fx-background-color:#A5D6A7");
+                } else {
+                    getTableRow().setStyle("");
+                }
+            } 
+        });
         
         empleadosTableView.setRowFactory( (Object tv) -> {
             TableRow<DescuentoTable> row = new TableRow<>();
@@ -569,6 +633,23 @@ public class DescuentosEmpleadosController implements Initializable {
         selectorDiaHa.setDisable(true);
         selectorMesHa.setDisable(true);
         selectorAnoHa.setDisable(true);
+        
+        tiposDeudas = (ArrayList<DeudaTipo>) new DeudaTipoDAO().findAll();
+        String[] itemsTposDeuda = new String[tiposDeudas.size()+1];
+        itemsTposDeuda[0] = "-> TODOS <-";
+        tiposDeudas.stream().forEach((obj) -> {
+            itemsTposDeuda[tiposDeudas.indexOf(obj)+1] = obj.getNombre();
+        });
+        choiceBoxCuenta.setItems(FXCollections.observableArrayList(itemsTposDeuda)); 
+        choiceBoxCuenta.getSelectionModel().selectFirst();
+        choiceBoxCuenta.getSelectionModel().selectedIndexProperty()
+                .addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, 
+                    Number oldValue, Number newNalue) {
+                filterCuenta();
+            }
+        });
     } 
     
     // Login items

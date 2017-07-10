@@ -220,10 +220,10 @@ public class Fechas {
     }
     
     public static ObservableList<String> arraySpinnerAno() {
-        String[] items = new String[60];
+        String[] items = new String[20];
         Integer count = 0;
         
-        Integer secuencia = (new DateTime().getYear()) - 30;
+        Integer secuencia = (new DateTime().getYear()) - 10;
         for (String number : items) {
             items[count] = secuencia.toString();
             secuencia++;

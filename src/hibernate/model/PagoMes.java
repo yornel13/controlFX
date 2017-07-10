@@ -23,6 +23,7 @@ public class PagoMes implements java.io.Serializable {
     private String inicioMes;
     private String finMes;
     private Set abonoDeudas = new HashSet(0);
+    private Set cuotaDeudas = new HashSet(0);
     private Set pagoMesItems = new HashSet(0);
     private List<PagoMesItem> pagosItems;
 
@@ -112,6 +113,14 @@ public class PagoMes implements java.io.Serializable {
 
     public void setPagosItems(List<PagoMesItem> pagosItems) {
         this.pagosItems = pagosItems;
+    }
+
+    public Set getCuotaDeudas() {
+        return cuotaDeudas;
+    }
+
+    public void setCuotaDeudas(Set cuotaDeudas) {
+        this.cuotaDeudas = cuotaDeudas;
     }
 
         

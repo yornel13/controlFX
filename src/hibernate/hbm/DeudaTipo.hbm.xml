@@ -19,5 +19,11 @@
         <property name="activo" type="java.lang.Boolean">
             <column name="activo" not-null="true" />
         </property>
+        <set name="deudas" inverse="true">
+            <key>
+                <column name="tipo_id" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.model.Deuda" />
+        </set>
     </class>
 </hibernate-mapping>

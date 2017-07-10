@@ -10,6 +10,9 @@
             <column name="id" />
             <generator class="identity" />
         </id>
+        <many-to-one name="tipoDeuda" class="hibernate.model.DeudaTipo" fetch="select">
+            <column name="tipo_id" not-null="true" />
+        </many-to-one>
         <many-to-one name="usuario" class="hibernate.model.Usuario" fetch="select">
             <column name="usuario_id" not-null="true" />
         </many-to-one>
@@ -24,6 +27,9 @@
         </property>
         <property name="restante" type="java.lang.Double">
             <column name="restante" precision="8" not-null="true" />
+        </property>
+        <property name="cuotasTotal" type="java.lang.Integer">
+            <column name="cuotas_total" not-null="true" />
         </property>
         <property name="cuotas" type="java.lang.Integer">
             <column name="cuotas" not-null="true" />
@@ -45,6 +51,12 @@
                 <column name="deuda_id" not-null="true" />
             </key>
             <one-to-many class="hibernate.model.AbonoDeuda" />
+        </set>
+        <set name="cuotaDeudas" inverse="true">
+            <key>
+                <column name="deuda_id" not-null="true" />
+            </key>
+            <one-to-many class="hibernate.model.CuotaDeuda" />
         </set>
     </class>
 </hibernate-mapping>

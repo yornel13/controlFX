@@ -6,14 +6,13 @@
 package aplicacion.control;
 
 import aplicacion.control.reports.ReporteDeudaEmpleadoIndividual;
-import aplicacion.control.tableModel.AbonoDeudaTable;
+import aplicacion.control.tableModel.CuotaDeudaTable;
 import aplicacion.control.tableModel.DeudaTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.AbonoDeudaDAO;
-import hibernate.model.AbonoDeuda;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
 import hibernate.model.Usuario;
@@ -66,7 +65,14 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import hibernate.dao.CuotaDeudaDAO;
+import hibernate.model.CuotaDeuda;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.scene.control.TableCell;
 import static aplicacion.control.util.Numeros.round;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 
 /**
  *
@@ -93,8 +99,11 @@ public class DeudaController implements Initializable {
     private TableColumn montoColumna;
     
     @FXML
-    private TableColumn restanteColumna;
-    
+    private TableColumn observacionColumna;
+     
+    @FXML
+    private TableColumn<CuotaDeudaTable, CuotaDeudaTable> marcarColumna;
+   
     @FXML
     private Label tipoText;
     
@@ -116,6 +125,12 @@ public class DeudaController implements Initializable {
     @FXML
     private Label debeText;
     
+     @FXML
+    private Label pagadoText;
+    
+    @FXML
+    private Label labelSugerencia;
+    
     @FXML
     private Button buttonImprimir;
     
@@ -125,11 +140,11 @@ public class DeudaController implements Initializable {
     @FXML
     private TableView deudasTableView;
     
-    private ObservableList<AbonoDeudaTable> data;
+    private ObservableList<CuotaDeudaTable> data;
     
     Deuda deuda;
     
-    ArrayList<AbonoDeuda> abonoDeudas;
+    ArrayList<CuotaDeuda> cuotaDeudas;
     
     Stage dialogLoading;
     
@@ -153,11 +168,11 @@ public class DeudaController implements Initializable {
         dialogWait();
         
         ReporteDeudaEmpleadoIndividual datasource = new ReporteDeudaEmpleadoIndividual();
-        datasource.addAll(abonoDeudas);
+        //datasource.addAll(cuotaDeudas);
         
         try {
             InputStream inputStream;
-            if (abonoDeudas == null || abonoDeudas.isEmpty()) {
+            if (cuotaDeudas == null || cuotaDeudas.isEmpty()) {
                 inputStream = new FileInputStream(Const.REPORTE_DEUDA_EMPLEADO_INDIVIDUAL_SIN_ABONO);
             } else {
                 inputStream = new FileInputStream(Const.REPORTE_DEUDA_EMPLEADO_INDIVIDUAL);
@@ -184,8 +199,8 @@ public class DeudaController implements Initializable {
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint;
-            if (abonoDeudas == null || abonoDeudas.isEmpty()) {
-                System.out.println("abono deudas empty" + abonoDeudas.isEmpty());
+            if (cuotaDeudas == null || cuotaDeudas.isEmpty()) {
+                System.out.println("abono deudas empty" + cuotaDeudas.isEmpty());
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
             } else {
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
@@ -306,39 +321,145 @@ public class DeudaController implements Initializable {
             dialogStage.initModality(Modality.APPLICATION_MODAL);
             dialogStage.setResizable(false);
             dialogStage.setTitle("Modificar Cuotas");
-            String stageIcon = AplicacionControl.class.getResource("imagenes/admin.png").toExternalForm();
+            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
             dialogStage.getIcons().add(new Image(stageIcon));
             Button buttonOk = new Button("Modificar");
             TextField fieldCuotas = new TextField();
             dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("Ingrese la cantidad de cuotas:"), fieldCuotas, buttonOk).
+            children(new Text("Ingrese la cantidad de cuotas que restaran ahora. \n"
+                    + "tenga en cuenta que todas las cuotas anteriores que no esten pagas \n"
+                    + "seran elimandas para hacer el reajuste."), fieldCuotas, buttonOk).
             alignment(Pos.CENTER).padding(new Insets(10)).build()));
             fieldCuotas.setMaxWidth(50);
             fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
             fieldCuotas.setText(deuda.getCuotas().toString());
             buttonOk.setOnAction((ActionEvent e) -> {
                 
-                if (fieldCuotas.getText() != null) {
-                    deuda.setCuotas(Integer.parseInt(fieldCuotas.getText()));
+                if (fieldCuotas.getText() != null && Integer.parseInt(fieldCuotas.getText()) > 0) {
+                    
+                    int numeroC = Integer.valueOf(fieldCuotas.getText());
+                
+                    Double monto = deuda.getRestante() / numeroC;
+                    monto = round(monto);
+                
+                    Fecha fecha = Fechas.getFechaActual();
+                    fecha.setDia("30");
+                    
+                     for (int number = 0; numeroC > number; number++) {
+                    
+                        CuotaDeuda cuota = new CuotaDeuda();
+                        cuota.setFecha(fecha.plusMonths(number).getFecha());
+                        cuota.setMonto(monto);
+                        cuota.setPagoMes(null);
+                        cuota.setCreado(Fechas.getToday());
+                        cuota.setEditado(Fechas.getToday());
+                        cuota.setAplazado(Boolean.FALSE);
+                        cuota.setDeuda(deuda);
+
+                        new CuotaDeudaDAO().save(cuota);
+
+                    }
+                    
+                    deuda.setCuotas(numeroC);
+                    for (CuotaDeuda cuotaDeudaToDelete: cuotaDeudas) {
+                        if (cuotaDeudaToDelete.getPagoMes() == null) {
+                            new CuotaDeudaDAO().delete(cuotaDeudaToDelete);
+                            HibernateSessionFactory.getSession().flush();
+                        } else {
+                            numeroC++;
+                        }
+                    }
+                    
+                    deuda.setCuotasTotal(numeroC);
                     deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
                     HibernateSessionFactory.getSession().flush();
                     deudaTable.setCuotas(Integer.parseInt(fieldCuotas.getText()));
                     deudasController.setEmpleado(empleado);
                     dialogStage.close();
-                    deudasController.deudasEmpleadosController.empleadoEditado(empleado);
-                    cuotasText.setText("Cuotas restantes: " + deuda.getCuotas());
+                    if (deudasController.deudasEmpleadosController != null)
+                        deudasController.deudasEmpleadosController.empleadoEditado(empleado);
+                    else
+                        deudasController.pagoMensualDetallesController.setInfoEditada(deudasController.pagoMensualDetallesController.inicio, 
+                                deudasController.pagoMensualDetallesController.fin, 
+                                deudasController.pagoMensualDetallesController.empleado.getId());
                         
                     // Registro para auditar
                     String detalles = "edito las cuotas de la deuda '" + deuda.getDetalles() + "' del empleado " 
-                            + deuda.getUsuario().getApellido()+ " " 
-                            + deuda.getUsuario().getNombre();
+                            +deuda.getUsuario().getApellido()+" " 
+                            +deuda.getUsuario().getNombre();
                     aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+                    
+                    setDeuda(deuda, deudaTable);
                     
                     deudasController.edicionCompletada();
                 }
             });
             dialogStage.show();
         }
+    }
+    
+    public void cambiarFecha(Deuda deuda, CuotaDeudaTable cuotaDeudaTable) {
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Modificar");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("Modificar");
+        
+        ChoiceBox selectorMes = new ChoiceBox();
+        ChoiceBox selectorAno = new ChoiceBox();
+        
+        selectorMes.setItems(Fechas.arraySpinnerMes());
+        selectorAno.setItems(Fechas.arraySpinnerAno());
+        
+        selectorMes.getSelectionModel().select(cuotaDeudaTable.getFecha().getMes());
+        selectorAno.getSelectionModel().select(cuotaDeudaTable.getFecha().getAno());
+        
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(0, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(selectorMes, selectorAno)
+                .build();
+        hBox.maxWidth(120);
+        
+        HBox hBoxText = HBoxBuilder.create()
+                .spacing(20.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 0, 5))
+                .alignment(Pos.CENTER)
+                .children(new Text("Mes   "), new Text("Año"))
+                .build();
+        hBox.maxWidth(120);
+
+        TextField fieldDetalles = new TextField();
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Selecione la nueva fecha para pago de la cuota"), 
+                hBoxText, hBox, new Text("Observación"), fieldDetalles, buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        fieldDetalles.setMaxWidth(200);
+        fieldDetalles.setText(cuotaDeudaTable.getCuotaDeuda().getDetalles());
+        buttonOk.setOnAction((ActionEvent e) -> {
+
+            CuotaDeuda cuotaDeuda = cuotaDeudaTable.getCuotaDeuda();
+            cuotaDeuda.setDetalles(fieldDetalles.getText());
+            cuotaDeuda.setFecha(new Fecha(selectorAno, selectorMes, "30").getFecha());
+            deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
+            HibernateSessionFactory.getSession().flush();
+
+            // Registro para auditar
+            String detalles = "modifico una cuota de la deuda '"+deuda.getDetalles()+ "' del empleado " 
+                    + deuda.getUsuario().getApellido()+ " " 
+                    + deuda.getUsuario().getNombre();
+            aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogStage.close();
+            setDeuda(deuda, deudaTable);
+            
+        });
+        dialogStage.show();
+
     }
     
     public void setDeuda(Deuda deuda, DeudaTable deudaTable) {
@@ -351,49 +472,82 @@ public class DeudaController implements Initializable {
         tipoText.setText("Tipo de deuda: " + deuda.getTipo());
         detallesText.setText("Detalles: " + deuda.getDetalles());
         montoText.setText("Monto: $" + deuda.getMonto());
-        fechaText.setText("Creada: $" + Fechas.getFechaConMes(deuda.getCreacion()));
-        cuotasText.setText("Cuotas restantes: " + deuda.getCuotas());
+        fechaText.setText("Creada el " + Fechas.getFechaConMes(deuda.getCreacion()));
         if (deuda.getPagada()) {
             estadoText.setText("Deuda Pagada");
+            labelSugerencia.setVisible(false);
+            buttonCambiar.setVisible(false);
         } else {
+            cuotasText.setText("Cuotas restantes: " + deuda.getCuotas());
             estadoText.setText("Deuda Pendiente");
         }
-        debeText.setText(deuda.getRestante().toString());
+        debeText.setText("$"+deuda.getRestante().toString());
         
-        AbonoDeudaDAO abonoDeudaDAO = new AbonoDeudaDAO();
-        abonoDeudas = new ArrayList<>();
-        abonoDeudas.addAll(abonoDeudaDAO.findAllByDeudaId(deuda.getId()));
+        Double pagado = 0d;
+        CuotaDeudaDAO cuotaDeudaDAO = new CuotaDeudaDAO();
+        cuotaDeudas = new ArrayList<>();
+        cuotaDeudas.addAll(cuotaDeudaDAO.findAllByDeudaId(deuda.getId()));
         data = FXCollections.observableArrayList(); 
-        for (AbonoDeuda abonoDeuda: abonoDeudas) {
-            AbonoDeudaTable abonoDeudaTable = new AbonoDeudaTable();
-            abonoDeudaTable.setId(abonoDeuda.getId());
-            abonoDeudaTable.setMonto(abonoDeuda.getMonto());
-            abonoDeudaTable.setFecha(Fechas.getFechaConMes(abonoDeuda.getFecha()));
-            abonoDeudaTable.setRestante(abonoDeuda.getRestante());
-            abonoDeudaTable.setPagoMes(abonoDeuda.getPagoMes());
-            abonoDeudaTable.setNumeroPago("N-" + abonoDeuda.getPagoMes().getId());
-            abonoDeudaTable.setDeuda(deuda);
-            data.add(abonoDeudaTable);
+        for (CuotaDeuda cuotaDeuda: cuotaDeudas) {
+            CuotaDeudaTable cuotaTable = new CuotaDeudaTable();
+            cuotaTable.setId(cuotaDeuda.getId());
+            cuotaTable.setMonto(cuotaDeuda.getMonto());
+            cuotaTable.setFechaString(Fechas.getFechaConMes(cuotaDeuda.getFecha()));
+            cuotaTable.setFecha(new Fecha(cuotaDeuda.getFecha()));
+            cuotaTable.setPagoMes(cuotaDeuda.getPagoMes());
+            cuotaTable.setDetalles(cuotaDeuda.getDetalles());
+            cuotaTable.setCuotaDeuda(cuotaDeuda);
+            if (cuotaDeuda.getPagoMes() != null) {
+                cuotaTable.setNumeroPago("N-" + cuotaDeuda.getPagoMes().getId());
+                pagado += cuotaDeuda.getMonto();
+            } else {
+                cuotaTable.setNumeroPago("-----");
+            }
+            cuotaTable.setDeuda(deuda);
+            data.add(cuotaTable);
         }
+        pagadoText.setText("$"+round(pagado).toString());
         deudasTableView.setItems(data);
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("fecha"));
+        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("fechaString"));
         numeroColumna.setCellValueFactory(new PropertyValueFactory<>("numeroPago"));
         montoColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
-        restanteColumna.setCellValueFactory(new PropertyValueFactory<>("restante"));
+        observacionColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+        marcarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        marcarColumna.setCellFactory(param -> new TableCell<CuotaDeudaTable, CuotaDeudaTable>() {
+
+            @Override
+            protected void updateItem(CuotaDeudaTable abonoDeudaTable, boolean empty) {
+                super.updateItem(abonoDeudaTable, empty);
+
+                if (abonoDeudaTable == null) {
+                    setGraphic(null);
+                    getTableRow().setStyle("");
+                    return;
+                }
+                
+                if (abonoDeudaTable.getPagoMes() != null) {
+                    getTableRow().setStyle("-fx-background-color:#A5D6A7");
+                } else {
+                    getTableRow().setStyle("");
+                }
+            } 
+        });
   
         deudasTableView.setEditable(Boolean.FALSE);
         
-        deudasTableView.setRowFactory( (Object tv) -> {
-            TableRow<AbonoDeudaTable> row = new TableRow<>();
+        deudasTableView.setRowFactory((Object tv) -> {
+            TableRow<CuotaDeudaTable> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    AbonoDeudaTable rowData = row.getItem();
-                    // TODO nada aqui
+                    CuotaDeudaTable rowData = row.getItem();
+                    if (rowData.getPagoMes() == null) {
+                        cambiarFecha(deuda, rowData);
+                    }
                 }
             });
             return row ;

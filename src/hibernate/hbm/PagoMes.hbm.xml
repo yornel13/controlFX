@@ -33,6 +33,12 @@
       </key>
       <one-to-many class="hibernate.model.AbonoDeuda"/>
     </set>
+    <set inverse="true" name="cuotaDeudas">
+      <key>
+        <column name="pago_id"/>
+      </key>
+      <one-to-many class="hibernate.model.CuotaDeuda"/>
+    </set>
     <set inverse="true" name="pagoMesItems">
       <key>
         <column name="pago_mes_id"/>

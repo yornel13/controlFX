@@ -10,13 +10,18 @@ import static aplicacion.control.DeudasController.numFilter;
 import aplicacion.control.reports.ReporteDeudasVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.Fecha;
+import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Numeros;
+import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.CuotaDeudaDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.CuotaDeuda;
 import hibernate.model.Deuda;
 import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
@@ -201,7 +206,30 @@ public class DeudasEmpleadosController implements Initializable {
                 newDeuda.setUsuario(findUsuarioById(empleadoTable.getId()));
                 new DeudaDAO().save(newDeuda);
                 new UsuarioDAO().getSession().refresh(newDeuda.getUsuario());
-                String detalle = "agrego una deudo al empleado " 
+                
+                int numeroC = newDeuda.getCuotas();
+                
+                Double montoCuotas = newDeuda.getRestante() / numeroC;
+                montoCuotas = round(montoCuotas);
+
+                Fecha fechaToSave = new Fecha(fecha.getFecha());
+
+                for (int number = 0; numeroC > number; number++) {
+
+                    CuotaDeuda cuota = new CuotaDeuda();
+                    cuota.setFecha(fechaToSave.plusMonths(number).getFecha());
+                    cuota.setMonto(montoCuotas);
+                    cuota.setPagoMes(null);
+                    cuota.setCreado(Fechas.getToday());
+                    cuota.setEditado(Fechas.getToday());
+                    cuota.setAplazado(Boolean.FALSE);
+                    cuota.setDeuda(newDeuda);
+
+                    new CuotaDeudaDAO().save(cuota);
+
+                }
+                
+                String detalle = "agrego una deuda al empleado " 
                         + empleadoTable.getApellido()+ " " 
                         + empleadoTable.getNombre()
                         + " del tipo " + newDeuda.getTipo()
@@ -385,23 +413,46 @@ public class DeudasEmpleadosController implements Initializable {
                 ChoiceBox choiceBoxTipos = new ChoiceBox();
                 TextField fieldDetalles = new TextField();
                 TextField fieldCuotas = new TextField();
+                
+                ChoiceBox selectorMes = new ChoiceBox();
+                ChoiceBox selectorAno = new ChoiceBox();
+
+                selectorMes.setItems(Fechas.arraySpinnerMes());
+                selectorAno.setItems(Fechas.arraySpinnerAno());
+
+                selectorMes.getSelectionModel().select(Fechas.getFechaActual().getMes());
+                selectorAno.getSelectionModel().select(Fechas.getFechaActual().getAno());
+
+                HBox hBox = HBoxBuilder.create()
+                        .spacing(10.0) //In case you are using HBoxBuilder
+                        .padding(new Insets(0, 5, 5, 5))
+                        .alignment(Pos.CENTER)
+                        .children(selectorMes, selectorAno)
+                        .build();
+                hBox.maxWidth(120);
+                
                 Text textTipo = new Text("Tipo");
                 Text textDetalles = new Text("Detalles");
                 Text textCuotas = new Text("Cuotas");
+                Text textFecha = new Text("Fecha de pago (a partir de)");
+                
                 dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
                 children(textTipo, choiceBoxTipos, textDetalles, fieldDetalles, 
-                        textCuotas, fieldCuotas, buttonConfirmar).
+                        textCuotas, fieldCuotas, textFecha, hBox, buttonConfirmar).
                 alignment(Pos.CENTER).padding(new Insets(20)).build()));
                 choiceBoxTipos.setItems(FXCollections.observableArrayList(itemsTipos));
                 fieldCuotas.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-                choiceBoxTipos.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+                choiceBoxTipos.getSelectionModel().selectedIndexProperty()
+                        .addListener(new ChangeListener<Number>() {
                     @Override
-                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                    public void changed(ObservableValue<? extends Number> 
+                            observable, Number oldValue, Number newValue) {
                         if (newValue.intValue() == (deudaTipos.size())) {
                             agregarDeuda();
                             dialogStage.close();
                         } else
-                            fieldCuotas.setText(deudaTipos.get(newValue.intValue()).getCuotas().toString());
+                            fieldCuotas.setText(deudaTipos.get(newValue.intValue())
+                                    .getCuotas().toString());
                     }
                 });
                 buttonConfirmar.setOnAction((ActionEvent e) -> {
@@ -419,16 +470,21 @@ public class DeudasEmpleadosController implements Initializable {
                         
                         Deuda newDeuda = new Deuda();
                         newDeuda.setTipo(tipo);
+                        newDeuda.setTipoDeuda(deudaTipos.get(choiceBoxTipos
+                                .getSelectionModel().getSelectedIndex()));
                         newDeuda.setDetalles(detalles);
                         newDeuda.setMonto(0d);
                         newDeuda.setCuotas(Integer.parseInt(cuotas));
+                        newDeuda.setCuotasTotal(Integer.parseInt(cuotas));
                         newDeuda.setPagada(Boolean.FALSE);
                         newDeuda.setAplazar(Boolean.FALSE);
                         newDeuda.setRestante(0d);
                         newDeuda.setCreacion(new Timestamp(new Date().getTime()));
                         newDeuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
                         
-                        deudaMultple(newDeuda);
+                        Fecha fecha = new Fecha(selectorAno, selectorMes, "30");
+                        
+                        deudaMultple(newDeuda, fecha);
                         
                         dialogStage.close();
                     }
@@ -535,7 +591,9 @@ public class DeudasEmpleadosController implements Initializable {
 
     }
     
-    public void deudaMultple(Deuda deuda) {
+    private Fecha fecha;
+    public void deudaMultple(Deuda deuda, Fecha fecha) {
+        this.fecha = fecha;
         
         tipoText.setText("Deuda por " + deuda.getTipo());
         
@@ -751,7 +809,6 @@ public class DeudasEmpleadosController implements Initializable {
                     String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);
-                    //ventana.setMaxWidth(608);
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaDeudas);
                     ventana.setScene(scene);

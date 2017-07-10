@@ -15,17 +15,20 @@ public class Deuda implements java.io.Serializable {
 	// Fields
 
 	private Integer id;
+        private DeudaTipo tipoDeuda;
 	private Usuario usuario;
         private String tipo;
 	private String detalles;
 	private Double monto;
 	private Double restante;
+        private Integer cuotasTotal;
 	private Integer cuotas;
 	private Timestamp creacion;
 	private Timestamp ultimaModificacion;
 	private Boolean pagada;
         private Boolean aplazar;
 	private Set abonoDeudas = new HashSet(0);
+        private Set cuotaDeudas = new HashSet(0);
 
 	// Constructors
 
@@ -158,5 +161,30 @@ public class Deuda implements java.io.Serializable {
         public void setTipo(String tipo) {
             this.tipo = tipo;
         }
+
+    public Set getCuotaDeudas() {
+        return cuotaDeudas;
+    }
+
+    public void setCuotaDeudas(Set cuotaDeudas) {
+        this.cuotaDeudas = cuotaDeudas;
+    }
+
+    public DeudaTipo getTipoDeuda() {
+        return tipoDeuda;
+    }
+
+    public void setTipoDeuda(DeudaTipo tipoDeuda) {
+        this.tipoDeuda = tipoDeuda;
+    }
+
+    public Integer getCuotasTotal() {
+        return cuotasTotal;
+    }
+
+    public void setCuotasTotal(Integer cuotasTotal) {
+        this.cuotasTotal = cuotasTotal;
+    }
    
+        
 }

@@ -1,5 +1,8 @@
 package hibernate.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * DeudaTipo entity. @author MyEclipse Persistence Tools
  */
@@ -12,6 +15,7 @@ public class DeudaTipo implements java.io.Serializable {
 	private String nombre;
 	private Integer cuotas;
 	private Boolean activo;
+        private Set deudas = new HashSet(0);
 
 	// Constructors
 
@@ -60,4 +64,13 @@ public class DeudaTipo implements java.io.Serializable {
 		this.activo = activo;
 	}
 
+    public Set getDeudas() {
+        return deudas;
+    }
+
+    public void setDeudas(Set deudas) {
+        this.deudas = deudas;
+    }
+
+        
 }

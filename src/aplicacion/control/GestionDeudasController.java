@@ -5,11 +5,17 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.tableModel.CuotaDeudaTable;
+import aplicacion.control.tableModel.DeudaTable;
+import aplicacion.control.util.Fecha;
+import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
+import hibernate.dao.CuotaDeudaDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
 import hibernate.dao.UsuarioDAO;
+import hibernate.model.CuotaDeuda;
 import hibernate.model.Deuda;
 import hibernate.model.DeudaTipo;
 import hibernate.model.Empresa;
@@ -28,6 +34,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -45,6 +52,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -86,20 +94,22 @@ public class GestionDeudasController implements Initializable {
     private TableColumn tipoColumna;
     
     @FXML
-    private TableColumn<Deuda, Deuda> borrarColumna;
+    private TableColumn<CuotaDeudaTable, CuotaDeudaTable> borrarColumna;
     
     @FXML
     private TableView deudasTableView;
     
-    private ObservableList<Deuda> data;
+    private ObservableList<CuotaDeudaTable> data;
     
-    ArrayList<Deuda> deudas;
+    ArrayList<CuotaDeuda> cuotas;
     
     @FXML
     private Button buttonAgregar;
     
     @FXML
     private Button buttonListo;
+    
+    private Fecha fin;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -125,7 +135,8 @@ public class GestionDeudasController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.CREAR)) {
                
-               nuevaDeuda();
+               stagePrincipal.close();
+               pagoMensualDetallesController.abrirDeudasEmpleado();
                   
             } else {
                aplicacionControl.noPermitido();
@@ -138,6 +149,7 @@ public class GestionDeudasController implements Initializable {
                 pagoMensualDetallesController.fin, 
                 pagoMensualDetallesController.empleado.getId());
     }
+    
     
     public void nuevaDeuda() {
         if (aplicacionControl.permisos == null) {
@@ -222,7 +234,7 @@ public class GestionDeudasController implements Initializable {
                         aplicacionControl.au.saveAgrego(detalle, 
                                 aplicacionControl.permisos.getUsuario());
                         
-                        setEmpleado(empleado);
+                        setEmpleado(empleado, fin);
                         
                         guardar();
                         
@@ -309,12 +321,12 @@ public class GestionDeudasController implements Initializable {
             buttonOk.setOnAction((ActionEvent e) -> {
                 
                 if (fieldCuotas.getText() != null) {
-                    deuda.setCuotas(Integer.parseInt(fieldCuotas.getText()));
+                    /*deuda.setCuotas(Integer.parseInt(fieldCuotas.getText()));
                     deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
                     HibernateSessionFactory.getSession().flush();
                     new UsuarioDAO().getSession().refresh(deuda.getUsuario());
                     data.set(data.indexOf(deuda), deuda);
-                    dialogStage.close();
+                    dialogStage.close();*/
                         
                     // Registro para auditar
                     String detalles = "edito las cuotas de la deuda '" + deuda.getDetalles() + "' del empleado " 
@@ -381,31 +393,42 @@ public class GestionDeudasController implements Initializable {
         });
     }
     
-    public void setEmpleado(Usuario empleado) {
+    public void setEmpleado(Usuario empleado, Fecha fin) {
         this.empleado = empleado;
-        DeudaDAO deudaDao = new DeudaDAO();
-        deudas = new ArrayList<>();
-        deudas.addAll(deudaDao.findAllByEmpleadoId(empleado.getId()));
+        this.fin = fin;
+        CuotaDeudaDAO cuotaDeudaDAO = new CuotaDeudaDAO();
+        cuotas = new ArrayList<>();
+        cuotas.addAll(cuotaDeudaDAO.findAllByFechaAndEmpleadoId(empleado.getId(), fin.getFecha()));
         data = FXCollections.observableArrayList(); 
-        data.addAll(deudas);
+        for (CuotaDeuda cuota: cuotas) {
+            CuotaDeudaTable cuotaTable = new CuotaDeudaTable();
+            cuotaTable.setId(cuota.getId());
+            cuotaTable.setMonto(cuota.getMonto());
+            cuotaTable.setFechaString(Fechas.getFechaConMes(cuota.getDeuda().getCreacion()));
+            cuotaTable.setFecha(new Fecha(cuota.getFecha()));
+            cuotaTable.setTipo(cuota.getDeuda().getTipo());
+            cuotaTable.setDetalles(cuota.getDetalles());
+            cuotaTable.setCuotaDeuda(cuota);
+            cuotaTable.setCuotas(cuota.getDeuda().getCuotasTotal());
+            data.addAll(cuotaTable);
+        }
         deudasTableView.setItems(data);
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
-        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("creacion"));
-        detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
-        montoColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
-        restanteColumna.setCellValueFactory(new PropertyValueFactory<>("restante"));
-        cuotasColumna.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
+        fechaColumna.setCellValueFactory(new PropertyValueFactory<>("fechaString"));
         tipoColumna.setCellValueFactory(new PropertyValueFactory<>("tipo"));
+        montoColumna.setCellValueFactory(new PropertyValueFactory<>("monto"));
+        detallesColumna.setCellValueFactory(new PropertyValueFactory<>("detalles"));
+        cuotasColumna.setCellValueFactory(new PropertyValueFactory<>("cuotas"));
         borrarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        borrarColumna.setCellFactory(param -> new TableCell<Deuda, Deuda>() {
+        borrarColumna.setCellFactory(param -> new TableCell<CuotaDeudaTable, CuotaDeudaTable>() {
             private final CheckBox checkBoxDeuda = new CheckBox();
 
             @Override
-            protected void updateItem(Deuda deuda, boolean empty) {
+            protected void updateItem(CuotaDeudaTable deuda, boolean empty) {
                 super.updateItem(deuda, empty);
 
                 if (deuda == null) {
@@ -415,11 +438,11 @@ public class GestionDeudasController implements Initializable {
                 
                 setGraphic(checkBoxDeuda);
                 if (checkBoxDeuda != null)
-                    checkBoxDeuda.setSelected(deuda.getAplazar());
+                    checkBoxDeuda.setSelected(false);
                 checkBoxDeuda.setOnAction(event -> {
-                     deuda.setAplazar(checkBoxDeuda.isSelected());
+                     /*deuda.setAplazar(checkBoxDeuda.isSelected());
                      HibernateSessionFactory.getSession().flush();
-                     guardar();
+                     guardar();*/
                 });
             }
 
@@ -432,26 +455,26 @@ public class GestionDeudasController implements Initializable {
             TableRow<Deuda> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    Deuda rowData = row.getItem();
-                    cambiarCuotasDeuda(rowData);
+                    /*Deuda rowData = row.getItem();
+                    cambiarCuotasDeuda(rowData);*/
                 }
             });
             return row ;
         });
         
         buttonAgregar.setTooltip(
-            new Tooltip("Agregar deuda")
+            new Tooltip("Ajustar deudas")
         );
         buttonAgregar.setOnMouseEntered((MouseEvent t) -> {
             buttonAgregar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "url('aplicacion/control/imagenes/configurar.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: #29B6F6;");
         });
         buttonAgregar.setOnMouseExited((MouseEvent t) -> {
             buttonAgregar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/agregar.png'); "
+                    + "url('aplicacion/control/imagenes/configurar.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");

@@ -14,7 +14,6 @@ import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.RolClienteDAO;
@@ -23,7 +22,6 @@ import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.PagoQuincenaDAO;
 import hibernate.dao.RolIndividualDAO;
 import hibernate.dao.UsuarioDAO;
-import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
@@ -111,6 +109,8 @@ import javafx.stage.StageStyle;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.MaterialDesignButton;
+import hibernate.dao.CuotaDeudaDAO;
+import hibernate.model.CuotaDeuda;
 import org.joda.time.DateTime;
 
 /**
@@ -224,8 +224,8 @@ public class PagoMensualController implements Initializable {
     ArrayList<PagoQuincena> pagosQuincena;
     
     DeudaDAO deudaDAO = new DeudaDAO();
+    CuotaDeudaDAO cuotaDeudaDAO = new CuotaDeudaDAO();
     ConstanteDAO constanteDAO = new ConstanteDAO();
-    AbonoDeudaDAO abonoDeudaDAO = new AbonoDeudaDAO();
     PagoMesDAO pagoMesDAO = new PagoMesDAO();
    
     
@@ -1301,16 +1301,16 @@ public class PagoMensualController implements Initializable {
     
     public Double getDeudas(EmpleadoTable empleadoTable, ArrayList<PagoMesItem> pagoMesItems) {
         
-        ArrayList<Deuda> deudasAPagar = new ArrayList<>();
+        ArrayList<CuotaDeuda> deudasAPagar = new ArrayList<>();
         Double monto = 0d;
-        deudasAPagar.addAll(deudaDAO
-                .findAllByUsuarioIdNoPagadaSinAplazar(empleadoTable.getId()));
-        for (Deuda deuda: deudasAPagar) {
-            monto += (deuda.getRestante() / deuda.getCuotas());
+        deudasAPagar.addAll(cuotaDeudaDAO
+                .findAllByFechaAndEmpleadoId(empleadoTable.getId(), fin.getFecha()));
+        for (CuotaDeuda cuota: deudasAPagar) {
+            monto += cuota.getMonto();
             {
                 PagoMesItem rol = new PagoMesItem();
-                rol.setDescripcion("Deuda - " + deuda.getTipo());
-                rol.setDeduccion(deuda.getRestante() / deuda.getCuotas());
+                rol.setDescripcion("Deuda - " + cuota.getDeuda().getTipo());
+                rol.setDeduccion(cuota.getMonto());
                 rol.setClave(Const.IP_DEUDA);
                 pagoMesItems.add(rol);
             }
@@ -1462,9 +1462,9 @@ public class PagoMensualController implements Initializable {
                     System.out.println("Deudas:" +empleadoTable.getDeudas().size());
                     
                     if (!empleadoTable.getDeudas().isEmpty()) 
-                        for (Deuda deudaTable: empleadoTable.getDeudas()) {
-                            Deuda deuda = deudaDAO.findById(deudaTable.getId());
-                            Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas());
+                        for (CuotaDeuda cuota: empleadoTable.getDeudas()) {
+                            Deuda deuda = deudaDAO.findById(cuota.getDeuda().getId());
+                            Double montoAPagar = cuota.getMonto();
                             Integer newCuotas = deuda.getCuotas() - 1;
                             if (newCuotas == 0) {
                                 deuda.setPagada(Boolean.TRUE);
@@ -1477,13 +1477,9 @@ public class PagoMensualController implements Initializable {
                             }
                             deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
 
-                            AbonoDeuda abonoDeuda = new AbonoDeuda();
-                            abonoDeuda.setDeuda(deuda);
-                            abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
-                            abonoDeuda.setMonto(montoAPagar);
-                            abonoDeuda.setRestante(deuda.getRestante());
-                            abonoDeuda.setPagoMes(pagoMes);
-                            abonoDeudaDAO.save(abonoDeuda);  
+                            CuotaDeuda cuotaDeuda = new CuotaDeudaDAO().findById(cuota.getId());
+                            cuotaDeuda.setEditado(new Timestamp(new Date().getTime()));
+                            cuotaDeuda.setPagoMes(pagoMes);
                         }
 
                     // Registro para auditar

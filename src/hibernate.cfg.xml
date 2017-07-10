@@ -32,6 +32,7 @@
     <mapping resource="hibernate/hbm/Uniforme.hbm.xml"/>
     <mapping resource="hibernate/hbm/Deuda.hbm.xml"/>
     <mapping resource="hibernate/hbm/AbonoDeuda.hbm.xml"/>
+    <mapping resource="hibernate/hbm/CuotaDeuda.hbm.xml"/>
     <mapping resource="hibernate/hbm/PagoQuincena.hbm.xml"/>
     <mapping resource="hibernate/hbm/PagoMes.hbm.xml"/>
     <mapping resource="hibernate/hbm/DeudaTipo.hbm.xml"/>

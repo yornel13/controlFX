@@ -78,9 +78,7 @@ import javafx.scene.control.TableRow;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.RolIndividualDAO;
-import hibernate.model.AbonoDeuda;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javafx.application.Platform;
@@ -98,6 +96,8 @@ import hibernate.model.ControlExtras;
 import java.util.List;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import hibernate.dao.CuotaDeudaDAO;
+import hibernate.model.CuotaDeuda;
 
 /**
  *
@@ -343,7 +343,7 @@ public class PagoMensualPagadoController implements Initializable {
     
     DeudaDAO deudaDAO = new DeudaDAO();
     ConstanteDAO constanteDAO = new ConstanteDAO();
-    AbonoDeudaDAO abonoDeudaDAO = new AbonoDeudaDAO();
+    CuotaDeudaDAO cuotaDeudaDAO = new CuotaDeudaDAO();
     PagoMesDAO pagoMesDAO = new PagoMesDAO();
     RolClienteDAO rolClienteDAO = new RolClienteDAO();
     RolIndividualDAO rolIndividualDAO = new RolIndividualDAO();
@@ -980,12 +980,16 @@ public class PagoMensualPagadoController implements Initializable {
             try {
                 int pagoId = pagoMes.getId();
         
-                for (AbonoDeuda abonoDeuda: abonoDeudaDAO.findAllByPagoId(pagoId)) {
-                    Deuda deuda = abonoDeuda.getDeuda();
-                    deuda.setRestante(deuda.getRestante() + abonoDeuda.getMonto());
+                for (CuotaDeuda cuota: cuotaDeudaDAO.findAllByPagoId(pagoId)) {
+                    Deuda deuda = cuota.getDeuda();
+                    deuda.setRestante(deuda.getRestante() + cuota.getMonto());
                     deuda.setCuotas(deuda.getCuotas() + 1);
                     deuda.setPagada(Boolean.FALSE);
-                    abonoDeudaDAO.delete(abonoDeuda);
+                    
+                    cuota.setEditado(new Timestamp(new Date().getTime()));
+                    cuota.setPagoMes(null);
+                    
+                    HibernateSessionFactory.getSession().flush();
                 }
                 for (PagoMesItem pagoMesItem: pagoMesItems) {
                     pagoMesItemDAO.delete(pagoMesItem);
@@ -994,13 +998,13 @@ public class PagoMensualPagadoController implements Initializable {
                 rolIndividualDAO.delete(rolIndividualDAO
                         .findById(rolIndividual.getId()));
                 HibernateSessionFactory.getSession().flush();
-                String detalles = "elemino el pago mensual numero " + pagoId 
-                        + ", del empleado " + pagoMes.getUsuario().getNombre() 
-                        + " " + pagoMes.getUsuario().getApellido();
+                String detalles = "elemino el pago mensual numero "+pagoId 
+                        +", del empleado " + pagoMes.getUsuario().getNombre() 
+                        +" "+pagoMes.getUsuario().getApellido();
                 aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
               
             } catch (Exception e) {
-                System.out.println("error");
+                e.printStackTrace();
             }
             Platform.runLater(new Runnable() {
                 @Override public void run() {

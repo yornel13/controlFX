@@ -14,14 +14,11 @@ import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.ConstanteDAO;
-import hibernate.dao.DeudaDAO;
 import hibernate.dao.RolClienteDAO;
 import hibernate.dao.PagoMesDAO;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.RolIndividualDAO;
-import hibernate.model.AbonoDeuda;
 import hibernate.model.Constante;
 import hibernate.model.Deuda;
 import hibernate.model.Empresa;
@@ -93,19 +90,13 @@ import aplicacion.control.util.Numeros;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.util.Callback;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.ControlExtrasDAO;
-import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import java.util.List;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
+import hibernate.dao.CuotaDeudaDAO;
+import hibernate.model.CuotaDeuda;
 
 /**
  *
@@ -334,7 +325,7 @@ public class PagoMensualDetallesController implements Initializable {
     
     private ArrayList<PagoMesItem> pagoMesItems;
     
-    ArrayList<Deuda> deudasAPagar = new ArrayList<>();
+    ArrayList<CuotaDeuda> deudasAPagar = new ArrayList<>();
     
     private RolIndividual pagoRol;
     
@@ -402,7 +393,7 @@ public class PagoMensualDetallesController implements Initializable {
                         controller.setStagePrincipal(ventana);
                         controller.setProgramaPrincipal(aplicacionControl);
                         controller.setPagoTotalController(this);
-                        controller.setEmpleado(empleado);
+                        controller.setEmpleado(empleado, fin);
                         ventana.show();
 
                     } catch (Exception e) {
@@ -415,6 +406,41 @@ public class PagoMensualDetallesController implements Initializable {
             }
         } else {
             
+        }
+    }
+    
+    public void abrirDeudasEmpleado() {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.EDITAR)) {
+                try {
+                    
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDeudas.fxml"));
+                    AnchorPane ventanaDeudas = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle(empleado.getNombre() + " " + empleado.getApellido());
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaDeudas);
+                    ventana.setScene(scene);
+                    DeudasController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setProgramaDeudas(this, fin);
+                    controller.setEmpleado(empleado);
+                    ventana.show();
+                    
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+                aplicacionControl.noPermitido();
+            }
         }
     }
     
@@ -529,8 +555,9 @@ public class PagoMensualDetallesController implements Initializable {
             new PagoMesItemDAO().save(pago);
         }
         
-        for (Deuda deuda: deudasAPagar) {
-            Double montoAPagar = round(deuda.getRestante() / (double) deuda.getCuotas());
+        for (CuotaDeuda cuota: deudasAPagar) {
+            Deuda deuda = cuota.getDeuda();
+            Double montoAPagar = cuota.getMonto();
             Integer newCuotas = deuda.getCuotas() - 1;
             if (newCuotas == 0) {
                 deuda.setPagada(Boolean.TRUE);
@@ -544,13 +571,10 @@ public class PagoMensualDetallesController implements Initializable {
             deuda.setUltimaModificacion(new Timestamp(new Date().getTime()));
             HibernateSessionFactory.getSession().flush();
             
-            AbonoDeuda abonoDeuda = new AbonoDeuda();
-            abonoDeuda.setDeuda(deuda);
-            abonoDeuda.setFecha(new Timestamp(new Date().getTime()));
-            abonoDeuda.setMonto(montoAPagar);
-            abonoDeuda.setRestante(deuda.getRestante());
-            abonoDeuda.setPagoMes(pagoMes);
-            new AbonoDeudaDAO().save(abonoDeuda);  
+            CuotaDeuda cuotaDeuda = cuota;
+            cuotaDeuda.setEditado(new Timestamp(new Date().getTime()));
+            cuotaDeuda.setPagoMes(pagoMes); 
+            HibernateSessionFactory.getSession().flush();
         }
         
         textError.setTextFill(Color.YELLOW);
@@ -968,7 +992,7 @@ public class PagoMensualDetallesController implements Initializable {
             pagoRol.setSeguros(montoSegurosTextValor);
             pagoRol.setUniformes(montoUniformasTextValor);
             pagoRol.setTotalIngreso(totalTextValor);
-            pagoRol.setEmpleado(empleado.getNombre() + " " + empleado.getApellido());
+            pagoRol.setEmpleado(empleado.getNombre()+" "+empleado.getApellido());
             pagoRol.setCedula(empleado.getCedula());
             pagoRol.setEmpresa(empleado.getDetallesEmpleado().getEmpresa().getNombre());
             pagoRol.setSueldo(empleado.getDetallesEmpleado().getSueldo());
@@ -1109,21 +1133,19 @@ public class PagoMensualDetallesController implements Initializable {
     
     public Double getDeudas() {
         Double monto = 0d;
-        ArrayList<Deuda> deudas = new ArrayList<>();
-        deudas.addAll(new DeudaDAO().findAllByUsuarioIdNoPagadaSinAplazar(empleado
-                .getId()));
+        ArrayList<CuotaDeuda> deudas = new ArrayList<>();
+        deudas.addAll(new CuotaDeudaDAO()
+                .findAllByFechaAndEmpleadoId(empleado.getId(), fin.getFecha()));
         deudasAPagar.addAll(deudas);
-        for (Deuda deuda: deudas) {
-            monto += (deuda.getRestante() / deuda.getCuotas());
+        for (CuotaDeuda cuota: deudas) {
+            monto += cuota.getMonto();
             {
                 PagoMesItem rol = new PagoMesItem();
-                rol.setDescripcion("Deuda - " + deuda.getTipo());
-                rol.setDeduccion(deuda.getRestante() / deuda.getCuotas());
+                rol.setDescripcion("Deuda - " + cuota.getDeuda().getTipo());
+                rol.setDeduccion(cuota.getMonto());
                 rol.setClave(Const.IP_DEUDA);
                 pagoMesItems.add(rol);
-                
             }
-            
         }
         return monto;
     }
@@ -1135,17 +1157,5 @@ public class PagoMensualDetallesController implements Initializable {
             }
         }
         return null;
-    }
-    
-    // Login items
-    @FXML
-    public Button login;
-    
-    @FXML 
-    public Label usuarioLogin;
-    
-    @FXML
-    public void onClickLoginButton(ActionEvent event) {
-        aplicacionControl.login(login, usuarioLogin);
     }
 }

@@ -21,19 +21,19 @@
                   <MenuItem mnemonicParsing="false" text="Action 2" />
                </items>
             </MenuButton>
-            <MenuButton fx:id="buttonHoras" layoutX="405.0" layoutY="160.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   HORAS" textAlignment="CENTER" textFill="WHITE">
+            <MenuButton fx:id="buttonHoras" layoutX="405.0" layoutY="120.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   HORAS" textAlignment="CENTER" textFill="WHITE">
               <items>
                 <MenuItem mnemonicParsing="false" text="Action 1" />
                 <MenuItem mnemonicParsing="false" text="Action 2" />
               </items>
             </MenuButton>
-            <MenuButton fx:id="buttonRoles" layoutX="405.0" layoutY="250.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   ROLES" textAlignment="CENTER" textFill="WHITE">
+            <MenuButton fx:id="buttonRoles" layoutX="405.0" layoutY="210.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   ROLES" textAlignment="CENTER" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" text="Action 1" />
                   <MenuItem mnemonicParsing="false" text="Action 2" />
                </items>
             </MenuButton>
-            <MenuButton fx:id="buttonPagos" layoutX="405.0" layoutY="340.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   PAGOS" textAlignment="CENTER" textFill="WHITE">
+            <MenuButton fx:id="buttonPagos" layoutX="405.0" layoutY="390.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   PAGOS" textAlignment="CENTER" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" text="Action 1" />
                   <MenuItem mnemonicParsing="false" text="Action 2" />
@@ -66,6 +66,12 @@
             </Label>
             <Button fx:id="buttonReportes" alignment="BASELINE_LEFT" layoutX="35.0" layoutY="390.0" maxHeight="55.0" mnemonicParsing="false" onAction="#verReportes" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="REPORTES" textFill="WHITE" />
             <MenuButton fx:id="buttonAjustes" layoutX="35.0" layoutY="300.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text=" AJUSTES" textAlignment="CENTER" textFill="WHITE">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
+            <MenuButton fx:id="buttonDeudas" layoutX="405.0" layoutY="300.0" maxHeight="55.0" mnemonicParsing="false" prefHeight="55.0" prefWidth="170.0" style="-fx-background-color: #039BE5;" text="   DEUDAS" textAlignment="CENTER" textFill="WHITE">
                <items>
                   <MenuItem mnemonicParsing="false" text="Action 1" />
                   <MenuItem mnemonicParsing="false" text="Action 2" />
