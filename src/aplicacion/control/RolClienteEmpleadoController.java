@@ -186,7 +186,7 @@ public class RolClienteEmpleadoController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_UNITARIO);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", pago.getUsuario().getDetallesEmpleado().getEmpresa().getNombre());
             parametros.put("siglas", pago.getUsuario().getDetallesEmpleado().getEmpresa().getSiglas());
             parametros.put("correo", "Correo: " + pago.getUsuario().getDetallesEmpleado().getEmpresa().getEmail());

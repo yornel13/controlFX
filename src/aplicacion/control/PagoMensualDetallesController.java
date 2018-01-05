@@ -97,6 +97,7 @@ import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import hibernate.dao.CuotaDeudaDAO;
 import hibernate.model.CuotaDeuda;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 
 /**
  *
@@ -474,7 +475,7 @@ public class PagoMensualDetallesController implements Initializable {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
             InputStream inputHoras = new FileInputStream(Const.REPORTE_HORAS_TRABAJADAS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
@@ -494,7 +495,11 @@ public class PagoMensualDetallesController implements Initializable {
             ///////////////////// Horas trabajadas
             JasperDesign jasperDesignHoras = JRXmlLoader.load(inputHoras);
             JasperReport jasperReportHoras = JasperCompileManager.compileReport(jasperDesignHoras);
-            JasperPrint jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, horasSource);
+            JasperPrint jasperPrintHoras;
+            if (controlEmpleado.isEmpty())
+                jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, new JREmptyDataSource());
+            else
+                jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, horasSource);
 
             String filenameHoras = "hora_trabajadas_" + pagoRol.getId();
             

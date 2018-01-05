@@ -10,9 +10,7 @@ import aplicacion.control.tableModel.DescuentoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import hibernate.dao.PagoMesItemDAO;
 import hibernate.model.Empresa;
-import hibernate.model.PagoMesItem;
 import hibernate.model.Usuario;
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,6 +66,7 @@ import hibernate.dao.CuotaDeudaDAO;
 import hibernate.model.CuotaDeuda;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.ChoiceBox;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 
 /**
  *
@@ -271,7 +270,7 @@ public class DescuentosEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DESCUENTOS_EMPLEADOS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());
@@ -285,7 +284,11 @@ public class DescuentosEmpleadosController implements Initializable {
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            JasperPrint jasperPrint;
+            if (descuentos.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
             String filename = "descuentos_" + System.currentTimeMillis();
             

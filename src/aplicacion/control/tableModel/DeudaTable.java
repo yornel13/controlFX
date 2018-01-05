@@ -20,6 +20,7 @@ public class DeudaTable {
     private Double monto;
     private Double restante;
     private Integer cuotas;
+    private Integer cuotasRestantes;
     private Timestamp creacion;
     private Timestamp ultimaModificacion;
     private Boolean pagada;
@@ -120,6 +121,14 @@ public class DeudaTable {
 
     public void setFecha(String fecha) {
         this.fecha = fecha;
+    }
+
+    public Integer getCuotasRestantes() {
+        return cuotasRestantes;
+    }
+
+    public void setCuotasRestantes(Integer cuotasRestantes) {
+        this.cuotasRestantes = cuotasRestantes;
     }
     
     

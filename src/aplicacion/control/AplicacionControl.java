@@ -41,9 +41,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.paint.Color;
 import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
-import static javafx.application.Application.launch;
 
 /**
  *
@@ -673,7 +670,7 @@ public class AplicacionControl extends Application {
                         }
                     });
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+                    au.saveRegistro(au.INGRESO, au.DEUDAS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -898,7 +895,7 @@ public class AplicacionControl extends Application {
                         }
                     });
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+                    au.saveRegistro(au.INGRESO, au.DEUDAS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -943,7 +940,7 @@ public class AplicacionControl extends Application {
                         }
                     });
                     ventana.show();
-                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+                    au.saveRegistro(au.INGRESO, au.DEUDAS, permisos.getUsuario(), null);
  
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -965,7 +962,7 @@ public class AplicacionControl extends Application {
                     FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPlanillaIess.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
-                    ventana.setTitle("Planilla IESS");
+                    ventana.setTitle("Historial Laboral");
                     String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
                     ventana.getIcons().add(new Image(stageIcon));
                     ventana.setResizable(false);

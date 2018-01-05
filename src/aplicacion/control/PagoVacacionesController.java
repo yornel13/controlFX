@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.util.DateUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.GuardarText;
@@ -62,11 +63,12 @@ import hibernate.model.DiasVacaciones;
 import hibernate.model.PagoMes;
 import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -357,12 +359,14 @@ public class PagoVacacionesController implements Initializable {
     }
     
     public void setTableInfo() {
-        periodoALiquidar = "1 de enero "+yearLabel.getText()+" al 31 de diciembre "+yearLabel.getText();
-        periodoLabel.setText("Periodo a liquidar del "+periodoALiquidar);
+        periodoALiquidar = "el año "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
+                +" al año "+yearLabel.getText();
+        periodoLabel.setText("Periodo a liquidar entre "+periodoALiquidar);
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), 
+                new Fecha("01","01",yearLabel.getText())));
         DiasVacacionesDAO diasDAO = new DiasVacacionesDAO();
         diasVac = new ArrayList<>();
         diasVac.addAll((ArrayList<DiasVacaciones>) diasDAO.findAllByEmpresaId(empresa.getId()));
@@ -385,8 +389,31 @@ public class PagoVacacionesController implements Initializable {
             empleado.setPagado("No");
             empleado.setPagar(true);
             
-            Fecha inicio = new Fecha("01","01",yearLabel.getText());
-            Fecha fin = new Fecha("30","12",yearLabel.getText());
+            Timestamp timestamp = user.getDetallesEmpleado().getFechaInicio();
+            DateTime contratoDate = new DateTime(timestamp.getTime());
+            
+            ////////////////////////////////////////////////////////////////////
+            Fecha inicio = new Fecha("01", "01", yearLabel.getText())
+                    .minusYears(1)
+                    .minusMonths(1)
+                    .plusMonths(contratoDate.getMonthOfYear());
+            Fecha fin = inicio.plusYears(1).minusMonths(1);
+            ////////////////////////////////////////////////////////////////////
+            Calendar cal = Calendar.getInstance();
+            cal.set(Integer.valueOf(yearLabel.getText())-1, contratoDate.getMonthOfYear()-1, 01);
+            Date inicioDate = new Date(cal.getTime().getTime());
+            Date finDate = DateUtil.addYears(inicioDate, 1);
+            finDate = DateUtil.removeMonths(finDate, 1);
+            Calendar calendar = Calendar.getInstance();  
+            calendar.setTime(finDate);
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            finDate = new Date(calendar.getTime().getTime());
+            empleado.setSqlDateInicio(inicioDate);
+            empleado.setSqlDateFin(finDate);
+            empleado.setFechaInicio(inicio);
+            empleado.setFechaFin(fin);
+            ////////////////////////////////////////////////////////////////////
+            fin.setDia("30");
             List<RolIndividual> rolIndividuals = new RolIndividualDAO()
                     .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleado.getId());
             List<PagoMes> pagosMensuales = new PagoMesDAO()
@@ -409,7 +436,7 @@ public class PagoVacacionesController implements Initializable {
             }
             
             if (pagoVacaciones != null) {
-                empleado.setVacaciones(pagoVacaciones.getMonto().toString());
+                empleado.setVacaciones(Numeros.round(pagoVacaciones.getMonto()).toString());
                 empleado.setDiasVacaciones(pagoVacaciones.getDias().toString());
                 empleado.setPagado("Si");
                 empleado.setPagoVacaciones(pagoVacaciones);

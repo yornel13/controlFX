@@ -127,7 +127,7 @@ public class PagoQuincenalPagadoController implements Initializable {
             try {
                 InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_ADELANTO_QUINCENAL);
 
-                Map<String, String> parametros = new HashMap();
+                Map<String, Object> parametros = new HashMap();
                 parametros.put("empleado", usuario.getNombre() + " " + usuario.getApellido());
                 parametros.put("cedula", usuario.getCedula());
                 parametros.put("cargo", usuario.getDetallesEmpleado().getCargo().getNombre());

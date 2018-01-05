@@ -66,10 +66,8 @@ import aplicacion.control.util.MaterialDesignButtonBlue;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.PlanillaIessDAO;
-import hibernate.dao.RolIndividualDAO;
 import hibernate.model.Constante;
 import hibernate.model.PlanillaIess;
-import hibernate.model.RolIndividual;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -91,6 +89,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import hibernate.dao.PagoMesItemDAO;
+import hibernate.dao.PagoVacacionesDAO;
+import hibernate.dao.RolIndividualDAO;
+import hibernate.model.PagoMesItem;
+import hibernate.model.PagoVacaciones;
+import hibernate.model.RolIndividual;
 import javafx.scene.control.ChoiceBox;
 
 /**
@@ -153,7 +158,7 @@ public class PlanillaIessController implements Initializable {
     
     private ObservableList<EmpleadoTable> data;
     
-    ArrayList<RolIndividual> rolIndividuals;
+    ArrayList<Double> ingresos;
     ArrayList<PlanillaIess> planillaIesses;
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
@@ -283,7 +288,7 @@ public class PlanillaIessController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_PLANILLA_IESS_EMPLEADOS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());
@@ -298,14 +303,14 @@ public class PlanillaIessController implements Initializable {
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
-            String filename = "planilla_iess_" + System.currentTimeMillis();
+            String filename = "hirtorial_laboral_" + System.currentTimeMillis();
             
             if (file != null) {
                 JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
             } 
             
             // Registro para auditar
-            String detalles = "genero una planilla IESS de todos los empleado";
+            String detalles = "genero el historial laboral de todos los empleado";
             aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
             
             dialogoCompletado();
@@ -322,7 +327,7 @@ public class PlanillaIessController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Planilla IESS");
+        dialogStage.setTitle("Historial Laboral");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
@@ -612,13 +617,13 @@ public class PlanillaIessController implements Initializable {
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa; 
         
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
-        
         inicio = Fechas.getFechaActual();
         inicio.setDia("01");
         fin = inicio.plusMonths(1).minusDays(1);
+        
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        usuarios = new ArrayList<>();
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
            
         inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
         fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
@@ -631,9 +636,8 @@ public class PlanillaIessController implements Initializable {
         checkBoxTodos.setSelected(false);
         contador.setText("");
         
-        RolIndividualDAO rolIndividualDAO = new RolIndividualDAO();
-        rolIndividuals = new ArrayList<>();
-        rolIndividuals.addAll(rolIndividualDAO.findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId()));
+        PagoMesItemDAO pagoMesItemDAO = new PagoMesItemDAO();
+        ingresos = new ArrayList<>();
         
         PlanillaIessDAO planillaIessDAO = new PlanillaIessDAO();
         planillaIesses = new ArrayList<>();
@@ -662,12 +666,17 @@ public class PlanillaIessController implements Initializable {
                 }
             }
             if (!encontrado) {
-                for (RolIndividual rolIndividual: rolIndividuals) {
-                    if (rolIndividual.getUsuario().getId().equals(user.getId())) {
-                        totalIngreso = rolIndividual.getTotalIngreso();
-                    }
+                RolIndividual rolIndividual = new RolIndividualDAO()
+                        .findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), 
+                            user.getId(), Const.ROL_PAGO_INDIVIDUAL);
+                
+                if (rolIndividual != null) {
+                    totalIngreso = rolIndividual.getSubtotal() 
+                        + getVacaciones(user)
+                        - rolIndividual.getSalario();
                 }
             }
+            totalIngreso = round(totalIngreso);
             empleado.setPlanilla(encontrado);
             empleado.setMonto(totalIngreso.toString());
             Double iessDescuento = (totalIngreso/100d) * getIess();
@@ -950,6 +959,39 @@ public class PlanillaIessController implements Initializable {
         }
     }
     
+    Double getVacaciones(Usuario user) { // TODO; revisar
+        Fecha inicioY = new Fecha("01","01",inicio.getAno());
+        PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
+                    .findInDeterminateTimeByUsuarioId(inicioY.getFecha(), user.getId()); 
+        if (pagoVacaciones == null) {
+            return 0d;
+        } else {
+            DateTime goceInicio = new DateTime(pagoVacaciones.getGoceInicio().getTime());
+            DateTime goceFin = new DateTime(pagoVacaciones.getGoceFin().getTime());
+            Integer monthNumber = inicio.getMesInt();
+
+            if (goceInicio.getMonthOfYear() == goceFin.getMonthOfYear()) {
+                if (goceInicio.getMonthOfYear() == monthNumber) {
+                    return pagoVacaciones.getMonto();
+                }
+            } else {
+                Integer days1 = 31 - goceInicio.getDayOfMonth();
+                Integer days2 = goceFin.getDayOfMonth();
+                Integer totalDays = days1 + days2;
+                
+                Double mont1 = (pagoVacaciones.getValor()/totalDays)*days1;
+                Double mont2 = (pagoVacaciones.getValor()/totalDays)*days2;
+
+                if (goceInicio.getMonthOfYear() == monthNumber) {
+                    return round(mont1);
+                } else if (goceFin.getMonthOfYear() == monthNumber) {
+                    return round(mont2);
+                }
+            } 
+        }
+        return 0d;
+    }
+    
     public double getIess() {
         if (iess == null) {
             return 0.0;
@@ -1056,19 +1098,24 @@ public class PlanillaIessController implements Initializable {
                         (List<EmpleadoTable>) empleadosTableView.getItems()) {
                     if (empleadoTable.getAgregar()) {
                         for (PlanillaIess planillaIessDelete: planillaIesses) {
-                            if (planillaIessDelete.getUsuario().getId() 
-                                    == empleadoTable.getUsuario().getId()) {
+                            if (planillaIessDelete.getUsuario().getId()
+                                    .equals(empleadoTable.getUsuario().getId())) {
                                 System.out.println("Borrando planilla: " + planillaIessDelete.getId());
                                 new PlanillaIessDAO().delete(planillaIessDelete);
                                 HibernateSessionFactory.getSession().flush();
                                 planillaIesses.remove(planillaIessDelete);
 
                                 Double totalIngreso = 0d;
-                                for (RolIndividual rolIndividual: rolIndividuals) {
-                                    if (rolIndividual.getUsuario().getId().equals(empleadoTable.getId())) {
-                                        totalIngreso = rolIndividual.getTotalIngreso();
+                                List<PagoMesItem> pagoMesItems = new PagoMesItemDAO()
+                                        .findByEmpleadoIdAndFecha(planillaIessDelete
+                                                .getUsuario().getId(), inicio.getFecha());
+                                 for (PagoMesItem pagoMesItem: pagoMesItems) {
+
+                                    if (pagoMesItem.getIngreso() != null) {
+                                        totalIngreso += pagoMesItem.getIngreso();
                                     }
                                 }
+                                totalIngreso = round(totalIngreso);
                                 empleadoTable.setPlanilla(false);
                                 empleadoTable.setMonto(totalIngreso.toString());
                                 Double iessDescuento = (totalIngreso/100d) * getIess();

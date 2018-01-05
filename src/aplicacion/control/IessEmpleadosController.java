@@ -20,7 +20,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -64,10 +62,8 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Fechas.getToday;
 import javafx.scene.control.ChoiceBox;
 
 /**
@@ -224,7 +220,7 @@ public class IessEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_IESS_EMPLEADOS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());
@@ -330,7 +326,7 @@ public class IessEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {

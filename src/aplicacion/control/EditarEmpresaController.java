@@ -223,7 +223,6 @@ public class EditarEmpresaController implements Initializable {
         diaCorteField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(30));
         
         numeracionField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        numeracionField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(999999999));
     }    
     
     public static EventHandler<KeyEvent> numFilter() {

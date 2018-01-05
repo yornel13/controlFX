@@ -5,6 +5,7 @@
  */
 package aplicacion.control.tableModel;
 
+import aplicacion.control.util.Fecha;
 import hibernate.model.Actuariales;
 import hibernate.model.Bonos;
 import hibernate.model.ControlDiario;
@@ -19,6 +20,7 @@ import hibernate.model.PagoQuincena;
 import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
+import java.sql.Date;
 import java.util.ArrayList;
 
 /**
@@ -97,6 +99,11 @@ public class EmpleadoTable {
     private String vacaciones;
     private PagoVacaciones pagoVacaciones;
     private String periodo;
+    private Boolean oculto;
+    private java.sql.Date sqlDateInicio;
+    private java.sql.Date sqlDateFin;
+    private Fecha fechaInicio;
+    private Fecha FechaFin;
 
     public EmpleadoTable() {
         problem = false;
@@ -667,6 +674,46 @@ public class EmpleadoTable {
 
     public void setReserva(Double reserva) {
         this.reserva = reserva;
+    }
+
+    public Boolean getOculto() {
+        return oculto;
+    }
+
+    public void setOculto(Boolean oculto) {
+        this.oculto = oculto;
+    }
+
+    public Date getSqlDateInicio() {
+        return sqlDateInicio;
+    }
+
+    public void setSqlDateInicio(Date sqlDateInicio) {
+        this.sqlDateInicio = sqlDateInicio;
+    }
+
+    public Date getSqlDateFin() {
+        return sqlDateFin;
+    }
+
+    public void setSqlDateFin(Date sqlDateFin) {
+        this.sqlDateFin = sqlDateFin;
+    }
+
+    public Fecha getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(Fecha fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public Fecha getFechaFin() {
+        return FechaFin;
+    }
+
+    public void setFechaFin(Fecha FechaFin) {
+        this.FechaFin = FechaFin;
     }
     
     

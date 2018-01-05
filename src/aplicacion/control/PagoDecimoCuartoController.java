@@ -699,7 +699,7 @@ public class PagoDecimoCuartoController implements Initializable {
                 try {
                     InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_DECIMO_CUARTO);
 
-                    Map<String, String> parametros = new HashMap();
+                    Map<String, Object> parametros = new HashMap();
                     parametros.put("empleado", user.getApellido()+ " " + user.getNombre());
                     parametros.put("cedula", user.getCedula());
                     parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());

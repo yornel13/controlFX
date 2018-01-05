@@ -1,12 +1,16 @@
 package hibernate.dao;
 
+import aplicacion.control.util.Fecha;
+import aplicacion.control.util.Fechas;
 import hibernate.model.Usuario;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +130,17 @@ public class UsuarioDAO extends BaseHibernateDAO {
                     .setParameter("empresa_id", empresaId);
             Object result = query.list();
             return (List<Usuario>) result;
+        }
+        
+        public List<Usuario> findAllByEmpresaIdActivoIFVISIBLE(Integer empresaId, Fecha inicio) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM usuario JOIN detalles_empleado "
+                            + "ON detalles_empleado.id = usuario.detalles_empleado_id "
+                            + "WHERE empresa_id = :empresa_id and activo = true")
+                    .addEntity(Usuario.class)
+                    .setParameter("empresa_id", empresaId);
+            Object result = query.list();
+            return removeUsersUnactive(result, inicio);
         }
         
         public Integer countEmpleados(Integer empresaId) {
@@ -304,4 +319,26 @@ public class UsuarioDAO extends BaseHibernateDAO {
 			throw re;
 		}
 	}
+        
+        public List<Usuario> removeUsersUnactive(Object list, Fecha inicio) {
+            System.out.println(inicio.toStringInverse());
+            List<Usuario> users = new ArrayList<>();
+            List<Usuario> usersRemove = new ArrayList<>();
+            users.addAll((List<Usuario>) list);
+            users.stream().forEach((user) -> {
+                DateTime desactivado;
+                try {
+                    desactivado = new DateTime(user
+                            .getDetallesEmpleado().getExtra());
+                    Fecha desactivadoFecha = Fechas.getFecha(desactivado);
+                    if (!desactivadoFecha.after(inicio)) {
+                        usersRemove.add(user);
+                    }
+                } catch (Exception e) {
+                    // Nothing to do
+                }
+            });
+            users.removeAll(usersRemove);
+            return users;
+        }
 }

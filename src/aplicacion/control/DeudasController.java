@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -539,13 +538,12 @@ public class DeudasController implements Initializable {
         dialogWait();
         
         ReporteDeudas datasource = new ReporteDeudas();
-        List<Deuda> deudasImprimir = (List<Deuda>) new DeudaDAO().findAllByEmpleadoId(empleado.getId());
-        datasource.addAll(deudasImprimir);
+        datasource.addAll((List<DeudaTable>) deudasTableView.getItems());
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DEUDAS_EMPLEADO);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
@@ -561,7 +559,7 @@ public class DeudasController implements Initializable {
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             
             JasperPrint jasperPrint;
-            if (deudasImprimir.isEmpty())
+            if (deudasTableView.getItems().isEmpty())
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
             else
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
@@ -711,6 +709,7 @@ public class DeudasController implements Initializable {
             deudaTable.setAplazar(deuda.getAplazar());
             deudaTable.setPagada(deuda.getPagada());
             deudaTable.setCuotas(deuda.getCuotasTotal());
+            deudaTable.setCuotasRestantes(deuda.getCuotas());
             deudaTable.setTipo(deuda.getTipo());
             deudaTable.setDetalles(deuda.getDetalles());
             deudaTable.setFecha(Fechas.getFechaConMes(deuda.getCreacion()));

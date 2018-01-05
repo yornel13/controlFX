@@ -19,7 +19,7 @@ public class Fecha {
     private String dia;
     private String mes;
     private String ano;
-
+    
     public Fecha(String fecha) {
         this.fecha = fecha;
         this.dia = fecha.subSequence(6, 8).toString();
@@ -107,6 +107,8 @@ public class Fecha {
     public String toStringInverse() {
         return dia+"-"+mes+"-"+ano;
     }
+    
+    
     
     public Fecha plusYears(int years) {
         Fecha newFecha = new Fecha(fecha);

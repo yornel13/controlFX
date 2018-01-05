@@ -259,7 +259,7 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemActuariales);
             MenuItem menuItemIess = new MenuItem("IESS Acumulado");
             buttonEdicion.getItems().add(menuItemIess);
-            MenuItem menuItemPlantilla = new MenuItem("Planilla IESS");
+            MenuItem menuItemPlantilla = new MenuItem("Historial Laboral");
             buttonEdicion.getItems().add(menuItemPlantilla);
             MenuItem menuItemVacaciones = new MenuItem("Dias de Vacaciones");
             buttonEdicion.getItems().add(menuItemVacaciones);
@@ -329,11 +329,11 @@ public class InEmpresaController implements Initializable {
             menuItemCuenta.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarDescuentosTodosEmpleados(empresa, stagePrincipal);
             });
-            MenuItem menuItemDescuentos = new MenuItem("Efectuadas");
+            /*MenuItem menuItemDescuentos = new MenuItem("Efectuadas");
             buttonDeudas.getItems().add(menuItemDescuentos);
             menuItemDescuentos.setOnAction((ActionEvent actionEvent) -> {
                  aplicacionControl.mostrarDescuentosEmpleados(empresa, stagePrincipal);    
-            });
+            });*/
             buttonDeudas.setOnMouseEntered((MouseEvent t) -> {
                 buttonDeudas.setStyle("-fx-background-color: #E0E0E0;");
             });

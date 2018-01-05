@@ -72,6 +72,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 
 /**
  *
@@ -193,23 +194,6 @@ public class DescuentosTodosEmpleadosController implements Initializable {
         setTableInfo();
     }
     
-    public void completado() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Completado");
-        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new Button("ok");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("Adelanto quincenal modificado con exito."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        dialogStage.show();
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-    }
-    
     public void dialogWait() {
         dialogLoading = new Stage();
         dialogLoading.initModality(Modality.APPLICATION_MODAL);
@@ -287,7 +271,7 @@ public class DescuentosTodosEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DESCUENTOS_EMPLEADOS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());
@@ -301,7 +285,11 @@ public class DescuentosTodosEmpleadosController implements Initializable {
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            JasperPrint jasperPrint;
+            if (descuentos.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
             
             String filename = "descuentos_" + System.currentTimeMillis();
             
@@ -327,12 +315,12 @@ public class DescuentosTodosEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir IESS");
+        dialogStage.setTitle("Imprimir");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Completado."), buttonOk).
+        children(new Text("Impresión de descuentos completada!!"), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -355,7 +343,7 @@ public class DescuentosTodosEmpleadosController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Descuentos");
+        dialogStage.setTitle("Imprimir");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Seleccionar ruta");

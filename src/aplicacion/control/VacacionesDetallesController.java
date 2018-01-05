@@ -9,6 +9,7 @@ import aplicacion.control.reports.ReporteRolVacaciones;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
+import aplicacion.control.util.DateUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
@@ -31,6 +32,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +79,8 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 
 /**
  *
@@ -115,6 +120,9 @@ public class VacacionesDetallesController implements Initializable {
     
     @FXML
     private Label sueldoLabel;
+    
+    @FXML
+    private Label inicioLabel;
     
     @FXML
     private Label devengadoLabel;
@@ -183,14 +191,12 @@ public class VacacionesDetallesController implements Initializable {
     @FXML
     public void onPicketAction(ActionEvent event) {
         inicio = Date.valueOf(datePicker.getValue());
-        DateTime inicioJT = new DateTime(inicio.getTime());
-        DateTime finJT = inicioJT.plusDays(empleadoTable.getObjectVacaciones().getDias());
-        fin = new Date(finJT.getMillis());
+        fin = DateUtil.addDays(inicio, empleadoTable.getObjectVacaciones().getDias()-1);
         
         periodoLabel.setText("Goce del "
-                +Fechas.getFechaCorta(inicioJT)
+                +DateUtil.getShortDate(inicio)
                 +" al "+
-                Fechas.getFechaCorta(finJT));
+                DateUtil.getShortDate(fin));
         
         if (rolIndividuales != null && !rolIndividuales.isEmpty())
             buttonPagar.setDisable(false);
@@ -259,7 +265,7 @@ public class VacacionesDetallesController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_VACACIONES);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("numero", pagoVacaciones.getId().toString()); 
             parametros.put("fecha_recibo", Fechas.getFechaConMes(pagoVacaciones.getFecha()));
             parametros.put("empleado", empleadoTable.getApellido()+ " " + empleadoTable.getNombre());
@@ -277,10 +283,10 @@ public class VacacionesDetallesController implements Initializable {
             parametros.put("valor", Numeros.round(pagoVacaciones.getValor()).toString());
             parametros.put("aporte", Numeros.round(pagoVacaciones.getAporte()).toString());
             parametros.put("cobrar", Numeros.round(pagoVacaciones.getMonto()).toString());
-            parametros.put("periodo", Fechas.getFechaConMes(pagoVacaciones.getGoceInicio())
+            parametros.put("periodo", DateUtil.getLongDate(pagoVacaciones.getGoceInicio())
                         +" al "+
-                        Fechas.getFechaConMes(pagoVacaciones.getGoceFin()));
-            parametros.put("regreso", Fechas.getFechaConMes(new DateTime(pagoVacaciones.getGoceFin()).plusDays(1)));
+                        DateUtil.getLongDate(pagoVacaciones.getGoceFin()));
+            parametros.put("regreso", DateUtil.getLongDate(DateUtil.addDays(pagoVacaciones.getGoceFin(), 1)));
             parametros.put("sueldo", Numeros.round(pagoVacaciones.getSueldo()).toString());
             parametros.put("ingreso", Fechas.getFechaCorta(empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio()));
             DateTime newDate = new DateTime();
@@ -288,7 +294,8 @@ public class VacacionesDetallesController implements Initializable {
             DateTime contratoDate = new DateTime(timestamp.getTime());
             Integer anios = newDate.getYear() - contratoDate.getYear();
             parametros.put("anios", anios.toString());
-            parametros.put("lapso", periodoLiquidacion);
+            parametros.put("lapso", DateUtil.getLongDate(empleadoTable
+                    .getSqlDateInicio())+" al "+DateUtil.getLongDate(empleadoTable.getSqlDateFin()));
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -452,8 +459,8 @@ public class VacacionesDetallesController implements Initializable {
         pagoVacaciones.setGoceFin(fin);
         pagoVacaciones.setUsuario(empleadoTable.getUsuario());
         pagoVacaciones.setFecha(Fechas.getToday());
-        pagoVacaciones.setInicio(new Fecha("01","01",new Fecha(rolIndividuales.get(0).getInicio()).getAno()).getFecha());
-        pagoVacaciones.setFinalizo(new Fecha("30","12",new Fecha(rolIndividuales.get(0).getInicio()).getAno()).getFecha());
+        pagoVacaciones.setInicio(empleadoTable.getFechaInicio().toString());
+        pagoVacaciones.setFinalizo(empleadoTable.getFechaFin().toString());
         
         new PagoVacacionesDAO().save(pagoVacaciones);
         
@@ -463,7 +470,7 @@ public class VacacionesDetallesController implements Initializable {
         datePicker.setDisable(true);
         
         {
-            empleadoTable.setVacaciones(pagoVacaciones.getMonto().toString());
+            empleadoTable.setVacaciones(Numeros.round(pagoVacaciones.getMonto()).toString());
             empleadoTable.setDiasVacaciones(pagoVacaciones.getDias().toString());
             empleadoTable.setPagado("Si");
             empleadoTable.setPagoVacaciones(pagoVacaciones);
@@ -672,6 +679,7 @@ public class VacacionesDetallesController implements Initializable {
         Integer anios = newDate.getYear() - contratoDate.getYear();
 
         aniosLabel.setText("Años de servicio: "+anios.toString());
+        inicioLabel.setText("Inicio "+Fechas.getFechaCorta(contratoDate));
         empleadoLabel.setText(empleadoTable.getApellido()+" "+empleadoTable.getNombre());
         
         rolIndividuales = new ArrayList<>();

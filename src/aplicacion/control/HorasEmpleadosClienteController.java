@@ -971,7 +971,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         
         UsuarioDAO usuariosDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuariosDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuariosDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         data = FXCollections.observableArrayList();
         

@@ -590,7 +590,7 @@ public class HorasEmpleadosPorDiaController implements Initializable {
         fechaLabel.setText(Fechas.getFechaConMes(fecha));
         
         usuarios = new ArrayList<>();
-        usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), fecha));
         
         data = FXCollections.observableArrayList();
         

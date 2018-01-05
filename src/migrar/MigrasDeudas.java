@@ -6,14 +6,9 @@ package migrar;
  * and open the template in the editor.
  */
 
-import aplicacion.control.util.Fecha;
-import aplicacion.control.util.Fechas;
-import aplicacion.control.util.Numeros;
-import hibernate.dao.AbonoDeudaDAO;
 import hibernate.dao.CuotaDeudaDAO;
 import hibernate.dao.DeudaDAO;
 import hibernate.dao.DeudaTipoDAO;
-import hibernate.model.AbonoDeuda;
 import hibernate.model.CuotaDeuda;
 import hibernate.model.Deuda;
 import hibernate.model.DeudaTipo;
@@ -34,8 +29,8 @@ public class MigrasDeudas {
         
         ArrayList<Deuda> deudas = new ArrayList<>();
         deudas.addAll((List<Deuda>) new DeudaDAO().findAll());
-        
-        /*for (Deuda deuda: deudas) {
+        /*
+        for (Deuda deuda: deudas) {
             
             System.out.println("Deuda de "+deuda.getUsuario().getApellido()+" "+deuda.getUsuario().getNombre()+". Nro: "+deuda.getId());
             
@@ -93,19 +88,17 @@ public class MigrasDeudas {
                 deuda.setTipoDeuda(tipo);
                 hibernate.HibernateSessionFactory.getSession().flush();
             }
-        }*/
-        
-        
+        }
+        */
         for (Deuda deuda: deudas) {
             ArrayList<CuotaDeuda> cuotaDeuda = (ArrayList<CuotaDeuda>) new CuotaDeudaDAO().findAllByDeudaId(deuda.getId());
+            //System.out.println("id: "+deuda.getId()+" cuota: "+cuotaDeuda.size());
             deuda.setCuotasTotal(cuotaDeuda.size());
             hibernate.HibernateSessionFactory.getSession().flush();
         }
         
-        
-        
         System.out.println("Migracion finalizada.");
     } 
-
+      
     
 }

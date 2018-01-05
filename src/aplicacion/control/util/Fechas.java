@@ -254,4 +254,27 @@ public class Fechas {
         
         return new Fecha(ano+mes+dia);
     }
+    
+    public static Fecha getFecha(DateTime dateTime) {
+        
+        String dia;
+        String mes;
+        String ano;
+        ano = String.valueOf(dateTime.getYear());
+        mes = String.valueOf(dateTime.getMonthOfYear());
+        if (dateTime.getDayOfMonth() > 30) {
+            dia = "30";
+        } else {
+            dia = String.valueOf(dateTime.getDayOfMonth());
+        }
+        
+        if (mes.length() == 1) {
+            mes = "0"+mes;
+        }
+        if (dia.length() == 1) {
+            dia = "0"+dia;
+        }
+        
+        return new Fecha(ano+mes+dia);
+    }
 }

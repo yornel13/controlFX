@@ -37,6 +37,7 @@ public class Auditar {
     public static final String ADMINITRADORES = "administradores";
     public static final String ROL_DE_PAGO = "rol de pago";
     public static final String PAGOS = "pagos";
+    public static final String DEUDAS = "deudas";
     public static final String HORARIOS_EMPLEADOS = "horarios empleados";
     public static final String HORARIOS = "horarios";
     public static final String REPORTES = "reportes";

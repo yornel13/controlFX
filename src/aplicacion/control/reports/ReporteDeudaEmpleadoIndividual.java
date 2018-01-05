@@ -6,7 +6,7 @@
 package aplicacion.control.reports;
 
 import aplicacion.control.util.Fechas;
-import hibernate.model.AbonoDeuda;
+import hibernate.model.CuotaDeuda;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -19,7 +19,7 @@ import net.sf.jasperreports.engine.JRField;
  */
 public class ReporteDeudaEmpleadoIndividual implements JRDataSource {
     
-    private final List<AbonoDeuda> lista = new ArrayList<>();
+    private final List<CuotaDeuda> lista = new ArrayList<>();
     private int indiceActual = -1;
     
     @Override
@@ -32,13 +32,16 @@ public class ReporteDeudaEmpleadoIndividual implements JRDataSource {
                 valor = Fechas.getFechaConMes(lista.get(indiceActual).getFecha());
                 break; 
             case "codigo":
-                valor = "N-" + lista.get(indiceActual).getPagoMes().getId().toString();
+                if (lista.get(indiceActual).getPagoMes() != null)
+                    valor = "N-" + lista.get(indiceActual).getPagoMes().getId().toString();
+                else
+                    valor = "Pendiente";
                 break;
             case "abonado":
                 valor = lista.get(indiceActual).getMonto();
                 break;
             case "restante":
-                valor = lista.get(indiceActual).getRestante();
+                valor = lista.get(indiceActual).getDetalles();
                 break;
             default:
                 break; 
@@ -52,11 +55,11 @@ public class ReporteDeudaEmpleadoIndividual implements JRDataSource {
         return ++indiceActual < lista.size(); 
     }
     
-    public void add(AbonoDeuda object) {
+    public void add(CuotaDeuda object) {
         this.lista.add(object);
     }
 
-    public void addAll(List<AbonoDeuda> objects) {
+    public void addAll(List<CuotaDeuda> objects) {
         this.lista.addAll(objects);
     }
 }

@@ -208,7 +208,7 @@ public class EditarEmpleadoController implements Initializable {
             empleado.getDetallesEmpleado().setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.getDetallesEmpleado().setFechaInicio(Timestamp.valueOf(datePickerInicio.getValue().atStartOfDay()));
             empleado.getDetallesEmpleado().setFechaContrato(Timestamp.valueOf(datePickerContratacion.getValue().atStartOfDay()));
-            empleado.getDetallesEmpleado().setExtra(extraField.getText());
+            //empleado.getDetallesEmpleado().setExtra(extraField.getText()); TODO, extra elimando
             empleado.getDetallesEmpleado().setNroCuenta(cuentaField.getText());
             empleado.getDetallesEmpleado().setSueldo(Double.parseDouble(sueldoField.getText()));
             empleado.getDetallesEmpleado().setAcumulaDecimos(checkBoxDecimos.isSelected());
@@ -322,7 +322,7 @@ public class EditarEmpleadoController implements Initializable {
         cuentaField.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldoField.setText(empleado.getDetallesEmpleado().getSueldo().toString());
         checkBoxDecimos.setSelected(empleado.getDetallesEmpleado().getAcumulaDecimos());
-        extraField.setText(empleado.getDetallesEmpleado().getExtra());
+        //extraField.setText(empleado.getDetallesEmpleado().getExtra());  TODO, extra elimando
         estadoCivilChoiceBox.getSelectionModel().select(empleado.getEstadoCivil().getNombre());
         departamentoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getDepartamento().getNombre());
         cargoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getCargo().getNombre()); 

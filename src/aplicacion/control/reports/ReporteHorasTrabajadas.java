@@ -8,7 +8,6 @@ package aplicacion.control.reports;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import java.util.ArrayList;
 import java.util.List;

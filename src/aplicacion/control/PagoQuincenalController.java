@@ -494,7 +494,7 @@ public class PagoQuincenalController implements Initializable {
         count = 0;
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
@@ -1092,7 +1092,7 @@ public class PagoQuincenalController implements Initializable {
                 try {
                     InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_ADELANTO_QUINCENAL);
 
-                    Map<String, String> parametros = new HashMap();
+                    Map<String, Object> parametros = new HashMap();
                     parametros.put("empleado", user.getNombre() + " " + user.getApellido());
                     parametros.put("cedula", user.getCedula());
                     parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());

@@ -6,7 +6,6 @@
 package aplicacion.control;
 
 import static aplicacion.control.ConstantesController.numDecimalFilter;
-import aplicacion.control.reports.ReporteAdelantoQuincenalVarios;
 import aplicacion.control.reports.ReporteSueldoVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
@@ -905,7 +904,7 @@ public class SueldoEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_SUELDO_EMPLEADOS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());

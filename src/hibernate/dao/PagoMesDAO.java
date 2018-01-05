@@ -109,7 +109,7 @@ public class PagoMesDAO extends BaseHibernateDAO {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago_mes "
                             + "where inicio_mes >= :fecha_inicio "
-                            + "and fin_mes < :fecha_fin "
+                            + "and fin_mes <= :fecha_fin "
                             + "and usuario_id = :usuario_id "
                             + "order by inicio_mes")
                     .addEntity(PagoMes.class)

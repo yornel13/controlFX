@@ -9,7 +9,6 @@ import aplicacion.control.reports.ReporteRolCliente;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import static aplicacion.control.util.Fechas.getToday;
 import hibernate.dao.RolClienteDAO;
 import hibernate.model.Empresa;
 import hibernate.model.RolCliente;
@@ -19,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +36,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -62,7 +59,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -314,7 +310,7 @@ public class RolIndividualController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_INDIVIDUAL);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());

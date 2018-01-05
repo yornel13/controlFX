@@ -208,7 +208,7 @@ public class RegistrarEmpleadoController implements Initializable {
                 detallesEmpleado.setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
                 detallesEmpleado.setFechaInicio(Timestamp.valueOf(datePickerInicio.getValue().atStartOfDay()));
                 detallesEmpleado.setFechaContrato(Timestamp.valueOf(datePickerContratacion.getValue().atStartOfDay()));
-                detallesEmpleado.setExtra(extraField.getText());
+                //detallesEmpleado.setExtra(extraField.getText()); TODO, extra elimando
                 detallesEmpleado.setNroCuenta(cuentaField.getText());
                 detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
                 detallesEmpleado.setQuincena(0d);

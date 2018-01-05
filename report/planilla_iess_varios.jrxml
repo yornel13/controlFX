@@ -24,40 +24,40 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true" isUnderline="true"/>
 				</textElement>
-				<text><![CDATA[Planilla IESS.]]></text>
+				<text><![CDATA[Historial Laboral.]]></text>
 			</staticText>
 			<textField pattern="dd MMMMM yyyy">
 				<reportElement mode="Transparent" x="455" y="10" width="100" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Transparent" x="10" y="10" width="90" height="20" forecolor="#666666"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{siglas}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{siglas}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Transparent" x="0" y="60" width="555" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{detalles}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{detalles}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Transparent" x="0" y="75" width="555" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{correo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{correo}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Transparent" x="100" y="35" width="355" height="25"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Calisto MT" size="20" isBold="true" isUnderline="false"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{empresa}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -71,7 +71,7 @@
 			<textField>
 				<reportElement mode="Transparent" x="20" y="60" width="522" height="20"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA["Lapso: " + $P{lapso}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Lapso: " + $P{lapso}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
@@ -135,7 +135,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Total Ingresos]]></text>
+				<text><![CDATA[Total]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -144,27 +144,27 @@
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="20" y="5" width="77" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{cedula}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{cedula}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="97" y="5" width="120" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{apellido}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{apellido}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="337" y="5" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{cargo}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{cargo}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="437" y="5" width="100" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$F{iess}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{iess}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement mode="Transparent" x="217" y="5" width="120" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{nombre}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -176,12 +176,12 @@
 			<textField>
 				<reportElement mode="Transparent" x="232" y="19" width="80" height="20"/>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression class="java.lang.String"><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report">
 				<reportElement mode="Transparent" x="312" y="19" width="40" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
@@ -197,7 +197,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression class="java.lang.String"><![CDATA["$"+$P{total}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["$"+$P{total}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement mode="Transparent" x="296" y="36" width="113" height="20"/>

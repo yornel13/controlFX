@@ -6,6 +6,7 @@
 package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
+import static aplicacion.control.util.Fechas.getFechaActual;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
@@ -20,6 +21,7 @@ import hibernate.model.Empresa;
 import hibernate.model.Foto;
 import hibernate.model.Usuario;
 import java.net.URL;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -53,6 +55,7 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -183,6 +186,20 @@ public class EmpleadosController implements Initializable {
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
                 empleado.setActivo(user.getActivo());
+                empleado.setUsuario(user);
+                
+                empleado.setOculto(false);
+                DateTime desactivado;
+                try {
+                    desactivado = new DateTime(user
+                            .getDetallesEmpleado().getExtra());
+                    if (desactivado.isBeforeNow()) {
+                        empleado.setOculto(true);
+                    }
+                } catch (Exception e) {
+                    desactivado = null;
+                }
+                
                 data.set(data.indexOf(empleadoTable), empleado);
                 return; 
             }
@@ -201,7 +218,7 @@ public class EmpleadosController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.ELIMINAR)) {
                 
-                if (empleadoTable.getActivo()) {
+                if (empleadoTable.getActivo() && !empleadoTable.getOculto()) {
                 
                     Boolean borrar = true;
 
@@ -267,27 +284,48 @@ public class EmpleadosController implements Initializable {
                         Stage dialogStage = new Stage();
                         dialogStage.initModality(Modality.APPLICATION_MODAL);
                         dialogStage.setResizable(false);
-                        dialogStage.setTitle("Confirmación de borrado");
+                        dialogStage.setTitle("Configuracion para desactivado");
                         String stageIcon = AplicacionControl.class
                                 .getResource("imagenes/icon_error.png").toExternalForm();
                         dialogStage.getIcons().add(new Image(stageIcon));
-                        MaterialDesignButton buttonOk = new MaterialDesignButton("Si, desactivar");
-                        MaterialDesignButton buttonNo = new MaterialDesignButton("no");
+                        MaterialDesignButton buttonDes = new MaterialDesignButton("Desactivar");
+                        MaterialDesignButton buttonOcu = new MaterialDesignButton("Ocultar completamente");
+                        MaterialDesignButton buttonNo = new MaterialDesignButton("Cancelar");
                         HBox hBox = HBoxBuilder.create()
                                 .spacing(10.0) //In case you are using HBoxBuilder
                                 .padding(new Insets(5, 5, 5, 5))
                                 .alignment(Pos.CENTER)
-                                .children(buttonOk, buttonNo)
+                                .children(buttonDes, buttonOcu, buttonNo)
                                 .build();
                         hBox.maxWidth(120);
                         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-                        children(new Text("No se puede borrar el empleado porque tiene roles generados."),
-                                 new Text("¿Desea desactivar el empleado?"),
-                                 new Text("Los empleados desactivados no aparecen en gestiones, horas, pagos, etc."), hBox).
+                        children(new Text("No se puede borrar el empleado porque tiene asociaciones como: pago, horas, deudas, etc; generadas."),
+                                 new Text("Puede hacer una de las siguientes 3 opciones:"),
+                                 new Text("1 Desactivar - oculta o desactiva el emplado a partir de la fecha actual"),
+                                 new Text("2 Ocultar completamente - oculta o desactiva completamente el emplado de todo lista sin importar la fecha."), 
+                                 new Text("3 Cancelar - No hacer nada."), hBox).
                         alignment(Pos.CENTER).padding(new Insets(20)).build()));
-                        buttonOk.setMinWidth(50);
+                        buttonOcu.setMinWidth(50);
+                        buttonDes.setMinWidth(50);
                         buttonNo.setMinWidth(50);
-                        buttonOk.setOnAction((ActionEvent e) -> {
+                        buttonDes.setOnAction((ActionEvent e) -> {
+
+                            new UsuarioDAO().findById(empleadoTable.getId())
+                                    .getDetallesEmpleado().setExtra(new DateTime().toString());
+                            HibernateSessionFactory.getSession().flush();
+                            empleadoTable.setOculto(true);
+                            data.set(data.indexOf(empleadoTable), empleadoTable);
+                            dialogStage.close();
+
+                            // Registro para auditar
+                            String detalles = "desactivo el empleado " 
+                                    + empleadoTable.getApellido() + " " 
+                                    + empleadoTable.getNombre();
+                            aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
+
+                            dialogStage.close();
+                        });
+                        buttonOcu.setOnAction((ActionEvent e) -> {
 
                             new UsuarioDAO().findById(empleadoTable.getId())
                                     .setActivo(Boolean.FALSE);
@@ -297,7 +335,7 @@ public class EmpleadosController implements Initializable {
                             dialogStage.close();
 
                             // Registro para auditar
-                            String detalles = "desactivo el empleado " 
+                            String detalles = "oculto el empleado " 
                                     + empleadoTable.getApellido() + " " 
                                     + empleadoTable.getNombre();
                             aplicacionControl.au.saveElimino(detalles, aplicacionControl.permisos.getUsuario());
@@ -335,8 +373,11 @@ public class EmpleadosController implements Initializable {
 
                         new UsuarioDAO().findById(empleadoTable.getId())
                                 .setActivo(Boolean.TRUE);
+                        new UsuarioDAO().findById(empleadoTable.getId())
+                                    .getDetallesEmpleado().setExtra(null);
                         HibernateSessionFactory.getSession().flush();
                         empleadoTable.setActivo(true);
+                        empleadoTable.setOculto(false);
                         data.set(data.indexOf(empleadoTable), empleadoTable);
                         dialogStage.close();
 
@@ -381,6 +422,21 @@ public class EmpleadosController implements Initializable {
                 empleado.setCargo(user.getDetallesEmpleado()
                         .getCargo().getNombre());
                 empleado.setActivo(user.getActivo());
+                empleado.setUsuario(user);
+                
+                empleado.setOculto(false);
+                DateTime desactivado;
+                try {
+                    desactivado = new DateTime(user
+                            .getDetallesEmpleado().getExtra());
+                    if (desactivado.isBeforeNow()) {
+                        empleado.setOculto(true);
+                    }
+                } catch (Exception e) {
+                    desactivado = null;
+                }
+                
+                
                 return empleado;
             }).forEach((empleado) -> {
                 data.add(empleado);
@@ -419,13 +475,13 @@ public class EmpleadosController implements Initializable {
                     deleteEmpleado(empleadoTable);
                 });
                 
-                if (empleadoTable.getActivo()) {
+               
+                if (empleadoTable.getActivo() && !empleadoTable.getOculto()) {
                     deleteButton.setText("Borrar");
                     getTableRow().setStyle("");
                 } else {
                     deleteButton.setText("Activar");
                     getTableRow().setStyle("-fx-background-color: lightcoral");
-                    
                 }
             }
         });

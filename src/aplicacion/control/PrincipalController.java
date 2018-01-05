@@ -68,6 +68,9 @@ public class PrincipalController implements Initializable {
     private Label labelEmpresa;
     
     @FXML
+    private Label versionLabel;
+    
+    @FXML
     private ProgressBar progressBar;
     
     ArrayList<Empresa> empresas;
@@ -185,6 +188,8 @@ public class PrincipalController implements Initializable {
         buttonGlobal.setVisible(false);
         login.setVisible(false);
         usuarioLogin.setVisible(false);
+        
+        versionLabel.setText("Version 1.0");
     }
     
     // Login items

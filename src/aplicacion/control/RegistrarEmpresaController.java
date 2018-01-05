@@ -162,7 +162,6 @@ public class RegistrarEmpresaController implements Initializable {
         diaCorteField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(28));
         
         numeracionField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
-        numeracionField.addEventFilter(KeyEvent.KEY_TYPED, new FilterMaxValue(999999999));
     }    
     
     public static EventHandler<KeyEvent> numFilter() {

@@ -921,6 +921,12 @@ public class HorarioEmpleadoClienteController implements Initializable {
         this.controlDiario = controlDiario;
         setControlInfo();
         verificarDia();
+        
+        sobreTiempo.setVisible(false);
+        sobretiempoLabel.setVisible(false);
+        suplementarias.setVisible(false);
+        recargoLabel.setVisible(false);
+        
     }
     
     void setEmpleado(List<Horario> horarios, 
@@ -931,6 +937,9 @@ public class HorarioEmpleadoClienteController implements Initializable {
         this.controlExtras = controlExtras;
         setControlInfo();
         verificarDia();
+        
+        normales.setVisible(false);
+        normalesLabel.setVisible(false);
     }
 
     void setAsignarHorarioController(AsignarHorariosController asignarHorariosController) {

@@ -110,7 +110,10 @@ import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.MaterialDesignButton;
 import hibernate.dao.CuotaDeudaDAO;
+import hibernate.dao.PagoVacacionesDAO;
 import hibernate.model.CuotaDeuda;
+import hibernate.model.PagoVacaciones;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import org.joda.time.DateTime;
 
 /**
@@ -332,6 +335,7 @@ public class PagoMensualController implements Initializable {
                 sobretiempo += empleadoTable.getRolIndividual().getMontoHorasSobreTiempo();
                 recargo += empleadoTable.getRolIndividual().getMontoHorasSuplementarias();
                 transporte += empleadoTable.getRolIndividual().getTransporte();
+                transporte += empleadoTable.getRolIndividual().getBono();
                 subtotal += empleadoTable.getRolIndividual().getSubtotal();
                 for (PagoMesItem pagoMesItem: empleadoTable.getPagoMesItems()){
                     if (pagoMesItem.getClave().equalsIgnoreCase(Const.IP_DECIMO_TERCERO)) {
@@ -375,7 +379,7 @@ public class PagoMensualController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_GENERAL_MENSUAL);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("fecha", Fechas.getFechaConMes(new DateTime()));
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
@@ -487,8 +491,8 @@ public class PagoMensualController implements Initializable {
         textosTXT = new ArrayList<>();
         for (EmpleadoTable empleadoTable: 
                 (List<EmpleadoTable>) data) {
-            if (empleadoTable.getAgregar() && empleadoTable.getPagado().equalsIgnoreCase("Si") && empleadoTable.getSueldo() > 0d) {
-                    textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getSueldo()));
+            if (empleadoTable.getAgregar() && empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                    textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getRolIndividual()));
                     textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getSueldo()));
             }
         }
@@ -667,7 +671,7 @@ public class PagoMensualController implements Initializable {
         pagosQuincena.addAll(new PagoQuincenaDAO()
                 .findAllInDeterminateTime(inicio.getFecha()));
         usuarios = new ArrayList<>();
-        usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(new UsuarioDAO().findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
@@ -1523,7 +1527,8 @@ public class PagoMensualController implements Initializable {
                 datasource.addAll(empleadoTable.getPagoMesItems());
                 
                 List<ControlExtras> controlEmpleado = new ControlExtrasDAO()
-                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), inicio.minusDays(7).getDate(), fin.minusDays(7).getDate());
+                        .findAllByEmpleadoIdInDeterminateTime(user.getId(), 
+                                inicio.minusDays(7).getDate(), fin.minusDays(7).getDate());
                 
                 String horasDetallado = "";
         
@@ -1549,7 +1554,7 @@ public class PagoMensualController implements Initializable {
                     InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_PAGO_INDIVIDUAL);
                     InputStream inputHoras = new FileInputStream(Const.REPORTE_HORAS_TRABAJADAS);
 
-                    Map<String, String> parametros = new HashMap();
+                    Map<String, Object> parametros = new HashMap();
                     parametros.put("empleado", user.getNombre() + " " + user.getApellido());
                     parametros.put("cedula", user.getCedula());
                     parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
@@ -1568,7 +1573,11 @@ public class PagoMensualController implements Initializable {
                     ///////////////////// Horas trabajadas
                     JasperDesign jasperDesignHoras = JRXmlLoader.load(inputHoras);
                     JasperReport jasperReportHoras = JasperCompileManager.compileReport(jasperDesignHoras);
-                    JasperPrint jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, horasSource);
+                    JasperPrint jasperPrintHoras;
+                    if (controlEmpleado.isEmpty())
+                        jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, new JREmptyDataSource());
+                    else
+                        jasperPrintHoras = JasperFillManager.fillReport(jasperReportHoras, parametros, horasSource);
 
                     String filenameHoras = "hora_trabajadas_" + empleadoTable.getRolIndividual().getId();
                     
@@ -1637,8 +1646,13 @@ public class PagoMensualController implements Initializable {
         
     }
     
-    String crearLineaDAT(Usuario user, Double sueldo) {
-        String monto = Numeros.roundToString(sueldo);
+    String crearLineaDAT(Usuario user, RolIndividual rolIndividual) {
+        
+        Double montoDouble = rolIndividual.getSubtotal() 
+                + getVacaciones(user)
+                - rolIndividual.getSalario();
+        
+        String monto = Numeros.roundToString(montoDouble);
         String espacios = "";
         String[] parts = monto.split(Pattern.quote("."));
         String partEntera = parts[0];
@@ -1678,7 +1692,41 @@ public class PagoMensualController implements Initializable {
         }
     }
     
+    Double getVacaciones(Usuario user) { // TODO; revisar
+        Fecha inicioY = new Fecha("01","01",inicio.getAno());
+        PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
+                    .findInDeterminateTimeByUsuarioId(inicioY.getFecha(), user.getId()); 
+        if (pagoVacaciones == null) {
+            return 0d;
+        } else {
+            DateTime goceInicio = new DateTime(pagoVacaciones.getGoceInicio().getTime());
+            DateTime goceFin = new DateTime(pagoVacaciones.getGoceFin().getTime());
+            Integer monthNumber = inicio.getMesInt();
+
+            if (goceInicio.getMonthOfYear() == goceFin.getMonthOfYear()) {
+                if (goceInicio.getMonthOfYear() == monthNumber) {
+                    return pagoVacaciones.getMonto();
+                }
+            } else {
+                Integer days1 = 31 - goceInicio.getDayOfMonth();
+                Integer days2 = goceFin.getDayOfMonth();
+                Integer totalDays = days1 + days2;
+                
+                Double mont1 = (pagoVacaciones.getValor()/totalDays)*days1;
+                Double mont2 = (pagoVacaciones.getValor()/totalDays)*days2;
+
+                if (goceInicio.getMonthOfYear() == monthNumber) {
+                    return round(mont1);
+                } else if (goceFin.getMonthOfYear() == monthNumber) {
+                    return round(mont2);
+                }
+            } 
+        }
+        return 0d;
+    }
+    
     String crearLineaTXT(Usuario user, Double sueldo) {
+        
         String monto = Numeros.roundToString(sueldo);
         String espacios = "";
         String[] parts = monto.split(Pattern.quote("."));

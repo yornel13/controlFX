@@ -878,7 +878,7 @@ public class DeudasEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DEUDAS_EMPLEADOS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("siglas", empresa.getSiglas());
             parametros.put("correo", "Correo: " + empresa.getEmail());
@@ -1003,13 +1003,8 @@ public class DeudasEmpleadosController implements Initializable {
             Double montoDeuda = 0d;
             Integer cantidad = 0;
             for (Deuda deuda: deudas) {
-                
-                montoDeuda += deuda.getRestante();
-                if (!deuda.getPagada()) {
-                   cantidad ++;
-               }
+                montoDeuda += deuda.getMonto();
             }
-            empleado.setTotalDeudas(cantidad);
             empleado.setTotalMontoDeudas(Numeros.round(montoDeuda));
             return empleado;
         }).forEach((empleado) -> {

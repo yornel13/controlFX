@@ -295,7 +295,7 @@ public class AjusteReservaEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {

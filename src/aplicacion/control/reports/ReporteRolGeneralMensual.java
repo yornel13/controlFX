@@ -51,8 +51,10 @@ public class ReporteRolGeneralMensual implements JRDataSource {
                 break;
             case "transporte":
                 Double transporte = lista.get(indiceActual).getRolIndividual().getTransporte();
-                if (transporte > 0d) 
-                    valor = Numeros.round(transporte).toString();
+                Double bono = lista.get(indiceActual).getRolIndividual().getBono();
+                Double bnoTransp = transporte + bono;
+                if (bnoTransp > 0d) 
+                    valor = Numeros.round(bnoTransp).toString();
                 else
                     valor = "-";
                 break;

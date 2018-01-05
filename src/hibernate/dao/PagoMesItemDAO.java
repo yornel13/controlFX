@@ -103,6 +103,20 @@ public class PagoMesItemDAO extends BaseHibernateDAO {
             return (List<PagoMesItem>) result;
         }
         
+        public List<PagoMesItem> findByEmpleadoIdAndFecha(Integer empleadoId, String inicio) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_mes_item "
+                            + "JOIN pago_mes "
+                            + "ON pago_mes.id = pago_mes_item.pago_mes_id "
+                            + "where usuario_id = :usuario_id "
+                            + "and inicio_mes = :inicio_mes")
+                    .addEntity(PagoMesItem.class)
+                    .setParameter("usuario_id", empleadoId)
+                    .setParameter("inicio_mes", inicio);
+            Object result = query.list();
+            return (List<PagoMesItem>) result;
+        }
+        
         public List<PagoMesItem> findByClaveAndFecha(String clave, String fechaInicio) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago_mes_item "

@@ -190,7 +190,7 @@ public class EmpleadoController implements Initializable {
         cargo.setText(empleado.getDetallesEmpleado().getCargo().getNombre());
         cuenta.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldo.setText("$"+empleado.getDetallesEmpleado().getSueldo());
-        extra.setText(empleado.getDetallesEmpleado().getExtra());
+        //extra.setText(empleado.getDetallesEmpleado().getExtra()); TODO, extra elimando
         DateTime inicio = new DateTime(empleado.getDetallesEmpleado().getFechaInicio().getTime());
         fechaInicio.setText(inicio.getDayOfMonth() + " de " + getMonthName(inicio.getMonthOfYear()) + " " + inicio.getYear());
         DateTime contrato = new DateTime(empleado.getDetallesEmpleado().getFechaContrato().getTime());

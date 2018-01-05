@@ -187,7 +187,7 @@ public class DecimosGeneradoController implements Initializable {
             try {
                 InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMOS_MES_EMPLEADO);
 
-                Map<String, String> parametros = new HashMap();
+                Map<String, Object> parametros = new HashMap();
                 parametros.put("empleado", usuario.getNombre() + " " + usuario.getApellido());
                 parametros.put("cedula", usuario.getCedula());
                 parametros.put("cargo", usuario.getDetallesEmpleado().getCargo().getNombre());
@@ -269,7 +269,7 @@ public class DecimosGeneradoController implements Initializable {
             try {
                 InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMO_TERCERO_TOTAL_EMPLEADO);
 
-                Map<String, String> parametros = new HashMap();
+                Map<String, Object> parametros = new HashMap();
                 parametros.put("empleado", usuario.getNombre() + " " + usuario.getApellido());
                 parametros.put("cedula", usuario.getCedula());
                 parametros.put("cargo", usuario.getDetallesEmpleado().getCargo().getNombre());
@@ -352,7 +352,7 @@ public class DecimosGeneradoController implements Initializable {
             try {
                 InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMO_CUARTO_TOTAL_EMPLEADO);
 
-                Map<String, String> parametros = new HashMap();
+                Map<String, Object> parametros = new HashMap();
                 parametros.put("empleado", usuario.getNombre() + " " + usuario.getApellido());
                 parametros.put("cedula", usuario.getCedula());
                 parametros.put("cargo", usuario.getDetallesEmpleado().getCargo().getNombre());

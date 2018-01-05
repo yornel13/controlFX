@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import static aplicacion.control.DeudaController.numFilter;
 import aplicacion.control.reports.ReporteAuditoria;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.Fechas;
@@ -30,10 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,6 +57,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -162,17 +162,22 @@ public class AuditoriaController implements Initializable {
         dialogLoading.show();
     }
     
-    public void imprimir(File file) {
+    public void imprimir(File file, int count) {
         
         dialogWait();
-        
+        List<RegistroAcciones> limitando = new ArrayList<>();
+        for (RegistroAcciones accion: (List<RegistroAcciones>) accionesTableView.getItems()) {
+            if (((List<RegistroAcciones>) accionesTableView.getItems()).indexOf(accion) < count) {
+                limitando.add(accion);
+            }
+        }
         ReporteAuditoria datasource = new ReporteAuditoria();
-        datasource.addAll((List<RegistroAcciones>) accionesTableView.getItems());
+        datasource.addAll(limitando);
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_AUDITORIA);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("detalles", "Reporte impreso por: " + 
                     aplicacionControl.permisos.getUsuario().getNombre() + " " + 
                     aplicacionControl.permisos.getUsuario().getApellido());
@@ -207,11 +212,44 @@ public class AuditoriaController implements Initializable {
         }
     }
     
+    public void selecionarCantidad() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Imprirmi");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("IMPRIMIR");
+        TextField field = new TextField();
+        HBox hBox = HBoxBuilder.create()
+                    .spacing(10.0) //In case you are using HBoxBuilder
+                    .padding(new Insets(0, 5, 5, 5))
+                    .alignment(Pos.CENTER)
+                    .children(new Text("Los primeros:"), field)
+                    .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("Indique el numero de registros a imprimir."), hBox, buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        field.setMaxWidth(50);
+        field.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        buttonOk.setOnAction((ActionEvent e) -> {
+
+            if (field.getText() != null && Integer.parseInt(field.getText()) > 0) {
+
+                int count = Integer.valueOf(field.getText());
+                dialogStage.close();
+                seleccionRuta(count);
+            }
+        });
+        dialogStage.showAndWait();
+    }
+    
     public void dialogoCompletado() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Auditoria");
+        dialogStage.setTitle("Imprimir");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
@@ -248,10 +286,15 @@ public class AuditoriaController implements Initializable {
     
     @FXML
     public void dialogoImprimir(ActionEvent event) {
-        Stage dialogStage = new Stage();
+        selecionarCantidad();
+    }
+    
+    
+   public void seleccionRuta(int count) {
+       Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Imprimir Auditoria");
+        dialogStage.setTitle("Imprimir");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Seleccionar ruta");
@@ -264,14 +307,14 @@ public class AuditoriaController implements Initializable {
             File file = seleccionarDirectorio();
             if (file != null) {
                 dialogStage.close();
-                imprimir(file);
+                imprimir(file, count);
             }
         });
         buttonNoDocumento.setOnAction((ActionEvent e) -> {
             dialogStage.close();
         });
         dialogStage.showAndWait();
-    }
+   }
     
     private void verAcciones() {
         filterField.clear();

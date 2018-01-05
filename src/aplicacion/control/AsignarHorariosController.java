@@ -166,7 +166,8 @@ public class AsignarHorariosController implements Initializable {
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         empleados = new ArrayList<>();
         empleadosSelected = new ArrayList<>();
-        empleados.addAll(usuarioDAO.findByEmpresaId(empresa.getId()));
+        empleados.addAll(usuarioDAO
+                .findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), Fechas.getFechaActual()));
         horarios = (List<Horario>) new HorarioDAO().findAll();
         clientes = new ClienteDAO().findAllActivo();
      

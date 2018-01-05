@@ -434,7 +434,7 @@ public class ReportesEmpleadosController implements Initializable {
                     break;
             }
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             if (reporte == REPORTE_HORAS) {
                 parametros.put("lapso", getFechaConMes(inicio.minusDays(7)) + " al " + getFechaConMes(fin.minusDays(7)));
@@ -499,7 +499,7 @@ public class ReportesEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_SUMATORIA_IESS);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
             
@@ -693,7 +693,7 @@ public class ReportesEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {

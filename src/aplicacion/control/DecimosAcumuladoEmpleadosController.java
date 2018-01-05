@@ -242,7 +242,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMO_TERCERO_ACUMULADOS_POR_MES);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
             parametros.put("pagado3", round(pagado3).toString());
@@ -304,7 +304,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DECIMO_CUARTO_ACUMULADOS_POR_MES);
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empresa", empresa.getNombre());
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
             parametros.put("pagado4", round(pagado4).toString());
@@ -517,7 +517,7 @@ public class DecimosAcumuladoEmpleadosController implements Initializable {
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {

@@ -144,6 +144,8 @@ public class DeudaController implements Initializable {
     
     Deuda deuda;
     
+    Double pagado;
+    
     ArrayList<CuotaDeuda> cuotaDeudas;
     
     Stage dialogLoading;
@@ -168,7 +170,7 @@ public class DeudaController implements Initializable {
         dialogWait();
         
         ReporteDeudaEmpleadoIndividual datasource = new ReporteDeudaEmpleadoIndividual();
-        //datasource.addAll(cuotaDeudas);
+        datasource.addAll(cuotaDeudas);
         
         try {
             InputStream inputStream;
@@ -178,7 +180,7 @@ public class DeudaController implements Initializable {
                 inputStream = new FileInputStream(Const.REPORTE_DEUDA_EMPLEADO_INDIVIDUAL);
             }
         
-            Map<String, String> parametros = new HashMap();
+            Map<String, Object> parametros = new HashMap();
             parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
             parametros.put("cedula", empleado.getCedula());
             parametros.put("cargo", empleado.getDetallesEmpleado().getCargo().getNombre());
@@ -187,14 +189,16 @@ public class DeudaController implements Initializable {
             parametros.put("detalles", deuda.getDetalles());
             parametros.put("monto", deuda.getMonto().toString());
             parametros.put("cuotas", deuda.getCuotas().toString());
+            parametros.put("cuotas_total", deuda.getCuotasTotal().toString());
             parametros.put("fecha", Fechas.getFechaConMes(deuda.getCreacion()));
             
             if (deuda.getPagada()) {
-                parametros.put("estado", "Pagada");
+                parametros.put("estado", "PAGADA");
             } else {
-                parametros.put("estado", "pendiente");
+                parametros.put("estado", "PENDIENTE");
             }
             parametros.put("total", round(deuda.getRestante()).toString());
+            parametros.put("abonado", round(pagado).toString());
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -338,7 +342,8 @@ public class DeudaController implements Initializable {
                 if (fieldCuotas.getText() != null && Integer.parseInt(fieldCuotas.getText()) > 0) {
                     
                     int numeroC = Integer.valueOf(fieldCuotas.getText());
-                
+                    int numeroCViejas = deuda.getCuotas();
+                    
                     Double monto = deuda.getRestante() / numeroC;
                     monto = round(monto);
                 
@@ -384,7 +389,7 @@ public class DeudaController implements Initializable {
                                 deudasController.pagoMensualDetallesController.empleado.getId());
                         
                     // Registro para auditar
-                    String detalles = "edito las cuotas de la deuda '" + deuda.getDetalles() + "' del empleado " 
+                    String detalles = "edito las cuotas restaste de "+numeroCViejas+" a "+deuda.getCuotas()+" de la deuda '" + deuda.getDetalles() + "' del empleado " 
                             +deuda.getUsuario().getApellido()+" " 
                             +deuda.getUsuario().getNombre();
                     aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
@@ -483,7 +488,7 @@ public class DeudaController implements Initializable {
         }
         debeText.setText("$"+deuda.getRestante().toString());
         
-        Double pagado = 0d;
+        pagado = 0d;
         CuotaDeudaDAO cuotaDeudaDAO = new CuotaDeudaDAO();
         cuotaDeudas = new ArrayList<>();
         cuotaDeudas.addAll(cuotaDeudaDAO.findAllByDeudaId(deuda.getId()));
