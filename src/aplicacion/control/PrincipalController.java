@@ -189,7 +189,7 @@ public class PrincipalController implements Initializable {
         login.setVisible(false);
         usuarioLogin.setVisible(false);
         
-        versionLabel.setText("Version 1.0");
+        versionLabel.setText("Version 1.01");
     }
     
     // Login items

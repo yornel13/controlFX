@@ -359,9 +359,9 @@ public class PagoVacacionesController implements Initializable {
     }
     
     public void setTableInfo() {
-        periodoALiquidar = "el año "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
-                +" al año "+yearLabel.getText();
-        periodoLabel.setText("Periodo a liquidar entre "+periodoALiquidar);
+        periodoALiquidar = "el 1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
+                +" al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1);
+        periodoLabel.setText("Periodo entre "+periodoALiquidar);
         
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
@@ -395,8 +395,9 @@ public class PagoVacacionesController implements Initializable {
             ////////////////////////////////////////////////////////////////////
             Fecha inicio = new Fecha("01", "01", yearLabel.getText())
                     .minusYears(1)
-                    .minusMonths(1)
-                    .plusMonths(contratoDate.getMonthOfYear());
+                    //.minusMonths(1)
+                    //.plusMonths(contratoDate.getMonthOfYear());   De aqui toma el mes cuando inicio el empleado a trabajar
+                    ; 
             Fecha fin = inicio.plusYears(1).minusMonths(1);
             ////////////////////////////////////////////////////////////////////
             Calendar cal = Calendar.getInstance();
