@@ -11,7 +11,6 @@ import hibernate.model.Bonos;
 import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import hibernate.model.CuotaDeuda;
-import hibernate.model.Deuda;
 import hibernate.model.DiasVacaciones;
 import hibernate.model.PagoMes;
 import hibernate.model.RolCliente;

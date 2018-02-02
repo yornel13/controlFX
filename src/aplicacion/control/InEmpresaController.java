@@ -9,12 +9,14 @@ import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Roboto;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
+import hibernate.model.Usuario;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -37,6 +39,7 @@ import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -121,8 +124,22 @@ public class InEmpresaController implements Initializable {
         numeracionLabel.setFont(Roboto.REGULAR(14));
         labelEmpresaSeguridad.setFont(Roboto.REGULAR(14));
         totalLabel.setFont(Roboto.REGULAR(14));
-        totalLabel.setText("Total de empleados: " 
-                + new UsuarioDAO().countEmpleados(empresa.getId()));
+        
+        List<Usuario> usuarios = new UsuarioDAO().findAllByEmpresaIdActivo(empresa.getId());
+        int usersCount = usuarios.size();
+        for (Usuario usuario: usuarios) {
+            DateTime desactivado;
+            try {
+                desactivado = new DateTime(usuario
+                        .getDetallesEmpleado().getExtra());
+                if (desactivado.isBeforeNow()) {
+                    usersCount--;
+                } 
+            } catch (Exception e) {
+                desactivado = null;
+            }
+        }
+        totalLabel.setText("Total de empleados: " + usersCount);
     }
  
     @Override
@@ -363,6 +380,11 @@ public class InEmpresaController implements Initializable {
             buttonAjustes.getItems().add(menuItem3);
             menuItem3.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarAjusteReservaEmpleados(empresa, stagePrincipal);
+            });
+            MenuItem menuItem4 = new MenuItem("Vacaciones");
+            buttonAjustes.getItems().add(menuItem4);
+            menuItem4.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarAjusteVacacionesEmpleados(empresa, stagePrincipal);
             });
             buttonAjustes.setOnMouseEntered((MouseEvent t) -> {
                 buttonAjustes.setStyle("-fx-background-color: #E0E0E0;");
