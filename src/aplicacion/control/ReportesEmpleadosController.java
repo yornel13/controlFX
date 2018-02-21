@@ -73,8 +73,11 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import javafx.scene.control.ChoiceBox;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.Numeros;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -133,6 +136,9 @@ public class ReportesEmpleadosController implements Initializable {
     private Button buttonImprimir;
     
     @FXML
+    private Button buttonBank;
+    
+    @FXML
     private Button buttonSiguiente;
     
     @FXML
@@ -173,6 +179,9 @@ public class ReportesEmpleadosController implements Initializable {
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     private Stage dialogLoading;
+    
+    private ArrayList<String> textosDAT;
+    private ArrayList<String> textosTXT;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -232,6 +241,179 @@ public class ReportesEmpleadosController implements Initializable {
             data.set(data.indexOf(empleadoTable), empleadoTable);
         }
         contarSelecciones();
+    }
+    
+    @FXML
+    public void generarBank(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("BizBank");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_select.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button horasButton = new MaterialDesignButtonBlue("Horas Extras");
+        Button decimo3Button = new MaterialDesignButtonBlue("Decimo Tercero");
+        Button decimo4Button = new MaterialDesignButtonBlue("Decimo Cuarto");
+        Button jubilacionButton = new MaterialDesignButtonBlue("Jubilacion Pat.");
+        Button aporteButton = new MaterialDesignButtonBlue("Aporte Pat.");
+        Button reservaButton = new MaterialDesignButtonBlue("Fondo de Res.");
+        Button transporteButton = new MaterialDesignButtonBlue("Transporte");
+        Button bonosButton = new MaterialDesignButtonBlue("Bonos");
+        Button vacacionesButton = new MaterialDesignButtonBlue("Vacaciones");
+        Button seguroButton = new MaterialDesignButtonBlue("Seguro");
+        Button uniformeButton = new MaterialDesignButtonBlue("Uniforme");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(horasButton, decimo3Button, decimo4Button, 
+                jubilacionButton, aporteButton, reservaButton, bonosButton, transporteButton,
+                vacacionesButton, seguroButton, uniformeButton).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        dialogStage.show();
+        horasButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_HORAS);
+            dialogStage.close();
+        });
+        jubilacionButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_JUBILACION);
+            dialogStage.close();
+        });
+        aporteButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_APORTE);
+            dialogStage.close();
+        });
+        reservaButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_RESERVA);
+            dialogStage.close();
+        });
+        vacacionesButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_VACACIONES);
+            dialogStage.close();
+        });
+        seguroButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_SEGUROS);
+            dialogStage.close();
+        });
+        uniformeButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_UNIFORMES);
+            dialogStage.close();
+        });
+        transporteButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_TRANSPORTE);
+            dialogStage.close();
+        });
+        bonosButton.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_BONOS);
+            dialogStage.close();
+        });
+        decimo3Button.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_DECIMO_TERCERO);
+            dialogStage.close();
+        });
+        decimo4Button.setOnAction((ActionEvent e) -> {
+            dialogoRutaBizBank(REPORTE_DECIMO_CUARTO);
+            dialogStage.close();
+        });
+    }
+    
+    public void generadorBank(File file, int reporte) {
+        
+        dialogWait();
+        
+        ArrayList<RolIndividual> roles = getRoles();
+        System.out.println("roles: "+roles.size());
+        
+        textosDAT = new ArrayList<>();
+        textosTXT = new ArrayList<>();
+        
+        for (RolIndividual rol: 
+                roles) {
+            
+            String reportName = "";
+            Double reportMonto = 0d;
+            
+            switch (reporte) {
+                case REPORTE_HORAS:
+                    reportMonto = rol.getMontoHorasSobreTiempo()+rol.getMontoHorasSuplementarias();
+                    reportName = "HORAS EXTRAS   ";
+                    break;
+                case REPORTE_JUBILACION:
+                    reportMonto = rol.getJubilacionPatronal();
+                    reportName = "JUBIL PATRONAL ";
+                    break;
+                case REPORTE_APORTE:
+                    reportMonto = rol.getAportePatronal();
+                    reportName = "APORT PATRONAL ";
+                    break;
+                case REPORTE_RESERVA:
+                    reportMonto = rol.getReserva();
+                    reportName = "FONDO RESERVA  ";
+                    break;
+                case REPORTE_VACACIONES:
+                    reportMonto = rol.getVacaciones();
+                    reportName = "VACACIONES     ";
+                    break;
+                case REPORTE_SEGUROS:
+                    reportMonto = rol.getSeguros();
+                    reportName = "SEGUROS        ";
+                    break;
+                case REPORTE_UNIFORMES:
+                    reportMonto = rol.getUniformes();
+                    reportName = "UNIFORME       ";
+                    break;
+                case REPORTE_TRANSPORTE:
+                    reportMonto = rol.getTransporte();
+                    reportName = "TRANSPORTE     ";
+                    break;
+                case REPORTE_BONOS:
+                    reportMonto = rol.getBono();
+                    reportName = "BONOS          ";
+                    break;
+                case REPORTE_DECIMO_TERCERO:
+                    reportMonto = rol.getDecimoTercero();
+                    reportName = "DECIMO TERCERO ";
+                    break;
+                case REPORTE_DECIMO_CUARTO:
+                    reportMonto = rol.getDecimoCuarto();
+                    reportName = "DECIMO CUARTO  ";
+                    break;
+            }
+            
+            textosDAT.add(crearLineaDAT(rol.getUsuario(), reportMonto));
+            textosTXT.add(crearLineaTXT(rol.getUsuario(), reportMonto, reportName));
+            
+        }
+        if (textosDAT.size() > 0 && textosTXT.size() > 0) {
+            if (file != null) {
+                new GuardarText().saveFile(textosDAT, getFileNameDat(file));
+                new GuardarText().saveFile(textosTXT, getFileNameTXT(file));
+                dialogoCompletado();
+            } 
+        } else {
+            dialogoErrorBizBank();
+        }
+        dialogLoading.close();
+    }
+    
+    public void dialogoErrorBizBank() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Generador de archivos");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("No se pueden generar los archivos porque\n"
+                + "no hay pagos en la fecha seleccionada."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
     }
     
     public void dialogWait() {
@@ -648,6 +830,29 @@ public class ReportesEmpleadosController implements Initializable {
         }
     }
     
+    public void dialogoRutaBizBank(int reporte) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Bizbank");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_select.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new MaterialDesignButtonBlue("Seleccionar ruta");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Seleccione la ruta de guardado de los bizbank"), 
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                generadorBank(file, reporte);
+            }
+        });
+        dialogStage.show();
+    }
+    
     public void dialogoRuta(int reporte) {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
@@ -826,6 +1031,23 @@ public class ReportesEmpleadosController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonBank.setTooltip(
+            new Tooltip("Generar .DAT y .TXT")
+        );
+        buttonBank.setOnMouseEntered((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBank.setOnMouseExited((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         buttonAnterior.setTooltip(
             new Tooltip("Mes Anterior")
         );
@@ -870,6 +1092,88 @@ public class ReportesEmpleadosController implements Initializable {
     @FXML
     public void onClickLoginButton(ActionEvent event) {
         aplicacionControl.login(login, usuarioLogin);
+    }
+    
+    String crearLineaDAT(Usuario user, Double reportMonto) {
+        String monto = Numeros.roundToString(reportMonto);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "           ";
+                break;
+            case 1:
+                espacios = "          ";
+                break;
+            case 2:
+                espacios = "         ";
+                break;
+            case 3:
+                espacios = "        ";
+                break;
+            case 4:
+                espacios = "       ";
+                break;
+            case 5:
+                espacios = "      ";
+                break;
+        }
+        String text = user.getDetallesEmpleado()
+                            .getEmpresa().getNumeracion()+";0001;"+inicio.getAno()
+                            +";"+inicio.getMes()+";INS;"+user.getCedula()
+                            +";"+espacios+monto+";0";
+        return text;
+    }
+    
+    String getFileNameDat(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".DAT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".DAT";
+        }
+    }
+    
+    String crearLineaTXT(Usuario user, Double reportMonto, String reportName) {
+        String monto = Numeros.roundToString(reportMonto);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        String partDecimal = parts[1];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "0000000000000";
+                break;
+            case 1:
+                espacios = "000000000000";
+                break;
+            case 2:
+                espacios = "00000000000";
+                break;
+            case 3:
+                espacios = "0000000000";
+                break;
+            case 4:
+                espacios = "000000000";
+                break;
+            case 5:
+                espacios = "00000000";
+                break;
+        }
+        String text = "10CPRP"+user.getDetallesEmpleado().getNroCuenta()
+                +espacios+partEntera+partDecimal+reportName
+                +user.getDetallesEmpleado().getEmpresa().getNombre()+"CUUSD";
+        return text;
+    }
+    
+    String getFileNameTXT(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".TXT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".TXT";
+        }
     }
     
 }

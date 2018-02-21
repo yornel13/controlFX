@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" maxHeight="600.0" maxWidth="800.0" minHeight="600.0" minWidth="800.0" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #E0E0E0;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PagoDecimoCuartoAnualController">
+    <children>
+      <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
+         <children>
+            <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="558.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <Accordion layoutX="216.0" layoutY="24.0" />
+            <Label fx:id="periodoLabel" layoutX="116.0" layoutY="30.0" prefHeight="20.0" prefWidth="378.0" text="Periodo a Liquidar" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <Label fx:id="yearLabel" alignment="CENTER" layoutX="539.0" layoutY="13.0" prefHeight="25.0" prefWidth="46.0" textFill="#fffbfb">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+            <Button fx:id="buttonSiguiente" layoutX="588.0" layoutY="9.0" mnemonicParsing="false" onAction="#onClickMore" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&gt;" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="buttonAnterior" layoutX="506.0" layoutY="10.0" mnemonicParsing="false" onAction="#onClickLess" prefHeight="25.0" prefWidth="25.0" style="-fx-background-color: #039BE5;" text="&lt;" textFill="WHITE">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Button>
+            <Label layoutX="645.0" layoutY="61.0" text="Todos:" textFill="#fffbfb">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+            <CheckBox fx:id="checkBoxPagarTodos" layoutX="700.0" layoutY="63.0" mnemonicParsing="false" onAction="#pagarATodos" />
+            <CheckBox fx:id="checkBoxImpTodos" layoutX="743.0" layoutY="63.0" mnemonicParsing="false" onAction="#impTodos" />
+         </children>
+      </Pane>
+        <Pane layoutY="570.0" prefHeight="30.0" prefWidth="800.0" style="-fx-background-color: rgba(255, 255, 255, .7);">
+            <children>
+               <Label fx:id="usuarioLogin" layoutX="14.0" layoutY="6.0" prefHeight="17.0" prefWidth="237.0">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Label>
+               <Button fx:id="login" layoutX="725.0" layoutY="2.0" maxHeight="25.0" mnemonicParsing="false" onAction="#onClickLoginButton" prefHeight="25.0" prefWidth="75.0" style="-fx-background-color: transparent;" text="Ingresar" underline="true">
+                  <font>
+                     <Font name="System Bold" size="12.0" />
+                  </font>
+               </Button>
+            </children>
+         </Pane>
+      <Label fx:id="empresaLabel" layoutX="67.0" layoutY="6.0" prefHeight="27.0" prefWidth="397.0" text="Modulo de pago de decimos cuarto" textFill="WHITE" wrapText="true">
+         <font>
+            <Font name="Arial Rounded MT Bold" size="18.0" />
+         </font>
+      </Label>
+      <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
+         <columns>
+            <TableColumn fx:id="cedulaColumna" text="Cedula" />
+            <TableColumn fx:id="apellidoColumna" prefWidth="150.0" text="Apellido" />
+            <TableColumn fx:id="nombreColumna" prefWidth="150.0" text="Nombre" />
+            <TableColumn fx:id="departamentoColumna" prefWidth="110.0" text="Departamento" />
+            <TableColumn fx:id="cargoColumna" prefWidth="100.0" text="Cargo" />
+            <TableColumn fx:id="montoColumna" style="-fx-alignment: CENTER;" text="Monto" />
+            <TableColumn fx:id="pagarColumna" prefWidth="50.0" style="-fx-alignment: CENTER;" text="Pagar" />
+            <TableColumn fx:id="imprimirColumna" prefWidth="40.0" style="-fx-alignment: CENTER;" text="Imp." />
+         </columns>
+      </TableView>
+      <Button fx:id="buttonPagar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#pagarAdelanto" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Button fx:id="buttonImprimir" layoutX="644.0" layoutY="10.0" mnemonicParsing="false" onAction="#imprimirGeneral" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Button fx:id="buttonBank" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#generarBank" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/bank.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+    </children>
+</AnchorPane>

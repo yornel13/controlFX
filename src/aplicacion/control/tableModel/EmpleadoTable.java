@@ -12,6 +12,7 @@ import hibernate.model.ControlDiario;
 import hibernate.model.ControlExtras;
 import hibernate.model.CuotaDeuda;
 import hibernate.model.DiasVacaciones;
+import hibernate.model.PagoDecimo;
 import hibernate.model.PagoMes;
 import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
@@ -57,7 +58,7 @@ public class EmpleadoTable {
     public ArrayList<PagoMesItem> pagoMesItems;
      public ArrayList<PagoMes> pagosMensuales;
     public ArrayList<RolCliente> pagos;
-    public ArrayList<RolIndividual> rolesVac;
+    public ArrayList<RolIndividual> rolesInds;
     public RolIndividual rolIndividual;
     public Boolean problem;
     public PagoQuincena pagoQuincena;
@@ -97,6 +98,7 @@ public class EmpleadoTable {
     private Bonos bonos;
     private String vacaciones;
     private PagoVacaciones pagoVacaciones;
+    private PagoDecimo pagoDecimo;
     private String periodo;
     private Boolean oculto;
     private java.sql.Date sqlDateInicio;
@@ -157,12 +159,12 @@ public class EmpleadoTable {
         return departamento;
     }
 
-    public ArrayList<RolIndividual> getRolesVac() {
-        return rolesVac;
+    public ArrayList<RolIndividual> getRolesInds() {
+        return rolesInds;
     }
 
-    public void setRolesVac(ArrayList<RolIndividual> rolesVac) {
-        this.rolesVac = rolesVac;
+    public void setRolesInds(ArrayList<RolIndividual> rolesVac) {
+        this.rolesInds = rolesVac;
     }
 
     public void setDepartamento(String departamento) {
@@ -713,6 +715,14 @@ public class EmpleadoTable {
 
     public void setFechaFin(Fecha FechaFin) {
         this.FechaFin = FechaFin;
+    }
+
+    public PagoDecimo getPagoDecimo() {
+        return pagoDecimo;
+    }
+
+    public void setPagoDecimo(PagoDecimo pagoDecimo) {
+        this.pagoDecimo = pagoDecimo;
     }
     
     

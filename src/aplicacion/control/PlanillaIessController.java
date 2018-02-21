@@ -97,6 +97,15 @@ import hibernate.model.PagoMesItem;
 import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
 import javafx.scene.control.ChoiceBox;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

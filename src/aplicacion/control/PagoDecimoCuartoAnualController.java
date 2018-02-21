@@ -5,37 +5,24 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.reports.ReporteRolDePagoDecimo;
+import aplicacion.control.reports.ReporteRolDecimoCuarto;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
-import hibernate.HibernateSessionFactory;
-import hibernate.dao.PagoDecimoDAO;
-import hibernate.dao.RolIndividualDAO;
+import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.Numeros;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
-import hibernate.model.PagoDecimo;
-import hibernate.model.RolIndividual;
+import hibernate.model.PagoQuincena;
 import hibernate.model.Usuario;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -49,7 +36,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -66,6 +52,35 @@ import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import hibernate.dao.PagoDecimoDAO;
+import hibernate.dao.RolIndividualDAO;
+import hibernate.model.DiasVacaciones;
+import hibernate.model.PagoDecimo;
+import hibernate.model.RolIndividual;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableCell;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.paint.Color;
+import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -74,43 +89,21 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import aplicacion.control.util.GuardarText;
-import aplicacion.control.util.Numeros;
-import hibernate.model.PagoMes;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
-import javafx.application.Platform;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.paint.Color;
-import javafx.stage.StageStyle;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.Permisos;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.AnchorPane;
 
 /**
  *
  * @author Yornel
  */
-public class PagoDecimoCuartoController implements Initializable {
+public class PagoDecimoCuartoAnualController implements Initializable {
     
     private Stage stagePrincipal;
     
     private AplicacionControl aplicacionControl;
-   
-    @FXML
-    private Button administradoresButton;
     
     @FXML
     private TableView empleadosTableView;
@@ -136,34 +129,62 @@ public class PagoDecimoCuartoController implements Initializable {
     @FXML 
     private TableColumn montoColumna;
     
-    @FXML
-    private CheckBox checkBoxPagarTodos;
-    
     @FXML 
     private TableColumn<EmpleadoTable, EmpleadoTable> pagarColumna;
+    
+    @FXML 
+    private TableColumn<EmpleadoTable, EmpleadoTable> imprimirColumna;
     
     @FXML
     private Button buttonAtras;
     
     @FXML
+    private Button buttonBank;
+    
+    @FXML
+    private Button buttonImprimir;
+    
+    @FXML
+    private Button buttonAnterior;
+    
+    @FXML
+    private Button buttonSiguiente;
+    
+    @FXML
     private Button buttonPagar;
+    
+    @FXML
+    private Label yearLabel;
+    
+    @FXML
+    private Label periodoLabel;
     
     private ObservableList<EmpleadoTable> data;
     
-    ArrayList<PagoDecimo> pagosDecimo;
+    @FXML
+    private CheckBox checkBoxPagarTodos;
+    
+    @FXML
+    private CheckBox checkBoxImpTodos;
+    
+    ArrayList<PagoQuincena> pagosQuincenal;
+    private ArrayList<String> textosDAT;
+    private ArrayList<String> textosTXT;
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
+    ArrayList<DiasVacaciones> diasVac;
+    Dialog<Void> dialog;
+    String periodoALiquidar;
+    
+    ArrayList<PagoDecimo> pagosDecimo;
+    
+    ArrayList<EmpleadoTable> empladosImprimir;
     
     Stage dialogLoading;
     
-    Dialog<Void> dialog;
-    
     Label loader;
     
-    ArrayList<List<RolIndividual>> rolesEmpleados;
-    ArrayList<List<RolIndividual>> rolesParaImprimir;
-    private ArrayList<String> textosDAT;
-    private ArrayList<String> textosTXT;
+    Integer count;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -174,10 +195,26 @@ public class PagoDecimoCuartoController implements Initializable {
     }
     
     @FXML
+    public void onClickMore(ActionEvent event) {
+        yearLabel.setText(String.valueOf(Integer.valueOf(yearLabel.getText())+1));
+        setTableInfo();
+    }
+    
+    @FXML
+    public void onClickLess(ActionEvent event) {
+        yearLabel.setText(String.valueOf(Integer.valueOf(yearLabel.getText())-1));
+        setTableInfo();
+    }
+    
+    @FXML
     private void returnEmpresa(ActionEvent event) {
         stagePrincipal.close();
         aplicacionControl.mostrarInEmpresa(empresa);
         setTableInfo();
+    }
+    
+    public void updateTable() {
+        empleadosTableView.refresh();
     }
     
     @FXML
@@ -185,13 +222,30 @@ public class PagoDecimoCuartoController implements Initializable {
         for (EmpleadoTable empleadoTable: 
                 (List<EmpleadoTable>) empleadosTableView.getItems()) {
             if (checkBoxPagarTodos.isSelected()) {
-                if (empleadoTable.getDecimo4().equals(0d)) {
+                if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
                     empleadoTable.setPagar(false);
                 } else {
                     empleadoTable.setPagar(true);
                 }
             } else {
                 empleadoTable.setPagar(false);
+            }
+            data.set(data.indexOf(empleadoTable), empleadoTable);
+        }
+    }
+    
+    @FXML
+    private void impTodos(ActionEvent event) {
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) empleadosTableView.getItems()) {
+            if (checkBoxImpTodos.isSelected()) {
+                if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                    empleadoTable.setAgregar(true);
+                } else {
+                    empleadoTable.setAgregar(false);
+                }
+            } else {
+                empleadoTable.setAgregar(false);
             }
             data.set(data.indexOf(empleadoTable), empleadoTable);
         }
@@ -231,10 +285,113 @@ public class PagoDecimoCuartoController implements Initializable {
         dialogStage.show();
     }
     
+    @FXML
+    public void generarBank(ActionEvent event) {
+        
+        textosDAT = new ArrayList<>();
+        textosTXT = new ArrayList<>();
+        for (EmpleadoTable empleadoTable: 
+                (List<EmpleadoTable>) data) {
+            if (empleadoTable.getAgregar() && empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getPagoDecimo()));
+                textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getPagoDecimo()));
+            }
+        }
+        if (textosDAT.size() > 0 && textosTXT.size() > 0) {
+            dialogoGenerarDatTxt();
+        } else {
+            dialogoErrorBizBank();
+        }
+    }
+    
+    @FXML
+    public void imprimirGeneral(ActionEvent event) {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Reporte - Decimo Cuartos");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new Button("Guardar Documento");
+        Button buttonNoDocumento = new Button("No Guardar");
+        CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(5, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(buttonSiDocumento, buttonNoDocumento)
+                .build();
+        hBox.maxWidth(120);
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(new Text("¿Desea imprimir el pago de decimos cuarto"),
+                new Text("de los empleados seleccionados?"),
+                hBox, enviarCorreo).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonSiDocumento.setMinWidth(50);
+        buttonNoDocumento.setMinWidth(50);
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                empladosImprimir = new ArrayList<>();
+                for (EmpleadoTable empleado: data) {
+                    if (empleado.getAgregar() && 
+                            empleado.getPagoDecimo() != null) {
+                        empladosImprimir.add(empleado);
+                    }
+                }
+                imprimir(file, enviarCorreo.isSelected());
+            }
+        });
+        buttonNoDocumento.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            if (enviarCorreo.isSelected()) {
+                imprimir(null, enviarCorreo.isSelected());
+            } else {
+                dialogoCompletado();
+            }
+        });
+        enviarCorreo.setSelected(true);
+        dialogStage.showAndWait();
+    }
+    
+    public void dialogoErrorBizBank() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Generador de archivos");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("No se pueden generar los archivos porque no hay empleados\n"
+                + "con pagos hechos, o sus pagos son menores a 0."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
+    }
+    
+    public void hacerPago() {
+        
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        Runnable worker = new PagoDecimoCuartoAnualController.DataBaseThread(0);
+        executor.execute(worker);
+        executor.shutdown();
+
+        loadingMode();
+    }
+    
     public void imprimir(File file, Boolean enviarCorreo) {
         
         ExecutorService executor = Executors.newFixedThreadPool(1);
-        Runnable worker = new PagoDecimoCuartoController.DataBaseThread(1, file, enviarCorreo);
+        Runnable worker = new PagoDecimoCuartoAnualController.DataBaseThread(1, file, enviarCorreo);
         executor.execute(worker);
         executor.shutdown();
 
@@ -262,17 +419,7 @@ public class PagoDecimoCuartoController implements Initializable {
         dialogLoading.show();
     }
     
-    public void hacerPago() {
-        
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Runnable worker = new PagoDecimoCuartoController.DataBaseThread(0);
-        executor.execute(worker);
-        executor.shutdown();
-
-        loadingMode();
-    }
-    
-     public void dialogoGenerarDatTxt() {
+    public void dialogoGenerarDatTxt() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -291,11 +438,32 @@ public class PagoDecimoCuartoController implements Initializable {
                 dialogStage.close();
                 new GuardarText().saveFile(textosDAT, getFileNameDat(file));
                 new GuardarText().saveFile(textosTXT, getFileNameTXT(file));
-                dialogoPagoDecimosCompletado();
+                dialogoGenerarDatCompletado();
             }
         });
-        dialogStage.show();
-        
+        dialogStage.show(); 
+    }
+    
+    public void dialogoGenerarDatCompletado() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Decimo Cuarto");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonOk = new Button("ok");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Generacion de archivos Dat y Txt completada."), buttonOk).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonOk.setPrefWidth(60);
+        buttonOk.setOnAction((ActionEvent e) -> {
+            dialogStage.close();
+            
+        });
+        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+            dialogStage.close();
+        });
+        dialogStage.showAndWait();
     }
     
     public void dialogoPagoDecimosCompletado() {
@@ -309,7 +477,7 @@ public class PagoDecimoCuartoController implements Initializable {
         Button buttonNoDocumento = new Button("No Guardar");
         CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se generaron los archivos DAT y TXT con exito, \n"
+        children(new Text("Se generaron los pagos de decimo cuarto con exito, \n"
                 + " ¿Desea guardar los documento de pago?."), 
                 buttonSiDocumento, buttonNoDocumento, enviarCorreo).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
@@ -341,7 +509,7 @@ public class PagoDecimoCuartoController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new Button("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Pagos de decimos cuarto acumulado hecho con exito."), buttonOk).
+        children(new Text("Pagos de decimos cuarto acumlado hecho con exito."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setPrefWidth(60);
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -356,22 +524,60 @@ public class PagoDecimoCuartoController implements Initializable {
     public void setEmpresa(Empresa empresa) throws ParseException {
         this.empresa = empresa;
         
+        DateTime fechaActual = new DateTime();
+        String anio = String.valueOf(fechaActual.getYear());
+        
+        yearLabel.setText(anio);
+        
         checkBoxPagarTodos.setSelected(false);
         
-        setTableInfo();
+         new Timer().schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                        cancel();
+                        Platform.runLater(new Runnable() {
+                            @Override public void run() {
+                                loadingMode();
+                                new Timer().schedule(
+                                    new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            cancel();
+                                            Platform.runLater(new Runnable() {
+                                                @Override public void run() {
+                                                    setTableInfo(); 
+                                                    closeDialogMode();
+                                                }
+                                            });
+                                        }
+                                    }, 500, 500);
+                            }
+                        });
+                    }
+                }, 500, 500);
     }
     
     public void setTableInfo() {
         
+        periodoALiquidar = "1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
+                +" al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1);
+        periodoLabel.setText("Periodo entre el "+periodoALiquidar);
+
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivo(empresa.getId()));
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), 
+                new Fecha("01","01",yearLabel.getText())));
         
-        rolesEmpleados = new ArrayList<>();
+        PagoDecimoDAO pagoDecimoDAO = new PagoDecimoDAO();
+        Timestamp fecha = new Timestamp(Integer.valueOf(yearLabel.getText())-1-1899, 0, 1, 0, 0, 0, 0);
+        pagosDecimo = new ArrayList<>();
+        pagosDecimo.addAll(pagoDecimoDAO.findByDecimoAndFecha(Const.DECIMO_CUARTO, fecha));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
             EmpleadoTable empleado = new EmpleadoTable();
+            empleado.setUsuario(user);
             empleado.setId(user.getId());
             empleado.setNombre(user.getNombre());
             empleado.setApellido(user.getApellido());
@@ -389,20 +595,32 @@ public class PagoDecimoCuartoController implements Initializable {
             List<RolIndividual> rolesIndividual = new RolIndividualDAO()
                     .findAllByEmpleadoId(empleado.getId());
             
-            List<RolIndividual> rolesDelParaPagar = new ArrayList<>();
+            ArrayList<RolIndividual> rolesDelParaPagar = new ArrayList<>();
           
             for (RolIndividual rolIndividual: rolesIndividual) {
-                if (!rolIndividual.getDecimosPagado() 
-                        && rolIndividual.getPagoDecimoCuarto() == null) {
+                
+                Fecha inicio = new Fecha(rolIndividual.getInicio());
+                Fecha finalizo = new Fecha(rolIndividual.getFinalizo());
+                if (inicio.getAno().equals(String.valueOf(Integer.valueOf(yearLabel.getText())-1))) {
                     monto += rolIndividual.getDecimoCuarto();
                     rolesDelParaPagar.add(rolIndividual);
                 }
             }
 
-            rolesEmpleados.add(rolesDelParaPagar);
-            
+            empleado.setRolesInds(rolesDelParaPagar);
+        
             empleado.setDecimo4(round(monto));
             empleado.setPagar(false);
+            empleado.setAgregar(false);
+            empleado.setPagado("No");
+            
+            for (PagoDecimo pagoDecimo: pagosDecimo) {
+                if (pagoDecimo.getUsuario().getId().equals(user.getId())) {
+                    empleado.setPagoDecimo(pagoDecimo);
+                    empleado.setPagado("Si");
+                    empleado.setDecimo4(round(pagoDecimo.getMonto()));
+                }
+            }
             
             return empleado;
         }).forEach((empleado) -> {
@@ -462,16 +680,6 @@ public class PagoDecimoCuartoController implements Initializable {
         
         montoColumna.setCellValueFactory(new PropertyValueFactory<>("decimo4"));
         
-        empleadosTableView.setRowFactory( (Object tv) -> {
-            TableRow<EmpleadoTable> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    EmpleadoTable rowData = row.getItem();
-                }
-            });
-            return row;
-        });
-        
         pagarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         pagarColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
             private final CheckBox checkBoxpagar = new CheckBox();
@@ -487,17 +695,75 @@ public class PagoDecimoCuartoController implements Initializable {
                 
                 setGraphic(checkBoxpagar);
                 if (checkBoxpagar != null) {
+                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                        checkBoxpagar.setDisable(true);
+                    } else {
+                        checkBoxpagar.setDisable(false);
+                    }
                     checkBoxpagar.setSelected(empleadoTable.getPagar());
                 }
                 checkBoxpagar.setOnAction(event -> {
-                    if (empleadoTable.getDecimo4().equals(0d)) {
+                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
                        empleadoTable.setPagar(false);
                        checkBoxpagar.setSelected(false);
                     } else {
                         empleadoTable.setPagar(checkBoxpagar.isSelected());
                     }
                 });
+                
+                if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                    getTableRow().setStyle("-fx-background-color:#A5D6A7");
+                } else {
+                    getTableRow().setStyle("");
+                }
             }
+        });
+        
+        imprimirColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        imprimirColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
+            private final CheckBox checkBoxImp = new CheckBox();
+
+            @Override
+            protected void updateItem(EmpleadoTable empleadoTable, boolean empty) {
+                super.updateItem(empleadoTable, empty);
+
+                if (empleadoTable == null) {
+                    setGraphic(null);
+                    getTableRow().setStyle("");
+                    return;
+                }
+                
+                setGraphic(checkBoxImp);
+                if (checkBoxImp != null) {
+                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                        checkBoxImp.setDisable(false);
+                    } else {
+                        checkBoxImp.setDisable(true);
+                    }
+                    checkBoxImp.setSelected(empleadoTable.getAgregar());
+                }
+                
+                checkBoxImp.setOnAction(event -> {
+                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
+                        empleadoTable.setAgregar(checkBoxImp.isSelected());
+                    } else {
+                        empleadoTable.setAgregar(false);
+                        checkBoxImp.setSelected(false);
+                    }
+                     
+                });
+            } 
+        });
+        
+        empleadosTableView.setRowFactory( (Object tv) -> {
+            TableRow<EmpleadoTable> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    EmpleadoTable rowData = row.getItem();
+                    mostrarPagoDecimoCuarto(rowData);
+                }
+            });
+           return row;
         });
         
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {
@@ -532,7 +798,93 @@ public class PagoDecimoCuartoController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonBank.setTooltip(
+            new Tooltip("Generar .DAT y .TXT \n(Selecionados en \"Imp.\")")
+        );
+        buttonBank.setOnMouseEntered((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonBank.setOnMouseExited((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        buttonImprimir.setTooltip(
+            new Tooltip("Imprimir \n(Selecionados en \"Imp.\")")
+        );
+        buttonImprimir.setOnMouseEntered((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonImprimir.setOnMouseExited((MouseEvent t) -> {
+            buttonImprimir.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/imprimir.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
+        
+        buttonAnterior.setTooltip(
+            new Tooltip("Mes Anterior")
+        );
+        buttonAnterior.setOnMouseEntered((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonAnterior.setOnMouseExited((MouseEvent t) -> {
+            buttonAnterior.setStyle("-fx-background-color: #039BE5;");
+        });
+        buttonSiguiente.setTooltip(
+            new Tooltip("Mes Siguiente")
+        );
+        buttonSiguiente.setOnMouseEntered((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #29B6F6;");
+        });
+        buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
+            buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
+        });
     } 
+    
+    public void mostrarPagoDecimoCuarto(EmpleadoTable empleadoTable) {
+        if (aplicacionControl.permisos == null) {
+           aplicacionControl.noLogeado();
+        } else {
+            if (aplicacionControl.permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaDecimoCuartoDetalles.fxml"));
+                    AnchorPane ventanaAuditar = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Decimo Cuarto");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/icon_registro.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaAuditar);
+                    ventana.setScene(scene);
+                    DecimoCuartoDetallesController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(aplicacionControl);
+                    controller.setPrograma(this);
+                    controller.setEmpleado(empleadoTable, periodoALiquidar, yearLabel.getText());
+                    ventana.show();
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              aplicacionControl.noPermitido();
+            }
+        }
+    }
     
     private void loadingMode(){
         dialog = new Dialog<>();
@@ -630,7 +982,7 @@ public class PagoDecimoCuartoController implements Initializable {
                             if (Objects.equals(opcion, GUARDAR)) {
                                 hacerPago();
                             } else if (Objects.equals(opcion, IMPRIMIR)) {
-                                imprimir(file, Boolean.TRUE);
+                                imprimir(file, enviarCorreo, empladosImprimir);
                             } 
                         } catch (Exception ex) {
                             ex.printStackTrace();
@@ -642,79 +994,75 @@ public class PagoDecimoCuartoController implements Initializable {
         }
         
         public void hacerPago() {
-
-            pagosDecimo = new ArrayList<>();
-            rolesParaImprimir = new ArrayList<>();
+        
+            empladosImprimir = new ArrayList<>();
             textosDAT = new ArrayList<>();
             textosTXT = new ArrayList<>();
 
-            for (Usuario user: usuarios) {
-                if (data.get(usuarios.indexOf(user)).getPagar()) {
+            for (EmpleadoTable empleadoTable: data) {
+                if (empleadoTable.getPagar()) {
                     PagoDecimo pagoDecimo = new PagoDecimo();
-                    pagoDecimo.setUsuario(user);
-                    pagoDecimo.setFecha(new Timestamp(new Date().getTime()));
-                    pagoDecimo.setMonto(data.get(usuarios.indexOf(user))
-                            .getDecimo4());
+                    pagoDecimo.setUsuario(empleadoTable.getUsuario());
+                    pagoDecimo.setFecha(new Timestamp(Integer.valueOf(yearLabel.getText())-1-1899, 0, 1, 0, 0, 0, 0));
+                    pagoDecimo.setMonto(empleadoTable.getDecimo4());
                     pagoDecimo.setDecimo(Const.DECIMO_CUARTO);
                     new PagoDecimoDAO().save(pagoDecimo);
-                    pagosDecimo.add(pagoDecimo);
-
-                    List<RolIndividual> roles = rolesEmpleados
-                            .get(usuarios.indexOf(user));
-
-                    for (RolIndividual rolIndividual: roles) {
-                        RolIndividual rolSearch = new RolIndividualDAO().findById(rolIndividual.getId());
-                        rolSearch.setPagoDecimoCuarto(pagoDecimo);
-                    }
-                    rolesParaImprimir.add(roles);
-                    HibernateSessionFactory.getSession().flush();
-
+                    
+                    empleadoTable.setPagoDecimo(pagoDecimo);
+                    empleadoTable.setPagado("Si");
+                    empleadoTable.setPagar(false);
+                    
+                    empladosImprimir.add(empleadoTable);
+                
                     // Registro para auditar
-                    String detalles = "hizo el pago de decimos acumulados nro: " 
-                            + pagoDecimo.getId() 
-                            + " del lapso " + getFechaConMes(roles.get(0).getInicio())+ " a " 
-                            + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()) + " para el empleado " 
-                            + user.getApellido()+ " " + user.getNombre();
+                    String detalles = "hizo el pago de decimo  acumulados nro: " + pagoDecimo.getId() 
+                            + " del lapso 1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
+                            + " al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1) + " para el empleado " 
+                            + empleadoTable.getApellido()+ " " + empleadoTable.getNombre();
                     aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
                     
-                    textosDAT.add(crearLineaDAT(user, pagoDecimo, roles.get(roles.size() - 1)));
-                    textosTXT.add(crearLineaTXT(user, pagoDecimo));
+                    textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), pagoDecimo));
+                    textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), pagoDecimo));
                 }
             }
             setTableInfo();
-
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     closeDialogMode();
-                    dialogoGenerarDatTxt();
+                    dialogoPagoDecimosCompletado();
                 }
             });
         }
+
+        public void imprimir(File file, Boolean enviarCorreo, List<EmpleadoTable> empleados) {
         
-        public void imprimir(File file, Boolean enviarCorreo) {
-        
-            for (PagoDecimo pagoDecimo: pagosDecimo) {
+            for (EmpleadoTable empleado: empleados) {
+                PagoDecimo pagoDecimo = empleado.getPagoDecimo();
                 Usuario user = pagoDecimo.getUsuario();
 
-                List<RolIndividual> roles = rolesParaImprimir
-                            .get(pagosDecimo.indexOf(pagoDecimo));
-
-                ReporteRolDePagoDecimo datasource = new ReporteRolDePagoDecimo();
-                datasource.add(pagoDecimo);
+                ReporteRolDecimoCuarto datasource = new ReporteRolDecimoCuarto();
+                datasource.addAll(empleado.getRolesInds());
 
                 try {
-                    InputStream inputStream = new FileInputStream(Const.REPORTE_PAGO_DECIMO_CUARTO);
+                    InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_DECIMO_CUARTO);
 
                     Map<String, Object> parametros = new HashMap();
-                    parametros.put("empleado", user.getApellido()+ " " + user.getNombre());
-                    parametros.put("cedula", user.getCedula());
-                    parametros.put("cargo", user.getDetallesEmpleado().getCargo().getNombre());
-                    parametros.put("empresa", user.getDetallesEmpleado().getEmpresa().getNombre());
                     parametros.put("numero", pagoDecimo.getId().toString()); 
-                    parametros.put("lapso", getFechaConMes(roles.get(0).getInicio()) 
-                            + " al " + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()));
-                    parametros.put("total", round(pagoDecimo.getMonto()).toString());
-                    parametros.put("fecha_recibo", Fechas.getFechaConMes(pagoDecimo.getFecha()));
+                    parametros.put("fecha_recibo", Fechas.getFechaConMes(Fechas.getFechaActual()));
+                    parametros.put("empleado", empleado.getApellido()+ " " + empleado.getNombre());
+                    parametros.put("cedula", empleado.getCedula());
+                    parametros.put("cargo", empleado.getUsuario().getDetallesEmpleado().getCargo().getNombre());
+                    parametros.put("empresa", empresa.getNombre());
+                    parametros.put("siglas", empresa.getSiglas());
+                    parametros.put("correo", "Correo: " + empresa.getEmail());
+                    parametros.put("detalles", 
+                                 "Ruc: " + empresa.getNumeracion() 
+                            + " - Direccion: " + empresa.getDireccion() 
+                            + " - Tel: " + empresa.getTelefono1());
+                    parametros.put("devengado", Numeros.round(pagoDecimo.getMonto()).toString());
+                    parametros.put("cobrar", Numeros.round(pagoDecimo.getMonto()).toString());
+                    parametros.put("lapso", "del 1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
+                                 +" al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1));
 
                     JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
                     JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -731,9 +1079,9 @@ public class PagoDecimoCuartoController implements Initializable {
                         CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
                                 user.getEmail(), Const.ASUNTO_PAGO_DECIMO_CUARTO, 
                                 "Recibo del pago del decimo cuarto acumulado desde el " 
-                                        + getFechaConMes(roles.get(0).getInicio()) 
+                                        + "1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1) 
                                         + " hasta el "
-                                        + getFechaConMes(roles.get(roles.size() - 1).getFinalizo()), 
+                                        + "31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1), 
                                 pdf.getPath(), filename + ".pdf");
                     }
 
@@ -741,7 +1089,7 @@ public class PagoDecimoCuartoController implements Initializable {
                     Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
                 } 
             }
-            pagosDecimo.clear();
+            empladosImprimir.clear();
             Platform.runLater(new Runnable() {
                 @Override public void run() {
                     closeDialogMode();
@@ -749,10 +1097,9 @@ public class PagoDecimoCuartoController implements Initializable {
                 }
             });
         }
-        
     }
     
-    String crearLineaDAT(Usuario user, PagoDecimo pagoDecimo, RolIndividual rolIndividual) {
+    String crearLineaDAT(Usuario user, PagoDecimo pagoDecimo) {
         String monto = Numeros.roundToString(pagoDecimo.getMonto());
         String espacios = "";
         String[] parts = monto.split(Pattern.quote("."));
@@ -778,8 +1125,8 @@ public class PagoDecimoCuartoController implements Initializable {
                 break;
         }
         String text = user.getDetallesEmpleado()
-                            .getEmpresa().getNumeracion()+";0001;"+new Fecha(rolIndividual.getFinalizo()).getAno()
-                            +";"+new Fecha(rolIndividual.getFinalizo()).getMes()+";INS;"+user.getCedula()
+                            .getEmpresa().getNumeracion()+";0001;"+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
+                            +";"+"12"+";INS;"+user.getCedula()
                             +";"+espacios+monto+";0";
         return text;
     }
@@ -820,7 +1167,7 @@ public class PagoDecimoCuartoController implements Initializable {
                 break;
         }
         String text = "10CPRP"+user.getDetallesEmpleado().getNroCuenta()
-                +espacios+partEntera+partDecimal+"DECIMO CUARTO  "
+                +espacios+partEntera+partDecimal+"DECIMO CUARTO "
                 +user.getDetallesEmpleado().getEmpresa().getNombre()+"CUUSD";
         return text;
     }

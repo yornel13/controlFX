@@ -50,6 +50,8 @@ public class Const {
     public static final String REPORTE_ROL_CLIENTE = "report/rol_cliente.jrxml";
     public static final String REPORTE_ROL_INDIVIDUAL = "report/rol_individual.jrxml";
     public static final String REPORTE_ROL_VACACIONES = "report/rol_vacaciones.jrxml";
+    public static final String REPORTE_ROL_DECIMO_TERCERO = "report/rol_decimo_tercero.jrxml";
+    public static final String REPORTE_ROL_DECIMO_CUARTO = "report/rol_decimo_cuarto.jrxml";
     public static final String REPORTE_ROL_UNITARIO = "report/rol_unitario.jrxml";
     public static final String REPORTE_PAGO_ADELANTO_QUINCENAL = "report/adelanto_quincenal_individual.jrxml";
     public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL = "report/deuda_empleado_individual.jrxml";

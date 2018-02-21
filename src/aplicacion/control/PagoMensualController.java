@@ -106,8 +106,6 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.MaterialDesignButton;
 import hibernate.dao.CuotaDeudaDAO;
 import hibernate.dao.PagoVacacionesDAO;
@@ -115,6 +113,8 @@ import hibernate.model.CuotaDeuda;
 import hibernate.model.PagoVacaciones;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *

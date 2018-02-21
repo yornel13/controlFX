@@ -12,14 +12,17 @@ import hibernate.HibernateSessionFactory;
 import hibernate.dao.ConstanteDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.dao.EmpresaDAO;
+import hibernate.dao.RolIndividualDAO;
 import hibernate.model.Constante;
 import hibernate.model.DiasVacaciones;
 import hibernate.model.Empresa;
+import hibernate.model.RolIndividual;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -247,6 +250,19 @@ public class PrincipalController implements Initializable {
                     System.out.println("ultimo cambio "+vacaciones.getValor());
                 }
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                new RolIndividualDAO().clearDecimosPagados();
+                for (RolIndividual rolIndividual: 
+                        (List<RolIndividual>) new RolIndividualDAO().findAll()) {
+                    Double devengado = 0d;
+                    try {
+                        devengado = Double.valueOf(rolIndividual.getEmpresa());
+                    } catch (NumberFormatException ex) {
+                        devengado = -1d;
+                    }
+                    rolIndividual.setEmpresa(devengado.toString());
+                }
+                HibernateSessionFactory.getSession().flush();
+                
                 
             } catch (Exception e) {
                 Platform.runLater(new Runnable() {

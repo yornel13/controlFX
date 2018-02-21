@@ -5,6 +5,8 @@
  */
 package aplicacion.control.tableModel;
 
+import aplicacion.control.util.Fecha;
+
 /**
  *
  * @author Yornel
@@ -26,6 +28,11 @@ public class PagosTable {
     private Double tercero;
     private Double cuarto;
     private Double total;
+    private String inicio;
+    private String finalizo;
+    private String devengado;
+    private Boolean modificar;
+    
 
     public Integer getId() {
         return id;
@@ -146,6 +153,40 @@ public class PagosTable {
     public void setCuarto(Double cuarto) {
         this.cuarto = cuarto;
     }
+
+    public String getInicio() {
+        return inicio;
+    }
+
+    public void setInicio(String inicio) {
+        this.inicio = inicio;
+    }
+
+    public String getFinalizo() {
+        return finalizo;
+    }
+
+    public void setFinalizo(String finalizo) {
+        this.finalizo = finalizo;
+    }
+
+    public String getDevengado() {
+        return devengado;
+    }
+
+    public void setDevengado(String devengado) {
+        this.devengado = devengado;
+    }
+
+    public Boolean getModificar() {
+        return modificar;
+    }
+
+    public void setModificar(Boolean modificar) {
+        this.modificar = modificar;
+    }
+
+    
     
     
     

@@ -424,7 +424,7 @@ public class PagoVacacionesController implements Initializable {
                     .findInDeterminateTimeByUsuarioId(inicio.getFecha(), empleado.getId());
             
             if (rolIndividuals != null) {
-                empleado.setRolesVac(new ArrayList<>(rolIndividuals));
+                empleado.setRolesInds(new ArrayList<>(rolIndividuals));
                 for (PagoMes pagoMes: pagosMensuales) {
                     pagoMes.setPagosItems(new PagoMesItemDAO().findByPagoMesId(pagoMes.getId()));
                 }

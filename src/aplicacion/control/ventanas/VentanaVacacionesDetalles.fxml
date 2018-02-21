@@ -97,5 +97,6 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
+      <Button fx:id="buttonGuardar" layoutX="337.0" layoutY="40.0" mnemonicParsing="false" onAction="#dialogoGuardar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

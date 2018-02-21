@@ -77,8 +77,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.GuardarText;
 import aplicacion.control.util.Numeros;
 import java.util.Objects;
@@ -95,6 +93,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *

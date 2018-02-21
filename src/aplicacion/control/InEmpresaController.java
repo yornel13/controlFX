@@ -436,7 +436,7 @@ public class InEmpresaController implements Initializable {
         buttonTercero.setMaxWidth(170);
         buttonTercero.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            aplicacionControl.mostrarPagoDecimoTercero(empresa, stagePrincipal);
+            aplicacionControl.mostrarPagoDecimoTerceroAnual(empresa, stagePrincipal);
         });
         buttonTercero.setOnMouseEntered((MouseEvent t) -> {
             buttonTercero.setStyle("-fx-background-color: #E0E0E0; "
@@ -454,7 +454,7 @@ public class InEmpresaController implements Initializable {
         buttonCuarto.setMaxWidth(170);
         buttonCuarto.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            aplicacionControl.mostrarPagoDecimoCuarto(empresa, stagePrincipal);
+            aplicacionControl.mostrarPagoDecimoCuartoAnual(empresa, stagePrincipal);
         });
         buttonCuarto.setOnMouseEntered((MouseEvent t) -> {
             buttonCuarto.setStyle("-fx-background-color: #E0E0E0; "

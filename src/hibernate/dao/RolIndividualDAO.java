@@ -295,6 +295,12 @@ public class RolIndividualDAO extends BaseHibernateDAO {
 	public List findByRolesCliente(Object rolesCliente) {
 		return findByProperty(ROLES_CLIENTE, rolesCliente);
 	}
+        
+        public void clearDecimosPagados() {
+            Query query = getSession().
+                    createSQLQuery("UPDATE rol_individual SET decimos_pagado = 0 WHERE id > 0");
+            query.executeUpdate();
+        }
 
 	public List findAll() {
 		log.debug("finding all RolIndividual instances");

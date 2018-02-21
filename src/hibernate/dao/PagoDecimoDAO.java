@@ -3,6 +3,7 @@ package hibernate.dao;
 // default package
 
 import hibernate.model.PagoDecimo;
+import java.sql.Timestamp;
 import java.util.List;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
@@ -75,6 +76,18 @@ public class PagoDecimoDAO extends BaseHibernateDAO {
                             + "decimo = :decimo")
                     .addEntity(PagoDecimo.class)
                     .setParameter("usuario_id", empleadoId)
+                    .setParameter("decimo", decimo);
+            Object result = query.list();
+            return (List<PagoDecimo>) result;
+        }
+        
+        public List<PagoDecimo> findByDecimoAndFecha(String decimo, Timestamp fecha) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_decimo where "
+                            + "fecha = :fecha and "
+                            + "decimo = :decimo")
+                    .addEntity(PagoDecimo.class)
+                    .setParameter("fecha", fecha)
                     .setParameter("decimo", decimo);
             Object result = query.list();
             return (List<PagoDecimo>) result;

@@ -65,6 +65,12 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import javafx.scene.control.ChoiceBox;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *

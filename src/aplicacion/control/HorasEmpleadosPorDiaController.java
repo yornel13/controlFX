@@ -89,6 +89,9 @@ import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.ControlDiarioDAO;
 import hibernate.model.ControlDiario;
 import javafx.scene.control.ChoiceBox;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

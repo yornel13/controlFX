@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" maxHeight="375.0" maxWidth="610.0" minHeight="375.0" minWidth="610.0" prefHeight="375.0" prefWidth="610.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.DecimoCuartoDetallesController">
+    <children>
+      <Accordion layoutX="40.0" layoutY="14.0" />
+      <TableView fx:id="rolesTableView" layoutX="10.0" layoutY="60.0" maxHeight="-Infinity" maxWidth="600.0" minHeight="-Infinity" minWidth="313.0" prefHeight="315.0" prefWidth="313.0" style="-fx-background-color: white;">
+        <columns>
+          <TableColumn fx:id="mesesColumna" prefWidth="190.0" text="Meses" />
+            <TableColumn fx:id="cuartoColumna" prefWidth="117.0" style="-fx-alignment: center;" text="Decimo Cuarto" />
+        </columns>
+      </TableView>
+      <Label fx:id="errorText" layoutX="330.0" layoutY="408.0" prefHeight="17.0" prefWidth="353.0" textFill="#d00b0b" />
+      <Label fx:id="empleadoLabel" layoutX="16.0" layoutY="7.0" prefHeight="20.0" prefWidth="389.0" text="Empleado" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="sueldoLabel" layoutX="16.0" layoutY="30.0" text="Sueldo" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="periodoLabel" alignment="CENTER" layoutX="329.0" layoutY="61.0" prefHeight="51.0" prefWidth="282.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="346.0" layoutY="156.0" prefHeight="20.0" prefWidth="183.0" text="Decimo cuarto acumulado:" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="346.0" layoutY="219.0" prefHeight="20.0" prefWidth="150.0" text="Monto a cobrar:" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Line endX="150.0" layoutX="437.0" layoutY="211.0" startX="-100.0" />
+      <Label fx:id="valorLabel" alignment="CENTER_RIGHT" layoutX="527.0" layoutY="156.0" prefHeight="20.0" prefWidth="73.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="aporteLabel" alignment="CENTER_RIGHT" layoutX="516.0" layoutY="182.0" prefHeight="20.0" prefWidth="60.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="cobrarLabel" alignment="CENTER_RIGHT" layoutX="527.0" layoutY="219.0" prefHeight="20.0" prefWidth="73.0" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="buttonPagar" disable="true" layoutX="450.0" layoutY="312.0" mnemonicParsing="false" onAction="#pagarDecimos" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" />
+      <Button fx:id="buttonBorrar" layoutX="491.0" layoutY="312.0" mnemonicParsing="false" onAction="#borrarPago" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/borrar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" visible="false" />
+      <Button fx:id="buttonImprimir" layoutX="409.0" layoutY="312.0" mnemonicParsing="false" onAction="#reimprimirRecibo" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" visible="false" />
+      <Label fx:id="inicioLabel" alignment="CENTER_RIGHT" layoutX="443.0" layoutY="12.0" prefHeight="20.0" prefWidth="150.0" text="Inicio" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="textPago" layoutX="401.0" layoutY="264.0" text="Ya se ha hecho este pago." textFill="#ffeb7c" underline="true" />
+    </children>
+</AnchorPane>
