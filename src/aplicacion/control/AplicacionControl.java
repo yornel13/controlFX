@@ -98,7 +98,6 @@ public class AplicacionControl extends Application {
     
     public void mostrarLogin() {
         try {
-            System.out.println("aplicacion.control.AplicacionControl.mostarLogin()");
             FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaLogin.fxml"));
             AnchorPane ventanaLogin = (AnchorPane) loader.load();
             Stage ventana = new Stage();
@@ -727,6 +726,51 @@ public class AplicacionControl extends Application {
         }
     }
     
+    public void mostrarFondoReservaEmpleados(Empresa empresa, Stage stage) {
+        if (permisos == null) {
+           noLogeado();
+        } else {
+            if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
+                try {
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaFondoReservaEmpleados.fxml"));
+                    AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
+                    Stage ventana = new Stage();
+                    ventana.setTitle("Fondo de Reserva");
+                    String stageIcon = AplicacionControl.class.getResource("imagenes/security_dialog.png").toExternalForm();
+                    ventana.getIcons().add(new Image(stageIcon));
+                    ventana.setResizable(false);
+                    ventana.setWidth(800);
+                    ventana.setHeight(628);
+                    ventana.initOwner(stagePrincipal);
+                    Scene scene = new Scene(ventanaEmpleados);
+                    ventana.setScene(scene);
+                    FondoReservaEmpleadosController controller = loader.getController();
+                    controller.setStagePrincipal(ventana);
+                    controller.setProgramaPrincipal(this);
+                    controller.setEmpresa(empresa);
+                    insertarDatosDeUsuarios(controller.login, controller.usuarioLogin);
+                    Platform.setImplicitExit(false);
+                    ventana.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                        @Override
+                        public void handle(WindowEvent event) {
+                            cerrarWindows();
+                            event.consume();
+                        }
+                    });
+                    ventana.show();
+                    au.saveRegistro(au.INGRESO, au.PAGOS, permisos.getUsuario(), null);
+ 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    //tratar la excepción
+                }
+            } else {
+              noPermitido();
+            }
+        }
+    }
+    
     public void mostrarAjusteTerceroEmpleados(Empresa empresa, Stage stage) {
         if (permisos == null) {
            noLogeado();
@@ -997,14 +1041,14 @@ public class AplicacionControl extends Application {
         }
     }
     
-    public void mostrarPlanillaIess(Empresa empresa, Stage stage) {
+    public void mostrarHistorialLaboral(Empresa empresa, Stage stage) {
         if (permisos == null) {
            noLogeado();
         } else {
             if (permisos.getPermiso(Permisos.GESTION, Permisos.Nivel.VER)) {
                 try {
                     stage.close();
-                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaPlanillaIess.fxml"));
+                    FXMLLoader loader = new FXMLLoader(AplicacionControl.class.getResource("ventanas/VentanaHistorialLaboral.fxml"));
                     AnchorPane ventanaEmpleados = (AnchorPane) loader.load();
                     Stage ventana = new Stage();
                     ventana.setTitle("Historial Laboral");
@@ -1016,7 +1060,7 @@ public class AplicacionControl extends Application {
                     ventana.initOwner(stagePrincipal);
                     Scene scene = new Scene(ventanaEmpleados);
                     ventana.setScene(scene);
-                    PlanillaIessController controller = loader.getController();
+                    HistorialLaboralController controller = loader.getController();
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpresa(empresa);

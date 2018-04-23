@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.reports.ReporteRolDecimoTercero;
 import aplicacion.control.tableModel.EmpleadoTable;
+import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fecha;
@@ -129,9 +130,9 @@ public class DecimoTerceroDetallesController implements Initializable {
     @FXML
     private Label textPago;
     
-    public ObservableList<RolIndividual> data;
+    public ObservableList<PagosTable> data;
     
-    ArrayList<RolIndividual> rolIndividuales;
+    ArrayList<PagosTable> pagosTable;
     
     Date inicio;
     Date fin;
@@ -239,8 +240,7 @@ public class DecimoTerceroDetallesController implements Initializable {
                     + " - Tel: " + empresa.getTelefono1());
             parametros.put("devengado", Numeros.round(pagoDecimo.getMonto()).toString());
             parametros.put("cobrar", Numeros.round(pagoDecimo.getMonto()).toString());
-            parametros.put("lapso", "del 1 de Ene "+String.valueOf(Integer.valueOf(year)-1)
-                         +" al 31 de Dic "+String.valueOf(Integer.valueOf(year)-1));
+            parametros.put("lapso", "del "+periodoLiquidacion);
 
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -257,15 +257,13 @@ public class DecimoTerceroDetallesController implements Initializable {
                 CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
                         user.getEmail(), Const.ASUNTO_PAGO_DECIMO_TERCERO, 
                         "Recibo del pago del decimo tercero acumulado desde el " 
-                                + "1 de Ene "+String.valueOf(Integer.valueOf(year)-1) 
-                                + " hasta el "
-                                + "31 de Dic "+String.valueOf(Integer.valueOf(year)-1), 
+                                +periodoLiquidacion, 
                         pdf.getPath(), filename + ".pdf");
             }
 
         } catch (JRException | IOException ex) {
             Logger.getLogger(PagoMensualDetallesController.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        }  
         dialogoCompletado();
     }
     
@@ -274,14 +272,14 @@ public class DecimoTerceroDetallesController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("Rol individua");
+        dialogStage.setTitle("Decimo Tercero");
         String stageIcon = AplicacionControl.class.getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Guardar Documento");
         Button buttonNoDocumento = new Button("No Guardar");
         CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Ya se hizo el pago de vacaciones del empleado, \n"
+        children(new Text("Ya se hizo el pago de decimo tercero de este año del empleado, \n"
                 + " ¿Desea guardar el documento de pago nuevamente?."), 
                 buttonSiDocumento, buttonNoDocumento, enviarCorreo).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
@@ -355,7 +353,6 @@ public class DecimoTerceroDetallesController implements Initializable {
     void hacerBorrado() {
         
         if (pagoDecimo.getId() != null) {
-            System.out.println("test id "+pagoDecimo.getId());
             new PagoDecimoDAO().delete(pagoDecimo);
             HibernateSessionFactory.getSession().flush();
             String detalles = "elemino el pago de decimo tercero numero " + pagoDecimo.getId()
@@ -383,7 +380,7 @@ public class DecimoTerceroDetallesController implements Initializable {
     public void hacerPago() {
         pagoDecimo = new PagoDecimo();
         pagoDecimo.setUsuario(empleadoTable.getUsuario());
-        pagoDecimo.setFecha(new Timestamp(Integer.valueOf(year)-1-1899, 0, 1, 0, 0, 0, 0));
+        pagoDecimo.setFecha(new Timestamp(Integer.valueOf(year)-1900, 0, 1, 0, 0, 0, 0));
         pagoDecimo.setMonto(empleadoTable.getDecimo3());
         pagoDecimo.setDecimo(Const.DECIMO_TERCERO);
         new PagoDecimoDAO().save(pagoDecimo);
@@ -546,8 +543,8 @@ public class DecimoTerceroDetallesController implements Initializable {
             valor = 0d;
             aCobrar = 0d;
             sueldo = empleadoTable.getUsuario().getDetallesEmpleado().getSueldo();
-            for (RolIndividual rol: empleadoTable.getRolesInds()) {
-                valor += rol.getDecimoTercero();
+            for (Double decimo: empleadoTable.getDecimosMes()) {
+                valor += decimo;
             }
 
             aCobrar = valor ;
@@ -579,10 +576,17 @@ public class DecimoTerceroDetallesController implements Initializable {
         inicioLabel.setText("A pagar en "+year);
         empleadoLabel.setText(empleadoTable.getApellido()+" "+empleadoTable.getNombre());
         
-        rolIndividuales = new ArrayList<>();
-        rolIndividuales.addAll(empleadoTable.getRolesInds());
+        pagosTable = new ArrayList<>();
+        for (RolIndividual rol: empleadoTable.getRolesInds()) {
+            PagosTable pago = new PagosTable();
+            pago.setInicio(rol.getInicio());
+            pago.setFinalizo(rol.getFinalizo());
+            pago.setTercero(empleadoTable.getDecimosMes()
+                    .get(empleadoTable.getRolesInds().indexOf(rol)));
+            pagosTable.add(pago);
+        }
         data = FXCollections.observableArrayList();
-        data.addAll(rolIndividuales);
+        data.addAll(pagosTable);
         
         rolesTableView.setItems(data);
         buttonPagar.setVisible(false);
@@ -592,10 +596,10 @@ public class DecimoTerceroDetallesController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         
         mesesColumna.setCellValueFactory(new Callback<TableColumn
-                .CellDataFeatures<RolIndividual, String>, ObservableValue<String>>() {
+                .CellDataFeatures<PagosTable, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TableColumn
-                    .CellDataFeatures<RolIndividual, String> data) {
+                    .CellDataFeatures<PagosTable, String> data) {
                 
                 Fecha fec = new Fecha(data.getValue().getInicio());
                 String fechaToTable = fec.getMonthName()+" "+fec.getAno();
@@ -603,7 +607,7 @@ public class DecimoTerceroDetallesController implements Initializable {
                 return new ReadOnlyStringWrapper(fechaToTable);
             }
         });
-        terceroColumna.setCellValueFactory(new PropertyValueFactory<>("decimoTercero"));
+        terceroColumna.setCellValueFactory(new PropertyValueFactory<>("tercero"));
         
         rolesTableView.setEditable(Boolean.FALSE);
         

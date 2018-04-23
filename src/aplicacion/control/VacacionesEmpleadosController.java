@@ -544,14 +544,16 @@ public class VacacionesEmpleadosController implements Initializable {
             for (EmpleadoTable empleado: data) {
                 if (empleado.getEditado()) {
                     DiasVacaciones diasVacaciones = new DiasVacaciones();
-                    diasVacaciones.setUsuario(empleado.getUsuario());
+                    diasVacaciones.setUsuario(new UsuarioDAO()
+                            .findById(empleado.getUsuario().getId()));
                     diasVacaciones.setAumentado(Boolean.TRUE);
                     diasVacaciones.setActivo(Boolean.TRUE);
                     diasVacaciones.setDias(Integer.valueOf(empleado.getDiasVacaciones()));
                     diasVacaciones.setFecha(new Timestamp(new Date().getTime()));
                     new DiasVacacionesDAO().save(diasVacaciones);
                     if (empleado.getObjectVacaciones() != null) {
-                        new DiasVacacionesDAO().delete(empleado.getObjectVacaciones());
+                        new DiasVacacionesDAO().delete(new DiasVacacionesDAO()
+                                .findById(empleado.getObjectVacaciones().getId()));
                         HibernateSessionFactory.getSession().flush();
                     }
                     
@@ -562,15 +564,16 @@ public class VacacionesEmpleadosController implements Initializable {
                             aplicacionControl.permisos.getUsuario());
                 }
             }
-            DiasVacacionesDAO diasDAO = new DiasVacacionesDAO();
+            /*DiasVacacionesDAO diasDAO = new DiasVacacionesDAO();
             diasVac = new ArrayList<>();
             diasVac = (ArrayList<DiasVacaciones>) diasDAO.findAllByEmpresaId(empresa.getId());
             for (DiasVacaciones diass: diasVac) {
                 System.out.println(diass.getDias());
-            }
+            }*/
             Platform.runLater(new Runnable() {
                 @Override public void run() {
-                    setTableInfo();
+                    HibernateSessionFactory.getSession().clear();
+                    setEmpresa(empresa);
                     closeDialogMode();
                     guardadoCompletado();
                 }

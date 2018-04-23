@@ -67,6 +67,7 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import javafx.scene.control.ChoiceBox;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

@@ -63,6 +63,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

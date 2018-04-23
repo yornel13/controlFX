@@ -78,6 +78,7 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.GuardarText;
 import aplicacion.control.util.Numeros;
 import java.util.regex.Pattern;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -713,26 +714,26 @@ public class ReportesEmpleadosController implements Initializable {
         }
     }
     
-    public void dialogoCompletado() {
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setResizable(false);
-        dialogStage.setTitle("Reporte");
-        String stageIcon = AplicacionControl.class
-                .getResource("imagenes/completado.png").toExternalForm();
-        dialogStage.getIcons().add(new Image(stageIcon));
-        Button buttonOk = new MaterialDesignButtonBlue("OK");
-        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Completado."), buttonOk).
-        alignment(Pos.CENTER).padding(new Insets(10)).build()));
-        buttonOk.setOnAction((ActionEvent e) -> {
-            dialogStage.close();
-        });
-        buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-            dialogStage.close();
-        });
-        dialogStage.showAndWait();
-    }
+        public void dialogoCompletado() {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Reporte");
+            String stageIcon = AplicacionControl.class
+                    .getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new MaterialDesignButtonBlue("OK");
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+            children(new Text("Completado."), buttonOk).
+            alignment(Pos.CENTER).padding(new Insets(10)).build()));
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
+                dialogStage.close();
+            });
+            dialogStage.showAndWait();
+        }
     
     @FXML
     public void dialogoImprimir(ActionEvent event) {

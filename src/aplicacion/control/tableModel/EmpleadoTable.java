@@ -59,6 +59,7 @@ public class EmpleadoTable {
      public ArrayList<PagoMes> pagosMensuales;
     public ArrayList<RolCliente> pagos;
     public ArrayList<RolIndividual> rolesInds;
+    public ArrayList<Double> decimosMes;
     public RolIndividual rolIndividual;
     public Boolean problem;
     public PagoQuincena pagoQuincena;
@@ -723,6 +724,14 @@ public class EmpleadoTable {
 
     public void setPagoDecimo(PagoDecimo pagoDecimo) {
         this.pagoDecimo = pagoDecimo;
+    }
+
+    public ArrayList<Double> getDecimosMes() {
+        return decimosMes;
+    }
+
+    public void setDecimosMes(ArrayList<Double> decimosMes) {
+        this.decimosMes = decimosMes;
     }
     
     

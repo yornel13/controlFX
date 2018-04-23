@@ -99,6 +99,8 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import hibernate.dao.CuotaDeudaDAO;
 import hibernate.model.CuotaDeuda;
 import net.sf.jasperreports.engine.JREmptyDataSource;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -414,7 +416,7 @@ public class PagoMensualPagadoController implements Initializable {
             parametros.put("empresa", empleado.getDetallesEmpleado().getEmpresa().getNombre());
             parametros.put("numero", rolIndividual.getId().toString()); 
             parametros.put("lapso", getFechaConMes(inicio) + " al " + getFechaConMes(fin));
-            parametros.put("total", round(aPercibirValor).toString());
+                parametros.put("total", round(aPercibirValor).toString());
             parametros.put("fecha_recibo", Fechas.getFechaConMes(rolIndividual.getFecha()));
             parametros.put("horas_detallado", horasDetallado);
             

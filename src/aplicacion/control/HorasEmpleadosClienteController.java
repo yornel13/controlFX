@@ -98,6 +98,10 @@ import javafx.scene.control.ChoiceBox;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -568,7 +572,7 @@ public class HorasEmpleadosClienteController implements Initializable {
         Double totalVacacionesDouble = round(getVacaciones(empleado, sueldoSinVacaciones));
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
-                + totalBonosDouble + totalVacacionesDouble);
+                + totalBonosDouble);
         ////////////////////////////////////////////////////
         Double decimoTercero = round(subTotalDouble / 12d);
         Double decimoCuarto = round(getDecimoCuarto()/30d * diasDecimo4to);

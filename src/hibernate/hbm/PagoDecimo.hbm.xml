@@ -10,10 +10,10 @@
       <generator class="identity"/>
     </id>
     <many-to-one class="hibernate.model.Usuario" fetch="select" name="usuario">
-      <column name="usuario_id" not-null="true"/>
+      <column name="usuario_id" not-null="false"/>
     </many-to-one>
     <property name="monto" type="java.lang.Double">
-      <column name="monto" not-null="true" precision="8"/>
+      <column name="monto" not-null="false" precision="8"/>
     </property>
     <property name="fecha" type="java.sql.Timestamp">
       <column length="19" name="fecha" not-null="true"/>

@@ -98,6 +98,8 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import hibernate.dao.CuotaDeudaDAO;
 import hibernate.model.CuotaDeuda;
 import net.sf.jasperreports.engine.JREmptyDataSource;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -855,16 +857,7 @@ public class PagoMensualDetallesController implements Initializable {
             montoAportePatronalTextValor += pago.getAportePatronal(); // No Visible en ventana
             montoSegurosTextValor += pago.getSeguros(); // No Visible en ventana
             montoUniformasTextValor += pago.getUniformes(); // No Visible en ventana
-            
-            if (!empleado.getDetallesEmpleado().getAcumulaDecimos()) {
-                decimoTerceroTotalTextValor -= pagoTable.getVacaciones()/12;
-                decimosTotalTextValor -= pagoTable.getVacaciones()/12;
-                totalTextValor -= pagoTable.getVacaciones()/12;
-            }
         });
-        
-        subTotalTextValor -= vacacionesTextValor;
-        decimoTerceroTotalTextValor = round(subTotalTextValor / 12);
         
         data = FXCollections.observableArrayList(); 
         data.addAll(pagosTable);
@@ -922,9 +915,9 @@ public class PagoMensualDetallesController implements Initializable {
         
         // Calculando montos
         if (empleado.getDetallesEmpleado().getAcumulaDecimos()) {
-            ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor;
+            ingresoValor = subTotalTextValor;
         } else {
-            ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor + decimosTotalTextValor;
+            ingresoValor = subTotalTextValor + decimosTotalTextValor;
             {
                 PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Decimo Tercero");

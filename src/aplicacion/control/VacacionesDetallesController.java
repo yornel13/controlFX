@@ -15,7 +15,6 @@ import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
 import aplicacion.control.util.Numeros;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ConstanteDAO;
@@ -24,8 +23,6 @@ import hibernate.dao.PagoVacacionesDAO;
 import hibernate.model.Constante;
 import hibernate.model.ControlDiario;
 import hibernate.model.Empresa;
-import hibernate.model.PagoMes;
-import hibernate.model.PagoMesItem;
 import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
 import java.io.File;
@@ -37,7 +34,9 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -82,6 +81,7 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -147,6 +147,18 @@ public class VacacionesDetallesController implements Initializable {
     private Label cobrarLabel;
     
     @FXML
+    private Label mes1;
+    
+    @FXML
+    private Label mes2;
+    
+    @FXML
+    private Label montoMes1;
+    
+    @FXML
+    private Label montoMes2;
+    
+    @FXML
     private DatePicker datePicker;
     
     @FXML
@@ -163,7 +175,7 @@ public class VacacionesDetallesController implements Initializable {
     
     public ObservableList<PagosTable> data;
     
-    ArrayList<PagosTable> pagosTables;
+    List<PagosTable> pagosTable;
     
     Date inicio;
     Date fin;
@@ -173,6 +185,10 @@ public class VacacionesDetallesController implements Initializable {
     Double aCobrar;
     Integer dias;
     Double sueldo;
+    
+    private Integer mes1int, mes2int;
+    private Integer dias1int, dias2int;
+    private Double montoMes1Dou, montoMes2Dou;
     
     Stage dialogLoading;
     
@@ -195,15 +211,21 @@ public class VacacionesDetallesController implements Initializable {
     @FXML
     public void onPicketAction(ActionEvent event) {
         inicio = Date.valueOf(datePicker.getValue());
-        fin = DateUtil.addDays(inicio, empleadoTable.getObjectVacaciones().getDias()-1);
+        fin = DateUtil.addDays(inicio, dias-1);
+        setPeriodoGoceLabel();
         
+        if (pagosTable != null && !pagosTable.isEmpty()) {
+            buttonPagar.setDisable(false);
+            setBothMonths();
+        }
+    }
+    
+    private void setPeriodoGoceLabel() {
+        if (inicio != null && fin != null)
         periodoLabel.setText("Goce del "
                 +DateUtil.getShortDate(inicio)
                 +" al "+
                 DateUtil.getShortDate(fin));
-        
-        if (pagosTables != null && !pagosTables.isEmpty())
-            buttonPagar.setDisable(false);
     }
     
     @FXML
@@ -255,7 +277,7 @@ public class VacacionesDetallesController implements Initializable {
         for (RolIndividual rol: 
                 empleadoTable.rolesInds) {
             for (PagosTable pago: 
-                    pagosTables) {
+                    pagosTable) {
                 if (pago.getInicio().equals(rol.getInicio())) {
                     if (pago.getModificar()) {
                         rol.setEmpresa(pago.getDevengado());
@@ -271,8 +293,7 @@ public class VacacionesDetallesController implements Initializable {
             }
         }
         HibernateSessionFactory.getSession().flush();
-        setEmpleado(empleadoTable, periodoLiquidacion);
-        buttonGuardar.setVisible(false);
+        setTableInfo();
         devangadoCompletada();
     }
     
@@ -363,7 +384,7 @@ public class VacacionesDetallesController implements Initializable {
         dialogWait();
         
         ReporteRolVacaciones datasource = new ReporteRolVacaciones();
-        datasource.addAll(pagosTables);
+        datasource.addAll(pagosTable);
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_ROL_VACACIONES);
@@ -397,6 +418,22 @@ public class VacacionesDetallesController implements Initializable {
             Integer anios = empleadoTable.getFechaFin().getAnoInt() - contratoDate.getYear();
             parametros.put("anios", anios.toString());
             parametros.put("lapso", periodoLiquidacion);
+            if (montoMes1Dou != null && montoMes2Dou != null) {
+                parametros.put("mes1", dias1int+" dias en "+Fechas.getMonthName(mes1int));
+                parametros.put("mes2", dias2int+" dias en "+Fechas.getMonthName(mes2int));
+                parametros.put("puntos1", ":");
+                parametros.put("puntos2", ":");
+                parametros.put("monto1", "$"+montoMes1Dou.toString());
+                parametros.put("monto2", "$"+montoMes2Dou.toString());
+            } else {
+                parametros.put("mes1", "");
+                parametros.put("mes2", "");
+                parametros.put("puntos1", "");
+                parametros.put("puntos2", "");
+                parametros.put("monto1", "");
+                parametros.put("monto2", "");
+            }
+            
             
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -723,142 +760,189 @@ public class VacacionesDetallesController implements Initializable {
         this.periodoLiquidacion = periodo;
         this.empleadoTable = empleadoTable;
         this.empresa = empleadoTable.getUsuario().getDetallesEmpleado().getEmpresa();
+        this.pagoVacaciones = empleadoTable.getPagoVacaciones();
+        setTableInfo();
+    }
+    
+    private void setTableInfo() {
         buttonGuardar.setVisible(false);
         
-        if (empleadoTable.getPagoVacaciones() == null) {
-            rolesTableView.setEditable(Boolean.TRUE);
+        pagosTable = new ArrayList<>();
+        dias = 0;
+        devengado = 0d;
+        valor = 0d;
+        deduccion = 0d;
+        aCobrar = 0d;
         
-            devengado = 0d;
-            valor = 0d;
-            deduccion = 0d;
-            aCobrar = 0d;
+        // * Calculando Dias de derecho a vacaciones
+        if (pagoVacaciones == null) {
             dias = empleadoTable.getObjectVacaciones().getDias();
-            sueldo = empleadoTable.getUsuario().getDetallesEmpleado().getSueldo();
-            // falta anios
-            for (PagoMes pagoMes: empleadoTable.getPagosMensuales()) {
-                for (PagoMesItem pagoMesItem: pagoMes.getPagosItems()){
-                    if (pagoMesItem.getIngreso() != null) {
-                        devengado += pagoMesItem.getIngreso();
-                    }
-                }
-            }
-            for (RolIndividual rol: empleadoTable.getRolesInds()) {
-                valor += rol.getVacaciones();
-            }
-
-            deduccion = (valor/100d) * getIess();
-            aCobrar = valor - deduccion;
-
-            sueldoLabel.setText("Sueldo: $"+sueldo.toString());
-            diasLabel.setText("Dias de vacaciones:  "+dias.toString());
-            devengadoLabel.setText("Devengada anual:  $"+Numeros.round(devengado).toString());
-            valorLabel.setText("$"+Numeros.round(valor).toString());
-            aporteLabel.setText("$"+Numeros.round(deduccion).toString());
-            cobrarLabel.setText("$"+Numeros.round(aCobrar).toString());
-            
+            ConstanteDAO cdao = new ConstanteDAO();                          
+            Constante vacaciones = cdao.findUniqueResultByNombre("vacaciones");
+            Integer diferencia = Integer.valueOf(vacaciones.getValor()) - empleadoTable.getFechaInicio().getAnoInt();
+            dias = dias - diferencia;
+            if (dias < 15) dias = 15;
         } else {
-            rolesTableView.setEditable(Boolean.FALSE);
-            
-            pagoVacaciones = empleadoTable.getPagoVacaciones();
-            
-            sueldoLabel.setText("Sueldo: $"+pagoVacaciones.getSueldo().toString());
-            diasLabel.setText("Dias de vacaciones:  "+pagoVacaciones.getDias().toString());
-            devengadoLabel.setText("Devengada anual:  $"+Numeros.round(pagoVacaciones.getDevengado()).toString());
-            valorLabel.setText("$"+Numeros.round(pagoVacaciones.getValor()).toString());
-            aporteLabel.setText("$"+Numeros.round(pagoVacaciones.getAporte()).toString());
-            cobrarLabel.setText("$"+Numeros.round(pagoVacaciones.getMonto()).toString());
-            periodoLabel.setText("Goce del "+Fechas.getFechaCorta(pagoVacaciones.getGoceInicio())
-                        +" al "+
-                        Fechas.getFechaCorta(pagoVacaciones.getGoceFin()));
-            
-            buttonPagar.setVisible(false);
-            buttonBorrar.setVisible(true);
-            buttonImprimir.setVisible(true);
-            datePicker.setDisable(true);
-            
+            dias = pagoVacaciones.getDias();   
         }
-        ///////////////////////Dias Faltantes//////////////////////////////////
-        ControlDiarioDAO controlDAO = new ControlDiarioDAO();
-
-        ArrayList<ControlDiario> controlesEmpleado = new ArrayList<>();
-
-        controlesEmpleado.addAll(controlDAO
-            .findAllByEmpleadoIdInDeterminateTime(empleadoTable.getId(), 
-                    empleadoTable.getFechaInicio().getFecha(), 
-                    empleadoTable.getFechaFin().getFecha()));
- 
-        ArrayList<PagosTable> pagos = new ArrayList<>();
+        /*******************************************************/
+        /***************Creando data para tabla*****************/
+        /*******************************************************/
         for (RolIndividual rol: empleadoTable.getRolesInds()) {
             PagosTable pago = new PagosTable();
             pago.setDias(rol.getDias());
             pago.setInicio(rol.getInicio());
             pago.setFinalizo(rol.getFinalizo());
             pago.setVacaciones(rol.getVacaciones());
-            pago.setDevengado("0");
+            pago.setDevengado(rol.getSubtotal().toString());
             pago.setModificar(Boolean.FALSE);
             
-            for (PagoMes pagoMes: empleadoTable.getPagosMensuales()) {
-                if (rol.getInicio().equals(pagoMes.getInicioMes())) {
-                    for (PagoMesItem pagoMesItem: pagoMes.getPagosItems()){
-                        if (pagoMesItem.getIngreso() != null) {
-                            Double monto = Double.valueOf(pago.getDevengado())
-                                    + pagoMesItem.getIngreso();
-                            pago.setDevengado(Numeros.round(monto).toString());
-                        }
-                    }
-                }
-            }
-            
+            /*******************************************************/
+            /*********Obteniendo nuevo valor de ingreso*************/
+            /*******************************************************/
             try {
                 Double devengadoNew = round(rol.getEmpresa());
                 if (devengadoNew.compareTo(-1d) == 1) {
                     pago.setDevengado(devengadoNew.toString());
+                    pago.setVacaciones(round((devengadoNew/360d)*dias.doubleValue()));
                 }
             } catch (NumberFormatException ex) {
                 // Nothing to do
             }
-            pagos.add(pago);
-        }
-        
-
-        for (ControlDiario control: controlesEmpleado) {
-            for (PagosTable pago: pagos) {
+            /*******************************************************/
+            /******Agregando dias de que estuvo de vacaciones*******/
+            /*******************************************************/
+            List<ControlDiario> controlesEmpleado = new ArrayList<>();
+            controlesEmpleado.addAll(new ControlDiarioDAO()
+            .findAllByEmpleadoIdInDeterminateTime(empleadoTable.getId(), 
+                    empleadoTable.getFechaInicio().getFecha(), 
+                    empleadoTable.getFechaFin().getFecha()));
+            for (ControlDiario control: controlesEmpleado) {
                 if (new Fecha(pago.getInicio()).getMesInt()
                         .equals(new Fecha(control.getFecha()).getMesInt())) {
                     if (control.getCaso().equalsIgnoreCase(Const.VACACIONES)) {
                             pago.setDias(pago.getDias()+1);
-                        } 
+                    } 
                 }
+            
             }
+            pagosTable.add(pago);
         }
         
-        if (empleadoTable.getPagoVacaciones() == null) {
-           Double ptD = 0d;
-           for (PagosTable pt :
-                   pagos) {
-               ptD += round(pt.getDevengado());
-               
-           } 
-           
-           devengado = ptD;
-           devengadoLabel.setText("Devengada anual:  $"+Numeros.round(devengado).toString());
-        }   
-        //////////////////////////////////////////////////////////////////// 
+        /*******************************************************/
+        /******************Obteniendo valores*******************/
+        /*******************************************************/
+        if (pagoVacaciones == null) {
+            rolesTableView.setEditable(Boolean.TRUE);
+            // * Sueldo
+            sueldo = empleadoTable.getUsuario().getDetallesEmpleado().getSueldo();
+            // * Devengado anual
+            for (PagosTable pt : 
+                    pagosTable) {
+                devengado += round(pt.getDevengado()); 
+            }
+            // * Valor de Vacaciones
+            for (PagosTable pt : 
+                    pagosTable) {
+                valor += pt.getVacaciones();
+            }
+            valor = (devengado/360d)*dias.doubleValue();
+            // * Valor aporte IESS
+            deduccion = (valor/100d) * getIess();
+            // * Monto a cobrar
+            aCobrar = valor - deduccion;
+        } else {
+            rolesTableView.setEditable(Boolean.FALSE);
+            inicio = pagoVacaciones.getGoceInicio();
+            fin = pagoVacaciones.getGoceFin();
+            sueldo = pagoVacaciones.getSueldo();
+            devengado = pagoVacaciones.getDevengado();
+            valor = pagoVacaciones.getValor();
+            deduccion = pagoVacaciones.getAporte();
+            aCobrar = pagoVacaciones.getMonto();
+            setPeriodoGoceLabel();
+            
+            buttonPagar.setVisible(false);
+            buttonBorrar.setVisible(true);
+            buttonImprimir.setVisible(true);
+            datePicker.setDisable(true);
+        }
         
         Timestamp timestamp = empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio();
-        DateTime contratoDate = new DateTime(timestamp.getTime());
-        Integer anios = empleadoTable.getFechaFin().getAnoInt() - contratoDate.getYear();
-
-        aniosLabel.setText("Años de servicio: "+anios.toString());
-        inicioLabel.setText("Inicio "+Fechas.getFechaCorta(contratoDate));
+        DateTime contrateDate = new DateTime(timestamp.getTime());
+        Integer anios = empleadoTable.getFechaFin().getAnoInt() - contrateDate.getYear();
+        
+        /*******************************************************/
+        /*************Mostrando valores en vista****************/
+        /*******************************************************/
         empleadoLabel.setText(empleadoTable.getApellido()+" "+empleadoTable.getNombre());
-        
-        pagosTables = new ArrayList<>();
-        pagosTables.addAll(pagos);
+        sueldoLabel.setText("Sueldo: $"+sueldo.toString());
+        inicioLabel.setText("Inicio "+Fechas.getFechaCorta(contrateDate));
+        devengadoLabel.setText("Devengada anual:  $"+Numeros.round(devengado).toString());
+        aniosLabel.setText("Años de servicio: "+anios.toString());
+        diasLabel.setText("Dias de vacaciones:  "+dias.toString());
+        valorLabel.setText("$"+Numeros.round(valor).toString());
+        aporteLabel.setText("$"+Numeros.round(deduccion).toString());
+        cobrarLabel.setText("$"+Numeros.round(aCobrar).toString());
+         
         data = FXCollections.observableArrayList();
-        data.addAll(pagosTables);
-        
+        data.addAll(pagosTable);
         rolesTableView.setItems(data);
+        setBothMonths();
+    }
+    
+    private void setBothMonths() {
+        if (inicio != null && fin != null) {
+        
+            Calendar calIni = Calendar.getInstance();
+            calIni.setTime(inicio);
+            Calendar calFin = Calendar.getInstance();
+            calFin.setTime(fin);
+            
+            mes1int = calIni.get(Calendar.MONTH)+1;
+            mes2int = calFin.get(Calendar.MONTH)+1;
+            if (mes1int != mes2int) {
+                if (mes1int+1 == mes2int) {
+                    dias2int = calFin.get(Calendar.DAY_OF_MONTH);
+                    dias1int = dias - dias2int;
+                    mes1.setText(dias1int+" dias en "+Fechas.getMonthName(mes1int)+":");
+                    mes2.setText(dias2int+" dias en "+Fechas.getMonthName(mes2int)+":");
+                    Double valorDia = valor/(dias);
+                    montoMes1Dou = round(valorDia*dias1int);
+                    montoMes2Dou = round(valorDia*dias2int);
+                    montoMes1.setText("$"+montoMes1Dou.toString());
+                    montoMes2.setText("$"+montoMes2Dou.toString());
+                } else {
+                   mes1.setText("");
+                    mes2.setText("");
+                    montoMes1.setText("");
+                    montoMes2.setText(""); 
+                }
+            } else {
+                mes1.setText("");
+                mes2.setText("");
+                montoMes1.setText("");
+                montoMes2.setText("");
+            }
+        }
+    }
+    
+    private void sumDevengado() {
+        devengado = 0d;
+        valor = 0d;
+        for (PagosTable pt :
+                data) {
+            devengado += round(pt.getDevengado());
+            valor += round(pt.getVacaciones());
+
+        }
+        valor = (devengado/360d)*dias.doubleValue();
+        deduccion = (valor/100d) * getIess();
+        aCobrar = valor - deduccion;
+        valorLabel.setText("$"+Numeros.round(valor).toString());
+        aporteLabel.setText("$"+Numeros.round(deduccion).toString());
+        cobrarLabel.setText("$"+Numeros.round(aCobrar).toString());
+        devengadoLabel.setText("Devengada anual:  $"+Numeros.round(devengado).toString());
     }
     
     @Override
@@ -898,8 +982,13 @@ public class VacacionesDetallesController implements Initializable {
                                 .get(t.getTablePosition().getRow())); 
                     if (t.getOldValue() != null) {    
                         pagosTable.setDevengado(newValue.toString());
+                        if (newValue <= 0)  pagosTable.setVacaciones(0d);
+                        else pagosTable.setVacaciones(round((newValue/360d)
+                                *dias.doubleValue()));
                     }
                     data.set(data.indexOf(pagosTable), pagosTable);
+                    sumDevengado();
+                    setBothMonths();
                 }
             }
         );        vacacionesColumna.setCellValueFactory(new PropertyValueFactory<>("vacaciones"));

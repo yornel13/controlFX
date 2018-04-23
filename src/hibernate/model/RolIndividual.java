@@ -177,6 +177,10 @@ public class RolIndividual implements java.io.Serializable {
 	public void setMontoHorasSobreTiempo(Double montoHorasSobreTiempo) {
 		this.montoHorasSobreTiempo = montoHorasSobreTiempo;
 	}
+        
+        public Double getTotalMontoHorasExtras() {
+            return (this.montoHorasSobreTiempo+this.montoHorasSuplementarias);
+        } 
 
 	public Double getBono() {
 		return this.bono;
@@ -344,7 +348,6 @@ public class RolIndividual implements java.io.Serializable {
 
     public void setReserva(Double reserva) {
         this.reserva = reserva;
-    }
-
+    }  
         
 }

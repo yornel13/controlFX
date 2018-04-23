@@ -5,6 +5,7 @@
  */
 package aplicacion.control;
 
+import aplicacion.control.reports.ReporteDecimoGeneral;
 import aplicacion.control.reports.ReporteRolDecimoTercero;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
@@ -12,7 +13,9 @@ import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.MaterialDesignButtonBlue;
 import aplicacion.control.util.Numeros;
+import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.UsuarioDAO;
 import hibernate.model.Empresa;
 import hibernate.model.PagoQuincena;
@@ -90,11 +93,17 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
-import static aplicacion.control.util.Numeros.round;
 import aplicacion.control.util.Permisos;
 import hibernate.HibernateSessionFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.AnchorPane;
+import hibernate.dao.PagoVacacionesDAO;
+import hibernate.model.PagoVacaciones;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
+import javafx.scene.control.ChoiceBox;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 
 /**
  *
@@ -168,6 +177,9 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     @FXML
     private CheckBox checkBoxImpTodos;
     
+    @FXML
+    private Button buttonChange;
+    
     ArrayList<PagoQuincena> pagosQuincenal;
     private ArrayList<String> textosDAT;
     private ArrayList<String> textosTXT;
@@ -179,13 +191,18 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     
     ArrayList<PagoDecimo> pagosDecimo;
     
-    ArrayList<EmpleadoTable> empladosImprimir;
+    List<EmpleadoTable> empladosImprimir;
     
     Stage dialogLoading;
     
     Label loader;
     
     Integer count;
+    
+    PagoDecimoDAO pdDAO = new PagoDecimoDAO();
+    
+    PagoDecimo pdStart;
+    PagoDecimo pdEnd;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -203,6 +220,7 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     
     @FXML
     public void onClickLess(ActionEvent event) {
+        if (Integer.valueOf(yearLabel.getText()) > 2017)
         yearLabel.setText(String.valueOf(Integer.valueOf(yearLabel.getText())-1));
         setTableInfo();
     }
@@ -239,21 +257,19 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     private void impTodos(ActionEvent event) {
         for (EmpleadoTable empleadoTable: 
                 (List<EmpleadoTable>) empleadosTableView.getItems()) {
-            if (checkBoxImpTodos.isSelected()) {
-                if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
-                    empleadoTable.setAgregar(true);
-                } else {
-                    empleadoTable.setAgregar(false);
-                }
-            } else {
-                empleadoTable.setAgregar(false);
-            }
+            empleadoTable.setAgregar(checkBoxImpTodos.isSelected());
             data.set(data.indexOf(empleadoTable), empleadoTable);
         }
     }
     
     @FXML
     public void pagarAdelanto(ActionEvent event) {
+        
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getPagar()) empleadosTable.add(empleado);
+        } if (empleadosTable.isEmpty()) return;
+        
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -278,7 +294,6 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         buttonOk.setOnAction((ActionEvent e) -> {
             dialogStage.close();
             hacerPago();
-
         });
         buttonNo.setOnAction((ActionEvent e) -> {
             dialogStage.close();
@@ -289,13 +304,18 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     @FXML
     public void generarBank(ActionEvent event) {
         
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar()) empleadosTable.add(empleado);
+        } if (empleadosTable.isEmpty()) return;
+        
         textosDAT = new ArrayList<>();
         textosTXT = new ArrayList<>();
         for (EmpleadoTable empleadoTable: 
                 (List<EmpleadoTable>) data) {
-            if (empleadoTable.getAgregar() && empleadoTable.getPagado().equalsIgnoreCase("Si")) {
-                textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getPagoDecimo()));
-                textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getPagoDecimo()));
+            if (empleadoTable.getAgregar()) {
+                textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), empleadoTable.getDecimo3()));
+                textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), empleadoTable.getDecimo3()));
             }
         }
         if (textosDAT.size() > 0 && textosTXT.size() > 0) {
@@ -307,6 +327,14 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     
     @FXML
     public void imprimirGeneral(ActionEvent event) {
+        
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar()) empleadosTable.add(empleado);
+        } if (empleadosTable.isEmpty()) return;
+        
+        empladosImprimir = empleadosTable;
+        
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
@@ -315,7 +343,6 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonSiDocumento = new Button("Guardar Documento");
         Button buttonNoDocumento = new Button("No Guardar");
-        CheckBox enviarCorreo = new CheckBox("Enviar correo al empleado");
         HBox hBox = HBoxBuilder.create()
                 .spacing(10.0) //In case you are using HBoxBuilder
                 .padding(new Insets(5, 5, 5, 5))
@@ -324,9 +351,9 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                 .build();
         hBox.maxWidth(120);
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-        children(new Text("¿Desea imprimir el pago de decimos tercero"),
+        children(new Text("¿Desea imprimir el reporte general de decimos tercero"),
                 new Text("de los empleados seleccionados?"),
-                hBox, enviarCorreo).
+                hBox).
         alignment(Pos.CENTER).padding(new Insets(20)).build()));
         buttonSiDocumento.setMinWidth(50);
         buttonNoDocumento.setMinWidth(50);
@@ -334,26 +361,130 @@ public class PagoDecimoTerceroAnualController implements Initializable {
             File file = seleccionarDirectorio();
             if (file != null) {
                 dialogStage.close();
-                empladosImprimir = new ArrayList<>();
-                for (EmpleadoTable empleado: data) {
-                    if (empleado.getAgregar() && 
-                            empleado.getPagoDecimo() != null) {
-                        empladosImprimir.add(empleado);
-                    }
-                }
-                imprimir(file, enviarCorreo.isSelected());
+                imprimir(file);
             }
         });
         buttonNoDocumento.setOnAction((ActionEvent e) -> {
             dialogStage.close();
-            if (enviarCorreo.isSelected()) {
-                imprimir(null, enviarCorreo.isSelected());
-            } else {
-                dialogoCompletado();
-            }
         });
-        enviarCorreo.setSelected(true);
         dialogStage.showAndWait();
+    }
+    
+    public void imprimir(File file) {
+        
+        dialogWait();
+       
+        ReporteDecimoGeneral datasource = new ReporteDecimoGeneral();
+        datasource.addAll(empladosImprimir);
+        
+        try {
+            InputStream inputStream = new FileInputStream(Const.REPORTE_SUMATORIA_DECIMO_TERCERO);
+            String reportName = "Decimo Tercero";
+            
+            Map<String, Object> parametros = new HashMap();
+            parametros.put("empresa", empresa.getNombre());
+            parametros.put("lapso", pdStart.getStringFecha()+ " al "+pdEnd.getStringFecha());
+            
+            JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint;
+            if (empladosImprimir.isEmpty())
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+            else
+                jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
+            
+            String filename = reportName + " " + System.currentTimeMillis();
+            
+            if (file != null) {
+                JasperExportManager.exportReportToPdfFile(jasperPrint, file.getPath() + "\\" + filename +".pdf"); 
+            } 
+            
+            // Registro para auditar
+            String detalles = "genero el reporte de general de decimos tercero "
+                    + "de todos los empleado del "+pdStart.getStringFecha()
+                    + " al "+pdEnd.getStringFecha();
+            aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+            
+            dialogoCompletado();
+            
+            
+        } catch (JRException | IOException ex) {
+            Logger.getLogger(PagosTotalEmpleadoController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            dialogLoading.close();
+        }
+    }
+    
+    @FXML
+    private void cambiarFecha(ActionEvent event) {
+        
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Modificar Fecha");
+        String stageIcon = AplicacionControl.class.getResource("imagenes/icon_editar.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        MaterialDesignButtonBlue buttonConfirmar = new MaterialDesignButtonBlue("MODIFICAR");
+        ChoiceBox selectorMes = new ChoiceBox();
+        ChoiceBox selectorAno = new ChoiceBox();
+        ChoiceBox selectorMes2 = new ChoiceBox();
+        ChoiceBox selectorAno2 = new ChoiceBox();
+
+        selectorMes.setItems(Fechas.arraySpinnerMesText());
+        selectorAno.setItems(Fechas.arraySpinnerAnoCorto(pdEnd.getFecha().getYear()+1900));
+        selectorMes.getSelectionModel().select(pdEnd.getFecha().getMonth());
+        selectorAno.getSelectionModel().select(String.valueOf(pdEnd.getFecha().getYear()+1900));
+        
+        String[] mes2 = new String[1];
+        mes2[0] = Fechas.getMonthNameCort(pdStart.getFecha().getMonth()+1);
+        selectorMes2.setItems(FXCollections.observableArrayList(mes2));
+        String[] ano2 = new String[1];
+        ano2[0] = String.valueOf(pdStart.getFecha().getYear()+1900);
+        selectorAno2.setItems(FXCollections.observableArrayList(ano2));
+        selectorMes2.getSelectionModel().select(0);
+        selectorAno2.getSelectionModel().select(String.valueOf(pdStart.getFecha().getYear()+1900));
+        selectorMes2.setDisable(true);
+        selectorAno2.setDisable(true);
+
+        HBox hBox = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(0, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(selectorMes, selectorAno)
+                .build();
+        hBox.maxWidth(120);
+        
+         HBox hBox2 = HBoxBuilder.create()
+                .spacing(10.0) //In case you are using HBoxBuilder
+                .padding(new Insets(0, 5, 5, 5))
+                .alignment(Pos.CENTER)
+                .children(selectorMes2, selectorAno2)
+                .build();
+        hBox.maxWidth(120);
+
+        Text textStart = new Text("Fecha de pago (Desde)");
+        Text textEnd = new Text("Fecha de pago (Hasta)");
+
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+        children(textStart, hBox2, textEnd, hBox, buttonConfirmar).
+        alignment(Pos.CENTER).padding(new Insets(20)).build()));
+        buttonConfirmar.setOnAction((ActionEvent e) -> {
+
+            
+            Integer mesIndex = selectorMes.getSelectionModel().getSelectedIndex();
+            Integer anoInt = Integer.valueOf((String) selectorAno.getSelectionModel().getSelectedItem());
+            LocalDate now = LocalDate.of(anoInt, mesIndex+1, 1);
+            Integer dayMax = now.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth();
+            Timestamp newTime = new Timestamp(anoInt-1900, mesIndex, dayMax, 0, 0, 0, 0);
+            pdEnd = new PagoDecimo();
+            pdEnd.setFecha(newTime);
+            pdEnd.setMonto(Integer.valueOf(yearLabel.getText()).doubleValue());
+            pdEnd.setDecimo(Const.DECIMO_TERCERO_END);
+            calcular();
+            dialogStage.close();
+            
+        });  
+        dialogStage.show();
     }
     
     public void dialogoErrorBizBank() {
@@ -381,12 +512,46 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     
     public void hacerPago() {
         
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Runnable worker = new PagoDecimoTerceroAnualController.DataBaseThread(0);
-        executor.execute(worker);
-        executor.shutdown();
-
         loadingMode();
+        
+        empladosImprimir = new ArrayList<>();
+        textosDAT = new ArrayList<>();
+        textosTXT = new ArrayList<>();
+
+        for (EmpleadoTable empleadoTable: data) {
+            if (empleadoTable.getPagar()) {
+                if (pdDAO.getLastPagoEnd3(Integer.valueOf(yearLabel.getText())) == null) {
+                    pdDAO.save(pdStart);
+                    pdDAO.save(pdEnd);
+                }
+                PagoDecimo pagoDecimo = new PagoDecimo();
+                pagoDecimo.setUsuario(empleadoTable.getUsuario());
+                pagoDecimo.setFecha(new Timestamp(Integer.valueOf(yearLabel.getText())-1900, 0, 1, 0, 0, 0, 0));
+                pagoDecimo.setMonto(empleadoTable.getDecimo3());
+                pagoDecimo.setDecimo(Const.DECIMO_TERCERO);
+                new PagoDecimoDAO().save(pagoDecimo);
+
+                empleadoTable.setPagoDecimo(pagoDecimo);
+                empleadoTable.setPagado("Si");
+                empleadoTable.setPagar(false);
+
+                empladosImprimir.add(empleadoTable);
+
+                // Registro para auditar
+                String detalles = "hizo el pago de decimo tercero acumulados nro: " + pagoDecimo.getId() 
+                        + " del lapso "+pdStart.getStringFecha()
+                        + " al "+pdEnd.getStringFecha()+" para el empleado " 
+                        + empleadoTable.getApellido()+ " " + empleadoTable.getNombre();
+                aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+
+                textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), pagoDecimo.getMonto()));
+                textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), pagoDecimo.getMonto()));
+            }
+        }
+        closeDialogMode();
+        setTableInfo();
+        dialogoPagoDecimosCompletado();   
+        
     }
     
     public void imprimir(File file, Boolean enviarCorreo) {
@@ -526,7 +691,7 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         this.empresa = empresa;
         
         DateTime fechaActual = new DateTime();
-        String anio = String.valueOf(fechaActual.getYear());
+        String anio = String.valueOf(fechaActual.getYear()-1);
         
         yearLabel.setText(anio);
         
@@ -561,22 +726,82 @@ public class PagoDecimoTerceroAnualController implements Initializable {
     
     public void setTableInfo() {
         
-        periodoALiquidar = "1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
-                +" al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1);
+        pdStart = pdDAO.getLastPagoStart3(Integer.valueOf(yearLabel.getText()));
+        pdEnd = pdDAO.getLastPagoEnd3(Integer.valueOf(yearLabel.getText()));
+        
+        if (Integer.valueOf(yearLabel.getText()) > 2017) {
+            if (pdStart == null || pdEnd == null) {
+                buttonChange.setVisible(true);
+            } else buttonChange.setVisible(false);
+        } else buttonChange.setVisible(false);
+        
+        if (pdStart == null || pdEnd == null) {
+            if (Integer.valueOf(yearLabel.getText()) == 2017) {
+                pdStart = new PagoDecimo();
+                pdStart.setFecha(new Timestamp(
+                        Integer.valueOf(yearLabel.getText())-1-1900, 11, 1, 0, 0, 0, 0));
+                pdStart.setMonto(Integer.valueOf(yearLabel.getText()).doubleValue());
+                pdStart.setDecimo(Const.DECIMO_TERCERO_START);
+
+                pdEnd = new PagoDecimo();
+                pdEnd.setFecha(new Timestamp(
+                        Integer.valueOf(yearLabel.getText())-1900, 10, 30, 0, 0, 0, 0));
+                pdEnd.setMonto(Integer.valueOf(yearLabel.getText()).doubleValue());
+                pdEnd.setDecimo(Const.DECIMO_TERCERO_END);
+
+                pdDAO.save(pdStart);
+                pdDAO.save(pdEnd);
+            } else {
+                pdEnd = pdDAO.getLastPagoEnd3(Integer.valueOf(yearLabel.getText())-1);
+                if (pdEnd != null) {
+                    Timestamp timestamp = new Timestamp(pdEnd.getFecha().getTime());
+                    timestamp.setMonth(pdEnd.getFecha().getMonth()+1);
+                    timestamp.setDate(1);
+                    pdStart = new PagoDecimo();
+                    pdStart.setFecha(timestamp);
+                    pdStart.setMonto(Integer.valueOf(yearLabel.getText()).doubleValue());
+                    pdStart.setDecimo(Const.DECIMO_TERCERO_START);
+
+                    Timestamp timestampEnd = new Timestamp(pdEnd.getFecha().getTime());
+                    timestampEnd.setYear(pdEnd.getFecha().getYear()+1);
+                    pdEnd = new PagoDecimo();
+                    pdEnd.setFecha(timestampEnd);
+                    pdEnd.setMonto(Integer.valueOf(yearLabel.getText()).doubleValue());
+                    pdEnd.setDecimo(Const.DECIMO_TERCERO_END);
+                } else {
+                    onClickLess(null);
+                    return;
+                }
+            }
+        }
+        
+        calcular();
+    }
+    
+    void calcular() {
+        periodoALiquidar = pdStart.getStringFecha()+" al "+pdEnd.getStringFecha();
         periodoLabel.setText("Periodo entre el "+periodoALiquidar);
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
         usuarios = new ArrayList<>();
         usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), 
-                new Fecha("01","01",yearLabel.getText())));
+                new Fecha("01","01", yearLabel.getText())));
         
-        PagoDecimoDAO pagoDecimoDAO = new PagoDecimoDAO();
-        Timestamp fecha = new Timestamp(Integer.valueOf(yearLabel.getText())-1-1899, 0, 1, 0, 0, 0, 0);
+        Timestamp fecha = new Timestamp(Integer.valueOf(yearLabel.getText())-1900, 0, 1, 0, 0, 0, 0);
         pagosDecimo = new ArrayList<>();
-        pagosDecimo.addAll(pagoDecimoDAO.findByDecimoAndFecha(Const.DECIMO_TERCERO, fecha));
+        pagosDecimo.addAll(pdDAO.findByDecimoAndFecha(Const.DECIMO_TERCERO, fecha));
+        if (pagosDecimo.isEmpty() && Integer.valueOf(yearLabel.getText()) > 2017) {
+            if (pdDAO.getLastPagoEnd3(Integer.valueOf(yearLabel.getText())) != null) {
+                pdDAO.delete(pdStart);
+                pdDAO.delete(pdEnd);
+                HibernateSessionFactory.getSession().flush();
+                setTableInfo();
+                return;
+            }
+        }
         
         data = FXCollections.observableArrayList(); 
-        usuarios.stream().map((user) -> {
+        for (Usuario user: usuarios) {
             EmpleadoTable empleado = new EmpleadoTable();
             empleado.setUsuario(user);
             empleado.setId(user.getId());
@@ -597,17 +822,28 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                     .findAllByEmpleadoId(empleado.getId());
             
             ArrayList<RolIndividual> rolesDelParaPagar = new ArrayList<>();
-          
-            for (RolIndividual rolIndividual: rolesIndividual) {
+            ArrayList<Double> decimos = new ArrayList<>();
+            for (RolIndividual rol: rolesIndividual) {
                 
-                Fecha inicio = new Fecha(rolIndividual.getInicio());
-                Fecha finalizo = new Fecha(rolIndividual.getFinalizo());
-                if (inicio.getAno().equals(String.valueOf(Integer.valueOf(yearLabel.getText())-1))) {
-                    monto += rolIndividual.getDecimoTercero();
-                    rolesDelParaPagar.add(rolIndividual);
+                Fecha inicio = new Fecha(rol.getInicio());
+                if (isBetween(inicio, pdStart, pdEnd)) {
+                    Fecha inicioVac = new Fecha("01", "01", inicio.getAno())
+                                    .minusYears(1);
+                    PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
+                            .findInDeterminateTimeByUsuarioId(inicioVac.getFecha(), empleado.getId());
+                    /**********************************************************/
+                    //sueldo + sobretiempos + bonos + vacaciones - sueldo básico
+                    /**********************************************************/
+                    Double historial = rol.getSalario() + rol.getTotalMontoHorasExtras() 
+                            + getVacacionesFromThisMonth(pagoVacaciones, inicio)
+                            + rol.getTotalBonos()/* - rol.getSueldo()*/;
+                    ////////////////////////////////////////////////////////////
+                    monto += historial/12d;
+                    rolesDelParaPagar.add(rol);
+                    decimos.add(round(historial/12d));
                 }
             }
-
+            empleado.setDecimosMes(decimos);
             empleado.setRolesInds(rolesDelParaPagar);
         
             empleado.setDecimo3(round(monto));
@@ -623,13 +859,61 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                 }
             }
             
-            return empleado;
-        }).forEach((empleado) -> {
-            data.add(empleado);
-        });
+            data.add(empleado);  
+        }
+    
         empleadosTableView.setItems(data);
        
         filtro();
+    }
+    
+    private Double getVacacionesFromThisMonth(PagoVacaciones pagoVacaciones, Fecha inicio) {
+        
+        if (pagoVacaciones != null) {
+           Calendar calIni = Calendar.getInstance();
+            calIni.setTime(pagoVacaciones.getGoceInicio());
+
+            Calendar calFin = Calendar.getInstance();
+            calFin.setTime(pagoVacaciones.getGoceFin());
+
+
+            Integer mes1int = calIni.get(Calendar.MONTH)+1;
+            Integer mes2int = calFin.get(Calendar.MONTH)+1;
+            Integer dias1int = 0;
+            Integer dias2int = 0;
+            Double montoMes1Dou = 0d;
+            Double montoMes2Dou = 0d;
+            if (mes1int != mes2int) {
+                if (mes1int+1 == mes2int) {
+                    dias2int = calFin.get(Calendar.DAY_OF_MONTH);
+                    dias1int = pagoVacaciones.getDias() - dias2int;
+                    Double valorDia = pagoVacaciones.getValor()
+                            /pagoVacaciones.getDias().doubleValue();
+                    montoMes1Dou = round(valorDia*dias1int);
+                    montoMes2Dou = round(valorDia*dias2int);
+                } 
+            } else {
+                if (inicio.getMesInt() == mes1int) {
+                    return pagoVacaciones.getValor();
+                }
+            }
+            if (inicio.getMesInt() == mes1int) {
+                return montoMes1Dou;
+            }
+            if (inicio.getMesInt() == mes2int) {
+                return montoMes2Dou;
+            } 
+        }
+        return 0d;
+    }
+    
+    public Boolean isBetween(Fecha fechaF, PagoDecimo start, PagoDecimo end) {
+        if (start.isSameMore(fechaF)) {
+            if (end.isSameLess(fechaF)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public void filtro() {
@@ -662,6 +946,31 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         SortedList<EmpleadoTable> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(empleadosTableView.comparatorProperty());
         empleadosTableView.setItems(sortedData);
+        chequearFiltro(filteredData);
+    }
+    
+    void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
+        filteredData.setPredicate(empleado -> {
+            // If filter text is empty, display all persons.
+            if (filterField.getText() == null || filterField.getText().isEmpty()) {
+                return true;
+            }
+            // Compare first name and last name of every person with filter text.
+            String lowerCaseFilter = filterField.getText().toLowerCase();
+
+            if (empleado.getNombre().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches first name.
+            } else if (empleado.getApellido().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCedula().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getDepartamento().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } else if (empleado.getCargo().toLowerCase().contains(lowerCaseFilter)) {
+                return true; // Filter matches last name.
+            } 
+            return false; // Does not match.
+        });
     }
     
     @Override
@@ -736,22 +1045,11 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                 
                 setGraphic(checkBoxImp);
                 if (checkBoxImp != null) {
-                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
-                        checkBoxImp.setDisable(false);
-                    } else {
-                        checkBoxImp.setDisable(true);
-                    }
                     checkBoxImp.setSelected(empleadoTable.getAgregar());
                 }
                 
                 checkBoxImp.setOnAction(event -> {
-                    if (empleadoTable.getPagado().equalsIgnoreCase("Si")) {
-                        empleadoTable.setAgregar(checkBoxImp.isSelected());
-                    } else {
-                        empleadoTable.setAgregar(false);
-                        checkBoxImp.setSelected(false);
-                    }
-                     
+                    empleadoTable.setAgregar(checkBoxImp.isSelected());
                 });
             } 
         });
@@ -833,6 +1131,23 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonChange.setTooltip(
+            new Tooltip("Cambiar fecha")
+        );
+        buttonChange.setOnMouseEntered((MouseEvent t) -> {
+            buttonChange.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_change.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonChange.setOnMouseExited((MouseEvent t) -> {
+            buttonChange.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/icon_change.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         
         buttonAnterior.setTooltip(
             new Tooltip("Mes Anterior")
@@ -852,6 +1167,8 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
             buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
+        
+        buttonChange.setVisible(false);
     } 
     
     public void mostrarPagoDecimoTercero(EmpleadoTable empleadoTable) {
@@ -994,48 +1311,6 @@ public class PagoDecimoTerceroAnualController implements Initializable {
             
         }
         
-        public void hacerPago() {
-        
-            empladosImprimir = new ArrayList<>();
-            textosDAT = new ArrayList<>();
-            textosTXT = new ArrayList<>();
-
-            for (EmpleadoTable empleadoTable: data) {
-                if (empleadoTable.getPagar()) {
-                    PagoDecimo pagoDecimo = new PagoDecimo();
-                    pagoDecimo.setUsuario(empleadoTable.getUsuario());
-                    pagoDecimo.setFecha(new Timestamp(Integer.valueOf(yearLabel.getText())-1-1899, 0, 1, 0, 0, 0, 0));
-                    pagoDecimo.setMonto(empleadoTable.getDecimo3());
-                    pagoDecimo.setDecimo(Const.DECIMO_TERCERO);
-                    new PagoDecimoDAO().save(pagoDecimo);
-                    
-                    empleadoTable.setPagoDecimo(pagoDecimo);
-                    empleadoTable.setPagado("Si");
-                    empleadoTable.setPagar(false);
-                    
-                    empladosImprimir.add(empleadoTable);
-                
-                    // Registro para auditar
-                    String detalles = "hizo el pago de decimo  acumulados nro: " + pagoDecimo.getId() 
-                            + " del lapso 1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
-                            + " al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1) + " para el empleado " 
-                            + empleadoTable.getApellido()+ " " + empleadoTable.getNombre();
-                    aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
-                    
-                    textosDAT.add(crearLineaDAT(empleadoTable.getUsuario(), pagoDecimo));
-                    textosTXT.add(crearLineaTXT(empleadoTable.getUsuario(), pagoDecimo));
-                }
-            }
-            HibernateSessionFactory.getSession().close();
-            Platform.runLater(new Runnable() {
-                @Override public void run() {
-                    setTableInfo();
-                    closeDialogMode();
-                    dialogoPagoDecimosCompletado();
-                }
-            });
-        }
-
         public void imprimir(File file, Boolean enviarCorreo, List<EmpleadoTable> empleados) {
         
             for (EmpleadoTable empleado: empleados) {
@@ -1063,8 +1338,7 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                             + " - Tel: " + empresa.getTelefono1());
                     parametros.put("devengado", Numeros.round(pagoDecimo.getMonto()).toString());
                     parametros.put("cobrar", Numeros.round(pagoDecimo.getMonto()).toString());
-                    parametros.put("lapso", "del 1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1)
-                                 +" al 31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1));
+                    parametros.put("lapso", "del "+pdStart.getStringFecha()+ " al "+pdEnd.getStringFecha());
 
                     JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
                     JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
@@ -1081,9 +1355,7 @@ public class PagoDecimoTerceroAnualController implements Initializable {
                         CorreoUtil.mandarCorreo(user.getDetallesEmpleado().getEmpresa().getNombre(), 
                                 user.getEmail(), Const.ASUNTO_PAGO_DECIMO_TERCERO, 
                                 "Recibo del pago del decimo tercero acumulado desde el " 
-                                        + "1 de Ene "+String.valueOf(Integer.valueOf(yearLabel.getText())-1) 
-                                        + " hasta el "
-                                        + "31 de Dic "+String.valueOf(Integer.valueOf(yearLabel.getText())-1), 
+                                        +pdStart.getStringFecha()+ " al "+pdEnd.getStringFecha(), 
                                 pdf.getPath(), filename + ".pdf");
                     }
 
@@ -1101,8 +1373,8 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         }
     }
     
-    String crearLineaDAT(Usuario user, PagoDecimo pagoDecimo) {
-        String monto = Numeros.roundToString(pagoDecimo.getMonto());
+    String crearLineaDAT(Usuario user, Double decimo3ro) {
+        String monto = Numeros.roundToString(decimo3ro);
         String espacios = "";
         String[] parts = monto.split(Pattern.quote("."));
         String partEntera = parts[0];
@@ -1142,8 +1414,8 @@ public class PagoDecimoTerceroAnualController implements Initializable {
         }
     }
     
-    String crearLineaTXT(Usuario user, PagoDecimo pagoDecimo) {
-        String monto = Numeros.roundToString(pagoDecimo.getMonto());
+    String crearLineaTXT(Usuario user, Double decimo3ro) {
+        String monto = Numeros.roundToString(decimo3ro);
         String espacios = "";
         String[] parts = monto.split(Pattern.quote("."));
         String partEntera = parts[0];

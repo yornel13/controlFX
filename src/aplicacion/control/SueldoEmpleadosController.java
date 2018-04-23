@@ -69,6 +69,10 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

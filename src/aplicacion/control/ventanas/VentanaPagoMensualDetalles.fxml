@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.text.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="480.0" maxWidth="777.0" minHeight="480.0" minWidth="777.0" prefHeight="480.0" prefWidth="777.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PagoMensualDetallesController">
+<AnchorPane id="AnchorPane" maxHeight="480.0" maxWidth="777.0" minHeight="480.0" minWidth="777.0" prefHeight="480.0" prefWidth="777.0" style="-fx-background-color: #039BE5;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aplicacion.control.PagoMensualDetallesController">
     <children>
       <Pane layoutX="18.0" layoutY="366.0" prefHeight="49.0" prefWidth="426.0" style="-fx-background-color: #E0E0E0;" />
       <Pane layoutX="444.0" layoutY="366.0" prefHeight="49.0" prefWidth="100.0" style="-fx-background-color: #eea82f;" />
@@ -238,7 +241,7 @@
                   <Font size="13.0" />
                </font>
             </Label>
-            <Label fx:id="sueldoText1" text="Sueldo" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER">
+            <Label fx:id="sueldoText1" text="Salario" textFill="#fffbfb" GridPane.columnIndex="4" GridPane.halignment="CENTER">
                <font>
                   <Font size="13.0" />
                </font>

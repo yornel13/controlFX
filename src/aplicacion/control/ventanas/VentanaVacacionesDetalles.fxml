@@ -48,33 +48,33 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Label layoutX="346.0" layoutY="214.0" prefHeight="20.0" prefWidth="150.0" text="Valor de vacaciones:" textFill="WHITE">
+      <Label layoutX="346.0" layoutY="199.0" prefHeight="20.0" prefWidth="150.0" text="Valor de vacaciones:" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label layoutX="346.0" layoutY="242.0" prefHeight="20.0" prefWidth="150.0" text="Valor aporte de IESS:" textFill="WHITE">
+      <Label layoutX="346.0" layoutY="257.0" prefHeight="20.0" prefWidth="150.0" text="Valor aporte de IESS:" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label layoutX="346.0" layoutY="277.0" prefHeight="20.0" prefWidth="150.0" text="Monto a cobrar:" textFill="WHITE">
+      <Label alignment="CENTER_RIGHT" layoutX="345.0" layoutY="290.0" prefHeight="20.0" prefWidth="150.0" text="Monto a cobrar:" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Line endX="150.0" layoutX="437.0" layoutY="269.0" startX="-100.0" />
-      <Label fx:id="valorLabel" alignment="CENTER_RIGHT" layoutX="516.0" layoutY="214.0" prefHeight="20.0" prefWidth="60.0" textFill="WHITE">
+      <Line endX="150.0" layoutX="437.0" layoutY="282.0" startX="-100.0" />
+      <Label fx:id="valorLabel" alignment="CENTER_RIGHT" layoutX="506.0" layoutY="199.0" prefHeight="20.0" prefWidth="70.0" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="aporteLabel" alignment="CENTER_RIGHT" layoutX="516.0" layoutY="240.0" prefHeight="20.0" prefWidth="60.0" textFill="WHITE">
+      <Label fx:id="aporteLabel" alignment="CENTER_RIGHT" layoutX="506.0" layoutY="255.0" prefHeight="20.0" prefWidth="70.0" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="cobrarLabel" alignment="CENTER_RIGHT" layoutX="516.0" layoutY="277.0" prefHeight="20.0" prefWidth="60.0" textFill="WHITE">
+      <Label fx:id="cobrarLabel" alignment="CENTER_RIGHT" layoutX="506.0" layoutY="290.0" prefHeight="20.0" prefWidth="70.0" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
@@ -89,14 +89,34 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <Button fx:id="buttonPagar" disable="true" layoutX="450.0" layoutY="312.0" mnemonicParsing="false" onAction="#pagarVacaciones" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" />
-      <Button fx:id="buttonBorrar" layoutX="491.0" layoutY="312.0" mnemonicParsing="false" onAction="#borrarPago" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/borrar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" visible="false" />
-      <Button fx:id="buttonImprimir" layoutX="409.0" layoutY="312.0" mnemonicParsing="false" onAction="#reimprimirRecibo" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" visible="false" />
+      <Button fx:id="buttonPagar" disable="true" layoutX="450.0" layoutY="322.0" mnemonicParsing="false" onAction="#pagarVacaciones" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" />
+      <Button fx:id="buttonBorrar" layoutX="491.0" layoutY="322.0" mnemonicParsing="false" onAction="#borrarPago" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/borrar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" visible="false" />
+      <Button fx:id="buttonImprimir" layoutX="409.0" layoutY="322.0" mnemonicParsing="false" onAction="#reimprimirRecibo" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: rgba(0,0,0,0.1);" visible="false" />
       <Label fx:id="inicioLabel" layoutX="163.0" layoutY="30.0" text="Inicio" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
       <Button fx:id="buttonGuardar" layoutX="337.0" layoutY="40.0" mnemonicParsing="false" onAction="#dialogoGuardar" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/guardar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Label fx:id="mes1" layoutX="346.0" layoutY="219.0" prefHeight="20.0" prefWidth="150.0" textFill="#feffb7">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="montoMes1" alignment="CENTER_RIGHT" layoutX="506.0" layoutY="219.0" prefHeight="20.0" prefWidth="70.0" textFill="#feffb7">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="mes2" layoutX="346.0" layoutY="235.0" prefHeight="20.0" prefWidth="150.0" textFill="#feffb7">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="montoMes2" alignment="CENTER_RIGHT" layoutX="506.0" layoutY="235.0" prefHeight="20.0" prefWidth="70.0" textFill="#feffb7">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>

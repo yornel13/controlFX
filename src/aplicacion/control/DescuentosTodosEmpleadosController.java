@@ -73,6 +73,8 @@ import javafx.collections.ListChangeListener;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TableCell;
 import net.sf.jasperreports.engine.JREmptyDataSource;
+import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *

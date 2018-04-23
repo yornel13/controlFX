@@ -274,10 +274,10 @@ public class InEmpresaController implements Initializable {
             buttonEdicion.getItems().add(menuItemDecimos);
             MenuItem menuItemActuariales = new MenuItem("Actuariales");
             buttonEdicion.getItems().add(menuItemActuariales);
-            MenuItem menuItemIess = new MenuItem("IESS Acumulado");
-            buttonEdicion.getItems().add(menuItemIess);
-            MenuItem menuItemPlantilla = new MenuItem("Historial Laboral");
-            buttonEdicion.getItems().add(menuItemPlantilla);
+            MenuItem menuItemFondo = new MenuItem("Fondo de Reserva");
+            buttonEdicion.getItems().add(menuItemFondo);
+            MenuItem menuHistorialLaboral = new MenuItem("Historial Laboral");
+            buttonEdicion.getItems().add(menuHistorialLaboral);
             MenuItem menuItemVacaciones = new MenuItem("Dias de Vacaciones");
             buttonEdicion.getItems().add(menuItemVacaciones);
             MenuItem menuItemBonos = new MenuItem("Bono y Transporte");
@@ -295,11 +295,11 @@ public class InEmpresaController implements Initializable {
             menuItemActuariales.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarActuarialesEmpleados(empresa, stagePrincipal);
             });
-            menuItemIess.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarIessEmpleados(empresa, stagePrincipal);
+            menuItemFondo.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarFondoReservaEmpleados(empresa, stagePrincipal);
             });
-            menuItemPlantilla.setOnAction((ActionEvent actionEvent) -> {
-                aplicacionControl.mostrarPlanillaIess(empresa, stagePrincipal);     
+            menuHistorialLaboral.setOnAction((ActionEvent actionEvent) -> {
+                aplicacionControl.mostrarHistorialLaboral(empresa, stagePrincipal);     
             });
             menuItemVacaciones.setOnAction((ActionEvent actionEvent) -> {
                 aplicacionControl.mostrarDiasDerechoVacaciones(empresa, stagePrincipal);
@@ -392,6 +392,8 @@ public class InEmpresaController implements Initializable {
             buttonAjustes.setOnMouseExited((MouseEvent t) -> {
                 buttonAjustes.setStyle("-fx-background-color: #039BE5;");
             });
+            buttonAjustes.setVisible(false);
+            buttonReportes.setVisible(false);
         }
         
         buttonAtras.setOnMouseEntered((MouseEvent t) -> {

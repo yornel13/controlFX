@@ -5,8 +5,6 @@
  */
 package aplicacion.control;
 
-import aplicacion.control.util.Fecha;
-import aplicacion.control.util.Fechas;
 import aplicacion.control.util.Roboto;
 import hibernate.HibernateSessionFactory;
 import hibernate.dao.ConstanteDAO;
@@ -192,7 +190,7 @@ public class PrincipalController implements Initializable {
         login.setVisible(false);
         usuarioLogin.setVisible(false);
         
-        versionLabel.setText("Version 1.01");
+        versionLabel.setText("Version 1.10");
     }
     
     // Login items

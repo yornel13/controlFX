@@ -16,6 +16,10 @@ public class Const {
     
     public static final String DECIMO_CUARTO = "decimo_cuarto";
     public static final String DECIMO_TERCERO = "decimo_tercero";
+    public static final String DECIMO_TERCERO_START = "decimo_tercero_start";
+    public static final String DECIMO_TERCERO_END = "decimo_tercero_end";
+    public static final String DECIMO_CUARTO_START = "decimo_cuarto_start";
+    public static final String DECIMO_CUARTO_END = "decimo_cuarto_end";
     public static final String IESS = "iess";
     
     
@@ -54,6 +58,7 @@ public class Const {
     public static final String REPORTE_ROL_DECIMO_CUARTO = "report/rol_decimo_cuarto.jrxml";
     public static final String REPORTE_ROL_UNITARIO = "report/rol_unitario.jrxml";
     public static final String REPORTE_PAGO_ADELANTO_QUINCENAL = "report/adelanto_quincenal_individual.jrxml";
+    public static final String REPORTE_PAGO_FONDO_RESERVA = "report/fondo_reserva_individual.jrxml";
     public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL = "report/deuda_empleado_individual.jrxml";
     public static final String REPORTE_DEUDA_EMPLEADO_INDIVIDUAL_SIN_ABONO = "report/deuda_empleado_individual_sin_abono.jrxml";
     public static final String REPORTE_DECIMOS_MES_EMPLEADO = "report/decimos_mes_empleado.jrxml";
@@ -93,6 +98,7 @@ public class Const {
     public static final String ASUNTO_DECIMOS_GENERADO = "Decimos Generados";
     public static final String ASUNTO_DECIMO_TERCERO_GENERADO = "Decimo Tercero Generado";
     public static final String ASUNTO_DECIMO_CUARTO_GENERADO = "Decimo Cuarto Generado";
+    public static final String ASUNTO_FONDO_RESERVA = "Fondo de Reserva";
     // Mensaje
     public static final String MENSAJE_ROL_INDIVIDUAL = "Recibo de rol de pago";
     

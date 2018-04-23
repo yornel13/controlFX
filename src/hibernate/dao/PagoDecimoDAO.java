@@ -2,6 +2,7 @@ package hibernate.dao;
 
 // default package
 
+import aplicacion.control.util.Const;
 import hibernate.model.PagoDecimo;
 import java.sql.Timestamp;
 import java.util.List;
@@ -79,6 +80,54 @@ public class PagoDecimoDAO extends BaseHibernateDAO {
                     .setParameter("decimo", decimo);
             Object result = query.list();
             return (List<PagoDecimo>) result;
+        }
+        
+        public PagoDecimo getLastPagoStart3(Integer year) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_decimo where "
+                            + "monto = :monto and "
+                            + "decimo = :decimo")
+                    .addEntity(PagoDecimo.class)
+                    .setParameter("decimo", Const.DECIMO_TERCERO_START)
+                    .setParameter("monto", year.doubleValue());
+            Object result = query.uniqueResult();
+            return (PagoDecimo) result;
+        }
+        
+        public PagoDecimo getLastPagoEnd3(Integer year) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_decimo where "
+                            + "monto = :monto and "
+                            + "decimo = :decimo")
+                    .addEntity(PagoDecimo.class)
+                    .setParameter("decimo", Const.DECIMO_TERCERO_END)
+                    .setParameter("monto", year.doubleValue());
+            Object result = query.uniqueResult();
+            return (PagoDecimo) result;
+        }
+        
+        public PagoDecimo getLastPagoStart4(Integer year) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_decimo where "
+                            + "monto = :monto and "
+                            + "decimo = :decimo")
+                    .addEntity(PagoDecimo.class)
+                    .setParameter("decimo", Const.DECIMO_CUARTO_START)
+                    .setParameter("monto", year.doubleValue());
+            Object result = query.uniqueResult();
+            return (PagoDecimo) result;
+        }
+        
+        public PagoDecimo getLastPagoEnd4(Integer year) {
+            Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_decimo where "
+                            + "monto = :monto and "
+                            + "decimo = :decimo")
+                    .addEntity(PagoDecimo.class)
+                    .setParameter("decimo", Const.DECIMO_CUARTO_END)
+                    .setParameter("monto", year.doubleValue());
+            Object result = query.uniqueResult();
+            return (PagoDecimo) result;
         }
         
         public List<PagoDecimo> findByDecimoAndFecha(String decimo, Timestamp fecha) {

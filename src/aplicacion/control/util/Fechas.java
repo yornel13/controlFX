@@ -82,6 +82,14 @@ public class Fechas {
         return fecha;
     }
     
+    public static String getFechaConMesCorto(Timestamp timestamp) {
+        DateTime dateTime = new DateTime(timestamp.getTime());
+        String fecha = dateTime.getDayOfMonth() + " de " 
+                + getMonthName(dateTime.getMonthOfYear()).substring(0,3)
+                + " " + dateTime.getYear();
+        return fecha;
+    }
+    
     public static String getFechaConMes(Fecha fecha) {
         String fechaString = fecha.getDiaInt()+" de " 
                 + fecha.getMonthName() 
@@ -138,7 +146,7 @@ public class Fechas {
     }
     
     public static String getFechaCorta(Date date) {
-        DateTime dateTime = new DateTime(date.getTime());
+        DateTime dateTime = new DateTime(date.getTime()).plusHours(1); // con una hora adicional porque pone un dia anterior erroneo por el cambio horario
         return dateTime.toString("dd/MM/yyyy");
     }
     
@@ -219,11 +227,41 @@ public class Fechas {
         return FXCollections.observableArrayList(items);
     }
     
+    public static ObservableList<String> arraySpinnerMesText() {
+        String[] items = new String[12];
+        items[0] = "Ene";
+        items[1] = "Feb";
+        items[2] = "Mar";
+        items[3] = "Abr";
+        items[4] = "May";
+        items[5] = "Jun";
+        items[6] = "Jul";
+        items[7] = "Ago";
+        items[8] = "Sep";
+        items[9] = "Oct";
+        items[10] = "Nov";
+        items[11] = "Dic";
+        return FXCollections.observableArrayList(items);
+    }
+    
     public static ObservableList<String> arraySpinnerAno() {
         String[] items = new String[20];
         Integer count = 0;
         
         Integer secuencia = (new DateTime().getYear()) - 10;
+        for (String number : items) {
+            items[count] = secuencia.toString();
+            secuencia++;
+            count++;
+        }
+        return FXCollections.observableArrayList(items);
+    }
+    
+    public static ObservableList<String> arraySpinnerAnoCorto(int year) {
+        String[] items = new String[3];
+        Integer count = 0;
+        
+        Integer secuencia = year - 1;
         for (String number : items) {
             items[count] = secuencia.toString();
             secuencia++;
@@ -276,5 +314,74 @@ public class Fechas {
         }
         
         return new Fecha(ano+mes+dia);
+    }
+    
+    public static Fecha getFecha(Timestamp timestamp) {
+        
+        String dia;
+        String mes;
+        String ano;
+        ano = String.valueOf((timestamp.getYear()+1900));
+        mes = String.valueOf((timestamp.getMonth()+1));
+        if (timestamp.getDate() > 30) {
+            dia = "30";
+        } else {
+            dia = String.valueOf(timestamp.getDate());
+        }
+        
+        if (mes.length() == 1) {
+            mes = "0"+mes;
+        }
+        if (dia.length() == 1) {
+            dia = "0"+dia;
+        }
+        
+        return new Fecha(ano+mes+dia);
+    }
+    
+    public static Fecha getFechaStart(Timestamp timestamp) {
+        
+        String dia;
+        String mes;
+        String ano;
+        ano = String.valueOf((timestamp.getYear()+1900));
+        mes = String.valueOf((timestamp.getMonth()+1));
+        dia = "01";
+        
+        if (mes.length() == 1) {
+            mes = "0"+mes;
+        }
+        
+        return new Fecha(ano+mes+dia);
+    }
+    
+    public static String getMonthNameCort(Integer mes) {
+        switch (mes) {
+            case 1:
+                return "Ene";
+            case 2:
+                return "Feb";
+            case 3:
+                return "Mar";
+            case 4:
+                return "Abr";
+            case 5:
+                return "May";
+            case 6:
+                return "Jun";
+            case 7:
+                return "Jul";
+            case 8:
+                return "Ago";
+            case 9:
+                return "Sep";
+            case 10:
+                return "Oct";
+            case 11:
+                return "Nov";
+            case 12:
+                return "Dic";
+        }
+        return null;
     }
 }

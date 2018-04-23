@@ -3,12 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aplicacion.control.asincronas;
+package aplicacion.control.eventos;
 
 /**
  *
- * @author user 01
+ * @author Yornel
  */
-public class RolIndividualEmpleado {
-    
+public interface DialogResponse {
+
+    void onDialogOK();
+
+    void onDialogCancel();
 }

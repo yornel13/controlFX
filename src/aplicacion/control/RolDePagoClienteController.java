@@ -88,7 +88,6 @@ import hibernate.dao.BonosDAO;
 import hibernate.dao.DiasVacacionesDAO;
 import hibernate.model.Bonos;
 import hibernate.model.DiasVacaciones;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.ControlDiarioDAO;
 import hibernate.dao.ControlExtrasDAO;
 import hibernate.model.ControlDiario;
@@ -96,6 +95,7 @@ import hibernate.model.ControlExtras;
 import javafx.scene.control.ChoiceBox;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import static aplicacion.control.util.Numeros.round;
 
 /**
  *
@@ -1067,8 +1067,7 @@ public class RolDePagoClienteController implements Initializable {
             controlTable.setDia(controlTable.getFecha().getMonthName());
             controlesDiarios.add(controlTable);
         }
-        
-        System.out.println("dias " + controlesDiarios.size());
+        System.out.println("Dias en Fecha Custom " + controlesDiarios.size());
         controlesEmpleado = new ArrayList<>();
         controlesEmpleado.addAll(controlDAO
                 .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), 
@@ -1090,7 +1089,7 @@ public class RolDePagoClienteController implements Initializable {
         for(int i = 0; i <= daysE; i++) {
             ControlTable controlTable = new ControlTable();
             controlTable.setFechaExtra(dateA.plusDays(i));
-            controlTable.setFechaString(dateA.plusDays(i).toString("dd-MM-yyyy")); // QUITADO extrano problema en java.sql.date que lo deja con un mes mas del real, se deberia optimizar y acomodar el error, de momento se solvento diminuyendo un mes antes de pasar a string
+            controlTable.setFechaString(dateA.plusDays(i).toString("dd-MM-yyyy")); 
             controlesExtras.add(controlTable);
         }
         
@@ -1220,8 +1219,9 @@ public class RolDePagoClienteController implements Initializable {
         for (ControlTable controlExtra: controlesExtras) {
             
             for (ControlExtras control: controlesHoras) {
-                DateTime fechaActual = new DateTime(control.getFecha().getTime());
-                if (controlExtra.getFechaExtra().getMillis() == fechaActual.getMillis()) {
+                String fechaShow = controlExtra.getFechaExtra().toString("yyyy-MM-dd");
+                String fechaDB = control.getFecha().toString();
+                if (fechaShow.equalsIgnoreCase(fechaDB)) {
                     
                     controlExtra.setControlExtras(control);
                     controlExtra.setId(control.getId());
@@ -1293,7 +1293,7 @@ public class RolDePagoClienteController implements Initializable {
         vacacionesField.setText(totalVacacionesDouble.toString());
         Double subTotalDouble = round(totalSalarioDouble 
                 + totalSobreTiempoDouble + totalRecargoDouble 
-                + totalBonosDouble + totalVacacionesDouble);
+                + totalBonosDouble);
         subTotal.setText(subTotalDouble.toString());
         ////////////////////////////////////////////////////
         Double decimoTercero = casoEspecial ? round(decimo3Field.getText()) : round(subTotalDouble / 12d);
@@ -1312,7 +1312,8 @@ public class RolDePagoClienteController implements Initializable {
         
         Double ingresoTotal = round(subTotalDouble + decimoTercero 
                 + decimoCuarto + decimoTercero + jubilacionPatronal 
-                + aportePatronal + segurosDecimal + uniformeDecimal);
+                + aportePatronal + segurosDecimal + uniformeDecimal
+                + totalVacacionesDouble);
         totalIngresos.setText(ingresoTotal.toString());
         
         if (searchRol) {

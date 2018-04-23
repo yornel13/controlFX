@@ -16,7 +16,7 @@
       <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
          <children>
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
-            <TextField fx:id="filterField" layoutX="70.0" layoutY="53.0" prefHeight="25.0" prefWidth="558.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
+            <TextField fx:id="filterField" layoutX="70.0" layoutY="57.0" prefHeight="25.0" prefWidth="558.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
             <Accordion layoutX="216.0" layoutY="24.0" />
             <Label fx:id="periodoLabel" layoutX="116.0" layoutY="30.0" prefHeight="20.0" prefWidth="378.0" text="Periodo a Liquidar" textFill="#fffbfb">
                <font>
@@ -81,5 +81,6 @@
       <Button fx:id="buttonPagar" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#pagarAdelanto" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/pagar.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
       <Button fx:id="buttonImprimir" layoutX="644.0" layoutY="10.0" mnemonicParsing="false" onAction="#imprimirGeneral" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
       <Button fx:id="buttonBank" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#generarBank" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/bank.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
+      <Button fx:id="buttonChange" layoutX="435.0" layoutY="25.0" mnemonicParsing="false" onAction="#cambiarFecha" prefHeight="30.0" prefWidth="30.0" style="-fx-background-image: url('aplicacion/control/imagenes/icon_change.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

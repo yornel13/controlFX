@@ -115,6 +115,8 @@ import net.sf.jasperreports.engine.JREmptyDataSource;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import static aplicacion.control.util.Numeros.round;
+import static aplicacion.control.util.Fechas.getFechaConMes;
 
 /**
  *
@@ -851,11 +853,6 @@ public class PagoMensualController implements Initializable {
             montoSegurosTextValor += pago.getSeguros(); 
             montoUniformasTextValor += pago.getUniformes(); 
             
-             if (!empleado.getDetallesEmpleado().getAcumulaDecimos()) {
-                decimoTerceroTotalTextValor -= pago.getVacaciones()/12;
-                decimosTotalTextValor -= pago.getVacaciones()/12;
-                totalTextValor -= pago.getVacaciones()/12;
-            }
         }
         {
             PagoMesItem rol = new PagoMesItem();
@@ -866,8 +863,6 @@ public class PagoMensualController implements Initializable {
             rol.setClave(Const.IP_SUELDO);
             pagoMesItems.add(rol);
         }
-        subTotalTextValor -= vacacionesTextValor;
-        decimoTerceroTotalTextValor = round(subTotalTextValor / 12);
         {
             PagoMesItem rol = new PagoMesItem();
             rol.setDescripcion("Horas Extras");
@@ -884,10 +879,9 @@ public class PagoMensualController implements Initializable {
             pagoMesItems.add(rol);
         }
         if (empleado.getDetallesEmpleado().getAcumulaDecimos()) {
-            ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor;
+            ingresoValor = subTotalTextValor;
         } else {
-            ingresoValor = sueldoTotalTextValor + extraTextValor + bonosTextValor 
-                    + decimosTotalTextValor;
+            ingresoValor = subTotalTextValor + decimosTotalTextValor;
             {
                 PagoMesItem rol = new PagoMesItem();
                 rol.setDescripcion("Decimo Tercero");

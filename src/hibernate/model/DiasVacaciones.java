@@ -43,7 +43,7 @@ public class DiasVacaciones implements java.io.Serializable {
     }
 
     public Integer getDias() {
-        return dias-1;
+        return dias;
     }
 
     public void setDias(Integer dias) {
@@ -73,7 +73,7 @@ public class DiasVacaciones implements java.io.Serializable {
     public void setFecha(Timestamp fecha) {
         this.fecha = fecha;
     }
-        
-        
+
+     
 
 }

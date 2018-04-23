@@ -331,6 +331,7 @@ public class UsuarioDAO extends BaseHibernateDAO {
                     desactivado = new DateTime(user
                             .getDetallesEmpleado().getExtra());
                     Fecha desactivadoFecha = Fechas.getFecha(desactivado);
+                    desactivadoFecha.setDia("01");
                     if (!desactivadoFecha.after(inicio)) {
                         usersRemove.add(user);
                     }

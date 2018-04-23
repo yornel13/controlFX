@@ -8,6 +8,7 @@ package aplicacion.control;
 import aplicacion.control.reports.ReporteIessVarios;
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.Const;
+import aplicacion.control.util.DialogUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.dao.UsuarioDAO;
@@ -64,9 +65,7 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import aplicacion.control.util.MaterialDesignButtonBlue;
 import hibernate.HibernateSessionFactory;
-import hibernate.dao.ConstanteDAO;
 import hibernate.dao.PlanillaIessDAO;
-import hibernate.model.Constante;
 import hibernate.model.PlanillaIess;
 import java.util.Objects;
 import java.util.Timer;
@@ -87,9 +86,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.PagoVacacionesDAO;
 import hibernate.dao.RolIndividualDAO;
@@ -97,21 +93,20 @@ import hibernate.model.PagoMesItem;
 import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
 import javafx.scene.control.ChoiceBox;
-import static aplicacion.control.util.Numeros.round;
 import static aplicacion.control.util.Fechas.getFechaConMes;
+import aplicacion.control.util.GuardarText;
+import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Numeros.round;
-import static aplicacion.control.util.Fechas.getFechaConMes;
-import static aplicacion.control.util.Numeros.round;
+import hibernate.dao.ControlDiarioDAO;
+import hibernate.model.ControlDiario;
+import java.util.Calendar;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author Yornel
  */
-public class PlanillaIessController implements Initializable {
+public class HistorialLaboralController implements Initializable {
     
     private Stage stagePrincipal;
     
@@ -136,12 +131,6 @@ public class PlanillaIessController implements Initializable {
     private TableColumn ingresoColumna;
     
     @FXML 
-    private TableColumn iessColumna;
-    
-    @FXML 
-    private TableColumn totalColumna;
-    
-    @FXML 
     private TableColumn<EmpleadoTable, EmpleadoTable> marcarColumna;
     
     @FXML
@@ -151,10 +140,7 @@ public class PlanillaIessController implements Initializable {
     private Button buttonImprimir;
     
     @FXML
-    private Button buttonGuardar;
-    
-    @FXML
-    private Button buttonBorrar;
+    private Button buttonBank;
     
     @FXML
     private Button buttonAnterior;
@@ -197,9 +183,11 @@ public class PlanillaIessController implements Initializable {
     private Fecha fin;
     
     Stage dialogLoading;
-    private Constante iess;
     
     Dialog<Void> dialog;
+    
+    private ArrayList<String> textosDAT;
+    private ArrayList<String> textosTXT;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -247,6 +235,71 @@ public class PlanillaIessController implements Initializable {
             data.set(data.indexOf(empleadoTable), empleadoTable);
         }
         contarSelecciones();
+    }
+    
+     @FXML
+    public void generarBank() {
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setResizable(false);
+        dialogStage.setTitle("Bizbank");
+        String stageIcon = AplicacionControl.class
+                .getResource("imagenes/icon_select.png").toExternalForm();
+        dialogStage.getIcons().add(new Image(stageIcon));
+        Button buttonSiDocumento = new MaterialDesignButtonBlue("Seleccionar ruta");
+        dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
+        children(new Text("Seleccione la ruta de guardado de los bizbank"), 
+                buttonSiDocumento).
+        alignment(Pos.CENTER).padding(new Insets(10)).build()));
+        buttonSiDocumento.setOnAction((ActionEvent e) -> {
+            File file = seleccionarDirectorio();
+            if (file != null) {
+                dialogStage.close();
+                generadorBank(file);
+            }
+        });
+        dialogStage.show();
+    }
+    
+    public void generadorBank(File file) {
+        
+        dialogWait();
+    
+        textosDAT = new ArrayList<>();
+        textosTXT = new ArrayList<>();
+        
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar())
+                empleadosTable.add(empleado);
+        }
+        
+        for (EmpleadoTable table: 
+                empleadosTable) {
+            
+            String reportName = "";
+            Double reportMonto = 0d;
+            
+            reportMonto = Double.valueOf(table.getMonto());
+            reportName = "HISTORIAL LABO ";
+               
+            
+            textosDAT.add(crearLineaDAT(table.getUsuario(), reportMonto));
+            textosTXT.add(crearLineaTXT(table.getUsuario(), reportMonto, reportName));
+            
+        }
+        if (textosDAT.size() > 0 && textosTXT.size() > 0) {
+            if (file != null) {
+                new GuardarText().saveFile(textosDAT, getFileNameDat(file));
+                new GuardarText().saveFile(textosTXT, getFileNameTXT(file));
+                dialogoCompletado();
+            } 
+        } else {
+            DialogUtil.error("Generador de archivos", "No se pueden generar "
+                    + "los archivos porque\n no hay pagos en la fecha seleccionada.");
+        }
+        dialogLoading.close();
     }
     
     public void completado() {
@@ -386,69 +439,7 @@ public class PlanillaIessController implements Initializable {
         dialogStage.showAndWait();
     }
     
-    @FXML
-    public void dialogoGuardar(ActionEvent event) {
-        if (!contador.getText().equals("")) {
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("");
-            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
-            dialogStage.getIcons().add(new Image(stageIcon));
-            MaterialDesignButtonBlue buttonOk = new MaterialDesignButtonBlue("Si");
-            MaterialDesignButtonBlue buttonNo = new MaterialDesignButtonBlue("no");
-            HBox hBox = HBoxBuilder.create()
-                    .spacing(10.0) //In case you are using HBoxBuilder
-                    .padding(new Insets(5, 5, 5, 5))
-                    .alignment(Pos.CENTER)
-                    .children(buttonOk, buttonNo)
-                    .build();
-            hBox.maxWidth(120);
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("¿Seguro que desea guardar estas planillas?"), hBox).
-            alignment(Pos.CENTER).padding(new Insets(20)).build()));
-            buttonOk.setMinWidth(50);
-            buttonNo.setMinWidth(50);
-            buttonOk.setOnAction((ActionEvent e) -> {
-                guardarPlanillas();
-                dialogStage.close();
-            });
-            buttonNo.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
-            dialogStage.showAndWait();
-        } else {
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("");
-            String stageIcon = AplicacionControl.class
-                    .getResource("imagenes/icon_error.png").toExternalForm();
-            dialogStage.getIcons().add(new Image(stageIcon));
-            Button buttonOk = new MaterialDesignButtonBlue("ok");
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
-            children(new Text("No has seleccionado ningun empleado."), 
-                    buttonOk).
-            alignment(Pos.CENTER).padding(new Insets(20)).build()));
-            dialogStage.show();
-            buttonOk.setMaxWidth(60);
-            buttonOk.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
-            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-                dialogStage.close();
-            });
-        }
-    }
     
-    public void guardarPlanillas() {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Runnable worker = new PlanillaIessController.DataBaseThread(0);
-        executor.execute(worker);
-        executor.shutdown();
-
-        loadingMode();
-    }
     
     private void loadingMode(){
         dialog = new Dialog<>();
@@ -467,70 +458,6 @@ public class PlanillaIessController implements Initializable {
         ds.setColor(Color.DARKGRAY);
         dialog.getDialogPane().setEffect(ds);
         dialog.show();
-    }
-    
-    @FXML
-    public void dialogoBorrar(ActionEvent event) {
-        if (!contador.getText().equals("")) {
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("");
-            String stageIcon = AplicacionControl.class.getResource("imagenes/icon_error.png").toExternalForm();
-            dialogStage.getIcons().add(new Image(stageIcon));
-            MaterialDesignButtonBlue buttonOk = new MaterialDesignButtonBlue("Si");
-            MaterialDesignButtonBlue buttonNo = new MaterialDesignButtonBlue("no");
-            HBox hBox = HBoxBuilder.create()
-                    .spacing(10.0) //In case you are using HBoxBuilder
-                    .padding(new Insets(5, 5, 5, 5))
-                    .alignment(Pos.CENTER)
-                    .children(buttonOk, buttonNo)
-                    .build();
-            hBox.maxWidth(120);
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
-            children(new Text("¿Seguro que desea borrar estas planillas?"),hBox).
-            alignment(Pos.CENTER).padding(new Insets(20)).build()));
-            buttonOk.setMinWidth(50);
-            buttonNo.setMinWidth(50);
-            buttonOk.setOnAction((ActionEvent e) -> {
-                borrarPlanillas();
-                dialogStage.close();
-            });
-            buttonNo.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
-            dialogStage.showAndWait();
-        } else {
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setResizable(false);
-            dialogStage.setTitle("");
-            String stageIcon = AplicacionControl.class
-                    .getResource("imagenes/icon_error.png").toExternalForm();
-            dialogStage.getIcons().add(new Image(stageIcon));
-            Button buttonOk = new MaterialDesignButtonBlue("ok");
-            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(18).
-            children(new Text("No has seleccionado ningun empleado."), 
-                    buttonOk).
-            alignment(Pos.CENTER).padding(new Insets(20)).build()));
-            dialogStage.show();
-            buttonOk.setMaxWidth(60);
-            buttonOk.setOnAction((ActionEvent e) -> {
-                dialogStage.close();
-            });
-            buttonOk.setOnKeyPressed((KeyEvent event1) -> {
-                dialogStage.close();
-            });
-        }
-    }
-    
-    public void borrarPlanillas() {
-        ExecutorService executor = Executors.newFixedThreadPool(1);
-        Runnable worker = new PlanillaIessController.DataBaseThread(1);
-        executor.execute(worker);
-        executor.shutdown();
-
-        loadingMode();
     }
     
     public void error() {
@@ -629,10 +556,6 @@ public class PlanillaIessController implements Initializable {
         inicio = Fechas.getFechaActual();
         inicio.setDia("01");
         fin = inicio.plusMonths(1).minusDays(1);
-        
-        UsuarioDAO usuarioDAO = new UsuarioDAO();
-        usuarios = new ArrayList<>();
-        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
            
         inicio.setToSpinner(selectorAnoDe, selectorMesDe, selectorDiaDe);
         fin.setToSpinner(selectorAnoHa, selectorMesHa, selectorDiaHa);
@@ -641,6 +564,10 @@ public class PlanillaIessController implements Initializable {
     }
     
     public void setTableInfo() {
+        
+        UsuarioDAO usuarioDAO = new UsuarioDAO();
+        usuarios = new ArrayList<>();
+        usuarios.addAll(usuarioDAO.findAllByEmpresaIdActivoIFVISIBLE(empresa.getId(), inicio));
         
         checkBoxTodos.setSelected(false);
         contador.setText("");
@@ -666,32 +593,62 @@ public class PlanillaIessController implements Initializable {
                     .getDepartamento().getNombre());
             empleado.setCargo(user.getDetallesEmpleado()
                     .getCargo().getNombre());
-            Double totalIngreso = 0d; 
+            empleado.setUsuario(user);
+            Double historial = 0d; 
             Boolean encontrado = false;
+            
             for (PlanillaIess planillaIess: planillaIesses) {
                 if (planillaIess.getUsuario().getId().equals(user.getId())) {
-                    totalIngreso = planillaIess.getMonto();
+                    historial = planillaIess.getMonto();
                     encontrado = true;
                 }
             }
             if (!encontrado) {
-                RolIndividual rolIndividual = new RolIndividualDAO()
+                RolIndividual rol = new RolIndividualDAO()
                         .findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), 
                             user.getId(), Const.ROL_PAGO_INDIVIDUAL);
                 
-                if (rolIndividual != null) {
-                    totalIngreso = rolIndividual.getSubtotal() 
-                        + getVacaciones(user)
-                        - rolIndividual.getSalario();
+                Fecha inicioVac = new Fecha("01", "01", inicio.getAno())
+                    .minusYears(1);
+                
+                PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
+                    .findInDeterminateTimeByUsuarioId(inicioVac.getFecha(), empleado.getId());
+                
+                if (rol != null) {
+                    Double sueldo = rol.getSueldo();
+                    if (rol.getDias() < 30.0d) {
+                        List<ControlDiario> controlesDiarios = new ControlDiarioDAO()
+                                .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), 
+                                        inicio.getFecha(), fin.getFecha());
+                        Integer permisos = 0;
+                        for (ControlDiario control:
+                                controlesDiarios) {
+                            if (control.getCaso().equals(Const.PERMISO)) {
+                                permisos++;
+                            }
+                        }
+                        if (permisos > 0) {
+                            sueldo = (sueldo/30.0d)*(30.0d-permisos.doubleValue());
+                        }
+                    }
+                    /**********************************************************/
+                    //sueldo + sobretiempos + bonos + vacaciones - sueldo básico
+                    /**********************************************************/
+                     if (rol.getUsuario().getApellido().toLowerCase().contains("cardozo")) {
+                         if (pagoVacaciones == null)
+                            System.out.println("pagoVacaciones es nulo");
+                         else {
+                             System.out.println("tiene pago de vacaciones");
+                         }
+                     }
+                    historial = rol.getSalario() + rol.getTotalMontoHorasExtras() 
+                            + getVacacionesFromThisMonth(pagoVacaciones)
+                            + rol.getTotalBonos() - sueldo;
                 }
             }
-            totalIngreso = round(totalIngreso);
+            historial = round(historial);
             empleado.setPlanilla(encontrado);
-            empleado.setMonto(totalIngreso.toString());
-            Double iessDescuento = (totalIngreso/100d) * getIess();
-            empleado.setTotalIess(round(iessDescuento));
-            empleado.setNuevoSueldo(round(totalIngreso - iessDescuento));
-            empleado.setUsuario(user);
+            empleado.setMonto(historial.toString());
             return empleado;
         }).forEach((empleado) -> {
             data.add(empleado);
@@ -730,6 +687,53 @@ public class PlanillaIessController implements Initializable {
         chequearFiltro(filteredData);
     }
     
+    private Double getVacacionesFromThisMonth(PagoVacaciones pagoVacaciones) {
+        
+        if (pagoVacaciones != null) {
+            
+            Calendar calIni = Calendar.getInstance();
+            calIni.setTime(pagoVacaciones.getGoceInicio());
+
+            Calendar calFin = Calendar.getInstance();
+            calFin.setTime(pagoVacaciones.getGoceFin());
+
+
+            Integer mes1int = calIni.get(Calendar.MONTH)+1;
+            Integer mes2int = calFin.get(Calendar.MONTH)+1;
+            Integer dias1int = 0;
+            Integer dias2int = 0;
+            Double montoMes1Dou = 0d;
+            Double montoMes2Dou = 0d;
+            if (mes1int != mes2int) {
+                if (mes1int+1 == mes2int) {
+                    dias2int = calFin.get(Calendar.DAY_OF_MONTH);
+                    dias1int = pagoVacaciones.getDias() - dias2int;
+                    Double valorDia = pagoVacaciones.getValor()
+                            /pagoVacaciones.getDias().doubleValue();
+                    montoMes1Dou = round(valorDia*dias1int);
+                    montoMes2Dou = round(valorDia*dias2int);
+                } 
+            } else {
+                if (inicio.getMesInt() == mes1int) {
+                    System.out.println(pagoVacaciones.getValor());
+                    return pagoVacaciones.getValor();
+                }
+            }
+            if (pagoVacaciones.getUsuario().getApellido().toLowerCase().contains("cardozo")) {
+                System.out.println(pagoVacaciones.getValor());
+                System.out.println(montoMes1Dou);
+                System.out.println(montoMes2Dou);
+            }
+            if (inicio.getMesInt() == mes1int) {
+                return montoMes1Dou;
+            }
+            if (inicio.getMesInt() == mes2int) {
+                return montoMes2Dou;
+            } 
+        }
+        return 0d;
+    }
+    
     void chequearFiltro(FilteredList<EmpleadoTable> filteredData) {
         filteredData.setPredicate(empleado -> {
             // If filter text is empty, display all persons.
@@ -756,8 +760,8 @@ public class PlanillaIessController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {   
-        empleadosTableView.setEditable(Boolean.TRUE);
-        
+        empleadosTableView.setEditable(Boolean.FALSE);
+     
         cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         
         nombreColumna.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -784,18 +788,11 @@ public class PlanillaIessController implements Initializable {
                     empleadoTable.setAgregar(true);
                     Double totalIngreso = newValue; 
                     empleadoTable.setMonto(totalIngreso.toString());
-                    Double iessDescuento = (totalIngreso/100d) * getIess();
-                    empleadoTable.setTotalIess(round(iessDescuento));
-                    empleadoTable.setNuevoSueldo(round(totalIngreso - iessDescuento));
                     data.set(data.indexOf(empleadoTable), empleadoTable);
                     contarSelecciones();
                 }
             }
         );
-        
-        iessColumna.setCellValueFactory(new PropertyValueFactory<>("totalIess"));
-        
-        totalColumna.setCellValueFactory(new PropertyValueFactory<>("nuevoSueldo"));
         
         marcarColumna.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
         marcarColumna.setCellFactory(param -> new TableCell<EmpleadoTable, EmpleadoTable>() {
@@ -870,36 +867,19 @@ public class PlanillaIessController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
-        buttonGuardar.setTooltip(
-            new Tooltip("Guardar")
+        buttonBank.setTooltip(
+            new Tooltip("Generar .DAT y .TXT")
         );
-        buttonGuardar.setOnMouseEntered((MouseEvent t) -> {
-            buttonGuardar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/guardar.png'); "
+        buttonBank.setOnMouseEntered((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: #29B6F6;");
         });
-        buttonGuardar.setOnMouseExited((MouseEvent t) -> {
-            buttonGuardar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/guardar.png'); "
-                    + "-fx-background-position: center center; "
-                    + "-fx-background-repeat: stretch; "
-                    + "-fx-background-color: transparent;");
-        });
-        buttonBorrar.setTooltip(
-            new Tooltip("Borrar")
-        );
-        buttonBorrar.setOnMouseEntered((MouseEvent t) -> {
-            buttonBorrar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/borrar.png'); "
-                    + "-fx-background-position: center center; "
-                    + "-fx-background-repeat: stretch; "
-                    + "-fx-background-color: #29B6F6;");
-        });
-        buttonBorrar.setOnMouseExited((MouseEvent t) -> {
-            buttonBorrar.setStyle("-fx-background-image: "
-                    + "url('aplicacion/control/imagenes/borrar.png'); "
+        buttonBank.setOnMouseExited((MouseEvent t) -> {
+            buttonBank.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/bank.png'); "
                     + "-fx-background-position: center center; "
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
@@ -923,10 +903,6 @@ public class PlanillaIessController implements Initializable {
         buttonSiguiente.setOnMouseExited((MouseEvent t) -> {
             buttonSiguiente.setStyle("-fx-background-color: #039BE5;");
         });
-        
-        iess = (Constante) new ConstanteDAO().findUniqueResultByNombre(Const.IESS);
-        if (iess != null)
-            iessColumna.setText(Const.IP_IESS + " (" + iess.getValor() + "%)");
         
         selectorDiaDe.setItems(Fechas.arraySpinnerDia());
         selectorMesDe.setItems(Fechas.arraySpinnerMes());
@@ -968,7 +944,7 @@ public class PlanillaIessController implements Initializable {
         }
     }
     
-    Double getVacaciones(Usuario user) { // TODO; revisar
+    private Double getVacaciones(Usuario user) { // TODO; revisar
         Fecha inicioY = new Fecha("01","01",inicio.getAno());
         PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
                     .findInDeterminateTimeByUsuarioId(inicioY.getFecha(), user.getId()); 
@@ -1001,11 +977,85 @@ public class PlanillaIessController implements Initializable {
         return 0d;
     }
     
-    public double getIess() {
-        if (iess == null) {
-            return 0.0;
+    String crearLineaDAT(Usuario user, Double reportMonto) {
+        String monto = Numeros.roundToString(reportMonto);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "           ";
+                break;
+            case 1:
+                espacios = "          ";
+                break;
+            case 2:
+                espacios = "         ";
+                break;
+            case 3:
+                espacios = "        ";
+                break;
+            case 4:
+                espacios = "       ";
+                break;
+            case 5:
+                espacios = "      ";
+                break;
+        }
+        String text = user.getDetallesEmpleado()
+                            .getEmpresa().getNumeracion()+";0001;"+inicio.getAno()
+                            +";"+inicio.getMes()+";INS;"+user.getCedula()
+                            +";"+espacios+monto+";0";
+        return text;
+    }
+    
+    String getFileNameDat(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".DAT";
         } else {
-            return Double.valueOf(iess.getValor());
+            return  file.getPath()+"\\"+empresa.getNombre()+".DAT";
+        }
+    }
+    
+    String crearLineaTXT(Usuario user, Double reportMonto, String reportName) {
+        String monto = Numeros.roundToString(reportMonto);
+        String espacios = "";
+        String[] parts = monto.split(Pattern.quote("."));
+        String partEntera = parts[0];
+        String partDecimal = parts[1];
+        switch (partEntera.length()) {
+            case 0:
+                espacios = "0000000000000";
+                break;
+            case 1:
+                espacios = "000000000000";
+                break;
+            case 2:
+                espacios = "00000000000";
+                break;
+            case 3:
+                espacios = "0000000000";
+                break;
+            case 4:
+                espacios = "000000000";
+                break;
+            case 5:
+                espacios = "00000000";
+                break;
+        }
+        String text = "10CPRP"+user.getDetallesEmpleado().getNroCuenta()
+                +espacios+partEntera+partDecimal+reportName
+                +user.getDetallesEmpleado().getEmpresa().getNombre()+"CUUSD";
+        return text;
+    }
+    
+    String getFileNameTXT(File file) {
+        String nombre = empresa.getNombre();
+        if (nombre.length() >= 8) {
+            return  file.getPath()+"\\"+empresa.getNombre().substring(0,8)+".TXT";
+        } else {
+            return  file.getPath()+"\\"+empresa.getNombre()+".TXT";
         }
     }
     
@@ -1021,140 +1071,4 @@ public class PlanillaIessController implements Initializable {
         aplicacionControl.login(login, usuarioLogin);
     }
 
-    public class DataBaseThread implements Runnable {
-        
-        public final Integer GUARDAR = 0;
-        public final Integer BORRAR = 1;
-        
-        Integer opcion;
-
-        public DataBaseThread(Integer opcion){
-            this.opcion = opcion;
-        }
-
-        @Override
-        public void run() {
-    
-            new Timer().schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                        cancel();
-                        if (Objects.equals(opcion, GUARDAR)) {
-                            guardar();
-                        } else if (Objects.equals(opcion, BORRAR)) {
-                            borrar();
-                        } 
-                    }
-             }, 1000, 1000);
-            
-        }
-        
-        private void guardar() {
-            try {
-                ArrayList<EmpleadoTable> empleadosMarcados = new ArrayList<>();
-        
-                for (EmpleadoTable empleadoTable: 
-                        (List<EmpleadoTable>) empleadosTableView.getItems()) {
-                    if (empleadoTable.getAgregar()) {
-                        empleadoTable.setPlanilla(true);
-                        data.set(data.indexOf(empleadoTable), empleadoTable);
-                        empleadosMarcados.add(empleadoTable);
-                    }
-                }
-
-                for (EmpleadoTable empleadoTable: empleadosMarcados) {
-                    PlanillaIess planillaIess = new PlanillaIess();
-                    planillaIess.setFecha(new Timestamp((new DateTime()).getMillis()));
-                    planillaIess.setInicioMes(inicio.getFecha());
-                    planillaIess.setFinMes(fin.getFecha());
-                    planillaIess.setUsuario(empleadoTable.getUsuario());
-                    planillaIess.setMonto(round(empleadoTable.getMonto()));
-                    new PlanillaIessDAO().save(planillaIess);
-
-                    for (PlanillaIess planillaIessDelete: planillaIesses) {
-                        if (planillaIessDelete.getUsuario().getId() 
-                                == empleadoTable.getUsuario().getId()) {
-                            System.out.println("Borrando planilla: " + planillaIessDelete.getId());
-                            new PlanillaIessDAO().delete(planillaIessDelete);
-                            HibernateSessionFactory.getSession().flush();
-                            planillaIesses.remove(planillaIessDelete);
-                            break;
-                        }
-                    }
-                    planillaIesses.add(planillaIess);
-                }
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        updateWindows();
-                    }
-                });
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        error();
-                    }
-                });
-            }
-            
-        }
-        
-        private void borrar() {
-            try {
-                for (EmpleadoTable empleadoTable: 
-                        (List<EmpleadoTable>) empleadosTableView.getItems()) {
-                    if (empleadoTable.getAgregar()) {
-                        for (PlanillaIess planillaIessDelete: planillaIesses) {
-                            if (planillaIessDelete.getUsuario().getId()
-                                    .equals(empleadoTable.getUsuario().getId())) {
-                                System.out.println("Borrando planilla: " + planillaIessDelete.getId());
-                                new PlanillaIessDAO().delete(planillaIessDelete);
-                                HibernateSessionFactory.getSession().flush();
-                                planillaIesses.remove(planillaIessDelete);
-
-                                Double totalIngreso = 0d;
-                                List<PagoMesItem> pagoMesItems = new PagoMesItemDAO()
-                                        .findByEmpleadoIdAndFecha(planillaIessDelete
-                                                .getUsuario().getId(), inicio.getFecha());
-                                 for (PagoMesItem pagoMesItem: pagoMesItems) {
-
-                                    if (pagoMesItem.getIngreso() != null) {
-                                        totalIngreso += pagoMesItem.getIngreso();
-                                    }
-                                }
-                                totalIngreso = round(totalIngreso);
-                                empleadoTable.setPlanilla(false);
-                                empleadoTable.setMonto(totalIngreso.toString());
-                                Double iessDescuento = (totalIngreso/100d) * getIess();
-                                empleadoTable.setTotalIess(round(iessDescuento));
-                                empleadoTable.setNuevoSueldo(round(totalIngreso - iessDescuento));
-                                data.set(data.indexOf(empleadoTable), empleadoTable);
-                                
-                                break;
-                            }
-                        }
-                    }
-                }
-                
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        updateWindowsBorrado();
-                    }
-                });
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-                Platform.runLater(new Runnable() {
-                    @Override public void run() {
-                        error();
-                    }
-                });
-            }
-            
-        }
-        
-    }
-    
 }
