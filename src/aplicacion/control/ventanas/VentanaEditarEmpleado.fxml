@@ -8,6 +8,7 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
@@ -55,10 +56,8 @@
                   <Label layoutX="25.0" layoutY="38.0" text="Departamento" textFill="WHITE" />
                   <Label layoutX="25.0" layoutY="78.0" text="Cargo" textFill="WHITE" />
                   <TextField fx:id="cuentaField" layoutX="113.0" layoutY="153.0" prefHeight="25.0" prefWidth="440.0" promptText="Numero de cuenta Bancaria" />
-                  <TextField fx:id="extraField" layoutX="113.0" layoutY="193.0" prefHeight="25.0" prefWidth="440.0" promptText="Dato adicional (Opcional)" visible="false" />
                   <Button fx:id="guardarButton1" layoutX="199.0" layoutY="359.0" mnemonicParsing="false" onAction="#onCLickGuardar" text="Guardar" />
                   <Label layoutX="25.0" layoutY="158.0" text="Cta. Bancaria" textFill="WHITE" />
-                  <Label layoutX="26.0" layoutY="198.0" text="Extra" textFill="WHITE" visible="false" />
                   <Button fx:id="cancelarButton1" layoutX="342.0" layoutY="359.0" mnemonicParsing="false" onAction="#onClickCancelar" text="Cancelar" />
                   <ChoiceBox fx:id="departamentoChoiceBox" layoutX="113.0" layoutY="34.0" prefHeight="25.0" prefWidth="257.0" />
                   <ChoiceBox fx:id="cargoChoiceBox" layoutX="113.0" layoutY="74.0" prefHeight="25.0" prefWidth="257.0" />
@@ -71,10 +70,12 @@
                   <DatePicker fx:id="datePickerContratacion" layoutX="379.0" layoutY="113.0" promptText="Fecha de contratacion" />
                   <Label layoutX="25.0" layoutY="118.0" text="Inicio" textFill="WHITE" />
                   <Label layoutX="295.0" layoutY="118.0" text="Contratacion" textFill="WHITE" />
-                  <CheckBox fx:id="checkBoxDecimos" layoutX="364.0" layoutY="239.0" mnemonicParsing="false" selected="true" text="Acumula decimos" textFill="WHITE" />
-                  <Label layoutX="110.0" layoutY="238.0" text="\$" textFill="WHITE" />
-                  <Label layoutX="27.0" layoutY="239.0" text="Sueldo" textFill="WHITE" />
-                  <TextField fx:id="sueldoField" layoutX="123.0" layoutY="234.0" prefHeight="25.0" prefWidth="98.0" promptText="Sueldo mensual" />
+                  <TextField fx:id="sueldoField" layoutX="113.0" layoutY="196.0" prefHeight="25.0" prefWidth="102.0" promptText="Sueldo mensual" />
+                  <Label layoutX="25.0" layoutY="200.0" text="Sueldo" textFill="WHITE" />
+                  <Label layoutX="25.0" layoutY="243.0" text="Extra" textFill="WHITE" />
+                  <Label layoutX="99.0" layoutY="200.0" text="\$" textFill="WHITE" />
+                  <CheckBox fx:id="checkBoxDecimos" layoutX="379.0" layoutY="200.0" mnemonicParsing="false" selected="true" text="Acumula decimos" textFill="WHITE" />
+                  <TextArea fx:id="extraField" layoutX="113.0" layoutY="239.0" prefHeight="80.0" prefWidth="440.0" promptText="Observación (Opcional)" wrapText="true" />
                </children>
             </AnchorPane>
          </content>

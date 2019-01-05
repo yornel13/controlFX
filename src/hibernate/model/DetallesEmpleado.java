@@ -23,6 +23,7 @@ public class DetallesEmpleado implements java.io.Serializable {
         private Boolean acumulaDecimos;
 	private String nroCuenta;
 	private String extra;
+	private String observacion;
         private Timestamp fechaInicio;
         private Timestamp fechaContrato;
 	private Set usuarios = new HashSet(0);
@@ -126,6 +127,14 @@ public class DetallesEmpleado implements java.io.Serializable {
 	public void setExtra(String extra) {
 		this.extra = extra;
 	}
+
+        public String getObservacion() {
+            return observacion;
+        }
+
+        public void setObservacion(String observacion) {
+            this.observacion = observacion;
+        }
 
 	public Set getUsuarios() {
 		return this.usuarios;

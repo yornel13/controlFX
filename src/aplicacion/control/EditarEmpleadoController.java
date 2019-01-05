@@ -36,7 +36,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
@@ -91,7 +93,7 @@ public class EditarEmpleadoController implements Initializable {
     private TextField cuentaField;
     
     @FXML
-    private TextField extraField;
+    private TextArea extraField;
     
     @FXML
     private TextField sueldoField;
@@ -158,7 +160,8 @@ public class EditarEmpleadoController implements Initializable {
     
     @FXML
     private void onCLickGuardar(ActionEvent event) throws IOException, Exception {
-        System.out.println("aplicacion.control.RegistrarEmpleadoController.onCLickGuardar()");
+        errorText1.setText("");
+        errorText2.setText("");
         if (nombreField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar un nombre");
             errorText2.setText("Debe ingresar un nombre");
@@ -208,7 +211,7 @@ public class EditarEmpleadoController implements Initializable {
             empleado.getDetallesEmpleado().setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
             empleado.getDetallesEmpleado().setFechaInicio(Timestamp.valueOf(datePickerInicio.getValue().atStartOfDay()));
             empleado.getDetallesEmpleado().setFechaContrato(Timestamp.valueOf(datePickerContratacion.getValue().atStartOfDay()));
-            //empleado.getDetallesEmpleado().setExtra(extraField.getText()); TODO, extra elimando
+            empleado.getDetallesEmpleado().setObservacion(extraField.getText());
             empleado.getDetallesEmpleado().setNroCuenta(cuentaField.getText());
             empleado.getDetallesEmpleado().setSueldo(Double.parseDouble(sueldoField.getText()));
             empleado.getDetallesEmpleado().setAcumulaDecimos(checkBoxDecimos.isSelected());
@@ -322,7 +325,7 @@ public class EditarEmpleadoController implements Initializable {
         cuentaField.setText(empleado.getDetallesEmpleado().getNroCuenta());
         sueldoField.setText(empleado.getDetallesEmpleado().getSueldo().toString());
         checkBoxDecimos.setSelected(empleado.getDetallesEmpleado().getAcumulaDecimos());
-        //extraField.setText(empleado.getDetallesEmpleado().getExtra());  TODO, extra elimando
+        extraField.setText(empleado.getDetallesEmpleado().getObservacion());
         estadoCivilChoiceBox.getSelectionModel().select(empleado.getEstadoCivil().getNombre());
         departamentoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getDepartamento().getNombre());
         cargoChoiceBox.getSelectionModel().select(empleado.getDetallesEmpleado().getCargo().getNombre()); 
@@ -367,6 +370,9 @@ public class EditarEmpleadoController implements Initializable {
         cargoChoiceBox.setItems(FXCollections.observableArrayList(itemsCargos)); 
        
         sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
+        
+        extraField.setTextFormatter(new TextFormatter<>(change -> 
+            change.getControlNewText().length() <= 500 ? change : null));
     }    
     
     public static EventHandler<KeyEvent> numDecimalFilter() {

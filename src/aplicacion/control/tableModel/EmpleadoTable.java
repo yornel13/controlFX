@@ -18,6 +18,7 @@ import hibernate.model.RolCliente;
 import hibernate.model.PagoMesItem;
 import hibernate.model.PagoQuincena;
 import hibernate.model.PagoVacaciones;
+import hibernate.model.PlanillaIess;
 import hibernate.model.RolIndividual;
 import hibernate.model.Usuario;
 import java.sql.Date;
@@ -56,7 +57,7 @@ public class EmpleadoTable {
     private Boolean sinRoles;
     public ArrayList<CuotaDeuda> deudas;
     public ArrayList<PagoMesItem> pagoMesItems;
-     public ArrayList<PagoMes> pagosMensuales;
+    public ArrayList<PagoMes> pagosMensuales;
     public ArrayList<RolCliente> pagos;
     public ArrayList<RolIndividual> rolesInds;
     public ArrayList<Double> decimosMes;
@@ -67,6 +68,7 @@ public class EmpleadoTable {
     private Boolean activo;
     private Boolean agregar;
     private String monto;
+    private String montoAlternativo;
     private String cuotas;
     private Double decimo3;
     private Double decimo4;
@@ -106,6 +108,8 @@ public class EmpleadoTable {
     private java.sql.Date sqlDateFin;
     private Fecha fechaInicio;
     private Fecha FechaFin;
+    private boolean administrativo;
+    private PlanillaIess planillaIess;
 
     public EmpleadoTable() {
         problem = false;
@@ -174,6 +178,14 @@ public class EmpleadoTable {
 
     public String getCargo() {
         return cargo;
+    }
+
+    public String getMontoAlternativo() {
+        return montoAlternativo;
+    }
+
+    public void setMontoAlternativo(String montoAlternativo) {
+        this.montoAlternativo = montoAlternativo;
     }
 
     public void setCargo(String cargo) {
@@ -486,6 +498,14 @@ public class EmpleadoTable {
         this.usuario = usuario;
     }
 
+    public PlanillaIess getPlanillaIess() {
+        return planillaIess;
+    }
+
+    public void setPlanillaIess(PlanillaIess planillaIess) {
+        this.planillaIess = planillaIess;
+    }
+
     public RolCliente getRolCliente() {
         return rolCliente;
     }
@@ -732,6 +752,14 @@ public class EmpleadoTable {
 
     public void setDecimosMes(ArrayList<Double> decimosMes) {
         this.decimosMes = decimosMes;
+    }
+
+    public boolean isAdministrativo() {
+        return administrativo;
+    }
+
+    public void setAdministrativo(boolean administrativo) {
+        this.administrativo = administrativo;
     }
     
     

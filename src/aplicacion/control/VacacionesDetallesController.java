@@ -11,6 +11,7 @@ import aplicacion.control.tableModel.PagosTable;
 import aplicacion.control.util.Const;
 import aplicacion.control.util.CorreoUtil;
 import aplicacion.control.util.DateUtil;
+import aplicacion.control.util.DialogUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.MaterialDesignButton;
@@ -82,6 +83,11 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import static aplicacion.control.util.Numeros.round;
+import hibernate.dao.PagoMesDAO;
+import hibernate.dao.PagoMesItemDAO;
+import hibernate.dao.RolIndividualDAO;
+import hibernate.model.DiasVacaciones;
+import hibernate.model.PagoMes;
 
 /**
  *
@@ -173,6 +179,9 @@ public class VacacionesDetallesController implements Initializable {
     @FXML
     private Button buttonGuardar;
     
+    @FXML
+    private CheckBox checkbox;
+    
     public ObservableList<PagosTable> data;
     
     List<PagosTable> pagosTable;
@@ -195,6 +204,11 @@ public class VacacionesDetallesController implements Initializable {
     public PagoVacaciones pagoVacaciones;
     
     public PagoVacacionesController pagoVacacionesController;
+    private String year;
+    
+    private boolean fisrtInst = true;
+    
+    private Integer aniosServicio;
     
     public void setStagePrincipal(Stage stagePrincipal) {
         this.stagePrincipal = stagePrincipal;
@@ -413,10 +427,7 @@ public class VacacionesDetallesController implements Initializable {
             parametros.put("regreso", DateUtil.getLongDate(DateUtil.addDays(pagoVacaciones.getGoceFin(), 1)));
             parametros.put("sueldo", Numeros.round(pagoVacaciones.getSueldo()).toString());
             parametros.put("ingreso", Fechas.getFechaCorta(empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio()));
-            Timestamp timestamp = empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio();
-            DateTime contratoDate = new DateTime(timestamp.getTime());
-            Integer anios = empleadoTable.getFechaFin().getAnoInt() - contratoDate.getYear();
-            parametros.put("anios", anios.toString());
+            parametros.put("anios", aniosServicio.toString());
             parametros.put("lapso", periodoLiquidacion);
             if (montoMes1Dou != null && montoMes2Dou != null) {
                 parametros.put("mes1", dias1int+" dias en "+Fechas.getMonthName(mes1int));
@@ -602,6 +613,12 @@ public class VacacionesDetallesController implements Initializable {
         
         new PagoVacacionesDAO().save(pagoVacaciones);
         
+        String detalles = "genero el recibo del liquidacion de vacaciones nro: " + pagoVacaciones.getId()
+                    + ", del empleado " + pagoVacaciones.getUsuario().getNombre() 
+                    + " " + pagoVacaciones.getUsuario().getApellido()
+                + ". "+periodoLabel.getText();
+        aplicacionControl.au.saveAgrego(detalles, aplicacionControl.permisos.getUsuario());
+        
         buttonPagar.setVisible(false);
         buttonBorrar.setVisible(true);
         buttonImprimir.setVisible(true);
@@ -617,7 +634,7 @@ public class VacacionesDetallesController implements Initializable {
                     Fechas.getFechaCorta(pagoVacaciones.getGoceFin()));
             pagoVacacionesController.empleadoEditado(empleadoTable);
         }
-        
+        checkbox.setDisable(true);
         dialogoImprimir(null);
         
     }
@@ -756,7 +773,96 @@ public class VacacionesDetallesController implements Initializable {
         });
     }
     
-    public void setEmpleado(EmpleadoTable empleadoTable, String periodo) {
+    @FXML
+    public void change(ActionEvent event) {
+        
+        if (checkbox.isSelected()) {
+            
+            empleadoTable.setAdministrativo(true);
+            
+            Timestamp timestamp = empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio();
+            DateTime contratoDate = new DateTime(timestamp.getTime());
+            Fecha inicio = new Fecha("01", "01", year)
+                    .minusYears(1)
+                    .minusMonths(1)
+                    .plusMonths(contratoDate.getMonthOfYear()); 
+            Fecha fin = inicio.plusYears(1).minusMonths(1);
+            Calendar cal = Calendar.getInstance();
+            cal.set(Integer.valueOf(year)-1, contratoDate.getMonthOfYear()-1, 01);
+            Date inicioDate = new Date(cal.getTime().getTime());
+            Date finDate = DateUtil.addYears(inicioDate, 1);
+            finDate = DateUtil.removeMonths(finDate, 1);
+            Calendar calendar = Calendar.getInstance();  
+            calendar.setTime(finDate);
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            finDate = new Date(calendar.getTime().getTime());
+            empleadoTable.setSqlDateInicio(inicioDate);
+            empleadoTable.setSqlDateFin(finDate);
+            empleadoTable.setFechaInicio(inicio);
+            empleadoTable.setFechaFin(fin);
+            fin.setDia("30");
+            List<RolIndividual> rolIndividuals = new RolIndividualDAO()
+                        .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleadoTable.getId());
+            List<PagoMes> pagosMensuales = new PagoMesDAO()
+                    .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleadoTable.getId());
+
+            if (rolIndividuals != null) {
+                empleadoTable.setRolesInds(new ArrayList<>(rolIndividuals));
+                for (PagoMes pagoMes: pagosMensuales) {
+                    pagoMes.setPagosItems(new PagoMesItemDAO().findByPagoMesId(pagoMes.getId()));
+                }
+                empleadoTable.setPagosMensuales(new ArrayList<>(pagosMensuales));
+            }
+            String periodoALiquidar = Fechas.getFechaCorta(inicioDate)
+                            +" al "+ Fechas.getFechaCorta(finDate);
+            setEmpleado(empleadoTable, periodoALiquidar, year);
+
+        } else {
+            
+            empleadoTable.setAdministrativo(false);
+            
+            Timestamp timestamp = empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio();
+            DateTime contratoDate = new DateTime(timestamp.getTime());
+            
+            ////////////////////////////////////////////////////////////////////
+            Fecha inicio = new Fecha("01", "01", year)
+                    .minusYears(1);
+            Fecha fin = inicio.plusYears(1).minusMonths(1);
+            ////////////////////////////////////////////////////////////////////
+            Calendar cal = Calendar.getInstance();
+            cal.set(Integer.valueOf(year)-1, contratoDate.getMonthOfYear()-1, 01);
+            Date inicioDate = new Date(cal.getTime().getTime());
+            Date finDate = DateUtil.addYears(inicioDate, 1);
+            finDate = DateUtil.removeMonths(finDate, 1);
+            Calendar calendar = Calendar.getInstance();  
+            calendar.setTime(finDate);
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            finDate = new Date(calendar.getTime().getTime());
+            empleadoTable.setSqlDateInicio(inicioDate);
+            empleadoTable.setSqlDateFin(finDate);
+            empleadoTable.setFechaInicio(inicio);
+            empleadoTable.setFechaFin(fin);
+            fin.setDia("30");
+            List<RolIndividual> rolIndividuals = new RolIndividualDAO()
+                    .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleadoTable.getId());
+            List<PagoMes> pagosMensuales = new PagoMesDAO()
+                    .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleadoTable.getId());
+            
+            if (rolIndividuals != null) {
+                empleadoTable.setRolesInds(new ArrayList<>(rolIndividuals));
+                for (PagoMes pagoMes: pagosMensuales) {
+                    pagoMes.setPagosItems(new PagoMesItemDAO().findByPagoMesId(pagoMes.getId()));
+                }
+                empleadoTable.setPagosMensuales(new ArrayList<>(pagosMensuales));
+            } 
+            String periodoALiquidar = Fechas.getFechaCorta(inicioDate)
+                            +" al "+ Fechas.getFechaCorta(finDate);
+            setEmpleado(empleadoTable, periodoALiquidar, year);
+        }
+    }
+    
+    public void setEmpleado(EmpleadoTable empleadoTable, String periodo, String year) {
+        this.year = year;
         this.periodoLiquidacion = periodo;
         this.empleadoTable = empleadoTable;
         this.empresa = empleadoTable.getUsuario().getDetallesEmpleado().getEmpresa();
@@ -766,6 +872,7 @@ public class VacacionesDetallesController implements Initializable {
     
     private void setTableInfo() {
         buttonGuardar.setVisible(false);
+        checkbox.setSelected(empleadoTable.isAdministrativo());
         
         pagosTable = new ArrayList<>();
         dias = 0;
@@ -783,7 +890,16 @@ public class VacacionesDetallesController implements Initializable {
             dias = dias - diferencia;
             if (dias < 15) dias = 15;
         } else {
-            dias = pagoVacaciones.getDias();   
+            checkbox.setDisable(true);
+            dias = pagoVacaciones.getDias(); 
+            if (fisrtInst) {
+                fisrtInst = false;
+                if (new Fecha(pagoVacaciones.getInicio()).getMesInt() != 1) {
+                    checkbox.setSelected(true);
+                    change(null);
+                    return;
+                }
+            }
         }
         /*******************************************************/
         /***************Creando data para tabla*****************/
@@ -870,7 +986,15 @@ public class VacacionesDetallesController implements Initializable {
         
         Timestamp timestamp = empleadoTable.getUsuario().getDetallesEmpleado().getFechaInicio();
         DateTime contrateDate = new DateTime(timestamp.getTime());
-        Integer anios = empleadoTable.getFechaFin().getAnoInt() - contrateDate.getYear();
+        aniosServicio = empleadoTable.getFechaFin().getAnoInt() - contrateDate.getYear();
+        {
+            int monthActual = empleadoTable.getFechaFin().getMesInt();
+            int monthInit = contrateDate.getMonthOfYear();
+            Integer months = monthActual - monthInit;
+            if (months < 0) {
+                aniosServicio -= 1;
+            }
+        }
         
         /*******************************************************/
         /*************Mostrando valores en vista****************/
@@ -879,7 +1003,7 @@ public class VacacionesDetallesController implements Initializable {
         sueldoLabel.setText("Sueldo: $"+sueldo.toString());
         inicioLabel.setText("Inicio "+Fechas.getFechaCorta(contrateDate));
         devengadoLabel.setText("Devengada anual:  $"+Numeros.round(devengado).toString());
-        aniosLabel.setText("Años de servicio: "+anios.toString());
+        aniosLabel.setText("Años de servicio: "+aniosServicio.toString());
         diasLabel.setText("Dias de vacaciones:  "+dias.toString());
         valorLabel.setText("$"+Numeros.round(valor).toString());
         aporteLabel.setText("$"+Numeros.round(deduccion).toString());
@@ -902,7 +1026,9 @@ public class VacacionesDetallesController implements Initializable {
             mes1int = calIni.get(Calendar.MONTH)+1;
             mes2int = calFin.get(Calendar.MONTH)+1;
             if (mes1int != mes2int) {
-                if (mes1int+1 == mes2int) {
+                System.out.println("mes 1 " + mes1int);
+                System.out.println("mes 2 " + mes2int);
+                if (mes1int+1 == mes2int || mes1int == 12 && mes2int == 1) {
                     dias2int = calFin.get(Calendar.DAY_OF_MONTH);
                     dias1int = dias - dias2int;
                     mes1.setText(dias1int+" dias en "+Fechas.getMonthName(mes1int)+":");
@@ -913,7 +1039,7 @@ public class VacacionesDetallesController implements Initializable {
                     montoMes1.setText("$"+montoMes1Dou.toString());
                     montoMes2.setText("$"+montoMes2Dou.toString());
                 } else {
-                   mes1.setText("");
+                    mes1.setText("");
                     mes2.setText("");
                     montoMes1.setText("");
                     montoMes2.setText(""); 
@@ -947,6 +1073,8 @@ public class VacacionesDetallesController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        
+        System.out.println("detallado vacaciones");
         
         mesesColumna.setCellValueFactory(new Callback<TableColumn
                 .CellDataFeatures<PagosTable, String>, ObservableValue<String>>() {

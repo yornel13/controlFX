@@ -835,7 +835,7 @@ public class PagoDecimoCuartoAnualController implements Initializable {
                     Fecha inicioVac = new Fecha("01", "01", inicio.getAno())
                                     .minusYears(1);
                     PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
-                            .findInDeterminateTimeByUsuarioId(inicioVac.getFecha(), empleado.getId());
+                            .findInDeterminateYearByUsuarioId(inicioVac.getAno(), empleado.getId());
                     
                     Double diasDecimo4to = getDiasDecimo4(user, 
                             new Fecha(rol.getInicio()), new Fecha(rol.getFinalizo()));

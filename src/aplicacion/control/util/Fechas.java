@@ -97,6 +97,11 @@ public class Fechas {
         return fechaString;
     }
     
+    public static String getFechaSoloMesYAno(Fecha fecha) {
+        String fechaString = fecha.getMonthName()+" "+fecha.getAnoInt();
+        return fechaString;
+    }
+    
     public static String getFechaConMes(String fechaFecha) {
         Fecha fecha = new Fecha(fechaFecha);
         String fechaString = fecha.getDiaInt()+" de " 

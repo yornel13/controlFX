@@ -7,6 +7,7 @@ package aplicacion.control;
 
 import aplicacion.control.tableModel.EmpleadoTable;
 import aplicacion.control.util.DateUtil;
+import aplicacion.control.util.DialogUtil;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import aplicacion.control.util.GuardarText;
@@ -421,7 +422,7 @@ public class PagoVacacionesController implements Initializable {
                     .findAllByRangoFechaAndEmpleadoId(inicio.getFecha(), fin.getFecha(), empleado.getId());
             
             PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
-                    .findInDeterminateTimeByUsuarioId(inicio.getFecha(), empleado.getId());
+                    .findInDeterminateYearByUsuarioId(inicio.getAno(), empleado.getId());
             
             if (rolIndividuals != null) {
                 empleado.setRolesInds(new ArrayList<>(rolIndividuals));
@@ -746,6 +747,13 @@ public class PagoVacacionesController implements Initializable {
     } 
     
     public void mostrarPagoVacaciones(EmpleadoTable empleadoTable) {
+        
+        if (empleadoTable.getObjectVacaciones() == null) {
+            DialogUtil.error("Error", "El empleado seleccionado "
+                    + "no tiene configurado dias de vacaciones.");
+            return;
+        } 
+        
         if (aplicacionControl.permisos == null) {
            aplicacionControl.noLogeado();
         } else {
@@ -765,7 +773,7 @@ public class PagoVacacionesController implements Initializable {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(aplicacionControl);
                     controller.setPrograma(this);
-                    controller.setEmpleado(empleadoTable, periodoALiquidar);
+                    controller.setEmpleado(empleadoTable, periodoALiquidar, yearLabel.getText());
                     ventana.show();
  
                 } catch (Exception e) {

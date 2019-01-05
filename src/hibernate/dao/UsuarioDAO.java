@@ -3,10 +3,8 @@ package hibernate.dao;
 import aplicacion.control.util.Fecha;
 import aplicacion.control.util.Fechas;
 import hibernate.model.Usuario;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.criterion.Example;
@@ -328,6 +326,11 @@ public class UsuarioDAO extends BaseHibernateDAO {
             users.stream().forEach((user) -> {
                 DateTime desactivado;
                 try {
+                    if (user.getDetallesEmpleado() == null 
+                            || user.getDetallesEmpleado().getExtra() == null 
+                            || user.getDetallesEmpleado().getExtra().isEmpty()){
+                        throw new Exception(); 
+                    }
                     desactivado = new DateTime(user
                             .getDetallesEmpleado().getExtra());
                     Fecha desactivadoFecha = Fechas.getFecha(desactivado);

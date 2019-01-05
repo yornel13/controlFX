@@ -128,6 +128,18 @@ public class PagoVacacionesDAO extends BaseHibernateDAO {
                 return (PagoVacaciones) result;
 	}
         
+        public PagoVacaciones findInDeterminateYearByUsuarioId(String year, Integer usuarioId) {
+		Query query = getSession().
+                    createSQLQuery("SELECT * FROM pago_vacaciones "
+                            + "WHERE usuario_id = :usuario_id "
+                            + "and SUBSTR(inicio, 1, 4) = :year")
+                    .addEntity(PagoVacaciones.class)
+                    .setParameter("usuario_id", usuarioId)
+                    .setParameter("year", year);
+                Object result = query.uniqueResult();
+                return (PagoVacaciones) result;
+	}
+        
         public List<PagoVacaciones> findAllByUsuarioId(Integer usuarioId) {
             Query query = getSession().
                     createSQLQuery("SELECT * FROM pago_vacaciones "

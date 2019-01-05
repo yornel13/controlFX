@@ -588,13 +588,15 @@ public class FondoReservaEmpleadosController extends BaseController
                     Fecha inicioVac = new Fecha("01", "01", new Fecha(rolIndividual.getInicio()).getAno())
                         .minusYears(1);
                     PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
-                        .findInDeterminateTimeByUsuarioId(inicioVac.getFecha(), empleado.getId());
-
-                    Double montoFR = rolIndividual.getSalario() 
+                        .findInDeterminateYearByUsuarioId(inicioVac.getAno(), empleado.getId());
+                        
+                    /*Double montoFR = rolIndividual.getSalario() 
                             + rolIndividual.getTotalMontoHorasExtras() 
                             + rolIndividual.getTotalBonos() 
                             + getVacacionesFromThisMonth(pagoVacaciones);
-                    monto += montoFR/12d;
+                    monto += montoFR/12d;*/
+                    //Double vacaciones12 = getVacacionesFromThisMonth(pagoVacaciones) /12;
+                    monto = rolIndividual.getReserva();
                 }
                 empleado.setMonto(round(monto).toString());
             }  else {

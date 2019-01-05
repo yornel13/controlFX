@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
@@ -118,5 +119,6 @@
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
+      <CheckBox fx:id="checkbox" layoutX="497.0" layoutY="75.0" mnemonicParsing="false" onAction="#change" text="Administrativo" textFill="WHITE" />
     </children>
 </AnchorPane>

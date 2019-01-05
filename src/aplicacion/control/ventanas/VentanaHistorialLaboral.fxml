@@ -16,6 +16,7 @@
     <children>
       <Pane prefHeight="150.0" prefWidth="800.0" style="-fx-background-color: #039BE5;">
          <children>
+            <Button fx:id="buttonBank" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#generarBank" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/bank.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonAtras" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#returnEmpresa" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/atras.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <Button fx:id="buttonImprimir" layoutX="744.0" layoutY="10.0" mnemonicParsing="false" onAction="#dialogoImprimir" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/imprimir.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
             <TextField fx:id="filterField" layoutX="70.0" layoutY="51.0" prefHeight="25.0" prefWidth="564.0" promptText="Escriba para filtrar (cedula, nombre, apellido, cargo o departamento)." />
@@ -40,6 +41,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Button>
+            <Button fx:id="buttonChange" layoutX="644.0" layoutY="10.0" mnemonicParsing="false" onAction="#changeHistorial" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/change_historial.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
          </children>
       </Pane>
       <TableView fx:id="empleadosTableView" layoutX="12.0" layoutY="90.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="459.0" prefWidth="770.0" style="-fx-background-color: white;">
@@ -82,6 +84,5 @@
       <ChoiceBox fx:id="selectorDiaHa" layoutX="441.0" layoutY="12.0" prefHeight="25.0" prefWidth="40.0" />
       <ChoiceBox fx:id="selectorMesHa" layoutX="481.0" layoutY="12.0" prefHeight="25.0" prefWidth="40.0" />
       <ChoiceBox fx:id="selectorAnoHa" layoutX="521.0" layoutY="12.0" prefHeight="25.0" prefWidth="60.0" />
-      <Button fx:id="buttonBank" layoutX="694.0" layoutY="10.0" mnemonicParsing="false" onAction="#generarBank" prefHeight="40.0" prefWidth="40.0" style="-fx-background-image: url('aplicacion/control/imagenes/bank.png'); -fx-background-position: center center; -fx-background-repeat: stretch; -fx-background-color: transparent;" />
     </children>
 </AnchorPane>

@@ -19,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,15 +63,8 @@ import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import org.joda.time.DateTime;
 import aplicacion.control.util.MaterialDesignButtonBlue;
-import hibernate.HibernateSessionFactory;
 import hibernate.dao.PlanillaIessDAO;
 import hibernate.model.PlanillaIess;
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
@@ -82,14 +74,11 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.HBoxBuilder;
 import javafx.scene.paint.Color;
 import javafx.stage.StageStyle;
 import hibernate.dao.PagoMesItemDAO;
 import hibernate.dao.PagoVacacionesDAO;
 import hibernate.dao.RolIndividualDAO;
-import hibernate.model.PagoMesItem;
 import hibernate.model.PagoVacaciones;
 import hibernate.model.RolIndividual;
 import javafx.scene.control.ChoiceBox;
@@ -97,10 +86,22 @@ import static aplicacion.control.util.Fechas.getFechaConMes;
 import aplicacion.control.util.GuardarText;
 import aplicacion.control.util.Numeros;
 import static aplicacion.control.util.Numeros.round;
+import hibernate.HibernateSessionFactory;
 import hibernate.dao.ControlDiarioDAO;
 import hibernate.model.ControlDiario;
+import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.HBoxBuilder;
 
 /**
  *
@@ -143,6 +144,9 @@ public class HistorialLaboralController implements Initializable {
     private Button buttonBank;
     
     @FXML
+    private Button buttonChange;
+    
+    @FXML
     private Button buttonAnterior;
     
     @FXML
@@ -154,7 +158,7 @@ public class HistorialLaboralController implements Initializable {
     private ObservableList<EmpleadoTable> data;
     
     ArrayList<Double> ingresos;
-    ArrayList<PlanillaIess> planillaIesses;
+    
     ArrayList<Usuario> usuarios;
     private Empresa empresa;
     
@@ -300,6 +304,155 @@ public class HistorialLaboralController implements Initializable {
                     + "los archivos porque\n no hay pagos en la fecha seleccionada.");
         }
         dialogLoading.close();
+    }
+
+    @FXML
+    public void changeHistorial(ActionEvent event) {
+        if (getCount() > 0) {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setResizable(false);
+            dialogStage.setTitle("Historial Laboral");
+            String stageIcon = AplicacionControl.class
+                    .getResource("imagenes/completado.png").toExternalForm();
+            dialogStage.getIcons().add(new Image(stageIcon));
+            Button buttonOk = new Button("Cambiar");
+            Button buttonNo = new Button("Cancelar");
+            CheckBox checkBox1 = new CheckBox("salario + horas extras + bonos + vacaciones - sueldo básico");
+            checkBox1.setSelected(true);
+            CheckBox checkBox2 = new CheckBox("horas extras + bonos + vacaciones                                         ");
+            checkBox1.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    checkBox2.setSelected(!newValue);
+                }
+            });
+            checkBox2.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    checkBox1.setSelected(!newValue);
+                }
+            });
+            HBox hBox = HBoxBuilder.create()
+                    .spacing(10.0) //In case you are using HBoxBuilder
+                    .padding(new Insets(5, 5, 5, 5))
+                    .alignment(Pos.CENTER)
+                    .children(buttonOk, buttonNo)
+                    .build();
+            hBox.maxWidth(120);
+            dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(15).
+            children(
+                    new Text("Esta opcion le permite cambiar la manera de calcular el historial laboral.\n"
+                            + "al precionar cambiar los montos de este mes seran calculados con dicha formula."), 
+                    new Text("Por defecto el historial laboral siempre sera calculado con:\n"
+                            + "salario + sobretiempos + bonos + vacaciones - sueldo básico"),
+                    new Text(""),
+                    checkBox1,
+                    checkBox2,
+                    hBox).
+            alignment(Pos.CENTER).padding(new Insets(20)).build()));
+            buttonOk.setMinWidth(50);
+            buttonNo.setMinWidth(50);
+            buttonOk.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+                if (checkBox2.isSelected()) {
+                    cambiarValores();
+                } else {
+                    borrarValores();
+                }
+            });
+            buttonNo.setOnAction((ActionEvent e) -> {
+                dialogStage.close();
+            });
+            dialogStage.show();
+        } else {
+            DialogUtil.error("Historial Laboral", "No has seleccionado ningun empleado.");
+        }
+    }
+    
+    public void cambiarValores() {
+        loadingMode();
+        try {
+            ArrayList<EmpleadoTable> empleadosMarcados = new ArrayList<>();
+
+            for (EmpleadoTable empleadoTable: 
+                    (List<EmpleadoTable>) empleadosTableView.getItems()) {
+                if (empleadoTable.getAgregar()) {
+                    empleadosMarcados.add(empleadoTable);
+                }
+            }
+
+            for (EmpleadoTable empleadoTable: empleadosMarcados) {
+                PlanillaIess planillaIess = new PlanillaIess();
+                planillaIess.setFecha(new Timestamp((new DateTime()).getMillis()));
+                planillaIess.setInicioMes(inicio.getFecha());
+                planillaIess.setFinMes(fin.getFecha());
+                planillaIess.setUsuario(empleadoTable.getUsuario());
+                planillaIess.setMonto(round(empleadoTable.getMontoAlternativo()));
+                new PlanillaIessDAO().save(planillaIess);
+
+                if (empleadoTable.getPlanillaIess() != null) {
+                    PlanillaIess planillaDelete = empleadoTable.getPlanillaIess();
+                    System.out.println("Borrando planilla: " + planillaDelete.getId());
+                    new PlanillaIessDAO().delete(planillaDelete);
+                    HibernateSessionFactory.getSession().flush();
+                }
+
+                empleadoTable.setMonto(planillaIess.getMonto().toString());
+                empleadoTable.setPlanillaIess(planillaIess);
+                empleadoTable.setPlanilla(true);
+                data.set(data.indexOf(empleadoTable), empleadoTable);
+                // Registro para auditar
+                String detalles = "modifico el calculo de historial laboral"
+                        + " del mes "+Fechas.getFechaSoloMesYAno(inicio)
+                        +" para el empleado "+ empleadoTable.getNombre()+" "
+                        +empleadoTable.getApellido()+ " a la formula especial.";
+                aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+            }
+            updateWindows();
+        } catch (Exception e) {
+            e.printStackTrace();
+            error();
+        }
+    }
+    
+    public void borrarValores() {
+        loadingMode();
+        try {
+            ArrayList<EmpleadoTable> empleadosMarcados = new ArrayList<>();
+
+            for (EmpleadoTable empleadoTable: 
+                    (List<EmpleadoTable>) empleadosTableView.getItems()) {
+                if (empleadoTable.getAgregar()) {
+                    empleadosMarcados.add(empleadoTable);
+                }
+            }
+            for (EmpleadoTable empleadoTable: empleadosMarcados) {
+                if (empleadoTable.getPlanillaIess() != null) {
+                    System.out.println("Borrando planilla: " + empleadoTable.getPlanillaIess().getId());
+                    PlanillaIess planillaIessDelete = new PlanillaIessDAO()
+                            .findById(empleadoTable.getPlanillaIess().getId());
+                    new PlanillaIessDAO().delete(planillaIessDelete);
+                    HibernateSessionFactory.getSession().flush();
+
+                    empleadoTable.setPlanillaIess(null);
+                    empleadoTable.setPlanilla(false);
+                    data.set(data.indexOf(empleadoTable), empleadoTable);
+                }
+
+                // Registro para auditar
+                String detalles = "modifico el calculo de historial laboral"
+                    + " del mes "+Fechas.getFechaSoloMesYAno(inicio)
+                    +" para el empleado "+ empleadoTable.getNombre()+" "
+                    +empleadoTable.getApellido()+ " a la formula original.";
+                aplicacionControl.au.saveEdito(detalles, aplicacionControl.permisos.getUsuario());
+            }
+            updateWindowsBorrado();;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            error();
+        }
     }
     
     public void completado() {
@@ -509,14 +662,13 @@ public class HistorialLaboralController implements Initializable {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setResizable(false);
-        dialogStage.setTitle("");
+        dialogStage.setTitle("Historial Laboral");
         String stageIcon = AplicacionControl.class
                 .getResource("imagenes/completado.png").toExternalForm();
         dialogStage.getIcons().add(new Image(stageIcon));
         Button buttonOk = new MaterialDesignButtonBlue("ok");
         dialogStage.setScene(new Scene(VBoxBuilder.create().spacing(20).
-        children(new Text("Se guardaron las planillas con exito."),
-                new Text("Para que aparezca el monto real debe borrar las planillas"), buttonOk).
+        children(new Text("Se modifico la formula de historial laboral con exito."), buttonOk).
         alignment(Pos.CENTER).padding(new Insets(10)).build()));
         buttonOk.setMaxWidth(50);
         buttonOk.setOnAction((ActionEvent e) -> {
@@ -571,13 +723,11 @@ public class HistorialLaboralController implements Initializable {
         
         checkBoxTodos.setSelected(false);
         contador.setText("");
-        
-        PagoMesItemDAO pagoMesItemDAO = new PagoMesItemDAO();
-        ingresos = new ArrayList<>();
-        
+       
         PlanillaIessDAO planillaIessDAO = new PlanillaIessDAO();
-        planillaIesses = new ArrayList<>();
-        planillaIesses.addAll(planillaIessDAO.findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId()));
+        List<PlanillaIess> planillaIesses = new ArrayList<>();
+        planillaIesses.addAll(planillaIessDAO
+                .findAllByFechaAndEmpresaId(inicio.getFecha(), empresa.getId()));
         
         data = FXCollections.observableArrayList(); 
         usuarios.stream().map((user) -> {
@@ -595,60 +745,73 @@ public class HistorialLaboralController implements Initializable {
                     .getCargo().getNombre());
             empleado.setUsuario(user);
             Double historial = 0d; 
+            Double montoCalculado = 0d; 
+            Double montoAlternativo = 0d; 
             Boolean encontrado = false;
             
             for (PlanillaIess planillaIess: planillaIesses) {
                 if (planillaIess.getUsuario().getId().equals(user.getId())) {
                     historial = planillaIess.getMonto();
                     encontrado = true;
+                    empleado.setPlanillaIess(planillaIess);
                 }
             }
-            if (!encontrado) {
-                RolIndividual rol = new RolIndividualDAO()
-                        .findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), 
-                            user.getId(), Const.ROL_PAGO_INDIVIDUAL);
-                
-                Fecha inicioVac = new Fecha("01", "01", inicio.getAno())
-                    .minusYears(1);
-                
-                PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
-                    .findInDeterminateTimeByUsuarioId(inicioVac.getFecha(), empleado.getId());
-                
-                if (rol != null) {
-                    Double sueldo = rol.getSueldo();
-                    if (rol.getDias() < 30.0d) {
-                        List<ControlDiario> controlesDiarios = new ControlDiarioDAO()
-                                .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), 
-                                        inicio.getFecha(), fin.getFecha());
-                        Integer permisos = 0;
-                        for (ControlDiario control:
-                                controlesDiarios) {
-                            if (control.getCaso().equals(Const.PERMISO)) {
+            
+            RolIndividual rol = new RolIndividualDAO()
+                    .findByFechaAndEmpleadoIdAndDetalles(inicio.getFecha(), 
+                        user.getId(), Const.ROL_PAGO_INDIVIDUAL);
+
+            Fecha inicioVac = new Fecha("01", "01", inicio.getAno())
+                .minusYears(1);
+
+            PagoVacaciones pagoVacaciones = new PagoVacacionesDAO()
+                .findInDeterminateYearByUsuarioId(inicioVac.getAno(), empleado.getId());
+
+            if (rol != null) {
+                empleado.setRolIndividual(rol);
+                Double sueldo = rol.getSueldo();
+                if (rol.getDias() < 30.0d) {
+                    List<ControlDiario> controlesDiarios = new ControlDiarioDAO()
+                            .findAllByEmpleadoIdInDeterminateTime(empleado.getId(), 
+                                    inicio.getFecha(), fin.getFecha());
+                    Integer permisos = 0;
+                    int descansosMedicos = 0;
+                    for (ControlDiario control:
+                            controlesDiarios) {
+                        if (control.getCaso().equals(Const.PERMISO)) {
+                            permisos++;
+                        }
+                        if (control.getCaso().equals(Const.DM)) {
+                            descansosMedicos++;
+                            if (descansosMedicos > 3) {
                                 permisos++;
                             }
-                        }
-                        if (permisos > 0) {
-                            sueldo = (sueldo/30.0d)*(30.0d-permisos.doubleValue());
+                        } else {
+                            descansosMedicos = 0;
                         }
                     }
-                    /**********************************************************/
-                    //sueldo + sobretiempos + bonos + vacaciones - sueldo básico
-                    /**********************************************************/
-                     if (rol.getUsuario().getApellido().toLowerCase().contains("cardozo")) {
-                         if (pagoVacaciones == null)
-                            System.out.println("pagoVacaciones es nulo");
-                         else {
-                             System.out.println("tiene pago de vacaciones");
-                         }
-                     }
-                    historial = rol.getSalario() + rol.getTotalMontoHorasExtras() 
-                            + getVacacionesFromThisMonth(pagoVacaciones)
-                            + rol.getTotalBonos() - sueldo;
+                    if (permisos > 0) {
+                        System.out.println("dias permiso "+permisos.toString()+" "+user.getApellido());
+                        sueldo = (sueldo/30.0d)*(30.0d-permisos.doubleValue());
+                    }
                 }
+                /**********************************************************/
+                //sueldo + sobretiempos + bonos + vacaciones - sueldo básico
+                /**********************************************************/
+                Double vacaciones = getVacacionesFromThisMonth(pagoVacaciones);
+                montoCalculado = rol.getSalario() + rol.getTotalMontoHorasExtras() 
+                        + vacaciones
+                        + rol.getTotalBonos() - sueldo;
+                montoAlternativo = rol.getTotalMontoHorasExtras() 
+                        + vacaciones
+                        + rol.getTotalBonos();
             }
-            historial = round(historial);
+            
+            if (encontrado) { historial = round(historial); }
+            else { historial = round(montoCalculado); }
             empleado.setPlanilla(encontrado);
             empleado.setMonto(historial.toString());
+            empleado.setMontoAlternativo(montoAlternativo.toString());
             return empleado;
         }).forEach((empleado) -> {
             data.add(empleado);
@@ -715,14 +878,8 @@ public class HistorialLaboralController implements Initializable {
                 } 
             } else {
                 if (inicio.getMesInt() == mes1int) {
-                    System.out.println(pagoVacaciones.getValor());
                     return pagoVacaciones.getValor();
                 }
-            }
-            if (pagoVacaciones.getUsuario().getApellido().toLowerCase().contains("cardozo")) {
-                System.out.println(pagoVacaciones.getValor());
-                System.out.println(montoMes1Dou);
-                System.out.println(montoMes2Dou);
             }
             if (inicio.getMesInt() == mes1int) {
                 return montoMes1Dou;
@@ -818,7 +975,7 @@ public class HistorialLaboralController implements Initializable {
                 });
                 
                 if (empleadoTable.getPlanilla()) {
-                    getTableRow().setStyle("-fx-background-color:#A5D6A7");
+                    getTableRow().setStyle("-fx-background-color:#EEE8AA");
                 } else {
                     getTableRow().setStyle("");
                 }
@@ -884,6 +1041,23 @@ public class HistorialLaboralController implements Initializable {
                     + "-fx-background-repeat: stretch; "
                     + "-fx-background-color: transparent;");
         });
+        buttonChange.setTooltip(
+            new Tooltip("Cambiar Monto")
+        );
+        buttonChange.setOnMouseEntered((MouseEvent t) -> {
+            buttonChange.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/change_historial.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: #29B6F6;");
+        });
+        buttonChange.setOnMouseExited((MouseEvent t) -> {
+            buttonChange.setStyle("-fx-background-image: "
+                    + "url('aplicacion/control/imagenes/change_historial.png'); "
+                    + "-fx-background-position: center center; "
+                    + "-fx-background-repeat: stretch; "
+                    + "-fx-background-color: transparent;");
+        });
         
         buttonAnterior.setTooltip(
             new Tooltip("Mes Anterior")
@@ -942,6 +1116,16 @@ public class HistorialLaboralController implements Initializable {
         } else {
             checkBoxTodos.setSelected(false);
         }
+    }
+    
+    public int getCount() {
+        List<EmpleadoTable> empleadosTable = new ArrayList<>();
+        for (EmpleadoTable empleado: (List<EmpleadoTable>) data) {
+            if (empleado.getAgregar())
+                empleadosTable.add(empleado);
+        }
+         int count = empleadosTable.size();
+        return count;
     }
     
     private Double getVacaciones(Usuario user) { // TODO; revisar
@@ -1070,5 +1254,4 @@ public class HistorialLaboralController implements Initializable {
     public void onClickLoginButton(ActionEvent event) {
         aplicacionControl.login(login, usuarioLogin);
     }
-
 }

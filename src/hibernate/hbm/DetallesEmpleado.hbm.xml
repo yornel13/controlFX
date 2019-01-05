@@ -34,6 +34,9 @@
         <property name="extra" type="java.lang.String">
             <column name="extra" length="65535" />
         </property>
+        <property name="observacion" type="java.lang.String">
+          <column length="500" name="observacion"/>
+        </property>
         <property name="fechaInicio" type="java.sql.Timestamp">
             <column name="fecha_inicio" length="19" />
         </property>

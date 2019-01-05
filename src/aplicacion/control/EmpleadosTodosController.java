@@ -74,9 +74,6 @@ public class EmpleadosTodosController implements Initializable {
     private TableColumn apellidoColumna;
     
     @FXML 
-    private TableColumn telefonoColumna;
-    
-    @FXML 
     private TableColumn empresaColumna;
     
     @FXML 
@@ -380,8 +377,6 @@ public class EmpleadosTodosController implements Initializable {
        
         apellidoColumna.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         
-        telefonoColumna.setCellValueFactory(new PropertyValueFactory<>("telefono"));
-        
         empresaColumna.setCellValueFactory(new PropertyValueFactory<>("empresa"));
         
         cargoColumna.setCellValueFactory(new PropertyValueFactory<>("cargo"));
@@ -467,7 +462,7 @@ public class EmpleadosTodosController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.VER)) {
                
-               aplicacionControl.mostrarEmpleado(empleado);
+               aplicacionControl.mostrarEmpleado(empleado, true);
                   
             } else {
                aplicacionControl.noPermitido();

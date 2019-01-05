@@ -162,7 +162,7 @@ public class EmpleadosController implements Initializable {
         } else {
             if (aplicacionControl.permisos.getPermiso(Permisos.EMPLEADOS, Permisos.Nivel.VER)) {
                
-               aplicacionControl.mostrarEmpleado(empleado);
+               aplicacionControl.mostrarEmpleado(empleado, false);
                   
             } else {
                aplicacionControl.noPermitido();

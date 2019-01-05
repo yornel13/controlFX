@@ -39,7 +39,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBoxBuilder;
@@ -95,7 +97,7 @@ public class RegistrarEmpleadoController implements Initializable {
     private TextField cuentaField;
     
     @FXML
-    private TextField extraField;
+    private TextArea extraField;
     
     @FXML
     private TextField sueldoField;
@@ -154,6 +156,8 @@ public class RegistrarEmpleadoController implements Initializable {
     
     @FXML
     private void onCLickGuardar(ActionEvent event) throws IOException, Exception {
+        errorText1.setText("");
+        errorText2.setText("");
         if (nombreField.getText().isEmpty()) {
             errorText1.setText("Debe ingresar un nombre");
             errorText2.setText("Debe ingresar un nombre");
@@ -208,7 +212,7 @@ public class RegistrarEmpleadoController implements Initializable {
                 detallesEmpleado.setCargo(cargos.get(cargoChoiceBox.getSelectionModel().getSelectedIndex()));
                 detallesEmpleado.setFechaInicio(Timestamp.valueOf(datePickerInicio.getValue().atStartOfDay()));
                 detallesEmpleado.setFechaContrato(Timestamp.valueOf(datePickerContratacion.getValue().atStartOfDay()));
-                //detallesEmpleado.setExtra(extraField.getText()); TODO, extra elimando
+                detallesEmpleado.setObservacion(extraField.getText());
                 detallesEmpleado.setNroCuenta(cuentaField.getText());
                 detallesEmpleado.setSueldo(Double.parseDouble(sueldoField.getText()));
                 detallesEmpleado.setQuincena(0d);
@@ -323,6 +327,9 @@ public class RegistrarEmpleadoController implements Initializable {
         sueldoField.addEventFilter(KeyEvent.KEY_TYPED, numDecimalFilter());
         
         cedulaField.addEventFilter(KeyEvent.KEY_TYPED, numFilter());
+        
+        extraField.setTextFormatter(new TextFormatter<>(change -> 
+            change.getControlNewText().length() <= 500 ? change : null));
     }    
     
     public static EventHandler<KeyEvent> numDecimalFilter() {

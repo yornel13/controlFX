@@ -75,6 +75,7 @@ import javafx.scene.control.TableCell;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import static aplicacion.control.util.Fechas.getFechaConMes;
 import static aplicacion.control.util.Numeros.round;
+import java.util.Collection;
 
 /**
  *
@@ -216,15 +217,45 @@ public class DescuentosTodosEmpleadosController implements Initializable {
         ReporteDescuentosVarios datasource = new ReporteDescuentosVarios();
         
         
-        List<DescuentoTable> descuentos = new ArrayList<>();
+        List<DescuentoTable> descuentosToPrint = new ArrayList<>();
         String tipo = "";
         int count = 0;
         Double total = 0d;
         int fullCount = 0;
         Double fullTotal = 0d;
         
+        /**
+         * For organize array descuentos
+         */
+        HashMap<String, List<DescuentoTable>> descuentosHash = new HashMap<>();
+        
         for (DescuentoTable descuentoTable: (List<DescuentoTable>) 
                 empleadosTableView.getItems()) {
+            
+            String tipoDeudaNombre = descuentoTable.getTipoDeuda().getNombre();
+            if (!descuentosHash.containsKey(tipoDeudaNombre)) {
+                List<DescuentoTable> list = new ArrayList<>();
+                list.add(descuentoTable);
+
+                descuentosHash.put(tipoDeudaNombre, list);
+            } else {
+                descuentosHash.get(tipoDeudaNombre).add(descuentoTable);
+            }
+        }
+        
+        List<DescuentoTable> descuentosArray = new ArrayList<>();
+        for (Map.Entry<String, List<DescuentoTable>> descuentosList: 
+                descuentosHash.entrySet()) {
+            
+            for (DescuentoTable descuentoTable: descuentosList.getValue()) {
+                descuentosArray.add(descuentoTable);
+            }
+        }
+        /**
+         * For organize array descuentos
+         */
+        
+        for (DescuentoTable descuentoTable: descuentosArray) {
             
             fullCount ++;
             fullTotal += descuentoTable.getValor();
@@ -238,12 +269,12 @@ public class DescuentosTodosEmpleadosController implements Initializable {
                     title.setNombres("TOTAL POR CUENTA:     "+count);
                     title.setCedula("");
                     title.setValor(total);
-                    descuentos.add(title);
+                    descuentosToPrint.add(title);
                     
                     DescuentoTable espacio = new DescuentoTable();
                     espacio.setNombres("");
                     espacio.setCedula("");
-                    descuentos.add(espacio);
+                    descuentosToPrint.add(espacio);
                     count = 0;
                     total = 0d;
                 }
@@ -253,22 +284,22 @@ public class DescuentosTodosEmpleadosController implements Initializable {
                 DescuentoTable title = new DescuentoTable();
                 title.setNombres(descuentoTable.getTipo());
                 title.setCedula("");
-                descuentos.add(title);
+                descuentosToPrint.add(title);
             }
             tipo = descuentoTable.getTipo();
             
-            descuentos.add(descuentoTable);
+            descuentosToPrint.add(descuentoTable);
         }
         
-        if (descuentos.size() > 1) {
+        if (descuentosToPrint.size() > 1) {
             DescuentoTable title = new DescuentoTable();
             title.setNombres("TOTAL POR CUENTA:     "+count);
             title.setCedula("");
             title.setValor(total);
-            descuentos.add(title);
+            descuentosToPrint.add(title);
         }
         
-        datasource.addAll(descuentos);
+        datasource.addAll(descuentosToPrint);
         
         try {
             InputStream inputStream = new FileInputStream(Const.REPORTE_DESCUENTOS_EMPLEADOS);
@@ -288,7 +319,7 @@ public class DescuentosTodosEmpleadosController implements Initializable {
             JasperDesign jasperDesign = JRXmlLoader.load(inputStream);
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint;
-            if (descuentos.isEmpty())
+            if (descuentosToPrint.isEmpty())
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
             else
                 jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, datasource);
@@ -515,7 +546,10 @@ public class DescuentosTodosEmpleadosController implements Initializable {
     }
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {   
+    public void initialize(URL url, ResourceBundle rb) {  
+        
+        System.out.println("Descuentos todos los los empleados");
+        
         empleadosTableView.setEditable(Boolean.FALSE);
         
         cedulaColumna.setCellValueFactory(new PropertyValueFactory<>("cedula"));

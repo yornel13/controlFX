@@ -1221,7 +1221,7 @@ public class AplicacionControl extends Application {
        }
     }
     
-    public void mostrarEmpleado(Usuario empleado) {
+    public void mostrarEmpleado(Usuario empleado, Boolean change) {
         if (permisos == null) {
            noLogeado();
         } else {
@@ -1241,6 +1241,8 @@ public class AplicacionControl extends Application {
                     controller.setStagePrincipal(ventana);
                     controller.setProgramaPrincipal(this);
                     controller.setEmpleado(empleado);
+                    if (change)
+                        controller.showChangeEmpresa();
                     ventana.show();
                     au.saveRegistro(au.INGRESO, au.EMPLEADO, permisos.getUsuario(), empleado.getNombre());
                 } catch (Exception e) {
